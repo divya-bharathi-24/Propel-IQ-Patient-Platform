@@ -21,7 +21,7 @@ The Unified Patient Access & Clinical Intelligence Platform is a standalone heal
 
 - AG-1: Trust-First AI Architecture — every AI-generated output flows through a mandatory human verification workflow before finalization, ensuring clinical safety and accountability
 - AG-2: HIPAA Compliance by Design — encryption (AES-256 at rest, TLS 1.2+ in transit), immutable audit logging, and role-based access control are embedded at every architectural layer
-- AG-3: Modular Microservices — independently deployable services with clear bounded contexts enabling team autonomy and targeted scaling
+- AG-3: Modular Monolith — single deployable unit with distinct bounded modules (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) enabling team autonomy within a deployable footprint compatible with free-tier hosting; clear boundaries enable future extraction to microservices post-Phase 1
 - AG-4: Free-Tier Deployability — all technology choices provide viable free-tier hosting options for Phase 1, with documented migration paths to paid infrastructure
 - AG-5: Measurable Outcomes — architecture supports built-in metrics collection for AI agreement rate, no-show reduction, and clinical prep time benchmarks
 - AG-6: Graceful Degradation — external service failures (calendar APIs, SMS/email, AI model providers) degrade functionality without blocking core booking and clinical workflows
@@ -121,23 +121,24 @@ The Unified Patient Access & Clinical Intelligence Platform is a standalone heal
 
 **Status:** Applicable
 
-**Rationale:** The upstream spec.md contains 7 `[AI-CANDIDATE]` and 7 `[HYBRID]` tagged functional requirements, covering conversational patient intake, clinical document extraction, medical coding (ICD-10/CPT), 360-degree patient view aggregation, data conflict detection, and no-show risk assessment. These features require natural language understanding, unstructured document processing, and pattern recognition capabilities that are well-suited for GenAI integration.
+**Rationale:** The upstream spec.md contains 8 `[AI-CANDIDATE]` and 4 `[HYBRID]` tagged functional requirements (FR-016, FR-028, FR-030, FR-045, FR-046, FR-047, FR-048, FR-050, FR-051, FR-052, FR-054, FR-056), covering conversational patient intake, clinical document extraction, medical coding (ICD-10/CPT), 360-degree patient view aggregation, data conflict detection, and no-show risk assessment. These features require natural language understanding, unstructured document processing, and pattern recognition capabilities that are well-suited for GenAI integration.
 
 **AI Fit Classification:**
 
 | Feature                                      | AI Fit Score (1-5) | Classification | Rationale                                                           |
 | -------------------------------------------- | ------------------ | -------------- | ------------------------------------------------------------------- |
 | AI Conversational Intake (FR-016)            | 5                  | HIGH-FIT       | NLU-based multi-turn conversation for structured data collection    |
-| Intake Mode Switch (FR-018)                  | 3                  | HYBRID         | AI state transfer combined with deterministic form rendering        |
-| Clinical Document Extraction (FR-032)        | 5                  | HIGH-FIT       | PDF to structured data extraction requiring NLU and layout analysis |
-| Post-visit Notes Processing (FR-033)         | 5                  | HIGH-FIT       | Unstructured clinical text to structured data extraction            |
-| 360° Patient View Aggregation (FR-034)       | 3                  | HYBRID         | AI performs initial extraction and de-duplication; staff verifies   |
-| Conflict Detection and Highlighting (FR-035) | 3                  | HYBRID         | AI flags conflicting data points; staff resolves                    |
-| Staff Verification Workflow (FR-036)         | 2                  | HYBRID         | Human-in-the-loop confirmation of AI outputs                        |
-| ICD-10 Code Suggestion (FR-037)              | 5                  | HIGH-FIT       | Medical terminology extraction and standardized code mapping        |
-| CPT Code Mapping (FR-038)                    | 5                  | HIGH-FIT       | Procedure identification and standardized code mapping              |
-| Medical Code Review (FR-039)                 | 3                  | HYBRID         | AI suggests codes with confidence; staff accepts or modifies        |
-| No-show Risk Assessment (FR-040)             | 3                  | HYBRID         | Rule-based factors augmented by AI historical pattern analysis      |
+| No-show Risk Assessment (FR-028)             | 4                  | HIGH-FIT       | AI pattern recognition over historical appointment behavioral data  |
+| High-risk Flagging & Intervention (FR-030)   | 3                  | HYBRID         | AI flags High-risk; Staff explicitly accepts or dismisses actions   |
+| Clinical Document Extraction (FR-045)        | 5                  | HIGH-FIT       | PDF to structured data extraction requiring NLU and layout analysis |
+| Data Aggregation & De-duplication (FR-046)   | 4                  | HIGH-FIT       | Semantic similarity scoring to merge equivalent clinical elements   |
+| Staff 360° View Verification (FR-047)        | 3                  | HYBRID         | AI performs extraction and de-duplication; staff verifies output    |
+| 2-Minute Clinical Retrieval SLA (FR-048)     | 4                  | HIGH-FIT       | AI pre-aggregates and pre-structures data to achieve time target    |
+| ICD-10 Code Suggestion (FR-050)              | 5                  | HIGH-FIT       | Medical terminology extraction and standardized code mapping        |
+| CPT Code Mapping (FR-051)                    | 5                  | HIGH-FIT       | Procedure identification and standardized code mapping              |
+| Medical Code Staff Review (FR-052)           | 3                  | HYBRID         | AI suggests codes with evidence; staff confirms or rejects each     |
+| Conflict Detection Across Documents (FR-054) | 4                  | HIGH-FIT       | AI semantic comparison identifies contradictory clinical values     |
+| Conflict Resolution Workflow (FR-056)        | 3                  | HYBRID         | AI highlights conflicts; staff selects authoritative value          |
 
 **Decision Gate:** Multiple features score 4-5 → PROCEED with full AI Requirements (AIR-XXX) section and AI Architecture Pattern.
 
@@ -187,11 +188,11 @@ The Unified Patient Access & Clinical Intelligence Platform is a standalone heal
 
 **Pattern Selection Rationale:**
 
-| Pattern        | Applied To                                                                                     | Rationale                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| RAG            | Clinical document extraction (AIR-001), 360° patient view (FR-034), post-visit notes (AIR-008) | Requires grounding in patient-specific uploaded documents with citation support    |
-| Tool Calling   | ICD-10 code suggestion (AIR-005), CPT code mapping (AIR-006), insurance validation (FR-029)    | Requires structured lookups against medical code databases and validation datasets |
-| Conversational | AI intake (AIR-004)                                                                            | Multi-turn natural language dialogue with structured data extraction               |
+| Pattern        | Applied To                                                                                                               | Rationale                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| RAG            | Clinical document extraction (AIR-001), 360° patient view aggregation (FR-046, FR-048), post-visit notes upload (FR-044) | Requires grounding in patient-specific uploaded documents with citation support    |
+| Tool Calling   | ICD-10 code suggestion (AIR-005), CPT code mapping (AIR-006), insurance validation (FR-038)                              | Requires structured lookups against medical code databases and validation datasets |
+| Conversational | AI intake (AIR-004)                                                                                                      | Multi-turn natural language dialogue with structured data extraction               |
 
 **Trust-First Verification Flow:**
 
@@ -206,7 +207,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 
 ## Architecture and Design Decisions
 
-- **AD-1: Microservices over Monolith** — The platform decomposes into independently deployable services (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) to enable targeted scaling and team autonomy. Justified by NFR-016 (horizontal scaling) and the distinct bounded contexts between scheduling and clinical intelligence
+- **AD-1: Modular Monolith over Distributed Microservices** — The platform is structured as a single deployable unit with clearly separated bounded modules (Auth, Patient, Appointment, Clinical, AI, Notification, Admin), enabling team autonomy and clear domain boundaries without the operational complexity of distributed services. This aligns with the free-tier hosting constraint and Phase 1 scope. Justified by NFR-003 (99.9% uptime without distributed tracing overhead), NFR-016 (internal module boundaries enable future extraction to microservices), and the free-tier infrastructure constraint (running 7+ independent services on free tiers is not viable)
 - **AD-2: CQRS within Services** — Each service separates command (write) and query (read) paths using MediatR, enabling optimized read models for dashboards (staff scheduling, 360° patient view) without impacting write performance. Justified by NFR-001 (2-second API response) and NFR-010 (100 concurrent users)
 - **AD-3: Event-Driven Async Processing** — Waitlist swap notifications, AI document processing, reminder scheduling, and calendar sync use asynchronous event-driven patterns to avoid blocking synchronous user flows. Justified by NFR-002 (AI latency tolerance) and NFR-018 (graceful degradation)
 - **AD-4: API Gateway Pattern** — A single entry point handles cross-cutting concerns (authentication, rate limiting, request routing, correlation ID injection) before forwarding to downstream services. Justified by NFR-006 (RBAC), NFR-017 (rate limiting), and NFR-014 (input validation)
@@ -222,10 +223,10 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | --------------------------------- | ---------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
 | Frontend                          | Angular                                  | 18.x       | NFR-012 (Core Web Vitals), NFR-010 (reactive forms for complex intake/booking), NFR-014 (client-side validation) |
 | Frontend State                    | NgRx Signals                             | 18.x       | NFR-001 (responsive UI), NFR-020 (real-time slot updates)                                                        |
-| Backend                           | ASP.NET Core Web API                     | .NET 8     | NFR-016 (microservices, horizontal scaling), NFR-013 (HIPAA ecosystem), NFR-001 (high throughput)                |
+| Backend                           | ASP.NET Core Web API                     | .NET 9     | NFR-016 (microservices, horizontal scaling), NFR-013 (HIPAA ecosystem), NFR-001 (high throughput)                |
 | Backend Messaging                 | MediatR                                  | 12.x       | NFR-016 (CQRS separation), AD-2 (command/query split)                                                            |
 | Backend Validation                | FluentValidation                         | 11.x       | NFR-014 (input validation), NFR-017 (request sanitization)                                                       |
-| ORM                               | Entity Framework Core                    | 8.x        | DR-009 (referential integrity), DR-013 (code-first migrations), DR-010 (soft delete)                             |
+| ORM                               | Entity Framework Core                    | 9.x        | DR-009 (referential integrity), DR-013 (code-first migrations), DR-010 (soft delete)                             |
 | Database                          | PostgreSQL                               | 16+        | DR-001-DR-018 (all data storage), NFR-004 (pgcrypto encryption), free licensing                                  |
 | Vector Store                      | pgvector (PostgreSQL extension)          | 0.7+       | AIR-R01 (embedding storage), AIR-R02 (similarity search), AD-5 (collocated)                                      |
 | Cache                             | Upstash Redis                            | Serverless | NFR-007 (session TTL), NFR-020 (slot cache), AD-8 (serverless free tier)                                         |
@@ -256,7 +257,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | Frontend         | React 19                | Angular's built-in reactive forms, signals, and dependency injection provide stronger support for complex healthcare forms and enterprise patterns; Angular prescribed by BRD |
 | Frontend         | Blazor WASM             | Larger bundle size, less mature component ecosystem for healthcare UI patterns; not prescribed by BRD                                                                         |
 | Backend          | Node.js/Express         | Lacks the mature healthcare ecosystem (.NET has Semantic Kernel, FHIR libraries), weaker type safety for complex domain models                                                |
-| Backend          | Java Spring Boot        | Higher memory footprint on free-tier hosting, longer startup times; .NET 8 prescribed by BRD                                                                                  |
+| Backend          | Java Spring Boot        | Higher memory footprint on free-tier hosting, longer startup times; .NET 9 prescribed by BRD                                                                                  |
 | Database         | SQL Server              | Licensing cost violates free-tier constraint; PostgreSQL offers equivalent features with pgvector for AI embeddings                                                           |
 | Database         | MongoDB                 | Weaker referential integrity for healthcare data compliance; PostgreSQL JSONB provides sufficient document flexibility                                                        |
 | Vector Store     | Pinecone                | Additional infrastructure cost and operational complexity; pgvector is free and collocated with PostgreSQL                                                                    |
@@ -284,7 +285,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | Real-time Updates (NFR-020)     | 9/10       | 8/10     | Signals + RxJS for reactive state               |
 | BRD Alignment                   | 10/10      | 0/10     | Prescribed technology                           |
 
-| Metric (from NFR/DR/AIR)  | .NET 8 | Node.js | Rationale                                    |
+| Metric (from NFR/DR/AIR)  | .NET 9 | Node.js | Rationale                                    |
 | ------------------------- | ------ | ------- | -------------------------------------------- |
 | HIPAA Ecosystem (NFR-013) | 9/10   | 6/10    | Mature healthcare libraries, Semantic Kernel |
 | AI Integration (AIR-001)  | 9/10   | 8/10    | Semantic Kernel native, Azure OpenAI SDK     |
@@ -301,8 +302,8 @@ All AI-generated outputs follow a mandatory verification pipeline:
 ## Technical Requirements
 
 - TR-001: System MUST use Angular 18 with standalone components and signals for the frontend application [justified by NFR-012, NFR-010, NFR-014]
-- TR-002: System MUST use .NET 8 ASP.NET Core Web API with microservices architecture for backend services [justified by NFR-016, NFR-013, NFR-001]
-- TR-003: System MUST use Entity Framework Core 8 as the ORM with code-first migrations for database access [justified by DR-013, DR-009, DR-010]
+- TR-002: System MUST use .NET 9 ASP.NET Core Web API with modular service architecture for backend services [justified by NFR-016, NFR-013, NFR-001]
+- TR-003: System MUST use Entity Framework Core 9 as the ORM with code-first migrations for database access [justified by DR-013, DR-009, DR-010]
 - TR-004: System MUST use PostgreSQL 16+ as the primary relational database [justified by DR-001 through DR-018, free licensing constraint]
 - TR-005: System MUST use Upstash Redis for distributed caching, session management, and real-time appointment slot availability [justified by NFR-007, NFR-020]
 - TR-006: System MUST implement RESTful API design following OpenAPI 3.0 specification for all service endpoints [justified by NFR-014, NFR-017]
@@ -341,12 +342,12 @@ All AI-generated outputs follow a mandatory verification pipeline:
 - Neon PostgreSQL free tier provides adequate storage and compute for Phase 1 data volumes (estimated under 10,000 patient records, under 50,000 appointments)
 - SendGrid and Twilio free tiers provide sufficient monthly quotas for Phase 1 notification volumes
 - PDF clinical documents uploaded by patients are machine-readable (text-based PDFs); scanned image PDFs with OCR requirements are handled on a best-effort basis with lower confidence scores
-- The development team has proficiency in Angular 18, .NET 8, and PostgreSQL; AI/ML integration via Semantic Kernel may require ramp-up time
+- The development team has proficiency in Angular 18, .NET 9, and PostgreSQL; AI/ML integration via Semantic Kernel may require ramp-up time
 - Google Calendar API and Microsoft Graph API free tiers will remain available and sufficient for Phase 1 calendar sync volumes
 
 ## Development Workflow
 
-1. **Project Scaffolding** — Initialize Angular 18 workspace (standalone components, signals) and .NET 8 solution with microservice project structure (Auth, Patient, Appointment, Clinical, AI, Notification, Admin services), Docker Compose for local orchestration, and PostgreSQL with pgvector extension
+1. **Project Scaffolding** — Initialize Angular 18 workspace (standalone components, signals) and .NET 9 solution with modular project structure (Auth, Patient, Appointment, Clinical, AI, Notification, Admin modules), Docker Compose for local orchestration, and PostgreSQL with pgvector extension
 2. **Authentication and Authorization Service** — Implement JWT-based authentication with bcrypt/Argon2 password hashing, refresh token rotation, RBAC middleware, session management via Upstash Redis (15-minute TTL), and audit logging for auth events
 3. **Patient Management Service** — Implement patient registration with email verification, profile CRUD, and role-based data access (patients access own records only, staff access authorized scope)
 4. **Appointment Booking Service** — Implement slot management with real-time availability (Redis cache), booking CRUD, waitlist enrollment with FIFO swap logic, same-day queue management, appointment PDF generation (QuestPDF), and calendar sync integrations (Google, Outlook)
