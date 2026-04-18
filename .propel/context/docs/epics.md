@@ -35,7 +35,7 @@ post_date: "2026-04-17"
 
 ---
 
-## Epic Descriptions
+## Epic Description
 
 ---
 
