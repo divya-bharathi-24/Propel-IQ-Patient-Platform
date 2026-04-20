@@ -34,7 +34,7 @@
 
 | Layer              | Technology                          | Version    |
 | ------------------ | ----------------------------------- | ---------- |
-| Backend            | ASP.NET Core Web API                | .NET 9     |
+| Backend            | ASP.NET Core Web API                | .net 10     |
 | Backend Messaging  | MediatR                             | 12.x       |
 | Backend Validation | FluentValidation                    | 11.x       |
 | ORM                | Entity Framework Core               | 9.x        |
@@ -75,7 +75,7 @@
 
 ## Task Overview
 
-Implement the appointment slot availability read path in the ASP.NET Core .NET 9 Appointment Module. The core endpoint `GET /api/appointments/slots` is backed by a two-tier data strategy:
+Implement the appointment slot availability read path in the ASP.NET Core .net 10 Appointment Module. The core endpoint `GET /api/appointments/slots` is backed by a two-tier data strategy:
 
 1. **Redis cache (primary)** — key `slots:{specialtyId}:{date}` with a TTL of 5 seconds (satisfying NFR-020 ≤5s staleness). Served via `ISlotCacheService`.
 2. **PostgreSQL fallback** — when Redis is unavailable or the key is absent, the handler queries the `appointments` table via EF Core to compute available slots from the configured time grid minus booked/pending records. A structured Serilog warning is emitted on fallback.

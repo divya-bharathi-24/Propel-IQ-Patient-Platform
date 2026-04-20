@@ -33,8 +33,8 @@
 
 | Layer              | Technology            | Version |
 | ------------------ | --------------------- | ------- |
-| Backend            | ASP.NET Core Web API  | .NET 9  |
-| Background Jobs    | .NET BackgroundService (IHostedService) | .NET 9 |
+| Backend            | ASP.NET Core Web API  | .net 10  |
+| Background Jobs    | .NET BackgroundService (IHostedService) | .net 10 |
 | Backend Messaging  | MediatR               | 12.x    |
 | Backend Validation | FluentValidation      | 11.x    |
 | ORM                | Entity Framework Core | 9.x     |
@@ -74,7 +74,7 @@
 
 ## Task Overview
 
-Implement the no-show risk calculation engine and its supporting infrastructure in the ASP.NET Core .NET 9 backend (Risk/Appointment module).
+Implement the no-show risk calculation engine and its supporting infrastructure in the ASP.NET Core .net 10 backend (Risk/Appointment module).
 
 **Key deliverables:**
 
@@ -204,7 +204,7 @@ Propel-IQ-Patient-Platform/
 
 ## External References
 
-- [.NET 9 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/timer-service)
+- [.net 10 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/timer-service)
 - [.NET BackgroundService — scoped services in IHostedService (IServiceScopeFactory)](https://learn.microsoft.com/en-us/dotnet/core/extensions/scoped-service)
 - [EF Core 9 — JSONB mapping with Npgsql (List<T> column)](https://www.npgsql.org/efcore/mapping/json.html)
 - [EF Core 9 — UPSERT via ExecuteUpdateAsync / AddOrUpdate](https://learn.microsoft.com/en-us/ef/core/saving/execute-insert-update-delete)

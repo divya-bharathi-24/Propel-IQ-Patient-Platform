@@ -30,7 +30,7 @@
 
 | Layer                    | Technology                          | Version |
 | ------------------------ | ----------------------------------- | ------- |
-| Backend Runtime          | ASP.NET Core (Kestrel)              | .NET 9  |
+| Backend Runtime          | ASP.NET Core (Kestrel)              | .net 10  |
 | Frontend Hosting         | Netlify / Vercel                    | —       |
 | Backend Hosting          | Railway (free tier)                 | —       |
 | Database Hosting         | Neon PostgreSQL (free tier)         | —       |

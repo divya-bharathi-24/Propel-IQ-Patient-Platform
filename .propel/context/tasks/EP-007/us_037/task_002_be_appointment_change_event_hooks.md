@@ -29,7 +29,7 @@
 
 | Layer      | Technology           | Version |
 |------------|----------------------|---------|
-| Backend    | ASP.NET Core Web API | .NET 9  |
+| Backend    | ASP.NET Core Web API | .net 10  |
 | Messaging  | MediatR              | 12.x    |
 | ORM        | Entity Framework Core| 9.x     |
 | Database   | PostgreSQL           | 16+     |
@@ -194,8 +194,8 @@ Server/
 
 ## External References
 
-- [MediatR — INotificationHandler (.NET 9)](https://github.com/jbogard/MediatR/wiki)
-- [.NET 9 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
+- [MediatR — INotificationHandler (.net 10)](https://github.com/jbogard/MediatR/wiki)
+- [.net 10 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
 - [Task.Run fire-and-forget pattern with exception logging](https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/async-scenarios)
 - [SemaphoreSlim — throttling concurrent async operations](https://learn.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim)
 - [AD-3 — Event-driven async processing](../docs/design.md)

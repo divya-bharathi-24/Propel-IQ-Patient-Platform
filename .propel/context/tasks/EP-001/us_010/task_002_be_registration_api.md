@@ -34,14 +34,14 @@
 
 | Layer               | Technology                  | Version |
 | ------------------- | --------------------------- | ------- |
-| Backend             | ASP.NET Core Web API        | .NET 9  |
+| Backend             | ASP.NET Core Web API        | .net 10  |
 | Backend Messaging   | MediatR                     | 12.x    |
 | Backend Validation  | FluentValidation            | 11.x    |
 | ORM                 | Entity Framework Core       | 9.x     |
 | Password Hashing    | BCrypt.Net-Next / Isopoh.Cryptography.Argon2 | Latest |
 | Email Service       | SendGrid SDK for .NET       | Latest  |
 | Logging             | Serilog                     | 4.x     |
-| Rate Limiting       | ASP.NET Core Rate Limiting  | .NET 9  |
+| Rate Limiting       | ASP.NET Core Rate Limiting  | .net 10  |
 | Testing — Unit      | xUnit + Moq                 | 2.x     |
 | Database            | PostgreSQL                  | 16+     |
 | AI/ML               | N/A                         | N/A     |
@@ -77,7 +77,7 @@
 
 ## Task Overview
 
-Implement the backend registration and email-verification subsystem for EP-001 (Auth Module) using ASP.NET Core .NET 9 with a MediatR CQRS pattern. The feature covers three endpoints:
+Implement the backend registration and email-verification subsystem for EP-001 (Auth Module) using ASP.NET Core .net 10 with a MediatR CQRS pattern. The feature covers three endpoints:
 
 1. `POST /api/auth/register` — validates input, hashes password with Argon2, creates a `Patient` record, generates a secure verification token, stores the token hash, and dispatches a SendGrid verification email asynchronously.
 2. `GET /api/auth/verify?token={token}` — validates the token (existence, expiry, used status), activates the account, and writes an immutable AuditLog record.
@@ -206,7 +206,7 @@ Propel-IQ-Patient-Platform/
 
 ## External References
 
-- [ASP.NET Core .NET 9 — Minimal APIs and Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-9.0)
+- [ASP.NET Core .net 10 — Minimal APIs and Controllers](https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-9.0)
 - [MediatR 12 — CQRS Pattern](https://github.com/jbogard/MediatR/wiki)
 - [FluentValidation 11 — ASP.NET Core Integration](https://docs.fluentvalidation.net/en/latest/aspnet.html)
 - [Argon2 Password Hashing — OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)

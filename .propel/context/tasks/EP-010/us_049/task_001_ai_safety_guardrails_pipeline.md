@@ -36,7 +36,7 @@
 | ------------------- | -------------------------- | ---------- |
 | AI/ML Orchestration | Microsoft Semantic Kernel  | 1.x        |
 | AI/ML Provider      | OpenAI GPT-4o              | —          |
-| Backend             | ASP.NET Core Web API       | .NET 9     |
+| Backend             | ASP.NET Core Web API       | .net 10     |
 | Cache               | Upstash Redis              | Serverless |
 | Logging             | Serilog                    | 4.x        |
 

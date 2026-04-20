@@ -30,7 +30,7 @@
 
 | Layer               | Technology                   | Version  |
 |---------------------|------------------------------|----------|
-| Backend             | ASP.NET Core Web API         | .NET 9   |
+| Backend             | ASP.NET Core Web API         | .net 10   |
 | Calendar - Google   | Google Calendar API          | v3       |
 | Calendar - Outlook  | Microsoft Graph API          | v1.0     |
 | Auth                | OAuth 2.0 (token refresh)    | —        |

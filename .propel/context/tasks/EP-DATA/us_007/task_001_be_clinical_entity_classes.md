@@ -28,7 +28,7 @@
 
 | Layer      | Technology            | Version |
 | ---------- | --------------------- | ------- |
-| Backend    | ASP.NET Core Web API  | .NET 9  |
+| Backend    | ASP.NET Core Web API  | .net 10  |
 | ORM        | Entity Framework Core | 9.x     |
 | Database   | PostgreSQL            | 16+     |
 | Vector Store | pgvector (PostgreSQL extension) | 0.7+ |
@@ -205,8 +205,8 @@ public class IntakeRecord
 - [Npgsql EF Core — JSONB column type](https://www.npgsql.org/efcore/mapping/json.html)
 - [Npgsql EF Core — pgvector integration](https://www.npgsql.org/efcore/mapping/vector.html)
 - [pgvector — `text-embedding-3-small` dimension (1536)](https://platform.openai.com/docs/models/text-embedding-3-small)
-- [.NET 9 — `System.Text.Json.JsonDocument`](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/use-dom-utf8jsonreader-utf8jsonwriter)
-- [.NET 9 — Nullable reference types (CS8618)](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
+- [.net 10 — `System.Text.Json.JsonDocument`](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/use-dom-utf8jsonreader-utf8jsonwriter)
+- [.net 10 — Nullable reference types (CS8618)](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
 
 ## Build Commands
 

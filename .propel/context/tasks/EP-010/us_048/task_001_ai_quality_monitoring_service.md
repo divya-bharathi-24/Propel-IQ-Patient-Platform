@@ -36,7 +36,7 @@
 | ------------------ | ----------------------------- | ---------- |
 | AI/ML Orchestration | Microsoft Semantic Kernel    | 1.x        |
 | AI/ML Provider     | OpenAI GPT-4o                 | —          |
-| Backend            | ASP.NET Core Web API          | .NET 9     |
+| Backend            | ASP.NET Core Web API          | .net 10     |
 | Cache              | Upstash Redis                 | Serverless |
 | Logging            | Serilog                       | 4.x        |
 
@@ -180,7 +180,7 @@ Server/
 ## External References
 
 - [Semantic Kernel 1.x — IFunctionInvocationFilter](https://learn.microsoft.com/en-us/semantic-kernel/concepts/filters) — Post-process function results for validation and guardrails
-- [System.Text.Json.Schema (.NET 9)](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/schema) — `JsonSchemaExporter` for JSON schema validation in .NET 9
+- [System.Text.Json.Schema (.net 10)](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/schema) — `JsonSchemaExporter` for JSON schema validation in .net 10
 - [Serilog 4.x — Structured Logging](https://serilog.net/) — `Log.Warning(...)`, `Log.Fatal(...)` with property capture
 - [StackExchange.Redis — StringSetAsync with TTL](https://stackexchange.github.io/StackExchange.Redis/Basics.html) — Setting alert flags with 1-hour expiry
 - [AIR-Q01 (design.md)](../.propel/context/docs/design.md) — ≥98% AI-Human Agreement Rate target

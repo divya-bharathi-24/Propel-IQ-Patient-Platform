@@ -30,13 +30,13 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | ORM | Entity Framework Core | 9.x |
 | Database | PostgreSQL | 16+ |
 | Cache | Upstash Redis | Serverless |
 | Logging | Serilog | 4.x |
-| Background Services | ASP.NET Core IHostedService | .NET 9 |
+| Background Services | ASP.NET Core IHostedService | .net 10 |
 | AI/ML | N/A | N/A |
 | Mobile | N/A | N/A |
 

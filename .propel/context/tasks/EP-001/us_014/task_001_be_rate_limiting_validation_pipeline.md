@@ -32,8 +32,8 @@
 
 | Layer              | Technology                   | Version |
 | ------------------ | ---------------------------- | ------- |
-| Backend            | ASP.NET Core Web API         | .NET 9  |
-| Rate Limiting      | ASP.NET Core Rate Limiting   | .NET 9  |
+| Backend            | ASP.NET Core Web API         | .net 10  |
+| Rate Limiting      | ASP.NET Core Rate Limiting   | .net 10  |
 | Validation         | FluentValidation             | 11.x    |
 | Messaging          | MediatR                      | 12.x    |
 | Logging            | Serilog                      | 4.x     |

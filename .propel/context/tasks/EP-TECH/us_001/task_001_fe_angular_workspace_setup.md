@@ -59,7 +59,7 @@
 
 ## Task Overview
 
-Initialize the Angular 18 Single-Page Application (SPA) workspace for the Unified Patient Access & Clinical Intelligence Platform. The workspace must use standalone components as the default, enable Angular Signals for reactive state, scaffold an NgRx Signals store with at least one feature slice, configure ESLint with zero-error rules, enforce a minimum Node.js engine version, and produce an LCP-optimized production bundle (`ng build --configuration production`). This task is the foundational frontend artifact that all patient-facing and staff-facing UI feature stories depend on. It aligns with TR-001 (Angular 18 with standalone components and signals) and TR-002 (.NET 9 modular architecture for the backend, to be integrated later).
+Initialize the Angular 18 Single-Page Application (SPA) workspace for the Unified Patient Access & Clinical Intelligence Platform. The workspace must use standalone components as the default, enable Angular Signals for reactive state, scaffold an NgRx Signals store with at least one feature slice, configure ESLint with zero-error rules, enforce a minimum Node.js engine version, and produce an LCP-optimized production bundle (`ng build --configuration production`). This task is the foundational frontend artifact that all patient-facing and staff-facing UI feature stories depend on. It aligns with TR-001 (Angular 18 with standalone components and signals) and TR-002 (.net 10 modular architecture for the backend, to be integrated later).
 
 ## Dependent Tasks
 

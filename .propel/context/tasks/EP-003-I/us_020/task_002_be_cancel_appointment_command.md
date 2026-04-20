@@ -33,7 +33,7 @@
 
 | Layer              | Technology                          | Version    |
 | ------------------ | ----------------------------------- | ---------- |
-| Backend            | ASP.NET Core Web API                | .NET 9     |
+| Backend            | ASP.NET Core Web API                | .net 10     |
 | Backend Messaging  | MediatR                             | 12.x       |
 | Backend Validation | FluentValidation                    | 11.x       |
 | ORM                | Entity Framework Core               | 9.x        |
@@ -74,7 +74,7 @@
 
 ## Task Overview
 
-Implement the `POST /api/appointments/{id}/cancel` command in the ASP.NET Core .NET 9 Appointment Module. This command performs a coordinated cancellation that:
+Implement the `POST /api/appointments/{id}/cancel` command in the ASP.NET Core .net 10 Appointment Module. This command performs a coordinated cancellation that:
 
 1. Validates the requesting patient owns the appointment and the appointment is in the future
 2. Sets `Appointment.status = Cancelled` with a `cancellationReason`

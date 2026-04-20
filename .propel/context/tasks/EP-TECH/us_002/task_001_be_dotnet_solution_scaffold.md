@@ -5,7 +5,7 @@
 - User Story: [us_002]
 - Story Location: [.propel/context/tasks/EP-TECH/us_002/us_002.md]
 - Acceptance Criteria:
-  - AC1: Given the .NET 9 solution is scaffolded, When I run `dotnet build`, Then all seven module projects (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) compile successfully with zero errors.
+  - AC1: Given the .net 10 solution is scaffolded, When I run `dotnet build`, Then all seven module projects (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) compile successfully with zero errors.
   - AC2: Given the solution structure is created, When I inspect the module boundaries, Then each module has its own Commands, Queries, Handlers (MediatR), and Validators (FluentValidation) folders with no direct cross-module references.
   - AC3: Given the API Gateway is configured, When an HTTP request arrives, Then it passes through correlation ID injection middleware, RBAC middleware placeholder, and rate limiting middleware before routing to the appropriate module handler.
   - AC4: Given the solution is running, When I navigate to `/swagger`, Then the OpenAPI 3.0 Swagger UI loads with all scaffolded endpoints documented and JWT Bearer authentication configured.
@@ -30,7 +30,7 @@
 
 | Layer              | Technology                  | Version |
 |--------------------|-----------------------------|---------|
-| Backend            | ASP.NET Core Web API        | .NET 9  |
+| Backend            | ASP.NET Core Web API        | .net 10  |
 | Backend Messaging  | MediatR                     | 12.x    |
 | Backend Validation | FluentValidation            | 11.x    |
 | ORM                | Entity Framework Core       | 9.x     |
@@ -63,7 +63,7 @@
 
 ## Task Overview
 
-Scaffold the .NET 9 ASP.NET Core Web API backend solution for the Unified Patient Access & Clinical Intelligence Platform. The solution is structured as a modular monolith (AG-3) with a single deployable API gateway host (`Propel.Api.Gateway`) and seven isolated module class library projects: Auth, Patient, Appointment, Clinical, AI, Notification, and Admin. Each module encapsulates its own CQRS artefacts (Commands, Queries, Handlers) wired through MediatR 12.x (TR-019) and its own request validators via FluentValidation 11.x (TR-020). The gateway host implements a middleware pipeline providing correlation ID propagation, an RBAC stub, and ASP.NET Core built-in rate limiting before dispatching to module handlers. Swagger/OpenAPI 3.0 with JWT Bearer auth is exposed at `/swagger` (TR-006). Entity Framework Core 9 (TR-003) and PostgreSQL connection string configuration (TR-004) are registered in the host; Upstash Redis (TR-005) connection is configured as a placeholder — actual schema migrations and Redis usage are delivered in subsequent stories. This task enables all backend feature teams to develop within clearly separated domain modules from day one.
+Scaffold the .net 10 ASP.NET Core Web API backend solution for the Unified Patient Access & Clinical Intelligence Platform. The solution is structured as a modular monolith (AG-3) with a single deployable API gateway host (`Propel.Api.Gateway`) and seven isolated module class library projects: Auth, Patient, Appointment, Clinical, AI, Notification, and Admin. Each module encapsulates its own CQRS artefacts (Commands, Queries, Handlers) wired through MediatR 12.x (TR-019) and its own request validators via FluentValidation 11.x (TR-020). The gateway host implements a middleware pipeline providing correlation ID propagation, an RBAC stub, and ASP.NET Core built-in rate limiting before dispatching to module handlers. Swagger/OpenAPI 3.0 with JWT Bearer auth is exposed at `/swagger` (TR-006). Entity Framework Core 9 (TR-003) and PostgreSQL connection string configuration (TR-004) are registered in the host; Upstash Redis (TR-005) connection is configured as a placeholder — actual schema migrations and Redis usage are delivered in subsequent stories. This task enables all backend feature teams to develop within clearly separated domain modules from day one.
 
 ## Dependent Tasks
 
@@ -73,7 +73,7 @@ Scaffold the .NET 9 ASP.NET Core Web API backend solution for the Unified Patien
 
 | Component / Module                          | Action | Notes                                                     |
 |---------------------------------------------|--------|-----------------------------------------------------------|
-| `server/` (solution root)                   | CREATE | .NET 9 solution folder and `Propel.sln` file              |
+| `server/` (solution root)                   | CREATE | .net 10 solution folder and `Propel.sln` file              |
 | `server/Propel.Api.Gateway/`                | CREATE | ASP.NET Core Web API host; single deployable entry point  |
 | `server/Propel.Modules.Auth/`               | CREATE | Auth bounded module class library                         |
 | `server/Propel.Modules.Patient/`            | CREATE | Patient bounded module class library                      |
@@ -89,7 +89,7 @@ Scaffold the .NET 9 ASP.NET Core Web API backend solution for the Unified Patien
 
 ## Implementation Plan
 
-1. **Create .NET 9 solution and project structure** — In the `server/` folder, run `dotnet new sln -n Propel`. Create the API gateway host with `dotnet new webapi -n Propel.Api.Gateway --use-minimal-apis false`. Create each of the seven module class libraries with `dotnet new classlib -n Propel.Modules.<Name>`. Add all projects to the solution. Configure project references: `Propel.Api.Gateway` references each of the seven modules; no module project references another module. This enforces the cross-module isolation boundary (AC2 edge case).
+1. **Create .net 10 solution and project structure** — In the `server/` folder, run `dotnet new sln -n Propel`. Create the API gateway host with `dotnet new webapi -n Propel.Api.Gateway --use-minimal-apis false`. Create each of the seven module class libraries with `dotnet new classlib -n Propel.Modules.<Name>`. Add all projects to the solution. Configure project references: `Propel.Api.Gateway` references each of the seven modules; no module project references another module. This enforces the cross-module isolation boundary (AC2 edge case).
 
 2. **Scaffold MediatR CQRS folder structure per module** — Install `MediatR` 12.x (`dotnet add package MediatR`) in each module project. Under each module's root, create sub-folders: `Commands/`, `Queries/`, `Handlers/`. Add one sample command (`Ping<Module>Command : IRequest<string>`) and its handler (`Ping<Module>CommandHandler : IRequestHandler<Ping<Module>Command, string>`) per module to confirm MediatR wiring. Register `services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(...))` in `Program.cs` covering all seven module assemblies. This satisfies AC2.
 
@@ -99,7 +99,7 @@ Scaffold the .NET 9 ASP.NET Core Web API backend solution for the Unified Patien
 
 5. **Implement CorrelationIdMiddleware** — In `Propel.Api.Gateway/Middleware/CorrelationIdMiddleware.cs`, implement `IMiddleware`. If the incoming request contains `X-Correlation-ID` header, read it; otherwise generate a new `Guid.NewGuid().ToString()`. Store the value in `HttpContext.Items["CorrelationId"]` and append it to the response headers. Register with `app.UseMiddleware<CorrelationIdMiddleware>()` before all other middleware in `Program.cs`. This satisfies AC3.
 
-6. **Implement RBAC middleware placeholder and rate limiting** — Create `RbacMiddleware.cs` as a pass-through stub that reads `HttpContext.User.Claims` and sets a placeholder authorization context (no actual policy enforcement yet; logs claims for observability). Install ASP.NET Core built-in rate limiting (`Microsoft.AspNetCore.RateLimiting` — included in .NET 9). Configure a fixed-window policy in `Program.cs`: `services.AddRateLimiter(opt => opt.AddFixedWindowLimiter("global", o => { o.Window = TimeSpan.FromMinutes(1); o.PermitLimit = 100; }))`. Apply with `app.UseRateLimiter()`. This satisfies AC3.
+6. **Implement RBAC middleware placeholder and rate limiting** — Create `RbacMiddleware.cs` as a pass-through stub that reads `HttpContext.User.Claims` and sets a placeholder authorization context (no actual policy enforcement yet; logs claims for observability). Install ASP.NET Core built-in rate limiting (`Microsoft.AspNetCore.RateLimiting` — included in .net 10). Configure a fixed-window policy in `Program.cs`: `services.AddRateLimiter(opt => opt.AddFixedWindowLimiter("global", o => { o.Window = TimeSpan.FromMinutes(1); o.PermitLimit = 100; }))`. Apply with `app.UseRateLimiter()`. This satisfies AC3.
 
 7. **Configure Swagger / OpenAPI 3.0 with JWT Bearer** — In `Program.cs`, call `services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Propel IQ API", Version = "v1" }); c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { ... }); c.AddSecurityRequirement(...); })`. Add `app.UseSwagger()` and `app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Propel IQ API v1"))` in the HTTP pipeline. Add one stub controller per module (e.g., `AuthController`, `PatientController`) with a single `[HttpGet("ping")]` action returning `Ok()` to confirm endpoints appear in Swagger UI. This satisfies AC4.
 
@@ -125,13 +125,13 @@ Propel-IQ-Patient-Platform/
 └── README.md
 ```
 
-*The `server/` .NET 9 solution folder does not yet exist. It will be created as part of this task.*
+*The `server/` .net 10 solution folder does not yet exist. It will be created as part of this task.*
 
 ## Expected Changes
 
 | Action | File Path                                                                 | Description                                                       |
 |--------|---------------------------------------------------------------------------|-------------------------------------------------------------------|
-| CREATE | `server/Propel.sln`                                                       | .NET 9 solution file referencing all eight projects               |
+| CREATE | `server/Propel.sln`                                                       | .net 10 solution file referencing all eight projects               |
 | CREATE | `server/Propel.Api.Gateway/Propel.Api.Gateway.csproj`                     | Host API project; references all 7 module projects                |
 | CREATE | `server/Propel.Api.Gateway/Program.cs`                                    | Service registration, middleware pipeline, Swagger, EF Core, Redis, rate limiting |
 | CREATE | `server/Propel.Api.Gateway/appsettings.json`                              | Connection strings (PostgreSQL, Redis), JWT settings (placeholder values) |
@@ -147,7 +147,7 @@ Propel-IQ-Patient-Platform/
 
 ## External References
 
-- [.NET 9 ASP.NET Core Web API — Getting Started](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-9.0)
+- [.net 10 ASP.NET Core Web API — Getting Started](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-9.0)
 - [MediatR 12.x — GitHub & NuGet](https://github.com/jbogard/MediatR)
 - [MediatR — CQRS with ASP.NET Core](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/cqrs-microservice-reads)
 - [FluentValidation 11.x — ASP.NET Core Integration](https://docs.fluentvalidation.net/en/latest/aspnet.html)
@@ -155,7 +155,7 @@ Propel-IQ-Patient-Platform/
 - [Swashbuckle/Swagger JWT Bearer config](https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-9.0)
 - [Entity Framework Core 9 — Getting Started](https://learn.microsoft.com/en-us/ef/core/get-started/overview/first-app)
 - [Npgsql EF Core Provider](https://www.npgsql.org/efcore/)
-- [TR-002: .NET 9 ASP.NET Core Web API modular architecture — design.md#technical-requirements]
+- [TR-002: .net 10 ASP.NET Core Web API modular architecture — design.md#technical-requirements]
 - [TR-003: EF Core 9 ORM — design.md#technical-requirements]
 - [TR-004: PostgreSQL 16+ — design.md#technical-requirements]
 - [TR-005: Upstash Redis — design.md#technical-requirements]

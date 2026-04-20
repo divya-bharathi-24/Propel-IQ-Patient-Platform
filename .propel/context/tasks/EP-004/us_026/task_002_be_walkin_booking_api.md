@@ -34,7 +34,7 @@
 
 | Layer              | Technology            | Version |
 | ------------------ | --------------------- | ------- |
-| Backend            | ASP.NET Core Web API  | .NET 9  |
+| Backend            | ASP.NET Core Web API  | .net 10  |
 | Backend Messaging  | MediatR               | 12.x    |
 | Backend Validation | FluentValidation      | 11.x    |
 | ORM                | Entity Framework Core | 9.x     |
@@ -74,7 +74,7 @@
 
 ## Task Overview
 
-Implement two Staff-exclusive endpoints in the ASP.NET Core .NET 9 Staff / Admin module:
+Implement two Staff-exclusive endpoints in the ASP.NET Core .net 10 Staff / Admin module:
 
 **1 — `GET /api/staff/patients/search`**: Searches the `patients` table by `ILIKE` on `name` and `dateOfBirth` match. Returns a lightweight `PatientSearchResultDto` list. Supports the live-search UI.
 

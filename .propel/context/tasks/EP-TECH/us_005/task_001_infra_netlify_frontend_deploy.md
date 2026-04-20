@@ -111,7 +111,7 @@ Propel-IQ-Patient-Platform/
 │   ├── package.json
 │   └── src/
 │       └── index.html
-├── server/                      # .NET 9 solution (from US_002)
+├── server/                      # .net 10 solution (from US_002)
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml               # From US_004 task_001

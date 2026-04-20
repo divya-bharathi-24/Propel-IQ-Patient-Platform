@@ -33,7 +33,7 @@
 
 | Layer              | Technology                          | Version    |
 | ------------------ | ----------------------------------- | ---------- |
-| Backend            | ASP.NET Core Web API                | .NET 9     |
+| Backend            | ASP.NET Core Web API                | .net 10     |
 | Backend Messaging  | MediatR                             | 12.x       |
 | Backend Validation | FluentValidation                    | 11.x       |
 | ORM                | Entity Framework Core               | 9.x        |
@@ -76,7 +76,7 @@
 
 ## Task Overview
 
-Implement the `POST /api/appointments/{id}/reschedule` command in the ASP.NET Core .NET 9 Appointment Module. Rescheduling is an atomic two-phase operation:
+Implement the `POST /api/appointments/{id}/reschedule` command in the ASP.NET Core .net 10 Appointment Module. Rescheduling is an atomic two-phase operation:
 
 **Phase 1 — Cancel original:** mirrors the logic from `CancelAppointmentCommandHandler` (task_002) but is executed inline rather than dispatched separately, to keep both mutations in a single database transaction.
 

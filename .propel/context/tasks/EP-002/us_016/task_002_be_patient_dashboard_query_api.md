@@ -31,7 +31,7 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | Backend Validation | FluentValidation | 11.x |
 | ORM | Entity Framework Core | 9.x |
@@ -219,7 +219,7 @@ Implement the `GET /api/patient/dashboard` read endpoint following the CQRS quer
 
 6. **Caching consideration** (NFR-001, NFR-010): Dashboard data is patient-specific and expected to change on each login session. No Redis cache is applied at this endpoint. If performance profiling reveals p95 > 2 s under load, a short-lived (30-second) per-patient Redis cache can be added as a delta task. Document this decision in the `Program.cs` registration comment.
 
-7. **Serialization**: The ASP.NET Core JSON serializer (`System.Text.Json`) will serialize `DateOnly` and `TimeOnly` correctly as ISO 8601 strings in .NET 9. Ensure `JsonSerializerOptions` registered in `Program.cs` includes `DateOnly`/`TimeOnly` converters (built-in since .NET 8).
+7. **Serialization**: The ASP.NET Core JSON serializer (`System.Text.Json`) will serialize `DateOnly` and `TimeOnly` correctly as ISO 8601 strings in .net 10. Ensure `JsonSerializerOptions` registered in `Program.cs` includes `DateOnly`/`TimeOnly` converters (built-in since .NET 8).
 
 ## Current Project State
 
@@ -246,7 +246,7 @@ Server/
 
 ## External References
 
-- [ASP.NET Core .NET 9 — Controller Authorization with Roles](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-9.0) — `[Authorize(Roles = "Patient")]` attribute
+- [ASP.NET Core .net 10 — Controller Authorization with Roles](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-9.0) — `[Authorize(Roles = "Patient")]` attribute
 - [EF Core 9 — Projections with `Select()` and `AsNoTracking()`](https://learn.microsoft.com/en-us/ef/core/querying/tracking#no-tracking-queries) — Efficient read-only projections without entity materialization
 - [EF Core — Correlated subquery in `Select()`](https://learn.microsoft.com/en-us/ef/core/querying/related-data/select) — Nested `Any()` translated to EXISTS subquery in SQL
 - [MediatR 12.x — Request/Handler pattern](https://github.com/jbogard/MediatR/wiki) — `IRequest<T>` / `IRequestHandler<TRequest, TResponse>`

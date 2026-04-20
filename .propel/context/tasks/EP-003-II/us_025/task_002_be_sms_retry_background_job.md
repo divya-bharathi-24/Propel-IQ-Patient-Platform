@@ -27,13 +27,13 @@
 | Layer | Technology | Version |
 |-------|------------|---------|
 | Frontend | N/A | N/A |
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | ORM | Entity Framework Core | 9.x |
 | Database | PostgreSQL | 16+ |
 | SMS Service | Twilio (free tier) | — |
 | Library | Serilog | 4.x |
-| Library | .NET BackgroundService / IHostedService | .NET 9 |
+| Library | .NET BackgroundService / IHostedService | .net 10 |
 | AI/ML | N/A | N/A |
 | Vector Store | N/A | N/A |
 | AI Gateway | N/A | N/A |
@@ -61,7 +61,7 @@
 
 ## Task Overview
 
-Implement the `SmsRetryBackgroundService` — a .NET 9 `BackgroundService` (IHostedService) that periodically polls for `Notification` records in `status = Failed` with `channel = SMS` and `templateType = "SlotSwapNotification"`, then attempts one retry via Twilio after the 5-minute window has elapsed since the original send attempt.
+Implement the `SmsRetryBackgroundService` — a .net 10 `BackgroundService` (IHostedService) that periodically polls for `Notification` records in `status = Failed` with `channel = SMS` and `templateType = "SlotSwapNotification"`, then attempts one retry via Twilio after the 5-minute window has elapsed since the original send attempt.
 
 **Retry Logic (AC-3):**
 - Poll interval: every 2 minutes (to catch the 5-minute threshold efficiently without excessive DB load).
@@ -74,7 +74,7 @@ Implement the `SmsRetryBackgroundService` — a .NET 9 `BackgroundService` (IHos
 **Dashboard alert on double-failure (edge case):**
 The `SmsRetryBackgroundService` checks whether the corresponding Email `Notification` record for the same `(patientId, appointmentId, templateType)` also has `status = Failed`. If both channels are `Failed` after the retry: set `Patient.pendingAlerts` JSONB with `SwapNotificationFailure` alert type (if not already set by task_001 — idempotent upsert). This ensures the dashboard alert is reliably raised even if task_001's in-process dual-failure flag was missed due to a transient error.
 
-The `BackgroundService` runs within the same .NET 9 process as the modular monolith (AD-1) — no separate worker process required for Phase 1.
+The `BackgroundService` runs within the same .net 10 process as the modular monolith (AD-1) — no separate worker process required for Phase 1.
 
 ## Dependent Tasks
 
@@ -116,7 +116,7 @@ The `BackgroundService` runs within the same .NET 9 process as the modular monol
    e. Insert `AuditLog { action: "NotificationRetried", details: { outcome, retryCount: 1 } }` (FR-034).
    f. If retry fails → check sibling Email `Notification` status. If email also `Failed` → idempotent-upsert `SwapNotificationFailure` alert into `Patient.pendingAlerts` JSONB.
 
-4. **`SmsRetryBackgroundService`** — Extend .NET 9 `BackgroundService`:
+4. **`SmsRetryBackgroundService`** — Extend .net 10 `BackgroundService`:
    ```csharp
    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
    {
@@ -162,19 +162,19 @@ Server/
 
 | Action | File Path | Description |
 |--------|-----------|-------------|
-| CREATE | `Server/Notification/BackgroundServices/SmsRetryBackgroundService.cs` | .NET 9 `BackgroundService` — polls every 2 min for retry-eligible SMS Notification records; dispatches `NotificationRetryCommand` per eligible record |
+| CREATE | `Server/Notification/BackgroundServices/SmsRetryBackgroundService.cs` | .net 10 `BackgroundService` — polls every 2 min for retry-eligible SMS Notification records; dispatches `NotificationRetryCommand` per eligible record |
 | CREATE | `Server/Notification/Repositories/SmsRetryRepository.cs` | EF Core repository — `GetRetryEligibleSmsAsync()` query with `retryCount = 0`, 5-min elapsed filter |
 | CREATE | `Server/Notification/Commands/NotificationRetryCommand.cs` | MediatR command + handler — fetches Appointment payload, calls `TwilioSmsService`, updates Notification record, inserts AuditLog, checks dual-failure |
 | MODIFY | `Server/Api/Program.cs` | Register `SmsRetryBackgroundService` as hosted service; register `SmsRetryRepository` as scoped |
 
 ## External References
 
-- [.NET 9 BackgroundService — IHostedService pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/background-service)
+- [.net 10 BackgroundService — IHostedService pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/background-service)
 - [.NET DI — IServiceScopeFactory in BackgroundService (avoid captive dependency)](https://learn.microsoft.com/en-us/dotnet/core/extensions/scoped-service-from-background-service)
 - [Twilio .NET SDK — MessageResource.CreateAsync retry patterns](https://www.twilio.com/docs/sms/quickstart/csharp)
 - [EF Core 9 — Parameterized LINQ queries with DateTime arithmetic](https://learn.microsoft.com/en-us/ef/core/querying/filtering)
 - [MediatR 12.x — IRequest\<T\> command pattern](https://github.com/jbogard/MediatR/wiki)
-- [.NET 9 — Task.Delay with CancellationToken in BackgroundService](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.delay)
+- [.net 10 — Task.Delay with CancellationToken in BackgroundService](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.delay)
 
 ## Build Commands
 

@@ -32,7 +32,7 @@
 
 | Layer              | Technology                              | Version |
 | ------------------ | --------------------------------------- | ------- |
-| Backend            | ASP.NET Core Web API                    | .NET 9  |
+| Backend            | ASP.NET Core Web API                    | .net 10  |
 | AI/ML — Orchestration | Microsoft Semantic Kernel            | 1.x     |
 | AI/ML — Model Provider | OpenAI API / Azure OpenAI          | GPT-4o  |
 | AI/ML — Embeddings | text-embedding-3-small (OpenAI)         | Latest  |

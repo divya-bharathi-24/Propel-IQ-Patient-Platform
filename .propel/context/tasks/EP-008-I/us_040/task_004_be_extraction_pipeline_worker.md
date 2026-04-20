@@ -28,7 +28,7 @@
 
 | Layer      | Technology           | Version    |
 |------------|----------------------|------------|
-| Backend    | ASP.NET Core Web API | .NET 9     |
+| Backend    | ASP.NET Core Web API | .net 10     |
 | Messaging  | MediatR              | 12.x       |
 | ORM        | Entity Framework Core| 9.x        |
 | Database   | PostgreSQL           | 16+        |
@@ -198,7 +198,7 @@ Server/
 
 ## External References
 
-- [.NET BackgroundService + PeriodicTimer (.NET 9)](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
+- [.NET BackgroundService + PeriodicTimer (.net 10)](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
 - [SemaphoreSlim — concurrency throttling](https://learn.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim)
 - [Idempotency via status transition locking pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/idempotency)
 - [AD-3 — Event-driven async processing](../docs/design.md)

@@ -34,7 +34,7 @@
 
 | Layer              | Technology              | Version |
 | ------------------ | ----------------------- | ------- |
-| Backend            | ASP.NET Core Web API    | .NET 9  |
+| Backend            | ASP.NET Core Web API    | .net 10  |
 | Backend Messaging  | MediatR                 | 12.x    |
 | Backend Validation | FluentValidation        | 11.x    |
 | ORM                | Entity Framework Core   | 9.x     |
@@ -176,7 +176,7 @@ Server/
 
 ## External References
 
-- [ASP.NET Core Controllers (.NET 9)](https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-9.0) — `[Authorize]`, `[Route]`, `[HttpGet]` attribute patterns
+- [ASP.NET Core Controllers (.net 10)](https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-9.0) — `[Authorize]`, `[Route]`, `[HttpGet]` attribute patterns
 - [MediatR 12.x Docs](https://github.com/jbogard/MediatR/wiki) — `IRequest<T>`, `IRequestHandler<T, R>` registration
 - [FluentValidation 11.x with ASP.NET Core](https://docs.fluentvalidation.net/en/latest/aspnet.html) — Automatic validation pipeline integration
 - [OpenAPI 3.0 / Swagger in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?view=aspnetcore-9.0) — `ProducesResponseType` attributes for Swagger docs

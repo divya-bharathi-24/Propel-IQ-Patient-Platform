@@ -31,7 +31,7 @@
 | Layer | Technology | Version |
 |-------|------------|---------|
 | Frontend | N/A | N/A |
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | Backend Validation | FluentValidation | 11.x |
 | ORM | Entity Framework Core | 9.x |
@@ -65,7 +65,7 @@
 
 ## Task Overview
 
-Implement the four ASP.NET Core Web API (.NET 9) endpoints that power the patient self-service intake edit flow:
+Implement the four ASP.NET Core Web API (.net 10) endpoints that power the patient self-service intake edit flow:
 
 1. **`GET /api/intake/{appointmentId}`** — Fetch the existing `IntakeRecord` for the appointment. Returns 200 with all JSONB field data and an `ETag` header (`rowVersion` as base64). Returns 404 if no record exists.
 2. **`GET /api/intake/{appointmentId}/draft`** — Fetch the persisted draft state from the `draftData` JSONB column on `IntakeRecord`. Returns 200 with partial field values, or 404 if no draft exists.

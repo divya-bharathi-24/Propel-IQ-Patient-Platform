@@ -24,7 +24,7 @@
 
 | Layer      | Technology                  | Version |
 |------------|-----------------------------|---------|
-| Backend    | ASP.NET Core Web API        | .NET 9  |
+| Backend    | ASP.NET Core Web API        | .net 10  |
 | Messaging  | MediatR                     | 12.x    |
 | Validation | FluentValidation            | 11.x    |
 | ORM        | Entity Framework Core       | 9.x     |
@@ -173,7 +173,7 @@ Server/
 
 ## External References
 
-- [MediatR CQRS pattern in .NET 9](https://github.com/jbogard/MediatR/wiki)
+- [MediatR CQRS pattern in .net 10](https://github.com/jbogard/MediatR/wiki)
 - [FluentValidation — ASP.NET Core integration](https://docs.fluentvalidation.net/en/latest/aspnet.html)
 - [ASP.NET Core RBAC authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-9.0)
 - [NFR-006 — Role-based access control at API level](../docs/design.md)

@@ -29,7 +29,7 @@
 | Layer      | Technology      | Version  |
 | ---------- | --------------- | -------- |
 | Frontend   | Angular         | 18.x     |
-| Backend    | ASP.NET Core    | .NET 9   |
+| Backend    | ASP.NET Core    | .net 10   |
 | CI/CD      | GitHub Actions  | —        |
 | Testing — Unit | xUnit + Moq | 2.x     |
 | Testing — E2E  | Playwright  | 1.x      |
@@ -85,7 +85,7 @@ This task covers only the **pull-request trigger** workflow (`ci.yml`). Deployme
 1. **Create `.github/workflows/ci.yml`** — Define workflow triggered on `pull_request` events targeting `main` (types: `opened`, `synchronize`, `reopened`).
 2. **Angular Lint Job** (`lint-angular`) — Checkout repository, set up Node.js 20, restore npm dependencies (`npm ci`), run `npx ng lint` (exit code must be 0).
 3. **Angular Build Job** (`build-angular`) — Depends on `lint-angular`; run `npx ng build --configuration production` to validate production bundle compilation.
-4. **Backend Build & Unit Test Job** (`build-test-dotnet`) — Checkout repository, set up .NET 9 SDK, run `dotnet restore` then `dotnet build --configuration Release --no-restore`, then `dotnet test --no-build --verbosity normal` for all xUnit test projects.
+4. **Backend Build & Unit Test Job** (`build-test-dotnet`) — Checkout repository, set up .net 10 SDK, run `dotnet restore` then `dotnet build --configuration Release --no-restore`, then `dotnet test --no-build --verbosity normal` for all xUnit test projects.
 5. **Playwright E2E Smoke Test Job** (`e2e-playwright`) — Depends on `build-angular` and `build-test-dotnet`; set up Node.js 20, run `npm ci`, install Playwright browsers (`npx playwright install --with-deps chromium`), spin up the Angular dev server, execute `npx playwright test --project=chromium` for smoke tests only.
 6. **Upload Playwright Test Report** — Within the `e2e-playwright` job, use `actions/upload-artifact@v4` to upload `playwright-report/` directory as artifact `playwright-report` with retention of 7 days. Run step with `if: always()` to ensure upload even on test failure.
 7. **Job Failure Propagation** — Verify that any single failing job causes the overall PR check status to fail, blocking merge (GitHub default behaviour; confirm branch protection rule requires all jobs).
@@ -101,7 +101,7 @@ Propel-IQ-Patient-Platform/
 │   ├── angular.json
 │   ├── package.json
 │   └── src/
-├── server/                      # .NET 9 solution (from US_002)
+├── server/                      # .net 10 solution (from US_002)
 │   ├── PropelIQ.sln
 │   └── src/
 ├── docker-compose.yml           # Local dev orchestration
@@ -165,7 +165,7 @@ cd app && npx playwright test --project=chromium
 - [ ] Create `.github/workflows/ci.yml` with `pull_request` trigger targeting `main`
 - [ ] Add `lint-angular` job: `checkout` → `setup-node@v4 (node 20)` → `npm ci` → `npx ng lint`
 - [ ] Add `build-angular` job (needs `lint-angular`): `checkout` → `setup-node@v4` → `npm ci` → `npx ng build --configuration production`
-- [ ] Add `build-test-dotnet` job: `checkout` → `setup-dotnet@v4 (.NET 9)` → `dotnet restore` → `dotnet build --no-restore` → `dotnet test --no-build`
+- [ ] Add `build-test-dotnet` job: `checkout` → `setup-dotnet@v4 (.net 10)` → `dotnet restore` → `dotnet build --no-restore` → `dotnet test --no-build`
 - [ ] Add `e2e-playwright` job (needs `build-angular`, `build-test-dotnet`): Node setup → `npm ci` → `npx playwright install --with-deps chromium` → start Angular dev server → run `npx playwright test --project=chromium`
 - [ ] Add `upload-artifact@v4` step in `e2e-playwright` job: path `playwright-report/`, name `playwright-report`, `if: always()`, retention-days 7
 - [ ] Add `concurrency` block at workflow level: group `ci-${{ github.ref }}`, `cancel-in-progress: true`

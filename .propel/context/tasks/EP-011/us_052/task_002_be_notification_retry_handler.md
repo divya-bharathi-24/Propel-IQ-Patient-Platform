@@ -33,7 +33,7 @@
 | Backend  | ASP.NET Core Web API / .NET           | 9       |
 | ORM      | Entity Framework Core                 | 9.x     |
 | Logging  | Serilog                               | 4.x     |
-| Background | `IHostedService` / `BackgroundService` | .NET 9 |
+| Background | `IHostedService` / `BackgroundService` | .net 10 |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 

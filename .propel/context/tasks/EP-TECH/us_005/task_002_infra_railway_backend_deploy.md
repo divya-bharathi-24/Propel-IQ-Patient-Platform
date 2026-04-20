@@ -5,7 +5,7 @@
 - User Story: [us_005] (extracted from input)
 - Story Location: [.propel/context/tasks/EP-TECH/us_005/us_005.md]
 - Acceptance Criteria:
-  - **AC-2**: Given the Railway project is configured, When the .NET 9 Docker container is deployed, Then the API is reachable at the configured domain over TLS 1.2+ and returns HTTP 200 on the `/health` endpoint.
+  - **AC-2**: Given the Railway project is configured, When the .net 10 Docker container is deployed, Then the API is reachable at the configured domain over TLS 1.2+ and returns HTTP 200 on the `/health` endpoint.
 - Edge Case:
   - What happens if Railway free-tier limits are reached? — Document monitoring alert at 80% resource usage and migration path to Railway Hobby/Pro tier in `railway.toml` comments and README. Pipeline marks deploy step as failed; previous deployment remains live (Railway atomic deploys).
 
@@ -26,7 +26,7 @@
 
 | Layer          | Technology             | Version |
 | -------------- | ---------------------- | ------- |
-| Backend        | ASP.NET Core Web API   | .NET 9  |
+| Backend        | ASP.NET Core Web API   | .net 10  |
 | Hosting (BE)   | Railway                | —       |
 | Container      | Docker                 | 24.x    |
 | CI/CD          | GitHub Actions         | —       |
@@ -58,20 +58,20 @@
 
 ## Task Overview
 
-Configure the Railway project to host the .NET 9 API as a stateless Docker container over HTTPS (TLS 1.2+ enforced by Railway's edge layer). This includes creating a multi-stage `Dockerfile` for the .NET solution, a `railway.toml` service manifest, and implementing the ASP.NET Core Health Checks `/health` endpoint. The endpoint is used by Railway's health-gate to confirm liveness after each deploy and by the CD pipeline smoke test from US_004 task_002.
+Configure the Railway project to host the .net 10 API as a stateless Docker container over HTTPS (TLS 1.2+ enforced by Railway's edge layer). This includes creating a multi-stage `Dockerfile` for the .NET solution, a `railway.toml` service manifest, and implementing the ASP.NET Core Health Checks `/health` endpoint. The endpoint is used by Railway's health-gate to confirm liveness after each deploy and by the CD pipeline smoke test from US_004 task_002.
 
 This task covers only the **Railway backend hosting** configuration. Netlify frontend deployment is handled in `task_001_infra_netlify_frontend_deploy.md`. Environment variable management and CORS are handled in `task_003_infra_env_vars_cors_policy.md`.
 
 ## Dependent Tasks
 
-- US_002 — .NET 9 solution must exist with a compilable `server/src/PropelIQ.Api` entry project
+- US_002 — .net 10 solution must exist with a compilable `server/src/PropelIQ.Api` entry project
 - US_004 task_002 — CD pipeline builds and pushes Docker image to GHCR and calls `railway up`; Railway service must be pre-configured before the secret `RAILWAY_TOKEN` is registered
 
 ## Impacted Components
 
 | Component | Action | Notes |
 | --------- | ------ | ----- |
-| `server/Dockerfile` | CREATE | Multi-stage .NET 9 Docker image (build → runtime), non-root user |
+| `server/Dockerfile` | CREATE | Multi-stage .net 10 Docker image (build → runtime), non-root user |
 | `railway.toml` (repository root) | CREATE | Railway service manifest: service name, start command, port, health check path, restart policy |
 | `server/src/PropelIQ.Api/Program.cs` | MODIFY | Register ASP.NET Core Health Checks middleware and map `/health` endpoint |
 | `.dockerignore` (server/) | CREATE | Exclude `bin/`, `obj/`, `.git/`, local secrets from Docker build context |
@@ -99,7 +99,7 @@ This task covers only the **Railway backend hosting** configuration. Netlify fro
 ```
 Propel-IQ-Patient-Platform/
 ├── app/                         # Angular 18 workspace (from US_001)
-├── server/                      # .NET 9 solution (from US_002)
+├── server/                      # .net 10 solution (from US_002)
 │   ├── PropelIQ.sln
 │   ├── Dockerfile               # To be created
 │   ├── .dockerignore            # To be created
@@ -120,7 +120,7 @@ _Update this tree during execution based on completed dependent tasks._
 
 | Action | File Path | Description |
 | ------ | --------- | ----------- |
-| CREATE | `server/Dockerfile` | Multi-stage .NET 9 Docker image; non-root user; port 8080 |
+| CREATE | `server/Dockerfile` | Multi-stage .net 10 Docker image; non-root user; port 8080 |
 | CREATE | `server/.dockerignore` | Exclude build artifacts, local secrets, and IDE files from Docker context |
 | CREATE | `railway.toml` | Railway service manifest: port, health check, restart policy |
 | MODIFY | `server/src/PropelIQ.Api/Program.cs` | Register `AddHealthChecks()` and map `/health` endpoint |
@@ -197,7 +197,7 @@ app.MapHealthChecks("/health");
 - [Railway CLI — `railway up` deploy command](https://docs.railway.app/guides/cli)
 - [ASP.NET Core — Health checks middleware](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks)
 - [Docker — Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
-- [Microsoft — .NET 9 Docker images (`mcr.microsoft.com/dotnet`)](https://hub.docker.com/_/microsoft-dotnet)
+- [Microsoft — .net 10 Docker images (`mcr.microsoft.com/dotnet`)](https://hub.docker.com/_/microsoft-dotnet)
 - [OWASP — Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
 
 ## Build Commands

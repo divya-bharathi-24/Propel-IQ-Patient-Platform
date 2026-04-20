@@ -112,7 +112,7 @@ Each story is validated against: **I**ndependent · **N**egotiable · **V**aluab
 ### US-TECH-001 · Full-Stack Project Scaffolding
 
 **Story**
-> As a **DevOps engineer**, I want the Angular 18 SPA and .NET 9 modular monolith to be fully scaffolded with all seven domain modules, so that every feature team can begin development immediately on a consistent, convention-aligned codebase.
+> As a **DevOps engineer**, I want the Angular 18 SPA and .net 10 modular monolith to be fully scaffolded with all seven domain modules, so that every feature team can begin development immediately on a consistent, convention-aligned codebase.
 
 **Business Value**
 Without scaffolding, every developer independently configures the project, creating divergence. This story eliminates that risk and enables all feature epics to start in parallel.
@@ -121,7 +121,7 @@ Without scaffolding, every developer independently configures the project, creat
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC1 | An empty repository | A developer runs `ng new` and the backend `dotnet new` scaffold commands | Angular 18 workspace with standalone components and NgRx Signals, and a .NET 9 solution with 7 module projects (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) are created |
+| AC1 | An empty repository | A developer runs `ng new` and the backend `dotnet new` scaffold commands | Angular 18 workspace with standalone components and NgRx Signals, and a .net 10 solution with 7 module projects (Auth, Patient, Appointment, Clinical, AI, Notification, Admin) are created |
 | AC2 | The scaffold is applied | A developer runs `dotnet build` | Build succeeds with zero errors and zero warnings |
 | AC3 | The scaffold is applied | A developer runs `ng build` | Angular build succeeds and outputs a production bundle |
 | AC4 | The scaffold is applied | Swagger UI is opened at `/swagger` | All module API endpoint groups are listed with OpenAPI 3.0 documentation |
