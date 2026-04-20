@@ -27,7 +27,7 @@
 
 | Layer      | Technology            | Version  |
 | ---------- | --------------------- | -------- |
-| Backend    | ASP.NET Core Web API  | .NET 9   |
+| Backend    | ASP.NET Core Web API  | .net 10   |
 | ORM        | Entity Framework Core | 9.x      |
 | Database   | PostgreSQL            | 16+      |
 | DB Driver  | Npgsql EF Core Provider | 9.x    |
@@ -195,7 +195,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 - [EF Core 9 — `dotnet ef migrations add`](https://learn.microsoft.com/en-us/ef/core/cli/dotnet#dotnet-ef-migrations-add)
 - [EF Core 9 — `IDesignTimeDbContextFactory<T>`](https://learn.microsoft.com/en-us/ef/core/cli/dbcontext-creation#from-a-design-time-factory)
 - [EF Core 9 — Idempotent migration scripts (`--idempotent`)](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying#idempotent-sql-scripts)
-- [Npgsql EF Core — Getting started with .NET 9](https://www.npgsql.org/efcore/index.html)
+- [Npgsql EF Core — Getting started with .net 10](https://www.npgsql.org/efcore/index.html)
 - [Neon PostgreSQL — Connection strings](https://neon.tech/docs/connect/connect-from-any-app)
 - [.NET local tool manifest (`dotnet-tools.json`)](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use)
 - [PostgreSQL error codes — 23503 FK violation, 23505 unique violation](https://www.postgresql.org/docs/current/errcodes-appendix.html)

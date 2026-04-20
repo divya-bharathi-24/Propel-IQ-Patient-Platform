@@ -34,7 +34,7 @@
 
 | Layer              | Technology              | Version    |
 | ------------------ | ----------------------- | ---------- |
-| Backend            | ASP.NET Core Web API    | .NET 9     |
+| Backend            | ASP.NET Core Web API    | .net 10     |
 | Backend Messaging  | MediatR                 | 12.x       |
 | Backend Validation | FluentValidation        | 11.x       |
 | ORM                | Entity Framework Core   | 9.x        |

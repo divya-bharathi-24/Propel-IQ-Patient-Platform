@@ -35,7 +35,7 @@
 
 | Layer              | Technology            | Version |
 | ------------------ | --------------------- | ------- |
-| Backend            | ASP.NET Core Web API  | .NET 9  |
+| Backend            | ASP.NET Core Web API  | .net 10  |
 | Backend Messaging  | MediatR               | 12.x    |
 | Backend Validation | FluentValidation      | 11.x    |
 | ORM                | Entity Framework Core | 9.x     |
@@ -75,7 +75,7 @@
 
 ## Task Overview
 
-Implement the ASP.NET Core .NET 9 AI Intake API within the AI module (`Server/Modules/AI/`). Three endpoints are required:
+Implement the ASP.NET Core .net 10 AI Intake API within the AI module (`Server/Modules/AI/`). Three endpoints are required:
 
 1. **`POST /api/intake/ai/session`** — creates an `IntakeSession` (in-memory or lightweight DB row), seeded with `patientId` from JWT and the supplied `appointmentId`; returns `sessionId` (GUID)
 

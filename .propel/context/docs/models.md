@@ -52,7 +52,7 @@ actor Patient #LightBlue
 actor Staff #LightBlue
 actor Admin #LightBlue
 
-rectangle "Unified Patient Access &\nClinical Intelligence Platform\n(ASP.NET Core .NET 9 + Angular 18)" #LightGreen {
+rectangle "Unified Patient Access &\nClinical Intelligence Platform\n(ASP.NET Core .net 10 + Angular 18)" #LightGreen {
   component "Angular 18 SPA\n(Patient Portal · Staff Dashboard · Admin Panel)" as FE
   component "ASP.NET Core Web API\n(Modular Monolith · JWT · MediatR)" as BE
 }
@@ -179,7 +179,7 @@ package "CDN / Frontend Hosting\nNetlify / Vercel (Free Tier)" #LightGreen {
 }
 
 package "Backend Hosting\nRailway / GitHub Codespaces (Free Tier)" #LightYellow {
-  node ".NET 9 ASP.NET Core Docker Container" as BE {
+  node ".net 10 ASP.NET Core Docker Container" as BE {
     component "API Gateway\n(Rate Limit · RBAC · Swagger)" as AGW
     component "Auth Module\n(JWT · Argon2)" as AuthC
     component "Patient Module" as PatC
@@ -234,7 +234,7 @@ CICD ..> BE : Docker Push → Railway Deploy
 | Component        | Specification                                                             | Source                   |
 | ---------------- | ------------------------------------------------------------------------- | ------------------------ |
 | Frontend CDN     | Netlify / Vercel free tier, global CDN, LCP < 2.5s                        | TR-014, NFR-012          |
-| Backend Compute  | Railway / GitHub Codespaces, stateless .NET 9 Docker container            | TR-015, NFR-016          |
+| Backend Compute  | Railway / GitHub Codespaces, stateless .net 10 Docker container            | TR-015, NFR-016          |
 | Primary Database | Neon PostgreSQL 16 free tier, pgvector extension, automated daily backups | TR-004, DR-012           |
 | Vector Store     | pgvector 0.7+ co-located in Neon PostgreSQL                               | TR-008, AIR-R01          |
 | Cache / Sessions | Upstash Redis serverless, 15-min TTL, slot staleness ≤ 5s                 | TR-005, NFR-007, NFR-020 |

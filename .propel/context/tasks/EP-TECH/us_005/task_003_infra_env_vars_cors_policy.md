@@ -27,7 +27,7 @@
 
 | Layer          | Technology             | Version |
 | -------------- | ---------------------- | ------- |
-| Backend        | ASP.NET Core Web API   | .NET 9  |
+| Backend        | ASP.NET Core Web API   | .net 10  |
 | Frontend       | Angular                | 18.x    |
 | Hosting (FE)   | Netlify                | —       |
 | Hosting (BE)   | Railway                | —       |
@@ -69,7 +69,7 @@ This task depends on `task_001_infra_netlify_frontend_deploy.md` and `task_002_i
 
 - `task_001_infra_netlify_frontend_deploy.md` — Netlify site must exist; `NETLIFY_SITE_ID` and frontend domain must be known
 - `task_002_infra_railway_backend_deploy.md` — Railway service must exist; `RAILWAY_TOKEN` registered; container `Program.cs` entry point must be in place
-- US_002 — .NET 9 solution must have `appsettings.json` present for IConfiguration base structure
+- US_002 — .net 10 solution must have `appsettings.json` present for IConfiguration base structure
 
 ## Impacted Components
 
@@ -113,7 +113,7 @@ Propel-IQ-Patient-Platform/
 │   │   │   └── env.js           # To be created (runtime env injection)
 │   │   └── environments/
 │   │       └── environment.ts   # To be modified (read from window.__env)
-├── server/                      # .NET 9 solution
+├── server/                      # .net 10 solution
 │   └── src/
 │       └── PropelIQ.Api/
 │           ├── Program.cs       # To be modified (CORS, env validation)

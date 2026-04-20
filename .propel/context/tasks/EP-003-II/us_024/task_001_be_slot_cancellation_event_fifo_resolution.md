@@ -27,7 +27,7 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Mediator | MediatR | 12.x |
 | ORM | Entity Framework Core | 9.x |
 | Database | PostgreSQL | 16+ |

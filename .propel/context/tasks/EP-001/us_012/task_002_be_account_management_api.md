@@ -34,14 +34,14 @@
 
 | Layer               | Technology                  | Version |
 | ------------------- | --------------------------- | ------- |
-| Backend             | ASP.NET Core Web API        | .NET 9  |
+| Backend             | ASP.NET Core Web API        | .net 10  |
 | Backend Messaging   | MediatR                     | 12.x    |
 | Backend Validation  | FluentValidation            | 11.x    |
 | ORM                 | Entity Framework Core       | 9.x     |
 | Password Hashing    | Isopoh.Cryptography.Argon2  | Latest  |
 | Email Service       | SendGrid SDK for .NET       | Latest  |
 | Logging             | Serilog                     | 4.x     |
-| Rate Limiting       | ASP.NET Core Rate Limiting  | .NET 9  |
+| Rate Limiting       | ASP.NET Core Rate Limiting  | .net 10  |
 | Testing — Unit      | xUnit + Moq                 | 2.x     |
 | Database            | PostgreSQL                  | 16+     |
 | AI/ML               | N/A                         | N/A     |
@@ -77,7 +77,7 @@
 
 ## Task Overview
 
-Implement the backend API surface for US_012 in the ASP.NET Core .NET 9 modular monolith across three modules:
+Implement the backend API surface for US_012 in the ASP.NET Core .net 10 modular monolith across three modules:
 
 - **Admin Module** — `POST /api/admin/users` (Admin-only): create Staff/Admin user account, generate one-time credential setup token, dispatch SendGrid invite email, write audit log.
 - **Auth Module** — `POST /api/auth/setup-credentials` (public, token-gated): validate one-time token, enforce password complexity, hash with Argon2, persist credentials, mark token consumed.
@@ -208,7 +208,7 @@ Propel-IQ-Patient-Platform/
 
 ## External References
 
-- [ASP.NET Core .NET 9 — Role-Based Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-9.0)
+- [ASP.NET Core .net 10 — Role-Based Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-9.0)
 - [ASP.NET Core — AllowAnonymous](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/simple?view=aspnetcore-9.0#allow-anonymous-access-with-the-allowanonymous-attribute)
 - [MediatR 12 — CQRS Pattern](https://github.com/jbogard/MediatR/wiki)
 - [FluentValidation 11 — ASP.NET Core Integration](https://docs.fluentvalidation.net/en/latest/aspnet.html)

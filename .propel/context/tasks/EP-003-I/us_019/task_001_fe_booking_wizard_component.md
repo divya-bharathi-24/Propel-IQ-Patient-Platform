@@ -39,7 +39,7 @@
 |-------|------------|---------|
 | Frontend | Angular | 18.x |
 | Frontend State | NgRx Signals | 18.x |
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Database | PostgreSQL | 16+ |
 | Cache | Upstash Redis (serverless) | — |
 | Library | Angular Router | 18.x |

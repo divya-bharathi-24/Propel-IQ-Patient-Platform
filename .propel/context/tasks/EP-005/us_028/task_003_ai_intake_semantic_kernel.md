@@ -36,7 +36,7 @@
 | AI Orchestration   | Microsoft Semantic Kernel | 1.x |
 | AI Model Provider  | OpenAI API / Azure OpenAI | GPT-4o |
 | Resilience         | Polly                 | 8.x     |
-| Backend            | ASP.NET Core Web API  | .NET 9  |
+| Backend            | ASP.NET Core Web API  | .net 10  |
 | Logging            | Serilog               | 4.x     |
 | Testing — Unit     | xUnit + Moq           | 2.x     |
 | AI/ML              | OpenAI GPT-4o (Azure OpenAI for HIPAA production path) | GPT-4o |

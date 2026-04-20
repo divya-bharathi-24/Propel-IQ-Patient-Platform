@@ -31,10 +31,10 @@
 
 | Layer             | Technology                          | Version |
 | ----------------- | ----------------------------------- | ------- |
-| Backend           | ASP.NET Core Web API                | .NET 9  |
+| Backend           | ASP.NET Core Web API                | .net 10  |
 | Password Hashing  | Isopoh.Cryptography.Argon2          | Latest  |
-| Encryption        | .NET System.Security.Cryptography   | .NET 9  |
-| Key Management    | ASP.NET Core Data Protection API    | .NET 9  |
+| Encryption        | .NET System.Security.Cryptography   | .net 10  |
+| Key Management    | ASP.NET Core Data Protection API    | .net 10  |
 | ORM               | Entity Framework Core               | 9.x     |
 | Testing — Unit    | xUnit + Moq                         | 2.x     |
 | Database          | PostgreSQL                          | 16+     |
@@ -138,7 +138,7 @@ Implement two security services centralising cryptographic controls for the enti
    ```
 
 4. **`AesGcmPhiEncryptionService`** (AES-256-GCM):
-   - Uses `AesGcm` from `System.Security.Cryptography` (.NET 9 built-in)
+   - Uses `AesGcm` from `System.Security.Cryptography` (.net 10 built-in)
    - 256-bit key sourced from ASP.NET Core Data Protection API (`IDataProtectionProvider.CreateProtector("phi-fields")`) — key managed, rotated, and persisted by the Data Protection stack
    - `Encrypt()`: generates a 12-byte random nonce, encrypts plaintext to ciphertext + 16-byte auth tag, returns Base64(nonce + ciphertext + tag) as a single storable string
    - `Decrypt()`: splits stored string back into nonce, ciphertext, tag; decrypts and returns plaintext

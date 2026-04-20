@@ -223,7 +223,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | --------------------------------- | ---------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
 | Frontend                          | Angular                                  | 18.x       | NFR-012 (Core Web Vitals), NFR-010 (reactive forms for complex intake/booking), NFR-014 (client-side validation) |
 | Frontend State                    | NgRx Signals                             | 18.x       | NFR-001 (responsive UI), NFR-020 (real-time slot updates)                                                        |
-| Backend                           | ASP.NET Core Web API                     | .NET 9     | NFR-016 (microservices, horizontal scaling), NFR-013 (HIPAA ecosystem), NFR-001 (high throughput)                |
+| Backend                           | ASP.NET Core Web API                     | .net 10     | NFR-016 (microservices, horizontal scaling), NFR-013 (HIPAA ecosystem), NFR-001 (high throughput)                |
 | Backend Messaging                 | MediatR                                  | 12.x       | NFR-016 (CQRS separation), AD-2 (command/query split)                                                            |
 | Backend Validation                | FluentValidation                         | 11.x       | NFR-014 (input validation), NFR-017 (request sanitization)                                                       |
 | ORM                               | Entity Framework Core                    | 9.x        | DR-009 (referential integrity), DR-013 (code-first migrations), DR-010 (soft delete)                             |
@@ -257,7 +257,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | Frontend         | React 19                | Angular's built-in reactive forms, signals, and dependency injection provide stronger support for complex healthcare forms and enterprise patterns; Angular prescribed by BRD |
 | Frontend         | Blazor WASM             | Larger bundle size, less mature component ecosystem for healthcare UI patterns; not prescribed by BRD                                                                         |
 | Backend          | Node.js/Express         | Lacks the mature healthcare ecosystem (.NET has Semantic Kernel, FHIR libraries), weaker type safety for complex domain models                                                |
-| Backend          | Java Spring Boot        | Higher memory footprint on free-tier hosting, longer startup times; .NET 9 prescribed by BRD                                                                                  |
+| Backend          | Java Spring Boot        | Higher memory footprint on free-tier hosting, longer startup times; .net 10 prescribed by BRD                                                                                  |
 | Database         | SQL Server              | Licensing cost violates free-tier constraint; PostgreSQL offers equivalent features with pgvector for AI embeddings                                                           |
 | Database         | MongoDB                 | Weaker referential integrity for healthcare data compliance; PostgreSQL JSONB provides sufficient document flexibility                                                        |
 | Vector Store     | Pinecone                | Additional infrastructure cost and operational complexity; pgvector is free and collocated with PostgreSQL                                                                    |
@@ -285,7 +285,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 | Real-time Updates (NFR-020)     | 9/10       | 8/10     | Signals + RxJS for reactive state               |
 | BRD Alignment                   | 10/10      | 0/10     | Prescribed technology                           |
 
-| Metric (from NFR/DR/AIR)  | .NET 9 | Node.js | Rationale                                    |
+| Metric (from NFR/DR/AIR)  | .net 10 | Node.js | Rationale                                    |
 | ------------------------- | ------ | ------- | -------------------------------------------- |
 | HIPAA Ecosystem (NFR-013) | 9/10   | 6/10    | Mature healthcare libraries, Semantic Kernel |
 | AI Integration (AIR-001)  | 9/10   | 8/10    | Semantic Kernel native, Azure OpenAI SDK     |
@@ -302,7 +302,7 @@ All AI-generated outputs follow a mandatory verification pipeline:
 ## Technical Requirements
 
 - TR-001: System MUST use Angular 18 with standalone components and signals for the frontend application [justified by NFR-012, NFR-010, NFR-014]
-- TR-002: System MUST use .NET 9 ASP.NET Core Web API with modular service architecture for backend services [justified by NFR-016, NFR-013, NFR-001]
+- TR-002: System MUST use .net 10 ASP.NET Core Web API with modular service architecture for backend services [justified by NFR-016, NFR-013, NFR-001]
 - TR-003: System MUST use Entity Framework Core 9 as the ORM with code-first migrations for database access [justified by DR-013, DR-009, DR-010]
 - TR-004: System MUST use PostgreSQL 16+ as the primary relational database [justified by DR-001 through DR-018, free licensing constraint]
 - TR-005: System MUST use Upstash Redis for distributed caching, session management, and real-time appointment slot availability [justified by NFR-007, NFR-020]
@@ -342,12 +342,12 @@ All AI-generated outputs follow a mandatory verification pipeline:
 - Neon PostgreSQL free tier provides adequate storage and compute for Phase 1 data volumes (estimated under 10,000 patient records, under 50,000 appointments)
 - SendGrid and Twilio free tiers provide sufficient monthly quotas for Phase 1 notification volumes
 - PDF clinical documents uploaded by patients are machine-readable (text-based PDFs); scanned image PDFs with OCR requirements are handled on a best-effort basis with lower confidence scores
-- The development team has proficiency in Angular 18, .NET 9, and PostgreSQL; AI/ML integration via Semantic Kernel may require ramp-up time
+- The development team has proficiency in Angular 18, .net 10, and PostgreSQL; AI/ML integration via Semantic Kernel may require ramp-up time
 - Google Calendar API and Microsoft Graph API free tiers will remain available and sufficient for Phase 1 calendar sync volumes
 
 ## Development Workflow
 
-1. **Project Scaffolding** — Initialize Angular 18 workspace (standalone components, signals) and .NET 9 solution with modular project structure (Auth, Patient, Appointment, Clinical, AI, Notification, Admin modules), Docker Compose for local orchestration, and PostgreSQL with pgvector extension
+1. **Project Scaffolding** — Initialize Angular 18 workspace (standalone components, signals) and .net 10 solution with modular project structure (Auth, Patient, Appointment, Clinical, AI, Notification, Admin modules), Docker Compose for local orchestration, and PostgreSQL with pgvector extension
 2. **Authentication and Authorization Service** — Implement JWT-based authentication with bcrypt/Argon2 password hashing, refresh token rotation, RBAC middleware, session management via Upstash Redis (15-minute TTL), and audit logging for auth events
 3. **Patient Management Service** — Implement patient registration with email verification, profile CRUD, and role-based data access (patients access own records only, staff access authorized scope)
 4. **Appointment Booking Service** — Implement slot management with real-time availability (Redis cache), booking CRUD, waitlist enrollment with FIFO swap logic, same-day queue management, appointment PDF generation (QuestPDF), and calendar sync integrations (Google, Outlook)

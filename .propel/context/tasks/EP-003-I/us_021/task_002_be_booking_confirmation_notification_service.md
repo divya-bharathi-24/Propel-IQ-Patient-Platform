@@ -29,11 +29,11 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Mediator | MediatR | 12.x |
 | ORM | Entity Framework Core | 9.x |
 | Database | PostgreSQL | 16+ |
-| Background Service | .NET `IHostedService` / `BackgroundService` | .NET 9 |
+| Background Service | .NET `IHostedService` / `BackgroundService` | .net 10 |
 | AI/ML | N/A | N/A |
 | Vector Store | N/A | N/A |
 | AI Gateway | N/A | N/A |

@@ -34,7 +34,7 @@
 
 | Layer              | Technology                  | Version |
 | ------------------ | --------------------------- | ------- |
-| Backend            | ASP.NET Core Web API        | .NET 9  |
+| Backend            | ASP.NET Core Web API        | .net 10  |
 | Backend Messaging  | MediatR                     | 12.x    |
 | Backend Validation | FluentValidation            | 11.x    |
 | ORM                | Entity Framework Core       | 9.x     |
@@ -75,7 +75,7 @@
 
 ## Task Overview
 
-Implement two Patient Module endpoints in the ASP.NET Core .NET 9 modular monolith:
+Implement two Patient Module endpoints in the ASP.NET Core .net 10 modular monolith:
 
 1. **`GET /api/patients/me`** — reads the authenticated patient's full demographic record from PostgreSQL (PHI fields decrypted via `IPhiEncryptionService`), serialises to `PatientProfileDto`, and returns with an `ETag` header derived from the patient's `RowVersion` (used for optimistic concurrency on PATCH).
 

@@ -27,7 +27,7 @@
 
 | Layer    | Technology                  | Version |
 |----------|-----------------------------|---------|
-| Backend  | ASP.NET Core Web API        | .NET 9  |
+| Backend  | ASP.NET Core Web API        | .net 10  |
 | Messaging| MediatR                     | 12.x    |
 | ORM      | Entity Framework Core       | 9.x     |
 | Database | PostgreSQL                  | 16+     |
@@ -59,7 +59,7 @@
 
 ## Task Overview
 
-Implement a .NET 9 `IHostedService` background service (`ReminderSchedulerService`) that runs periodically to evaluate upcoming appointments due for reminders, creates persisted `Notification` records (status=Pending) for each unprocessed reminder window (48h, 24h, 2h), suppresses reminders for cancelled appointments (logging suppression events), and resumes incomplete Pending jobs on service restart to guarantee at-least-once delivery. The scheduler reads interval configuration from `SystemSettings` at runtime to support dynamic reconfiguration per FR-032.
+Implement a .net 10 `IHostedService` background service (`ReminderSchedulerService`) that runs periodically to evaluate upcoming appointments due for reminders, creates persisted `Notification` records (status=Pending) for each unprocessed reminder window (48h, 24h, 2h), suppresses reminders for cancelled appointments (logging suppression events), and resumes incomplete Pending jobs on service restart to guarantee at-least-once delivery. The scheduler reads interval configuration from `SystemSettings` at runtime to support dynamic reconfiguration per FR-032.
 
 ## Dependent Tasks
 
@@ -77,7 +77,7 @@ Implement a .NET 9 `IHostedService` background service (`ReminderSchedulerServic
 
 ## Implementation Plan
 
-1. **Create `ReminderSchedulerService : BackgroundService`** — Override `ExecuteAsync(CancellationToken stoppingToken)` with a periodic loop running every 5 minutes using `PeriodicTimer` (safe cancellation-aware loop pattern in .NET 9).
+1. **Create `ReminderSchedulerService : BackgroundService`** — Override `ExecuteAsync(CancellationToken stoppingToken)` with a periodic loop running every 5 minutes using `PeriodicTimer` (safe cancellation-aware loop pattern in .net 10).
 2. **Load interval configuration** — On each tick, call `ISystemSettingsRepository.GetReminderIntervalsAsync()` to read current interval values (hours). Cache result in-process for 5 minutes to avoid DB round-trips every tick.
 3. **Query eligible appointments** — Call `IAppointmentRepository.GetAppointmentsForReminderEvaluationAsync(intervalHours[])` that returns Appointments with status=Booked where the appointment time minus any configured interval falls within the next scheduler tick window.
 4. **Idempotent job creation** — Before creating a Notification record, check for an existing record with the same `(appointmentId, templateType, scheduledAt)` to avoid duplicate jobs (at-least-once without duplicates).
@@ -181,7 +181,7 @@ Server/
 
 ## External References
 
-- [.NET BackgroundService & PeriodicTimer (.NET 9)](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
+- [.NET BackgroundService & PeriodicTimer (.net 10)](https://learn.microsoft.com/en-us/dotnet/core/extensions/workers)
 - [IHostedService lifetime management](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-9.0)
 - [Serilog structured logging (.NET)](https://serilog.net/)
 - [At-least-once delivery with DB-backed queue pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/competing-consumers)

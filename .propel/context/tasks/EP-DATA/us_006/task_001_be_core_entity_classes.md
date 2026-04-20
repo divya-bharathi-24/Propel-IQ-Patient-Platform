@@ -27,7 +27,7 @@
 
 | Layer      | Technology           | Version |
 | ---------- | -------------------- | ------- |
-| Backend    | ASP.NET Core Web API | .NET 9  |
+| Backend    | ASP.NET Core Web API | .net 10  |
 | ORM        | Entity Framework Core | 9.x    |
 | Database   | PostgreSQL           | 16+     |
 | AI/ML      | N/A                  | N/A     |
@@ -63,7 +63,7 @@ Create the C# POCO domain entity classes for the five core entities scoped to US
 
 ## Dependent Tasks
 
-- US_002 — .NET 9 solution must exist with at least a `PropelIQ.Domain` or `PropelIQ.Infrastructure` project that references `Microsoft.EntityFrameworkCore 9.x` via NuGet.
+- US_002 — .net 10 solution must exist with at least a `PropelIQ.Domain` or `PropelIQ.Infrastructure` project that references `Microsoft.EntityFrameworkCore 9.x` via NuGet.
 
 ## Impacted Components
 
@@ -92,7 +92,7 @@ Create the C# POCO domain entity classes for the five core entities scoped to US
 
 6. **Create `WaitlistEntry` entity** — Properties: `Guid Id`, `Guid PatientId`, `Guid CurrentAppointmentId`, `DateOnly PreferredDate`, `TimeOnly PreferredTimeSlot`, `DateTime EnrolledAt`, `WaitlistStatus Status`. Navigation: `Patient Patient`, `Appointment CurrentAppointment`.
 
-7. **Verify property nullability alignment** — All non-nullable reference type properties must be `required` or initialised to avoid CS8618 null-safety warnings in .NET 9. Optional FK columns (`CancellationReason`, `Description`) must be declared `string?`.
+7. **Verify property nullability alignment** — All non-nullable reference type properties must be `required` or initialised to avoid CS8618 null-safety warnings in .net 10. Optional FK columns (`CancellationReason`, `Description`) must be declared `string?`.
 
 8. **Confirm project reference** — Verify `PropelIQ.Infrastructure.csproj` references `PropelIQ.Domain.csproj` (or entities are co-located in Infrastructure). Entities must be discoverable by `AppDbContext` in task_002.
 
@@ -102,7 +102,7 @@ Create the C# POCO domain entity classes for the five core entities scoped to US
 server/
 ├── PropelIQ.sln
 └── src/
-    ├── PropelIQ.Api/             # .NET 9 Web API entry point (from US_002)
+    ├── PropelIQ.Api/             # .net 10 Web API entry point (from US_002)
     ├── PropelIQ.Domain/          # Domain layer — to be populated by this task
     │   ├── Entities/             # To be created
     │   └── Enums/                # To be created
@@ -179,7 +179,7 @@ public class Patient
 - [EF Core 9 — Entity types and properties](https://learn.microsoft.com/en-us/ef/core/modeling/entity-types)
 - [EF Core 9 — Relationships and navigation properties](https://learn.microsoft.com/en-us/ef/core/modeling/relationships)
 - [EF Core 9 — Optimistic concurrency (PostgreSQL xmin)](https://www.npgsql.org/efcore/modeling/concurrency.html)
-- [.NET 9 — Nullable reference types (CS8618)](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
+- [.net 10 — Nullable reference types (CS8618)](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
 - [PostgreSQL 16 — UUID primary key type](https://www.postgresql.org/docs/current/datatype-uuid.html)
 
 ## Build Commands
@@ -210,5 +210,5 @@ dotnet build src/PropelIQ.Domain/PropelIQ.Domain.csproj -warnaserror:CS8618
 - [ ] Create `User.cs` — all attributes from design.md `User` entity, `UserRole Role`, `PatientStatus Status`
 - [ ] Create `Appointment.cs` — all DR-002 attributes, `uint RowVersion` concurrency token, navigation to `Patient`, `Specialty`, `WaitlistEntry?`
 - [ ] Create `WaitlistEntry.cs` — all DR-003 attributes, `DateTime EnrolledAt` (FIFO ordering key), navigation to `Patient`, `Appointment`
-- [ ] Verify all `required` / `null!` / `string?` usage is correct for .NET 9 nullable reference types
+- [ ] Verify all `required` / `null!` / `string?` usage is correct for .net 10 nullable reference types
 - [ ] Run `dotnet build` on Domain project; confirm zero errors and zero CS8618 warnings

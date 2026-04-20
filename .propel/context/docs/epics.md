@@ -43,7 +43,7 @@ post_date: "2026-04-17"
 
 **Business Value**: Establishes the complete development foundation — project scaffolding, CI/CD pipeline, containerized local environment, and base architecture — enabling all subsequent feature epics to begin development immediately. Without this epic, no feature work is possible.
 
-**Description**: Bootstrap the full-stack project structure for the Unified Patient Access & Clinical Intelligence Platform. This includes initializing the Angular 18 SPA workspace (standalone components, signals, NgRx Signals), the .NET 9 ASP.NET Core modular monolith solution (Auth, Patient, Appointment, Clinical, AI, Notification, Admin modules), Docker Compose for local orchestration, PostgreSQL with pgvector extension, Upstash Redis integration baseline, GitHub Actions CI/CD pipeline, and Netlify/Railway deployment configuration.
+**Description**: Bootstrap the full-stack project structure for the Unified Patient Access & Clinical Intelligence Platform. This includes initializing the Angular 18 SPA workspace (standalone components, signals, NgRx Signals), the .net 10 ASP.NET Core modular monolith solution (Auth, Patient, Appointment, Clinical, AI, Notification, Admin modules), Docker Compose for local orchestration, PostgreSQL with pgvector extension, Upstash Redis integration baseline, GitHub Actions CI/CD pipeline, and Netlify/Railway deployment configuration.
 
 **UI Impact**: No
 
@@ -52,7 +52,7 @@ post_date: "2026-04-17"
 **Key Deliverables**:
 
 - Angular 18 workspace with standalone components, signals, and NgRx Signals configured
-- .NET 9 ASP.NET Core Web API solution with modular project structure (7 modules)
+- .net 10 ASP.NET Core Web API solution with modular project structure (7 modules)
 - Docker Compose for local full-stack orchestration (frontend, backend, PostgreSQL, Redis)
 - PostgreSQL 16+ with pgvector extension provisioned (Neon free tier)
 - Upstash Redis serverless instance configured for session and cache

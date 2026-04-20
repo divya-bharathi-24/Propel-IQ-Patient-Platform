@@ -34,7 +34,7 @@
 
 | Layer              | Technology              | Version |
 | ------------------ | ----------------------- | ------- |
-| Backend            | ASP.NET Core Web API    | .NET 9  |
+| Backend            | ASP.NET Core Web API    | .net 10  |
 | Backend Messaging  | MediatR                 | 12.x    |
 | Backend Validation | FluentValidation        | 11.x    |
 | ORM                | Entity Framework Core   | 9.x     |
@@ -75,7 +75,7 @@
 
 ## Task Overview
 
-Implement the ASP.NET Core .NET 9 backend for the manual ad-hoc reminder trigger feature. The core deliverable is a `POST /api/staff/appointments/{appointmentId}/reminders/trigger` endpoint that:
+Implement the ASP.NET Core .net 10 backend for the manual ad-hoc reminder trigger feature. The core deliverable is a `POST /api/staff/appointments/{appointmentId}/reminders/trigger` endpoint that:
 
 1. Validates the appointment is `Booked` (not `Cancelled`) — returns 422 on violation
 2. Enforces a 5-minute debounce cooldown per appointment — returns 429 with `retryAfterSeconds` if a `Sent` Notification for the appointment was recorded within the last 5 minutes
@@ -220,7 +220,7 @@ Server/
 
 - [MediatR 12.x documentation](https://github.com/jbogard/MediatR/wiki)
 - [FluentValidation ASP.NET Core integration](https://docs.fluentvalidation.net/en/latest/aspnet.html)
-- [ASP.NET Core .NET 9 — Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles)
+- [ASP.NET Core .net 10 — Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles)
 - [SendGrid C# library](https://github.com/sendgrid/sendgrid-dotnet)
 - [Twilio C# helper library](https://www.twilio.com/docs/libraries/csharp-dotnet)
 - [EF Core 9 — Querying related data](https://learn.microsoft.com/en-us/ef/core/querying/related-data/)

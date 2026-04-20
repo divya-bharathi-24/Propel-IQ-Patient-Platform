@@ -5,7 +5,7 @@
 - User Story: [us_003]
 - Story Location: [.propel/context/tasks/EP-TECH/us_003/us_003.md]
 - Acceptance Criteria:
-  - AC1: Given Docker Desktop is running, When I execute `docker compose up`, Then all four services (Angular dev server, .NET 9 API, PostgreSQL 16 with pgvector, Redis local emulator) start within 2 minutes without manual intervention.
+  - AC1: Given Docker Desktop is running, When I execute `docker compose up`, Then all four services (Angular dev server, .net 10 API, PostgreSQL 16 with pgvector, Redis local emulator) start within 2 minutes without manual intervention.
   - AC2: Given the Docker Compose environment is running, When the backend initializes, Then it applies pending EF Core migrations automatically and seeds the Specialty reference table.
   - AC3: Given the local stack is up, When I navigate to the Swagger UI URL, Then the API gateway is reachable and all health check endpoints return HTTP 200.
   - AC4: Given the stack is running, When I stop a single service (e.g., Redis), Then the remaining services continue running and the API returns a graceful degradation response for Redis-dependent endpoints.
@@ -32,7 +32,7 @@
 |----------------------|----------------------------------------|------------|
 | Containerization     | Docker / Docker Compose                | 24.x       |
 | Frontend             | Angular (dev server in container)      | 18.x       |
-| Backend              | ASP.NET Core Web API                   | .NET 9     |
+| Backend              | ASP.NET Core Web API                   | .net 10     |
 | ORM                  | Entity Framework Core                  | 9.x        |
 | Database             | PostgreSQL + pgvector extension        | 16+        |
 | Cache                | Redis (local; mirrors Upstash interface) | 7.x (Alpine) |
@@ -61,11 +61,11 @@
 
 ## Task Overview
 
-Create the Docker Compose local development environment that orchestrates all four platform services — Angular 18 dev server (`app/`), .NET 9 ASP.NET Core API (`server/`), PostgreSQL 16 with the `pgvector` extension, and a local Redis container that mirrors the Upstash Redis interface — with a single `docker compose up` command. The compose file uses `depends_on` with `condition: service_healthy` to sequence startup correctly (PostgreSQL ready before backend migrations run). The backend container entrypoint runs `dotnet ef database update` automatically and seeds the Specialty reference table before serving HTTP traffic. An `/healthz` endpoint is exposed on the API gateway confirming reachability (AC3). Graceful degradation for Redis-dependent endpoints is implemented in the .NET 9 backend: if Redis is unreachable, affected endpoints return HTTP 200 with an `X-Degraded: redis` response header and a non-cached fallback response, so remaining services are unaffected (AC4 / NFR-018). All secrets are injected via a `.env` file (`.env.example` committed; `.env` git-ignored). This task satisfies TR-022 (Docker containers for local dev) and NFR-016 (service isolation enabling horizontal scaling readiness).
+Create the Docker Compose local development environment that orchestrates all four platform services — Angular 18 dev server (`app/`), .net 10 ASP.NET Core API (`server/`), PostgreSQL 16 with the `pgvector` extension, and a local Redis container that mirrors the Upstash Redis interface — with a single `docker compose up` command. The compose file uses `depends_on` with `condition: service_healthy` to sequence startup correctly (PostgreSQL ready before backend migrations run). The backend container entrypoint runs `dotnet ef database update` automatically and seeds the Specialty reference table before serving HTTP traffic. An `/healthz` endpoint is exposed on the API gateway confirming reachability (AC3). Graceful degradation for Redis-dependent endpoints is implemented in the .net 10 backend: if Redis is unreachable, affected endpoints return HTTP 200 with an `X-Degraded: redis` response header and a non-cached fallback response, so remaining services are unaffected (AC4 / NFR-018). All secrets are injected via a `.env` file (`.env.example` committed; `.env` git-ignored). This task satisfies TR-022 (Docker containers for local dev) and NFR-016 (service isolation enabling horizontal scaling readiness).
 
 ## Dependent Tasks
 
-- [us_002/task_001_be_dotnet_solution_scaffold.md] — .NET 9 solution (`server/`) must exist before this task creates the backend Dockerfile and targets the solution for `dotnet build` and `dotnet ef database update`.
+- [us_002/task_001_be_dotnet_solution_scaffold.md] — .net 10 solution (`server/`) must exist before this task creates the backend Dockerfile and targets the solution for `dotnet build` and `dotnet ef database update`.
 - [us_001/task_001_fe_angular_workspace_setup.md] — Angular 18 workspace (`app/`) must exist before this task creates the frontend Dockerfile and targets `ng serve`.
 
 ## Impacted Components
@@ -125,7 +125,7 @@ Propel-IQ-Patient-Platform/
 │                   ├── us_003.md
 │                   └── task_001_infra_docker_compose_local_dev.md  ← THIS TASK
 ├── app/                  ← Angular 18 SPA (us_001)
-├── server/               ← .NET 9 solution (us_002)
+├── server/               ← .net 10 solution (us_002)
 ├── BRD Unified Patient Acces.md
 └── README.md
 ```
@@ -141,7 +141,7 @@ Propel-IQ-Patient-Platform/
 | CREATE | `.env.example`                                                            | Template env vars: PostgreSQL, Redis, JWT, ASPNETCORE settings                   |
 | MODIFY | `.gitignore`                                                              | Add `.env` to prevent secrets commit                                             |
 | CREATE | `app/Dockerfile`                                                          | Node 20 Alpine; `npm ci`; `ng serve --host 0.0.0.0 --poll 1000`                  |
-| CREATE | `server/Dockerfile`                                                       | Multi-stage: SDK 9.0 build → ASP.NET 9.0 runtime; `dotnet publish` release build |
+| CREATE | `server/Dockerfile`                                                       | Multi-stage: SDK 9.0 build → ASP.net 10.0 runtime; `dotnet publish` release build |
 | CREATE | `server/docker-entrypoint.sh`                                             | Wait-for-DB loop; `dotnet ef database update`; seed trigger; `dotnet` start       |
 | CREATE | `server/Propel.Api.Gateway/Endpoints/HealthCheckEndpoint.cs`             | `/healthz` minimal API; DB + Redis connectivity check; HTTP 200 with degraded state |
 | CREATE | `server/Propel.Api.Gateway/Data/SeedData.cs`                             | `SeedSpecialtiesAsync` — inserts Specialty rows if table is empty                |
@@ -154,7 +154,7 @@ Propel-IQ-Patient-Platform/
 - [Docker Compose `depends_on` with health checks](https://docs.docker.com/compose/compose-file/05-services/#depends_on)
 - [pgvector Docker image — `pgvector/pgvector:pg16`](https://hub.docker.com/r/pgvector/pgvector)
 - [Redis 7 Alpine Docker image](https://hub.docker.com/_/redis)
-- [.NET 9 Multi-stage Dockerfile best practices](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container)
+- [.net 10 Multi-stage Dockerfile best practices](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container)
 - [EF Core CLI — `dotnet ef database update`](https://learn.microsoft.com/en-us/ef/core/cli/dotnet#dotnet-ef-database-update)
 - [ASP.NET Core Health Checks](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0)
 - [StackExchange.Redis — `abortConnect=false` for graceful degradation](https://stackexchange.github.io/StackExchange.Redis/Configuration.html)

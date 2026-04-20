@@ -34,7 +34,7 @@
 
 | Layer              | Technology              | Version |
 | ------------------ | ----------------------- | ------- |
-| Backend            | ASP.NET Core Web API    | .NET 9  |
+| Backend            | ASP.NET Core Web API    | .net 10  |
 | Backend Messaging  | MediatR                 | 12.x    |
 | Backend Validation | FluentValidation        | 11.x    |
 | ORM                | Entity Framework Core   | 9.x     |
@@ -73,7 +73,7 @@
 
 ## Task Overview
 
-Implement the ASP.NET Core .NET 9 backend for the 360-degree patient view feature. This task delivers two endpoints:
+Implement the ASP.NET Core .net 10 backend for the 360-degree patient view feature. This task delivers two endpoints:
 
 1. **`GET /api/staff/patients/{patientId}/360-view`** — Queries `ExtractedData` and `ClinicalDocument` tables, groups records by `dataType` and `fieldName`, applies the de-duplication merge strategy computed by the AI service (task_003) which pre-writes canonical entries, builds source citation arrays, sets `isLowConfidence` flags, and returns the aggregated `Patient360ViewDto`. The endpoint must remain within the 2-minute SLA for ≤10 documents by operating exclusively on pre-aggregated data (written by the AI pipeline in task_003) rather than re-running extraction inline.
 
@@ -218,7 +218,7 @@ Server/
 - [FluentValidation — Custom async validators](https://docs.fluentvalidation.net/en/latest/custom-validators.html)
 - [EF Core 9 — Querying related data](https://learn.microsoft.com/en-us/ef/core/querying/related-data/)
 - [EF Core 9 — Grouping](https://learn.microsoft.com/en-us/ef/core/querying/grouping)
-- [ASP.NET Core .NET 9 — Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles)
+- [ASP.NET Core .net 10 — Authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles)
 - [OWASP A01 Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/)
 - [OWASP A03 Injection — parameterised queries](https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#parameterized-queries)
 

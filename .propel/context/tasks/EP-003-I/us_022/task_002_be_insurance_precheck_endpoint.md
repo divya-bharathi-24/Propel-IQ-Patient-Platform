@@ -31,7 +31,7 @@
 | Layer | Technology | Version |
 |-------|------------|---------|
 | Frontend | N/A | N/A |
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | Backend Validation | FluentValidation | 11.x |
 | ORM | Entity Framework Core | 9.x |
@@ -64,7 +64,7 @@
 
 ## Task Overview
 
-Implement the `POST /api/insurance/pre-check` ASP.NET Core Web API (.NET 9) endpoint that the booking wizard Step 3 calls interactively when a patient clicks "Check Insurance". This endpoint:
+Implement the `POST /api/insurance/pre-check` ASP.NET Core Web API (.net 10) endpoint that the booking wizard Step 3 calls interactively when a patient clicks "Check Insurance". This endpoint:
 
 1. **Accepts** `{ providerName: string?, insuranceId: string? }` in the request body. Both fields are intentionally nullable — the endpoint classifies missing values as `Incomplete` rather than rejecting the request.
 2. **Classifies status** using the `InsuranceSoftCheckService`:

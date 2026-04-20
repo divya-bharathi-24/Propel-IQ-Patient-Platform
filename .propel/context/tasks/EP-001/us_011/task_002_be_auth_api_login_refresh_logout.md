@@ -31,7 +31,7 @@
 | Layer | Technology | Version |
 |-------|------------|---------|
 | Frontend | N/A (backend task) | N/A |
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | Backend Messaging | MediatR | 12.x |
 | Backend Validation | FluentValidation | 11.x |
 | ORM | Entity Framework Core | 9.x |
@@ -65,7 +65,7 @@
 
 ## Task Overview
 
-Implement the three backend authentication endpoints for US_011 using ASP.NET Core Web API (.NET 9) following the CQRS pattern via MediatR 12.x. This task covers:
+Implement the three backend authentication endpoints for US_011 using ASP.NET Core Web API (.net 10) following the CQRS pattern via MediatR 12.x. This task covers:
 
 1. `POST /api/auth/login` — credential validation (Argon2 hash comparison), JWT generation (15-min expiry with role claim), refresh token generation (CSPRNG), Redis session creation (15-min TTL), and audit log entry.
 2. `POST /api/auth/refresh` — refresh token validation, Redis session alive check, atomic token rotation (revoke old / insert new in the same DB transaction), new JWT issuance. Includes full reuse-detection flow (token family invalidation + security alert).
@@ -142,7 +142,7 @@ All three endpoints are protected by FluentValidation request validators and pro
 ## Current Project State
 
 ```
-Server/                   ← ASP.NET Core .NET 9 Web API root (to be scaffolded)
+Server/                   ← ASP.NET Core .net 10 Web API root (to be scaffolded)
 └── (no source files yet)
 ```
 
@@ -170,7 +170,7 @@ Server/                   ← ASP.NET Core .NET 9 Web API root (to be scaffolded
 
 ## External References
 
-- [ASP.NET Core JWT Bearer Authentication (.NET 9)](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/jwt-authn?view=aspnetcore-9.0) — `AddAuthentication`, `AddJwtBearer`, `TokenValidationParameters`
+- [ASP.NET Core JWT Bearer Authentication (.net 10)](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/jwt-authn?view=aspnetcore-9.0) — `AddAuthentication`, `AddJwtBearer`, `TokenValidationParameters`
 - [MediatR 12.x — Send and Publish](https://github.com/jbogard/MediatR/wiki) — `IRequest<T>`, `IRequestHandler<T,R>`, pipeline behaviors
 - [FluentValidation 11.x with ASP.NET Core](https://docs.fluentvalidation.net/en/latest/aspnet.html) — `AddFluentValidationAutoValidation`, `AbstractValidator<T>`
 - [ASP.NET Core Rate Limiting Middleware (.NET 7+)](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-9.0) — `AddRateLimiter`, `AddFixedWindowLimiter`
@@ -184,7 +184,7 @@ Server/                   ← ASP.NET Core .NET 9 Web API root (to be scaffolded
 ## Build Commands
 
 ```bash
-# Scaffold .NET 9 Web API (greenfield)
+# Scaffold .net 10 Web API (greenfield)
 dotnet new webapi -n PropelIQ.Server --framework net9.0
 
 # Add required NuGet packages

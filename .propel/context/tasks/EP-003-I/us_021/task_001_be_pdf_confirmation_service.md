@@ -26,7 +26,7 @@
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Backend | ASP.NET Core Web API | .NET 9 |
+| Backend | ASP.NET Core Web API | .net 10 |
 | PDF Generation | QuestPDF | 2024.x |
 | Database | PostgreSQL | 16+ |
 | ORM | Entity Framework Core | 9.x |

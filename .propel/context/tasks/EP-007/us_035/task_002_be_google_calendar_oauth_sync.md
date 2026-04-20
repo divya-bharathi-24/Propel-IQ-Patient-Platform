@@ -34,12 +34,12 @@
 
 | Layer              | Technology            | Version |
 | ------------------ | --------------------- | ------- |
-| Backend            | ASP.NET Core Web API  | .NET 9  |
+| Backend            | ASP.NET Core Web API  | .net 10  |
 | Backend Messaging  | MediatR               | 12.x    |
 | ORM                | Entity Framework Core | 9.x     |
 | Logging            | Serilog               | 4.x     |
-| Token Security     | ASP.NET Core Data Protection API | .NET 9 |
-| Background Jobs    | .NET BackgroundService (IHostedService) | .NET 9 |
+| Token Security     | ASP.NET Core Data Protection API | .net 10 |
+| Background Jobs    | .NET BackgroundService (IHostedService) | .net 10 |
 | Google Calendar    | Google.Apis.Calendar.v3 NuGet | latest stable |
 | ICS Generation     | Ical.Net              | 4.x     |
 | Testing — Unit     | xUnit + Moq           | 2.x     |
@@ -77,7 +77,7 @@
 
 ## Task Overview
 
-Implement the ASP.NET Core .NET 9 Google Calendar OAuth 2.0 sync backend within the Calendar module (`Server/Modules/Calendar/`). Four capabilities are required:
+Implement the ASP.NET Core .net 10 Google Calendar OAuth 2.0 sync backend within the Calendar module (`Server/Modules/Calendar/`). Four capabilities are required:
 
 1. **OAuth flow initiation** — `GET /api/calendar/google/auth` builds the Google authorization URL with PKCE verifier and anti-CSRF `state` parameter, stores `state` in Redis (10-min TTL), and redirects to Google
 2. **OAuth callback handler** — `GET /api/calendar/google/callback` validates `state`, exchanges code for tokens, encrypts and stores tokens via `ASP.NET Core Data Protection API`, creates/updates the Google Calendar event, upserts `CalendarSync`, redirects FE
@@ -227,7 +227,7 @@ Propel-IQ-Patient-Platform/
 - [Google.Apis.Calendar.v3 NuGet package](https://www.nuget.org/packages/Google.Apis.Calendar.v3)
 - [ASP.NET Core Data Protection API — IDataProtector.Protect / Unprotect](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/using-data-protection)
 - [Ical.Net 4.x — Calendar / VEvent generation](https://github.com/rianjs/ical.net)
-- [.NET 9 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/timer-service)
+- [.net 10 BackgroundService + PeriodicTimer](https://learn.microsoft.com/en-us/dotnet/core/extensions/timer-service)
 - [OWASP A01 — Broken Access Control: `patientId` from JWT; ownership check on `CalendarSync`](https://owasp.org/Top10/A01_2021-Broken_Access_Control/)
 - [OWASP A02 — Cryptographic Failures: `GOOGLE_CLIENT_SECRET` from env var; tokens encrypted at rest](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)
 - [OWASP A07 — OAuth state parameter as CSRF guard; one-time Redis consumption](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)

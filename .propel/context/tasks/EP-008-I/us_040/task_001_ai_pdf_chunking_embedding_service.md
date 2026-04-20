@@ -26,7 +26,7 @@
 
 | Layer         | Technology                        | Version    |
 |---------------|-----------------------------------|------------|
-| Backend       | ASP.NET Core Web API              | .NET 9     |
+| Backend       | ASP.NET Core Web API              | .net 10     |
 | AI/ML         | OpenAI text-embedding-3-small     | Latest     |
 | AI Orchestration | Microsoft Semantic Kernel      | 1.x        |
 | Vector Store  | pgvector (PostgreSQL extension)   | 0.7+       |

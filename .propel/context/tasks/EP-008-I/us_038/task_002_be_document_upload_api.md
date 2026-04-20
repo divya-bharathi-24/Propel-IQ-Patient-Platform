@@ -45,12 +45,12 @@
 
 | Layer              | Technology                            | Version |
 | ------------------ | ------------------------------------- | ------- |
-| Backend            | ASP.NET Core Web API                  | .NET 9  |
+| Backend            | ASP.NET Core Web API                  | .net 10  |
 | Messaging          | MediatR                               | 12.x    |
 | Validation         | FluentValidation                      | 11.x    |
 | ORM                | Entity Framework Core                 | 9.x     |
 | Database           | PostgreSQL 16+ (Neon)                 | 16+     |
-| Encryption         | ASP.NET Core Data Protection API      | .NET 9  |
+| Encryption         | ASP.NET Core Data Protection API      | .net 10  |
 | Logging            | Serilog                               | 4.x     |
 | Testing            | xUnit + Moq                           | 2.x     |
 | AI/ML              | N/A                                   | N/A     |
@@ -358,7 +358,7 @@ Propel-IQ-Patient-Platform/
 
 ## External References
 
-- [ASP.NET Core .NET 9 — File uploads (IFormFile, RequestSizeLimit, multipart)](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-9.0)
+- [ASP.NET Core .net 10 — File uploads (IFormFile, RequestSizeLimit, multipart)](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-9.0)
 - [ASP.NET Core Data Protection — Protect/Unprotect byte arrays](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/using-data-protection?view=aspnetcore-9.0)
 - [ASP.NET Core Data Protection — Key storage in Redis (production)](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/implementation/key-storage-providers?view=aspnetcore-9.0#redis)
 - [FluentValidation 11.x — RuleForEach](https://docs.fluentvalidation.net/en/latest/collections.html)
