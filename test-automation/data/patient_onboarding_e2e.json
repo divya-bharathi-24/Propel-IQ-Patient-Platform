@@ -1,0 +1,43 @@
+{
+  "patient": {
+    "email": "e2e.onboard.patient@propeliq.dev",
+    "password": "E2eP@ss001!",
+    "firstName": "E2E",
+    "lastName": "OnboardPatient",
+    "dateOfBirth": "1988-03-22",
+    "phone": "+14155550501",
+    "verificationToken": "e2e-verify-token-001"
+  },
+  "appointment": {
+    "slotId": "e2e-001",
+    "slotDate": "2026-05-20",
+    "slotTime": "10:00",
+    "insurance": {
+      "provider": "BlueCross",
+      "memberId": "MBR-E2E-001"
+    }
+  },
+  "intake": {
+    "chatMessage": "I take Lisinopril 10mg daily and I am allergic to sulfa drugs",
+    "expectedMedications": ["Lisinopril 10mg"],
+    "expectedAllergies": ["Sulfa drugs"]
+  },
+  "documents": [
+    { "name": "e2e_doc_1.pdf", "sizeMb": 3 },
+    { "name": "e2e_doc_2.pdf", "sizeMb": 4 }
+  ],
+  "staff": {
+    "email": "e2e.staff@propeliq.dev",
+    "password": "StaffP@ss001!"
+  },
+  "conflict": {
+    "field": "medication",
+    "value1": "Lisinopril 10mg",
+    "source1": "Document 1",
+    "value2": "Lisinopril 20mg",
+    "source2": "Document 2",
+    "authoritativeValue": "Lisinopril 10mg"
+  },
+  "patientRef": "e2e-onboard-patient",
+  "patientId": "e2e-onboard-patient-id"
+}

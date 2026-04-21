@@ -1,0 +1,59 @@
+{
+  "tc_uc001_hp_001": {
+    "email": "hp.patient.001@propeliq.dev",
+    "password": "TestP@ss001!",
+    "firstName": "Happy",
+    "lastName": "Patient001",
+    "dateOfBirth": "1990-05-15",
+    "phone": "+14155550101",
+    "slotId": "hp-001",
+    "slotDate": "2026-05-15",
+    "slotTime": "09:00",
+    "insuranceProvider": "BlueCross",
+    "memberId": "MBR-001",
+    "verificationToken": "test-token-001"
+  },
+  "tc_uc001_ec_001": {
+    "patientEmail": "ec.patient.001@propeliq.dev",
+    "availableSlotId": "ec-available",
+    "preferredSlotId": "ec-preferred"
+  },
+  "tc_uc001_er_001": {
+    "duplicateEmail": "existing@propeliq.dev",
+    "password": "TestP@ss001!",
+    "firstName": "Existing",
+    "lastName": "User"
+  },
+  "tc_uc002_hp_001": {
+    "appointmentId": "appt-ai-001",
+    "chatMessage": "I take Metformin 500mg daily and Aspirin 81mg",
+    "allergyMessage": "I am allergic to penicillin",
+    "expectedMedications": ["Metformin 500mg", "Aspirin 81mg"],
+    "expectedAllergies": ["Penicillin"]
+  },
+  "tc_uc002_ec_001": {
+    "appointmentId": "appt-switch-001",
+    "preParsedMedication": "Metformin 500mg"
+  },
+  "tc_uc002_er_001": {
+    "appointmentId": "appt-nlu-001",
+    "ambiguousInput": "I take some kind of blood pressure pill",
+    "expectedConfidence": 0.6,
+    "confidenceThreshold": 0.8
+  },
+  "tc_uc003_hp_001": {
+    "appointmentId": "appt-manual-001",
+    "medications": "Lisinopril 10mg daily",
+    "allergies": "Sulfa drugs",
+    "symptoms": "Mild headache, fatigue",
+    "medicalHistory": "Hypertension (diagnosed 2020)"
+  },
+  "tc_uc003_ec_001": {
+    "appointmentId": "appt-prepop-001",
+    "aiParsedMedication": "Metformin 500mg"
+  },
+  "tc_uc003_er_001": {
+    "appointmentId": "appt-validate-001",
+    "requiredFields": ["medications", "allergies", "symptoms"]
+  }
+}
