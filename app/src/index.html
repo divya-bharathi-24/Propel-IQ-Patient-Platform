@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PropelIqPatientPlatform</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- Runtime environment injection: must load before Angular bootstrap so that
+         window.__env.apiUrl is available when environment.ts is evaluated.
+         %%API_URL%% is substituted by the Netlify build command via sed (AC-3). -->
+    <script src="/assets/env.js"></script>
+    <!-- Preconnect and DNS-prefetch for the API backend to reduce LCP connection latency -->
+    <link
+      rel="preconnect"
+      href="https://propeliq-api.up.railway.app"
+      crossorigin
+    />
+    <link rel="dns-prefetch" href="https://propeliq-api.up.railway.app" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

@@ -1,0 +1,195 @@
+<section class="walk-in-patient-create" aria-label="Create walk-in patient">
+  <!-- Toggle button -->
+  <button
+    mat-stroked-button
+    type="button"
+    (click)="toggleExpand()"
+    [attr.aria-expanded]="isExpanded()"
+    aria-controls="walk-in-patient-form"
+  >
+    <mat-icon aria-hidden="true">{{
+      isExpanded() ? "expand_less" : "person_add"
+    }}</mat-icon>
+    {{ isExpanded() ? "Cancel New Patient" : "New Walk-In Patient" }}
+  </button>
+
+  @if (isExpanded()) {
+    <div
+      id="walk-in-patient-form"
+      role="region"
+      aria-labelledby="walk-in-form-title"
+    >
+      <h3 id="walk-in-form-title" class="form-section-title">
+        New Patient Details
+      </h3>
+
+      <!-- Inline errors -->
+      @if (inlineError()) {
+        <div
+          class="inline-error"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          {{ inlineError() }}
+        </div>
+      }
+
+      <!-- Duplicate email warning -->
+      @if (duplicateEmail()) {
+        <div
+          class="duplicate-warning"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <span>Email already registered.</span>
+          @if (!existingPatient()) {
+            <button
+              mat-button
+              color="primary"
+              type="button"
+              (click)="linkExistingPatient()"
+              [disabled]="isLinkingPatient()"
+              aria-label="Link to existing patient account with this email"
+            >
+              @if (isLinkingPatient()) {
+                <mat-spinner diameter="16" aria-label="Loading…"></mat-spinner>
+              } @else {
+                Link to existing account
+              }
+            </button>
+          }
+          @if (existingPatient()) {
+            <button
+              mat-flat-button
+              color="accent"
+              type="button"
+              (click)="selectExistingPatient()"
+              [attr.aria-label]="
+                'Use existing account for ' + existingPatient()!.name
+              "
+            >
+              Use: {{ existingPatient()!.name }} ({{
+                existingPatient()!.email
+              }})
+            </button>
+          }
+        </div>
+      }
+
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        novalidate
+        aria-describedby="walk-in-form-instructions"
+      >
+        <p id="walk-in-form-instructions" class="sr-only">
+          Name and email are required. Phone is optional and must be in
+          international format.
+        </p>
+
+        <!-- Name -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Patient Name</mat-label>
+          <input
+            matInput
+            id="walkin-name"
+            formControlName="name"
+            type="text"
+            autocomplete="name"
+            aria-required="true"
+            [attr.aria-describedby]="
+              nameControl.invalid && nameControl.touched
+                ? 'walkin-name-error'
+                : null
+            "
+            placeholder="Full name"
+          />
+          @if (nameControl.invalid && nameControl.touched) {
+            <mat-error id="walkin-name-error" role="alert">
+              @if (nameControl.hasError("required")) {
+                Patient name is required.
+              }
+              @if (nameControl.hasError("maxlength")) {
+                Name must not exceed 200 characters.
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Phone (optional) -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number (optional)</mat-label>
+          <input
+            matInput
+            id="walkin-phone"
+            formControlName="phone"
+            type="tel"
+            autocomplete="tel"
+            aria-required="false"
+            [attr.aria-describedby]="
+              phoneControl.invalid && phoneControl.touched
+                ? 'walkin-phone-error'
+                : null
+            "
+            placeholder="+61412345678"
+          />
+          @if (phoneControl.invalid && phoneControl.touched) {
+            <mat-error id="walkin-phone-error" role="alert">
+              @if (phoneControl.hasError("pattern")) {
+                Phone must be in international format (e.g. +61412345678).
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input
+            matInput
+            id="walkin-email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            aria-required="true"
+            [attr.aria-describedby]="
+              emailControl.invalid && emailControl.touched
+                ? 'walkin-email-error'
+                : null
+            "
+            placeholder="patient@example.com"
+          />
+          @if (emailControl.invalid && emailControl.touched) {
+            <mat-error id="walkin-email-error" role="alert">
+              @if (emailControl.hasError("required")) {
+                Email address is required.
+              }
+              @if (emailControl.hasError("email")) {
+                Please enter a valid email address.
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="isSubmitting()"
+          aria-label="Create patient record"
+        >
+          @if (isSubmitting()) {
+            <mat-spinner
+              diameter="20"
+              aria-label="Creating patient…"
+            ></mat-spinner>
+          } @else {
+            Create Patient
+          }
+        </button>
+      </form>
+    </div>
+  }
+</section>

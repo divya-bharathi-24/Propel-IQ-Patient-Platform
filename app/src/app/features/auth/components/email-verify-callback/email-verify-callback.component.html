@@ -1,0 +1,162 @@
+<main
+  class="callback-container"
+  role="main"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <section class="callback-card">
+    <!-- Loading -->
+    @if (state() === "loading") {
+      <div
+        class="state-content"
+        aria-label="Verifying your email address, please wait."
+      >
+        <mat-spinner diameter="48"></mat-spinner>
+        <h1>Verifying your email…</h1>
+        <p>Please wait while we confirm your account.</p>
+      </div>
+    }
+
+    <!-- Success -->
+    @if (state() === "success") {
+      <div
+        class="state-content state-content--success"
+        aria-label="Email verified successfully."
+      >
+        <div class="icon-wrapper icon-wrapper--success" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+        </div>
+        <h1>Email Verified!</h1>
+        <p>Your account has been activated. Redirecting you to booking…</p>
+      </div>
+    }
+
+    <!-- Expired token (410) -->
+    @if (state() === "expired") {
+      <div
+        class="state-content state-content--warning"
+        aria-label="Verification link expired."
+      >
+        <div class="icon-wrapper icon-wrapper--warning" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h1>Link Expired</h1>
+        <p>
+          Your verification link has expired. Verification links are valid for
+          24 hours.
+        </p>
+        <a
+          mat-raised-button
+          color="primary"
+          routerLink="/auth/verify-pending"
+          aria-label="Request a new verification email"
+        >
+          Request New Verification Email
+        </a>
+      </div>
+    }
+
+    <!-- Already used (409) -->
+    @if (state() === "already-used") {
+      <div
+        class="state-content state-content--info"
+        aria-label="Verification link already used."
+      >
+        <div class="icon-wrapper icon-wrapper--info" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+        </div>
+        <h1>Link Already Used</h1>
+        <p>
+          This verification link has already been used. Your account may already
+          be active.
+        </p>
+        <a
+          mat-raised-button
+          color="primary"
+          routerLink="/auth/login"
+          aria-label="Go to sign in page"
+        >
+          Sign In
+        </a>
+      </div>
+    }
+
+    <!-- Generic error -->
+    @if (state() === "error") {
+      <div
+        class="state-content state-content--error"
+        aria-label="Verification failed."
+      >
+        <div class="icon-wrapper icon-wrapper--error" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+        </div>
+        <h1>Verification Failed</h1>
+        <p>
+          We could not verify your email. The link may be invalid or missing.
+        </p>
+        <a
+          mat-raised-button
+          color="primary"
+          routerLink="/auth/login"
+          aria-label="Go to sign in page"
+        >
+          Sign In
+        </a>
+      </div>
+    }
+  </section>
+</main>

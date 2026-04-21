@@ -1,0 +1,67 @@
+# netlify.toml — Netlify hosting configuration for the Angular 18 SPA
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  base    = "app"
+  # After the Angular build, substitute the %%API_URL%% placeholder in env.js with the
+  # actual Railway API URL provided by the API_URL Netlify build environment variable (AC-3).
+  # The sed -i '' syntax is macOS-compatible; Netlify build images use Linux so plain -i is fine.
+  command = "npm run build:prod && sed -i 's|%%API_URL%%|'\"$API_URL\"'|g' dist/propel-iq-patient-platform/browser/assets/env.js"
+  # Angular 18 application builder places browser assets in a /browser sub-directory
+  publish = "dist/propel-iq-patient-platform/browser"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# ---------------------------------------------------------------------------
+# SPA fallback: serve index.html for all client-side routes so that browser
+# refresh on any Angular route (e.g. /appointments) does not return a 404.
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ---------------------------------------------------------------------------
+# HTTPS enforcement: permanently redirect all HTTP traffic to HTTPS.
+# Netlify automatically provisions a Let's Encrypt certificate.
+# The :splat placeholder preserves the full request path and query string.
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from   = "http://propeliq.netlify.app/*"
+  to     = "https://propeliq.netlify.app/:splat"
+  status = 301
+  force  = true
+
+# ---------------------------------------------------------------------------
+# Security response headers (OWASP HTTP Headers Cheat Sheet)
+# Applied to every response served by Netlify.
+# ---------------------------------------------------------------------------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options           = "DENY"
+    X-Content-Type-Options    = "nosniff"
+    Referrer-Policy           = "strict-origin-when-cross-origin"
+    Permissions-Policy        = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# ---------------------------------------------------------------------------
+# Long-lived caching for hashed static assets.
+# Angular's outputHashing = "all" adds content-hash fingerprints to filenames,
+# making immutable caching safe (stale files are never served after a deploy).
+# ---------------------------------------------------------------------------
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

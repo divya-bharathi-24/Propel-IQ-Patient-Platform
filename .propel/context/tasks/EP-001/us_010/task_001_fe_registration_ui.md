@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value                                                                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **UI Impact**        | Yes                                                                                                                                   |
-| **Figma URL**        | N/A                                                                                                                                   |
-| **Wireframe Status** | PENDING                                                                                                                               |
-| **Wireframe Type**   | N/A                                                                                                                                   |
+| Reference Type         | Value                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                    |
+| **Figma URL**          | N/A                                                                                                                    |
+| **Wireframe Status**   | PENDING                                                                                                                |
+| **Wireframe Type**     | N/A                                                                                                                    |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-registration.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec**      | N/A (figma_spec.md not yet generated)                                                                                                 |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated)                                                                                                 |
-| **Design Tokens**    | N/A (designsystem.md not yet generated)                                                                                               |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                  |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                  |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                |
 
 > **Wireframe Status:** PENDING — implement layout following Angular Material and WCAG 2.2 AA guidelines until wireframes are available. Run `/analyze-ux` once wireframe is provided.
 
@@ -34,17 +34,17 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology       | Version |
-| ------------------ | ---------------- | ------- |
-| Frontend           | Angular          | 18.x    |
-| Frontend State     | NgRx Signals     | 18.x    |
-| Frontend Routing   | Angular Router   | 18.x    |
-| HTTP Client        | Angular HttpClient | 18.x  |
-| UI Components      | Angular Material | 18.x    |
-| Testing — Unit     | Jest             | Latest  |
-| Testing — E2E      | Playwright       | 1.x     |
-| AI/ML              | N/A              | N/A     |
-| Mobile             | N/A              | N/A     |
+| Layer            | Technology         | Version |
+| ---------------- | ------------------ | ------- |
+| Frontend         | Angular            | 18.x    |
+| Frontend State   | NgRx Signals       | 18.x    |
+| Frontend Routing | Angular Router     | 18.x    |
+| HTTP Client      | Angular HttpClient | 18.x    |
+| UI Components    | Angular Material   | 18.x    |
+| Testing — Unit   | Jest               | Latest  |
+| Testing — E2E    | Playwright         | 1.x     |
+| AI/ML            | N/A                | N/A     |
+| Mobile           | N/A                | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -52,25 +52,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -89,15 +89,15 @@ Implement the patient self-registration UI in Angular 18.x. The feature encompas
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `RegistrationFormComponent` | Angular Frontend (`app/`) |
-| CREATE | `EmailVerificationPendingComponent` | Angular Frontend (`app/`) |
-| CREATE | `EmailVerifyCallbackComponent` | Angular Frontend (`app/`) |
+| Status | Component / Module                                  | Project                   |
+| ------ | --------------------------------------------------- | ------------------------- |
+| CREATE | `RegistrationFormComponent`                         | Angular Frontend (`app/`) |
+| CREATE | `EmailVerificationPendingComponent`                 | Angular Frontend (`app/`) |
+| CREATE | `EmailVerifyCallbackComponent`                      | Angular Frontend (`app/`) |
 | CREATE | `AuthService` (registration + verification methods) | Angular Frontend (`app/`) |
-| MODIFY | `AppRoutingModule` / route config | Angular Frontend (`app/`) |
-| CREATE | `auth/register` route | Angular Routing |
-| CREATE | `auth/verify` route (callback from email link) | Angular Routing |
+| MODIFY | `AppRoutingModule` / route config                   | Angular Frontend (`app/`) |
+| CREATE | `auth/register` route                               | Angular Routing           |
+| CREATE | `auth/verify` route (callback from email link)      | Angular Routing           |
 
 ---
 
@@ -135,21 +135,21 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/features/auth/auth.module.ts` | Lazy-loaded Auth feature module with routing |
-| CREATE | `app/features/auth/auth-routing.module.ts` | Auth routes: `/auth/register`, `/auth/verify` |
-| CREATE | `app/features/auth/components/registration-form/registration-form.component.ts` | Reactive form component for patient self-registration |
-| CREATE | `app/features/auth/components/registration-form/registration-form.component.html` | Template: email, password (per-rule errors), name, phone, dateOfBirth fields |
-| CREATE | `app/features/auth/components/registration-form/registration-form.component.scss` | Component styles |
-| CREATE | `app/features/auth/components/email-verification-pending/email-verification-pending.component.ts` | Post-registration "check your email" screen with resend button |
-| CREATE | `app/features/auth/components/email-verification-pending/email-verification-pending.component.html` | Template for email pending screen |
-| CREATE | `app/features/auth/components/email-verify-callback/email-verify-callback.component.ts` | Handles `/auth/verify?token=…` redirect; success/error states |
-| CREATE | `app/features/auth/components/email-verify-callback/email-verify-callback.component.html` | Template for verification callback states |
-| CREATE | `app/features/auth/services/auth.service.ts` | Service: `register()`, `verifyEmail()`, `resendVerification()` methods |
-| CREATE | `app/features/auth/validators/password-complexity.validator.ts` | Custom validator returning per-rule error map |
-| CREATE | `app/features/auth/models/registration.models.ts` | TypeScript interfaces: `RegistrationRequest`, `RegistrationResponse`, `VerifyEmailResponse` |
-| MODIFY | `app/app-routing.module.ts` | Add lazy-loaded `auth` route pointing to `AuthModule` |
+| Action | File Path                                                                                           | Description                                                                                 |
+| ------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| CREATE | `app/features/auth/auth.module.ts`                                                                  | Lazy-loaded Auth feature module with routing                                                |
+| CREATE | `app/features/auth/auth-routing.module.ts`                                                          | Auth routes: `/auth/register`, `/auth/verify`                                               |
+| CREATE | `app/features/auth/components/registration-form/registration-form.component.ts`                     | Reactive form component for patient self-registration                                       |
+| CREATE | `app/features/auth/components/registration-form/registration-form.component.html`                   | Template: email, password (per-rule errors), name, phone, dateOfBirth fields                |
+| CREATE | `app/features/auth/components/registration-form/registration-form.component.scss`                   | Component styles                                                                            |
+| CREATE | `app/features/auth/components/email-verification-pending/email-verification-pending.component.ts`   | Post-registration "check your email" screen with resend button                              |
+| CREATE | `app/features/auth/components/email-verification-pending/email-verification-pending.component.html` | Template for email pending screen                                                           |
+| CREATE | `app/features/auth/components/email-verify-callback/email-verify-callback.component.ts`             | Handles `/auth/verify?token=…` redirect; success/error states                               |
+| CREATE | `app/features/auth/components/email-verify-callback/email-verify-callback.component.html`           | Template for verification callback states                                                   |
+| CREATE | `app/features/auth/services/auth.service.ts`                                                        | Service: `register()`, `verifyEmail()`, `resendVerification()` methods                      |
+| CREATE | `app/features/auth/validators/password-complexity.validator.ts`                                     | Custom validator returning per-rule error map                                               |
+| CREATE | `app/features/auth/models/registration.models.ts`                                                   | TypeScript interfaces: `RegistrationRequest`, `RegistrationResponse`, `VerifyEmailResponse` |
+| MODIFY | `app/app-routing.module.ts`                                                                         | Add lazy-loaded `auth` route pointing to `AuthModule`                                       |
 
 ---
 
@@ -191,13 +191,13 @@ npx playwright test
 - [ ] Unit tests pass for `RegistrationFormComponent` (validation states, submit handler, error mapping)
 - [ ] Unit tests pass for `EmailVerifyCallbackComponent` (success, expired, already-used states)
 - [ ] Unit tests pass for `AuthService` (register, verifyEmail, resendVerification methods)
-- [ ] Custom password validator emits correct per-rule error keys for each combination of missing rules
-- [ ] Form submit is disabled when form is invalid (no API call fired)
-- [ ] 409 response correctly sets `alreadyRegistered` error on email control without revealing active/inactive status
-- [ ] Token expired state renders correct message and resend link
-- [ ] Token already-used state renders "Link already used" and login link
-- [ ] All form fields have associated labels and ARIA attributes (accessibility audit passes)
-- [ ] No raw API error details interpolated into templates (XSS/injection check)
+- [x] Custom password validator emits correct per-rule error keys for each combination of missing rules
+- [x] Form submit is disabled when form is invalid (no API call fired)
+- [x] 409 response correctly sets `alreadyRegistered` error on email control without revealing active/inactive status
+- [x] Token expired state renders correct message and resend link
+- [x] Token already-used state renders "Link already used" and login link
+- [x] All form fields have associated labels and ARIA attributes (accessibility audit passes)
+- [x] No raw API error details interpolated into templates (XSS/injection check)
 - [ ] **[UI Tasks]** Visual comparison against wireframe completed at 375px, 768px, 1440px (when wireframe becomes AVAILABLE)
 - [ ] **[UI Tasks]** Run `/analyze-ux` to validate wireframe alignment (when wireframe becomes AVAILABLE)
 
@@ -205,16 +205,16 @@ npx playwright test
 
 ## Implementation Checklist
 
-- [ ] Create `app/features/auth/` module with lazy-loaded routing
-- [ ] Build `RegistrationFormComponent` reactive form (email, password, name, phone, dateOfBirth)
-- [ ] Implement `PasswordComplexityValidator` with per-rule error keys (`minLength`, `uppercase`, `digit`, `specialChar`)
-- [ ] Wire per-rule `<mat-error>` display for each password constraint beneath the password field
-- [ ] Implement duplicate-email error display from 409 API response ("Email already registered")
-- [ ] Build `EmailVerificationPendingComponent` with 60-second resend cooldown
-- [ ] Build `EmailVerifyCallbackComponent` handling success, expired, and already-used states
-- [ ] Implement `AuthService` with typed `register()`, `verifyEmail()`, `resendVerification()` methods
-- [ ] Add ARIA attributes and `role="alert"` for dynamically rendered error messages
-- [ ] Sanitize all user-visible API error text before template binding (NFR-014)
-- [ ] Register lazy-loaded auth routes in `AppRoutingModule`
+- [x] Create `app/features/auth/` feature with lazy-loaded routing
+- [x] Build `RegistrationFormComponent` reactive form (email, password, name, phone, dateOfBirth)
+- [x] Implement `PasswordComplexityValidator` with per-rule error keys (`minLength`, `uppercase`, `digit`, `specialChar`)
+- [x] Wire per-rule `<mat-error>` display for each password constraint beneath the password field
+- [x] Implement duplicate-email error display from 409 API response ("Email already registered")
+- [x] Build `EmailVerificationPendingComponent` with 60-second resend cooldown
+- [x] Build `EmailVerifyCallbackComponent` handling success, expired, and already-used states
+- [x] Implement `AuthService` with typed `register()`, `verifyEmail()`, `resendVerification()` methods
+- [x] Add ARIA attributes and `role="alert"` for dynamically rendered error messages
+- [x] Sanitize all user-visible API error text before template binding (NFR-014)
+- [x] Register lazy-loaded auth routes in `app.routes.ts`
 - [ ] **[UI Tasks - MANDATORY]** Reference wireframe from Design References table during implementation (when AVAILABLE)
 - [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking task complete (when AVAILABLE)

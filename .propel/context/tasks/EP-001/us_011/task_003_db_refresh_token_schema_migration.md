@@ -13,50 +13,50 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | N/A (database task) | N/A |
-| Backend | ASP.NET Core Web API | .net 10 |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| Database Hosting | Neon PostgreSQL | Free tier |
-| AI/ML | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer            | Technology            | Version   |
+| ---------------- | --------------------- | --------- |
+| Frontend         | N/A (database task)   | N/A       |
+| Backend          | ASP.NET Core Web API  | .net 10   |
+| ORM              | Entity Framework Core | 9.x       |
+| Database         | PostgreSQL            | 16+       |
+| Database Hosting | Neon PostgreSQL       | Free tier |
+| AI/ML            | N/A                   | N/A       |
+| Mobile           | N/A                   | N/A       |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -77,11 +77,11 @@ The migration is implemented as an EF Core code-first migration targeting `Npgsq
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `RefreshToken` (EF Core entity) | NEW | `Server/Domain/Entities/RefreshToken.cs` |
-| `AppDbContext` | MODIFY | `Server/Infrastructure/Data/AppDbContext.cs` |
-| EF Core migration file | NEW | `Server/Infrastructure/Data/Migrations/` |
+| Component                       | Status | Location                                     |
+| ------------------------------- | ------ | -------------------------------------------- |
+| `RefreshToken` (EF Core entity) | NEW    | `Server/Domain/Entities/RefreshToken.cs`     |
+| `AppDbContext`                  | MODIFY | `Server/Infrastructure/Data/AppDbContext.cs` |
+| EF Core migration file          | NEW    | `Server/Infrastructure/Data/Migrations/`     |
 
 ## Implementation Plan
 
@@ -133,12 +133,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/Domain/Entities/RefreshToken.cs` | EF Core entity with all columns and navigation property |
-| MODIFY | `Server/Infrastructure/Data/AppDbContext.cs` | Add `DbSet<RefreshToken>` + Fluent API column/index config in `OnModelCreating` |
-| CREATE | `Server/Infrastructure/Data/Migrations/<timestamp>_AddRefreshTokensTable.cs` | EF Core `Up()` and `Down()` migration |
-| CREATE | `Server/Infrastructure/Data/Migrations/<timestamp>_AddRefreshTokensTable.Designer.cs` | EF Core migration snapshot (auto-generated) |
+| Action | File Path                                                                             | Description                                                                     |
+| ------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| CREATE | `Server/Domain/Entities/RefreshToken.cs`                                              | EF Core entity with all columns and navigation property                         |
+| MODIFY | `Server/Infrastructure/Data/AppDbContext.cs`                                          | Add `DbSet<RefreshToken>` + Fluent API column/index config in `OnModelCreating` |
+| CREATE | `Server/Infrastructure/Data/Migrations/<timestamp>_AddRefreshTokensTable.cs`          | EF Core `Up()` and `Down()` migration                                           |
+| CREATE | `Server/Infrastructure/Data/Migrations/<timestamp>_AddRefreshTokensTable.Designer.cs` | EF Core migration snapshot (auto-generated)                                     |
 
 ## External References
 
@@ -188,8 +188,8 @@ dotnet ef migrations list --project Server/PropelIQ.Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `RefreshToken.cs` EF Core entity with all 8 properties and XML doc comment for `FamilyId` (explains reuse-detection purpose)
-- [ ] Add `DbSet<RefreshToken>` to `AppDbContext` and configure via Fluent API: column types, indexes, FK cascade
-- [ ] Generate EF Core migration `AddRefreshTokensTable` and verify `Up()` SQL creates table + 2 indexes
-- [ ] Verify `Down()` rollback drops indexes first, then the table (correct dependency order)
+- [x] Create `RefreshToken.cs` EF Core entity with all 8 properties and XML doc comment for `FamilyId` (explains reuse-detection purpose)
+- [x] Add `DbSet<RefreshToken>` to `AppDbContext` and configure via Fluent API: column types, indexes, FK cascade
+- [x] Generate EF Core migration `AddRefreshTokensTable` and verify `Up()` SQL creates table + 2 indexes
+- [x] Verify `Down()` rollback drops indexes first, then the table (correct dependency order)
 - [ ] Apply migration to development Neon PostgreSQL database and confirm table structure with `\d refresh_tokens`

@@ -15,52 +15,52 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | Yes |
-| **Figma URL** | N/A |
-| **Wireframe Status** | PENDING |
-| **Wireframe Type** | N/A |
+| Reference Type         | Value                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                 |
+| **Figma URL**          | N/A                                                                                                                 |
+| **Wireframe Status**   | PENDING                                                                                                             |
+| **Wireframe Type**     | N/A                                                                                                                 |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-011-login.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec** | N/A (figma_spec.md not yet generated) |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated) |
-| **Design Tokens** | N/A (designsystem.md not yet generated) |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                               |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                               |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                             |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | Angular | 18.x |
-| Frontend State | NgRx Signals | 18.x |
-| Backend | ASP.NET Core Web API | .net 10 |
-| Database | PostgreSQL | 16+ |
-| Cache | Upstash Redis | Serverless |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer          | Technology           | Version    |
+| -------------- | -------------------- | ---------- |
+| Frontend       | Angular              | 18.x       |
+| Frontend State | NgRx Signals         | 18.x       |
+| Backend        | ASP.NET Core Web API | .net 10    |
+| Database       | PostgreSQL           | 16+        |
+| Cache          | Upstash Redis        | Serverless |
+| AI/ML          | N/A                  | N/A        |
+| Vector Store   | N/A                  | N/A        |
+| AI Gateway     | N/A                  | N/A        |
+| Mobile         | N/A                  | N/A        |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -73,15 +73,15 @@ Implement the Angular 18 login user interface and client-side session management
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `LoginComponent` | NEW | `app/features/auth/login/` |
-| `AuthService` | NEW | `app/core/auth/` |
-| `AuthInterceptor` | NEW | `app/core/interceptors/` |
-| `SessionTimerService` | NEW | `app/core/auth/` |
-| `AuthGuard` | NEW | `app/core/guards/` |
-| `AppRoutingModule` | MODIFY | `app/app-routing.module.ts` |
-| `AppModule` / `provideRouter` | MODIFY | `app/app.config.ts` |
+| Component                     | Status | Location                    |
+| ----------------------------- | ------ | --------------------------- |
+| `LoginComponent`              | NEW    | `app/features/auth/login/`  |
+| `AuthService`                 | NEW    | `app/core/auth/`            |
+| `AuthInterceptor`             | NEW    | `app/core/interceptors/`    |
+| `SessionTimerService`         | NEW    | `app/core/auth/`            |
+| `AuthGuard`                   | NEW    | `app/core/guards/`          |
+| `AppRoutingModule`            | MODIFY | `app/app-routing.module.ts` |
+| `AppModule` / `provideRouter` | MODIFY | `app/app.config.ts`         |
 
 ## Implementation Plan
 
@@ -112,18 +112,18 @@ app/                          ← Angular 18 application root (to be scaffolded)
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `app/features/auth/login/login.component.ts` | Reactive login form with validation and submission |
-| CREATE | `app/features/auth/login/login.component.html` | Login form template (email, password, submit button, error banner) |
-| CREATE | `app/features/auth/login/login.component.scss` | Login page styles |
-| CREATE | `app/core/auth/auth.service.ts` | Token lifecycle: login, logout, refresh, isAuthenticated signal |
-| CREATE | `app/core/auth/auth-state.model.ts` | `AuthState` interface: `{ accessToken, refreshToken, userId, role }` |
-| CREATE | `app/core/auth/session-timer.service.ts` | 15-minute inactivity timer with activity event listeners |
-| CREATE | `app/core/interceptors/auth.interceptor.ts` | HTTP interceptor: bearer token injection + silent refresh + 401 handling |
-| CREATE | `app/core/guards/auth.guard.ts` | `CanActivateFn` protecting authenticated routes |
-| MODIFY | `app/app.config.ts` | Register `AuthInterceptor` via `provideHttpClient(withInterceptors([...]))` |
-| MODIFY | `app/app-routing.module.ts` | Add `/login` route and apply `authGuard` to all protected routes |
+| Action | File Path                                      | Description                                                                 |
+| ------ | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| CREATE | `app/features/auth/login/login.component.ts`   | Reactive login form with validation and submission                          |
+| CREATE | `app/features/auth/login/login.component.html` | Login form template (email, password, submit button, error banner)          |
+| CREATE | `app/features/auth/login/login.component.scss` | Login page styles                                                           |
+| CREATE | `app/core/auth/auth.service.ts`                | Token lifecycle: login, logout, refresh, isAuthenticated signal             |
+| CREATE | `app/core/auth/auth-state.model.ts`            | `AuthState` interface: `{ accessToken, refreshToken, userId, role }`        |
+| CREATE | `app/core/auth/session-timer.service.ts`       | 15-minute inactivity timer with activity event listeners                    |
+| CREATE | `app/core/interceptors/auth.interceptor.ts`    | HTTP interceptor: bearer token injection + silent refresh + 401 handling    |
+| CREATE | `app/core/guards/auth.guard.ts`                | `CanActivateFn` protecting authenticated routes                             |
+| MODIFY | `app/app.config.ts`                            | Register `AuthInterceptor` via `provideHttpClient(withInterceptors([...]))` |
+| MODIFY | `app/app-routing.module.ts`                    | Add `/login` route and apply `authGuard` to all protected routes            |
 
 ## External References
 
@@ -174,11 +174,11 @@ ng build --configuration production
 
 ## Implementation Checklist
 
-- [ ] Create `AuthState` model interface (`accessToken`, `refreshToken`, `userId`, `role`, `expiresAt`)
-- [ ] Implement `AuthService` with `login()`, `logout()`, `refresh()`, and `isAuthenticated` computed Signal
-- [ ] Implement `LoginComponent` reactive form with email/password validation and session-expired banner
-- [ ] Implement `AuthInterceptor` with bearer token injection, 401 detection, silent refresh, and retry logic
-- [ ] Implement `SessionTimerService` with 15-minute inactivity timer using RxJS `fromEvent` + `switchMap`
-- [ ] Implement `AuthGuard` (`CanActivateFn`) protecting authenticated routes
-- [ ] Wire `AuthInterceptor` into `provideHttpClient` in `app.config.ts`
-- [ ] Implement logout action: clear Signals, fire-and-forget `POST /api/auth/logout`, navigate to `/login`
+- [x] Create `AuthState` model interface (`accessToken`, `refreshToken`, `userId`, `role`, `expiresAt`)
+- [x] Implement `AuthService` with `login()`, `logout()`, `refresh()`, and `isAuthenticated` computed Signal
+- [x] Implement `LoginComponent` reactive form with email/password validation and session-expired banner
+- [x] Implement `AuthInterceptor` with bearer token injection, 401 detection, silent refresh, and retry logic
+- [x] Implement `SessionTimerService` with 15-minute inactivity timer using RxJS `fromEvent` + `switchMap`
+- [x] Implement `AuthGuard` (`CanActivateFn`) protecting authenticated routes
+- [x] Wire `AuthInterceptor` into `provideHttpClient` in `app.config.ts`
+- [x] Implement logout action: clear Signals, fire-and-forget `POST /api/auth/logout`, navigate to `/login`

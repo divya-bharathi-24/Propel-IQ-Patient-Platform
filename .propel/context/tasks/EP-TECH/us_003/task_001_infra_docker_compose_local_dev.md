@@ -15,49 +15,49 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type        | Value |
-|-----------------------|-------|
-| **UI Impact**         | No    |
-| **Figma URL**         | N/A   |
-| **Wireframe Status**  | N/A   |
-| **Wireframe Type**    | N/A   |
-| **Wireframe Path/URL**| N/A   |
-| **Screen Spec**       | N/A   |
-| **UXR Requirements**  | N/A   |
-| **Design Tokens**     | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer                | Technology                             | Version    |
-|----------------------|----------------------------------------|------------|
-| Containerization     | Docker / Docker Compose                | 24.x       |
-| Frontend             | Angular (dev server in container)      | 18.x       |
-| Backend              | ASP.NET Core Web API                   | .net 10     |
-| ORM                  | Entity Framework Core                  | 9.x        |
-| Database             | PostgreSQL + pgvector extension        | 16+        |
-| Cache                | Redis (local; mirrors Upstash interface) | 7.x (Alpine) |
+| Layer            | Technology                               | Version      |
+| ---------------- | ---------------------------------------- | ------------ |
+| Containerization | Docker / Docker Compose                  | 24.x         |
+| Frontend         | Angular (dev server in container)        | 18.x         |
+| Backend          | ASP.NET Core Web API                     | .net 10      |
+| ORM              | Entity Framework Core                    | 9.x          |
+| Database         | PostgreSQL + pgvector extension          | 16+          |
+| Cache            | Redis (local; mirrors Upstash interface) | 7.x (Alpine) |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-|-----------------------|-------|
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-|---------------------|-------|
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -70,18 +70,18 @@ Create the Docker Compose local development environment that orchestrates all fo
 
 ## Impacted Components
 
-| Component / Module                        | Action | Notes                                                                     |
-|-------------------------------------------|--------|---------------------------------------------------------------------------|
-| `docker-compose.yml`                      | CREATE | Orchestrates all 4 services; named volumes; bridge network; env_file      |
-| `docker-compose.override.yml`             | CREATE | Dev-only overrides (hot-reload volume mounts, debug ports)                |
-| `.env.example`                            | CREATE | Template with all required env var keys and placeholder values            |
-| `.gitignore`                              | MODIFY | Add `.env` entry to prevent secrets from being committed                  |
-| `app/Dockerfile`                          | CREATE | Multi-stage: Node 20 LTS base; `npm install`; `ng serve --host 0.0.0.0`  |
-| `server/Dockerfile`                       | CREATE | Multi-stage: `mcr.microsoft.com/dotnet/sdk:9.0` build stage; `aspnet:9.0` runtime stage |
-| `server/docker-entrypoint.sh`             | CREATE | Waits for DB health, runs `dotnet ef database update`, then `dotnet` start |
-| `server/Propel.Api.Gateway/Endpoints/HealthCheckEndpoint.cs` | CREATE | Minimal API `/healthz` endpoint returning HTTP 200 with service status     |
-| `server/Propel.Api.Gateway/Program.cs`   | MODIFY | Register `/healthz` endpoint; configure Redis resilience (try/catch + `X-Degraded` header) |
-| `server/Propel.Api.Gateway/Data/SeedData.cs` | CREATE | Seeds Specialty reference table on first run if empty                     |
+| Component / Module                                           | Action | Notes                                                                                      |
+| ------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------ |
+| `docker-compose.yml`                                         | CREATE | Orchestrates all 4 services; named volumes; bridge network; env_file                       |
+| `docker-compose.override.yml`                                | CREATE | Dev-only overrides (hot-reload volume mounts, debug ports)                                 |
+| `.env.example`                                               | CREATE | Template with all required env var keys and placeholder values                             |
+| `.gitignore`                                                 | MODIFY | Add `.env` entry to prevent secrets from being committed                                   |
+| `app/Dockerfile`                                             | CREATE | Multi-stage: Node 20 LTS base; `npm install`; `ng serve --host 0.0.0.0`                    |
+| `server/Dockerfile`                                          | CREATE | Multi-stage: `mcr.microsoft.com/dotnet/sdk:9.0` build stage; `aspnet:9.0` runtime stage    |
+| `server/docker-entrypoint.sh`                                | CREATE | Waits for DB health, runs `dotnet ef database update`, then `dotnet` start                 |
+| `server/Propel.Api.Gateway/Endpoints/HealthCheckEndpoint.cs` | CREATE | Minimal API `/healthz` endpoint returning HTTP 200 with service status                     |
+| `server/Propel.Api.Gateway/Program.cs`                       | MODIFY | Register `/healthz` endpoint; configure Redis resilience (try/catch + `X-Degraded` header) |
+| `server/Propel.Api.Gateway/Data/SeedData.cs`                 | CREATE | Seeds Specialty reference table on first run if empty                                      |
 
 ## Implementation Plan
 
@@ -90,7 +90,7 @@ Create the Docker Compose local development environment that orchestrates all fo
    - **`backend`**: builds from `server/Dockerfile`; maps port `5000:5000`, `5001:5001` (HTTPS); `env_file: .env`; `depends_on: postgres: condition: service_healthy`; entrypoint: `./docker-entrypoint.sh`.
    - **`postgres`**: image `pgvector/pgvector:pg16`; maps port `5432:5432`; named volume `pgdata`; `env_file: .env`; healthcheck: `pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}` with `interval: 5s, retries: 10, start_period: 10s`.
    - **`redis`**: image `redis:7-alpine`; maps port `6379:6379`; named volume `redisdata`; healthcheck: `redis-cli ping` with `interval: 5s, retries: 5`. Upstash Redis SDK is configured in the backend to point to `redis://redis:6379` when `REDIS_USE_LOCAL=true`; production uses the Upstash TLS URL.
-   This satisfies AC1.
+     This satisfies AC1.
 
 2. **Create `app/Dockerfile`** — Use `node:20-alpine` as base image. Set `WORKDIR /app`. Copy `package.json` and `package-lock.json` first (layer cache optimization). Run `npm ci`. Copy remaining source. Expose port `4200`. CMD: `npx ng serve --host 0.0.0.0 --poll 1000`. The `--poll` flag enables hot-reload inside the container without inotify issues on Windows Docker Desktop.
 
@@ -130,23 +130,23 @@ Propel-IQ-Patient-Platform/
 └── README.md
 ```
 
-*`docker-compose.yml`, Dockerfiles, `.env.example`, and the entrypoint script do not yet exist. They will be created as part of this task.*
+_`docker-compose.yml`, Dockerfiles, `.env.example`, and the entrypoint script do not yet exist. They will be created as part of this task._
 
 ## Expected Changes
 
-| Action | File Path                                                                 | Description                                                                      |
-|--------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| CREATE | `docker-compose.yml`                                                      | Orchestrates frontend, backend, postgres (pgvector), redis; health checks; named volumes |
-| CREATE | `docker-compose.override.yml`                                             | Dev-only volume mounts for hot-reload; debug port overrides                      |
-| CREATE | `.env.example`                                                            | Template env vars: PostgreSQL, Redis, JWT, ASPNETCORE settings                   |
-| MODIFY | `.gitignore`                                                              | Add `.env` to prevent secrets commit                                             |
-| CREATE | `app/Dockerfile`                                                          | Node 20 Alpine; `npm ci`; `ng serve --host 0.0.0.0 --poll 1000`                  |
-| CREATE | `server/Dockerfile`                                                       | Multi-stage: SDK 9.0 build → ASP.net 10.0 runtime; `dotnet publish` release build |
-| CREATE | `server/docker-entrypoint.sh`                                             | Wait-for-DB loop; `dotnet ef database update`; seed trigger; `dotnet` start       |
-| CREATE | `server/Propel.Api.Gateway/Endpoints/HealthCheckEndpoint.cs`             | `/healthz` minimal API; DB + Redis connectivity check; HTTP 200 with degraded state |
-| CREATE | `server/Propel.Api.Gateway/Data/SeedData.cs`                             | `SeedSpecialtiesAsync` — inserts Specialty rows if table is empty                |
-| MODIFY | `server/Propel.Api.Gateway/Program.cs`                                   | Register `/healthz`; register Redis with `abortConnect=false`; add `X-Degraded` header logic; call `SeedData` on startup |
-| MODIFY | `README.md`                                                               | Add "Local Development" section: prerequisites (Docker Desktop), `.env` setup, `docker compose up` instructions |
+| Action | File Path                                                    | Description                                                                                                              |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| CREATE | `docker-compose.yml`                                         | Orchestrates frontend, backend, postgres (pgvector), redis; health checks; named volumes                                 |
+| CREATE | `docker-compose.override.yml`                                | Dev-only volume mounts for hot-reload; debug port overrides                                                              |
+| CREATE | `.env.example`                                               | Template env vars: PostgreSQL, Redis, JWT, ASPNETCORE settings                                                           |
+| MODIFY | `.gitignore`                                                 | Add `.env` to prevent secrets commit                                                                                     |
+| CREATE | `app/Dockerfile`                                             | Node 20 Alpine; `npm ci`; `ng serve --host 0.0.0.0 --poll 1000`                                                          |
+| CREATE | `server/Dockerfile`                                          | Multi-stage: SDK 9.0 build → ASP.net 10.0 runtime; `dotnet publish` release build                                        |
+| CREATE | `server/docker-entrypoint.sh`                                | Wait-for-DB loop; `dotnet ef database update`; seed trigger; `dotnet` start                                              |
+| CREATE | `server/Propel.Api.Gateway/Endpoints/HealthCheckEndpoint.cs` | `/healthz` minimal API; DB + Redis connectivity check; HTTP 200 with degraded state                                      |
+| CREATE | `server/Propel.Api.Gateway/Data/SeedData.cs`                 | `SeedSpecialtiesAsync` — inserts Specialty rows if table is empty                                                        |
+| MODIFY | `server/Propel.Api.Gateway/Program.cs`                       | Register `/healthz`; register Redis with `abortConnect=false`; add `X-Degraded` header logic; call `SeedData` on startup |
+| MODIFY | `README.md`                                                  | Add "Local Development" section: prerequisites (Docker Desktop), `.env` setup, `docker compose up` instructions          |
 
 ## External References
 
@@ -205,11 +205,11 @@ docker compose stop redis
 
 ## Implementation Checklist
 
-- [ ] Create `docker-compose.yml` with four services (`frontend`, `backend`, `postgres`, `redis`), bridge network `propel-net`, named volumes `pgdata` and `redisdata`, and health checks on `postgres` and `redis` services; wire `depends_on: postgres: condition: service_healthy` for `backend`
-- [ ] Create `app/Dockerfile`: `FROM node:20-alpine`; `WORKDIR /app`; `COPY package*.json ./`; `RUN npm ci`; `COPY . .`; `EXPOSE 4200`; `CMD ["npx","ng","serve","--host","0.0.0.0","--poll","1000"]`
-- [ ] Create `server/Dockerfile` multi-stage build: build stage (`dotnet/sdk:9.0`) restores, publishes `Propel.Api.Gateway`; runtime stage (`dotnet/aspnet:9.0`) copies publish output and `docker-entrypoint.sh`; install `dotnet-ef` tool in build stage; expose 5000/5001
-- [ ] Create `server/docker-entrypoint.sh`: wait-for-postgres loop (max 30 retries, 2s sleep); run `dotnet ef database update`; exec `dotnet Propel.Api.Gateway.dll`; make executable (`chmod +x`)
-- [ ] Add `Specialty` entity and `DbSet<Specialty>` to `AppDbContext`; create `SeedData.SeedSpecialtiesAsync` seeding ≥5 Specialty rows if table is empty; call from `Program.cs` startup after migrations
-- [ ] Implement `/healthz` minimal API endpoint checking `db.Database.CanConnectAsync()` and Redis `PING`; return HTTP 200 JSON with `db` and `redis` status fields; never return 5xx for Redis failure (graceful degradation)
-- [ ] Configure `IConnectionMultiplexer` with `abortConnect=false` in `Program.cs`; wrap all Redis read/write calls in `try/catch (RedisConnectionException)`; append `X-Degraded: redis` response header on fallback path
-- [ ] Create `.env.example` with all required keys (PostgreSQL, Redis, JWT, ASPNETCORE vars); add `.env` to `.gitignore`; update `README.md` with "Local Development" setup instructions
+- [x] Create `docker-compose.yml` with four services (`frontend`, `backend`, `postgres`, `redis`), bridge network `propel-net`, named volumes `pgdata` and `redisdata`, and health checks on `postgres` and `redis` services; wire `depends_on: postgres: condition: service_healthy` for `backend`
+- [x] Create `app/Dockerfile`: `FROM node:20-alpine`; `WORKDIR /app`; `COPY package*.json ./`; `RUN npm ci`; `COPY . .`; `EXPOSE 4200`; `CMD ["npx","ng","serve","--host","0.0.0.0","--poll","1000"]`
+- [x] Create `server/Dockerfile` multi-stage build: build stage (`dotnet/sdk:10.0`) restores, publishes `Propel.Api.Gateway`; runtime stage (`dotnet/aspnet:10.0`) copies publish output and `docker-entrypoint.sh`; install `dotnet-ef` tool in build stage; expose 5000/5001
+- [x] Create `server/docker-entrypoint.sh`: wait-for-postgres loop (max 30 retries, 2s sleep); migrations applied via `db.Database.MigrateAsync()` in Program.cs startup; exec `dotnet Propel.Api.Gateway.dll`; make executable (`chmod +x`)
+- [x] Add `Specialty` entity and `DbSet<Specialty>` to `AppDbContext`; create `SeedData.SeedSpecialtiesAsync` seeding ≥5 Specialty rows if table is empty; call from `Program.cs` startup after migrations
+- [x] Implement `/healthz` minimal API endpoint checking `db.Database.CanConnectAsync()` and Redis `PING`; return HTTP 200 JSON with `db` and `redis` status fields; never return 5xx for Redis failure (graceful degradation)
+- [x] Configure `IConnectionMultiplexer` with `AbortOnConnectFail=false` in `Program.cs`; wrap all Redis read/write calls in `try/catch (RedisConnectionException)`; append `X-Degraded: redis` response header on fallback path
+- [x] Create `.env.example` with all required keys (PostgreSQL, Redis, JWT, ASPNETCORE vars); `.env` already in `.gitignore`; updated `README.md` with "Local Development" setup instructions

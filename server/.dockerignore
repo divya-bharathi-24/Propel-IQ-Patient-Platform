@@ -1,0 +1,32 @@
+# server/.dockerignore — excludes artefacts and local secrets from the Docker build context.
+# Minimises image size and prevents development credentials from entering the image.
+
+# ── Build artefacts ───────────────────────────────────────────────────────────
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+
+# ── Version control ───────────────────────────────────────────────────────────
+.git/
+.gitignore
+.gitattributes
+
+# ── IDE / editor files ────────────────────────────────────────────────────────
+**/*.user
+**/*.suo
+.vs/
+**/.vscode/
+.idea/
+
+# ── Local development secrets — MUST NOT enter the image (OWASP A02) ─────────
+**/appsettings.Development.json
+**/.env
+**/*.env
+**/*.pfx
+**/*.p12
+**/*.key
+**/*.pem
+
+# ── CI / pipeline artefacts ───────────────────────────────────────────────────
+.github/

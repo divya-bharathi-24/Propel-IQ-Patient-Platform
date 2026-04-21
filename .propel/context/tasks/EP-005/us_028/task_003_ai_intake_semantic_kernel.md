@@ -31,16 +31,16 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology            | Version |
-| ------------------ | --------------------- | ------- |
-| AI Orchestration   | Microsoft Semantic Kernel | 1.x |
-| AI Model Provider  | OpenAI API / Azure OpenAI | GPT-4o |
-| Resilience         | Polly                 | 8.x     |
-| Backend            | ASP.NET Core Web API  | .net 10  |
-| Logging            | Serilog               | 4.x     |
-| Testing — Unit     | xUnit + Moq           | 2.x     |
-| AI/ML              | OpenAI GPT-4o (Azure OpenAI for HIPAA production path) | GPT-4o |
-| Mobile             | N/A                   | N/A     |
+| Layer             | Technology                                             | Version |
+| ----------------- | ------------------------------------------------------ | ------- |
+| AI Orchestration  | Microsoft Semantic Kernel                              | 1.x     |
+| AI Model Provider | OpenAI API / Azure OpenAI                              | GPT-4o  |
+| Resilience        | Polly                                                  | 8.x     |
+| Backend           | ASP.NET Core Web API                                   | .net 10 |
+| Logging           | Serilog                                                | 4.x     |
+| Testing — Unit    | xUnit + Moq                                            | 2.x     |
+| AI/ML             | OpenAI GPT-4o (Azure OpenAI for HIPAA production path) | GPT-4o  |
+| Mobile            | N/A                                                    | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -48,14 +48,14 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type           | Value |
-| ------------------------ | ----- |
-| **AI Impact**            | Yes   |
+| Reference Type           | Value                                                                                                                                                                                                                                                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI Impact**            | Yes                                                                                                                                                                                                                                                                                                        |
 | **AIR Requirements**     | AIR-004 (multi-turn NLU structured extraction), AIR-003 (confidence < 80% flag + clarification), AIR-O01 (8,000 token budget per request), AIR-O02 (circuit breaker: 3 failures / 5-min window), AIR-O03 (prompt version configurable without redeployment), AIR-O04 (token usage + latency audit logging) |
-| **AI Pattern**           | Conversational — multi-turn dialogue with structured JSON output extraction |
-| **Prompt Template Path** | `Server/Modules/AI/Prompts/intake-system-v{version}.txt` (version from `appsettings.json`) |
-| **Guardrails Config**    | Output schema validation: `IntakeTurnResponseSchema`; reject responses that fail JSON parse; return clarification prompt on schema failure |
-| **Model Provider**       | OpenAI GPT-4o (dev/staging); Azure OpenAI GPT-4o (production HIPAA BAA path) |
+| **AI Pattern**           | Conversational — multi-turn dialogue with structured JSON output extraction                                                                                                                                                                                                                                |
+| **Prompt Template Path** | `Server/Modules/AI/Prompts/intake-system-v{version}.txt` (version from `appsettings.json`)                                                                                                                                                                                                                 |
+| **Guardrails Config**    | Output schema validation: `IntakeTurnResponseSchema`; reject responses that fail JSON parse; return clarification prompt on schema failure                                                                                                                                                                 |
+| **Model Provider**       | OpenAI GPT-4o (dev/staging); Azure OpenAI GPT-4o (production HIPAA BAA path)                                                                                                                                                                                                                               |
 
 ---
 
@@ -91,21 +91,22 @@ The system prompt instructs GPT-4o to act as a medical intake assistant, extract
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `SemanticKernelAiIntakeService` (implements `IAiIntakeService`) | `Server/Modules/AI/Services/SemanticKernelAiIntakeService.cs` |
-| CREATE | `IntakeTurnResult` record | `Server/Modules/AI/Models/IntakeTurnResult.cs` |
-| CREATE | `IntakePromptBuilder` (builds Semantic Kernel chat history from `ConversationTurn` list) | `Server/Modules/AI/Services/IntakePromptBuilder.cs` |
-| CREATE | `Server/Modules/AI/Prompts/intake-system-v1.txt` | System prompt template v1 — instructs GPT-4o on extraction schema and follow-up logic |
-| CREATE | `AiSettings` options class | `Server/Modules/AI/Options/AiSettings.cs` |
-| MODIFY | `appsettings.json` | Add `Ai` section: `IntakePromptVersion`, `CircuitBreakerFailureThreshold`, `CircuitBreakerWindowSeconds`, `MaxTokensPerRequest`, `ModelDeploymentName` |
-| MODIFY | `Server/Program.cs` | Register `SemanticKernelAiIntakeService`; bind `AiSettings`; add Semantic Kernel + Polly circuit breaker |
+| Status | Component / Module                                                                       | Project                                                                                                                                                |
+| ------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CREATE | `SemanticKernelAiIntakeService` (implements `IAiIntakeService`)                          | `Server/Modules/AI/Services/SemanticKernelAiIntakeService.cs`                                                                                          |
+| CREATE | `IntakeTurnResult` record                                                                | `Server/Modules/AI/Models/IntakeTurnResult.cs`                                                                                                         |
+| CREATE | `IntakePromptBuilder` (builds Semantic Kernel chat history from `ConversationTurn` list) | `Server/Modules/AI/Services/IntakePromptBuilder.cs`                                                                                                    |
+| CREATE | `Server/Modules/AI/Prompts/intake-system-v1.txt`                                         | System prompt template v1 — instructs GPT-4o on extraction schema and follow-up logic                                                                  |
+| CREATE | `AiSettings` options class                                                               | `Server/Modules/AI/Options/AiSettings.cs`                                                                                                              |
+| MODIFY | `appsettings.json`                                                                       | Add `Ai` section: `IntakePromptVersion`, `CircuitBreakerFailureThreshold`, `CircuitBreakerWindowSeconds`, `MaxTokensPerRequest`, `ModelDeploymentName` |
+| MODIFY | `Server/Program.cs`                                                                      | Register `SemanticKernelAiIntakeService`; bind `AiSettings`; add Semantic Kernel + Polly circuit breaker                                               |
 
 ---
 
 ## Implementation Plan
 
 1. **`AiSettings` options** (bound from `appsettings.json` section `"Ai"`):
+
    ```csharp
    public class AiSettings
    {
@@ -117,9 +118,11 @@ The system prompt instructs GPT-4o to act as a medical intake assistant, extract
        public bool UseAzureOpenAI { get; set; } = false;       // true in production
    }
    ```
+
    - `OpenAI:ApiKey` and `AzureOpenAI:Endpoint` from environment variables only — never in `appsettings.json` (OWASP A02)
 
 2. **System prompt template** (`intake-system-v1.txt`):
+
    ```
    You are a clinical intake assistant for a healthcare platform. Your task is to guide patients
    through a health history intake conversation and extract structured clinical data.
@@ -147,6 +150,7 @@ The system prompt instructs GPT-4o to act as a medical intake assistant, extract
    symptoms: primarySymptom, symptomDuration, symptomSeverity, associatedSymptoms
    medications: currentMedications, dosages, frequency, prescribingPhysician
    ```
+
    - Template file path loaded from `AiSettings.IntakePromptVersion` → `Prompts/intake-system-{version}.txt`
 
 3. **`IntakePromptBuilder`**:
@@ -165,6 +169,7 @@ The system prompt instructs GPT-4o to act as a medical intake assistant, extract
    g. Return `IntakeTurnResult { IsFallback = false, ExtractedFields, AiResponse = result.NextQuestion, IsComplete = result.IsComplete }`
 
 5. **Polly Circuit Breaker** (Polly 8.x `ResiliencePipelineBuilder`):
+
    ```csharp
    _pipeline = new ResiliencePipelineBuilder()
        .AddCircuitBreaker(new CircuitBreakerStrategyOptions
@@ -178,9 +183,11 @@ The system prompt instructs GPT-4o to act as a medical intake assistant, extract
        })
        .Build();
    ```
+
    - When circuit is open, Polly throws `BrokenCircuitException` → caught in `ProcessTurnAsync` → throw `AiServiceUnavailableException` (AIR-O02)
 
 6. **Audit logging per turn** (AIR-O04):
+
    ```csharp
    _logger.Information("AiIntake_TurnProcessed {@Audit}", new {
        SessionId = sessionId,
@@ -225,15 +232,15 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Modules/AI/Services/SemanticKernelAiIntakeService.cs` | `IAiIntakeService` implementation: Semantic Kernel multi-turn chat, Polly circuit breaker, JSON parse + validation |
-| CREATE | `Server/Modules/AI/Services/IntakePromptBuilder.cs` | Converts `ConversationTurn` list → Semantic Kernel `ChatHistory` |
-| CREATE | `Server/Modules/AI/Models/IntakeTurnResult.cs` | `{ IsFallback, ExtractedFields, AiResponse, IsComplete }` |
-| CREATE | `Server/Modules/AI/Options/AiSettings.cs` | Configuration POCO: model name, token budget, circuit breaker thresholds, prompt version |
-| CREATE | `Server/Modules/AI/Prompts/intake-system-v1.txt` | System prompt: extraction rules, JSON output schema, confidence thresholds, follow-up instructions |
-| MODIFY | `appsettings.json` | Add `"Ai"` section: `ModelDeploymentName`, `MaxTokensPerRequest`, `IntakePromptVersion`, `CircuitBreakerFailureThreshold`, `CircuitBreakerWindowSeconds`, `UseAzureOpenAI` |
-| MODIFY | `Server/Program.cs` | Register Semantic Kernel chat completion service; bind `AiSettings`; build and register Polly `ResiliencePipeline`; `IAiIntakeService → SemanticKernelAiIntakeService` |
+| Action | File Path                                                     | Description                                                                                                                                                                |
+| ------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Modules/AI/Services/SemanticKernelAiIntakeService.cs` | `IAiIntakeService` implementation: Semantic Kernel multi-turn chat, Polly circuit breaker, JSON parse + validation                                                         |
+| CREATE | `Server/Modules/AI/Services/IntakePromptBuilder.cs`           | Converts `ConversationTurn` list → Semantic Kernel `ChatHistory`                                                                                                           |
+| CREATE | `Server/Modules/AI/Models/IntakeTurnResult.cs`                | `{ IsFallback, ExtractedFields, AiResponse, IsComplete }`                                                                                                                  |
+| CREATE | `Server/Modules/AI/Options/AiSettings.cs`                     | Configuration POCO: model name, token budget, circuit breaker thresholds, prompt version                                                                                   |
+| CREATE | `Server/Modules/AI/Prompts/intake-system-v1.txt`              | System prompt: extraction rules, JSON output schema, confidence thresholds, follow-up instructions                                                                         |
+| MODIFY | `appsettings.json`                                            | Add `"Ai"` section: `ModelDeploymentName`, `MaxTokensPerRequest`, `IntakePromptVersion`, `CircuitBreakerFailureThreshold`, `CircuitBreakerWindowSeconds`, `UseAzureOpenAI` |
+| MODIFY | `Server/Program.cs`                                           | Register Semantic Kernel chat completion service; bind `AiSettings`; build and register Polly `ResiliencePipeline`; `IAiIntakeService → SemanticKernelAiIntakeService`     |
 
 ---
 
@@ -242,7 +249,7 @@ Propel-IQ-Patient-Platform/
 - [Microsoft Semantic Kernel 1.x — Chat Completion (GetChatMessageContentAsync)](https://learn.microsoft.com/en-us/semantic-kernel/concepts/ai-services/chat-completion/?tabs=csharp)
 - [Microsoft Semantic Kernel 1.x — Azure OpenAI integration](https://learn.microsoft.com/en-us/semantic-kernel/concepts/ai-services/chat-completion/azure-openai?tabs=csharp)
 - [Polly 8.x — Circuit Breaker resilience strategy](https://www.pollydocs.org/strategies/circuit-breaker)
-- [Polly 8.x — ResiliencePipelineBuilder (.NET 8/9)](https://www.pollydocs.org/pipelines/)
+- [Polly 8.x — ResiliencePipelineBuilder (.net 10/9)](https://www.pollydocs.org/pipelines/)
 - [OpenAI GPT-4o — PromptExecutionSettings MaxTokens](https://learn.microsoft.com/en-us/dotnet/api/microsoft.semantickernel.connectors.openai.openaipromptexecutionsettings.maxtokens)
 - [OWASP A02 — Cryptographic Failures: API keys in environment variables only](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)
 - [Azure OpenAI — HIPAA BAA path for production](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)

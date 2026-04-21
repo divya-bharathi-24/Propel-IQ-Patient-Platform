@@ -840,7 +840,7 @@ UC012_UPDATE ..> UC012_SEND : <<include>>
 
 1. **No Paid Cloud Infrastructure**: The platform must be hosted exclusively on free, open-source-friendly platforms (Netlify, Vercel, GitHub Codespaces). AWS, Azure, GCP, and equivalent paid cloud services are strictly out of scope for Phase 1. All auxiliary tools and services must be free and open-source.
 
-2. **Technology Stack is Fixed**: The frontend is Angular 18 with Standalone Components and RxJS; the backend is .NET 8 ASP.NET Core Web API with a microservices architecture, Entity Framework Core, and PostgreSQL. Deviations from this stack require explicit change approval and are out of scope.
+2. **Technology Stack is Fixed**: The frontend is Angular 18 with Standalone Components and RxJS; the backend is .net 10 ASP.NET Core Web API with a microservices architecture, Entity Framework Core, and PostgreSQL. Deviations from this stack require explicit change approval and are out of scope.
 
 3. **Insurance Validation is Soft and Dummy-Record-Based**: The insurance pre-check validates against a predefined, internally maintained set of dummy records only (FR-038). No real-time integration with actual insurance payer systems is in scope for Phase 1; results are informational and non-blocking.
 

@@ -31,18 +31,18 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology            | Version |
-| ------------------ | --------------------- | ------- |
-| Backend            | ASP.NET Core Web API  | .net 10  |
-| Background Jobs    | .NET BackgroundService (IHostedService) | .net 10 |
-| Backend Messaging  | MediatR               | 12.x    |
-| Backend Validation | FluentValidation      | 11.x    |
-| ORM                | Entity Framework Core | 9.x     |
-| Logging            | Serilog               | 4.x     |
-| Testing — Unit     | xUnit + Moq           | 2.x     |
-| Database           | PostgreSQL            | 16+     |
-| AI/ML              | N/A (delegates to `IAiNoShowRiskAugmenter` defined in task_003) | N/A |
-| Mobile             | N/A                   | N/A     |
+| Layer              | Technology                                                      | Version |
+| ------------------ | --------------------------------------------------------------- | ------- |
+| Backend            | ASP.NET Core Web API                                            | .net 10 |
+| Background Jobs    | .NET BackgroundService (IHostedService)                         | .net 10 |
+| Backend Messaging  | MediatR                                                         | 12.x    |
+| Backend Validation | FluentValidation                                                | 11.x    |
+| ORM                | Entity Framework Core                                           | 9.x     |
+| Logging            | Serilog                                                         | 4.x     |
+| Testing — Unit     | xUnit + Moq                                                     | 2.x     |
+| Database           | PostgreSQL                                                      | 16+     |
+| AI/ML              | N/A (delegates to `IAiNoShowRiskAugmenter` defined in task_003) | N/A     |
+| Mobile             | N/A                                                             | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -50,14 +50,14 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type           | Value |
-| ------------------------ | ----- |
-| **AI Impact**            | Yes (via `IAiNoShowRiskAugmenter` interface — implemented in task_003) |
+| Reference Type           | Value                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| **AI Impact**            | Yes (via `IAiNoShowRiskAugmenter` interface — implemented in task_003)                              |
 | **AIR Requirements**     | AIR-007 (rule-based factors augmented by AI); AC-3 (AI unavailable → rule-based runs independently) |
-| **AI Pattern**           | N/A (AI integration via interface; degraded-mode handled in this layer) |
-| **Prompt Template Path** | N/A (managed in task_003) |
-| **Guardrails Config**    | N/A (managed in task_003) |
-| **Model Provider**       | N/A (managed in task_003) |
+| **AI Pattern**           | N/A (AI integration via interface; degraded-mode handled in this layer)                             |
+| **Prompt Template Path** | N/A (managed in task_003)                                                                           |
+| **Guardrails Config**    | N/A (managed in task_003)                                                                           |
+| **Model Provider**       | N/A (managed in task_003)                                                                           |
 
 ---
 
@@ -100,19 +100,19 @@ Implement the no-show risk calculation engine and its supporting infrastructure 
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `RuleBasedNoShowRiskCalculator` | `Server/Modules/Risk/Services/RuleBasedNoShowRiskCalculator.cs` |
-| CREATE | `INoShowRiskCalculator` interface | `Server/Modules/Risk/Interfaces/INoShowRiskCalculator.cs` |
-| CREATE | `IAiNoShowRiskAugmenter` interface | `Server/Modules/Risk/Interfaces/IAiNoShowRiskAugmenter.cs` (stub; implemented in task_003) |
-| CREATE | `NoShowRiskCalculationBackgroundService` | `Server/Modules/Risk/BackgroundServices/NoShowRiskCalculationBackgroundService.cs` |
-| CREATE | `CalculateNoShowRiskCommand` + `CalculateNoShowRiskCommandHandler` | `Server/Modules/Risk/Commands/` |
-| CREATE | `GetStaffAppointmentsQuery` + `GetStaffAppointmentsQueryHandler` | `Server/Modules/Risk/Queries/` |
-| CREATE | `StaffAppointmentsController` | `Server/Modules/Staff/StaffAppointmentsController.cs` (or extend existing) |
-| CREATE | `RiskScoreResult` record | `Server/Modules/Risk/Models/RiskScoreResult.cs` |
-| CREATE | `StaffAppointmentDto` + `NoShowRiskDto` | `Server/Modules/Risk/Dtos/` |
-| CREATE | EF Core migration `AddSeverityToNoShowRisks` (if `severity` column absent from US_006) | `Server/Infrastructure/Migrations/` |
-| MODIFY | `Program.cs` | Register `INoShowRiskCalculator`, `IAiNoShowRiskAugmenter`, `NoShowRiskCalculationBackgroundService`, MediatR handlers |
+| Status | Component / Module                                                                     | Project                                                                                                                |
+| ------ | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `RuleBasedNoShowRiskCalculator`                                                        | `Server/Modules/Risk/Services/RuleBasedNoShowRiskCalculator.cs`                                                        |
+| CREATE | `INoShowRiskCalculator` interface                                                      | `Server/Modules/Risk/Interfaces/INoShowRiskCalculator.cs`                                                              |
+| CREATE | `IAiNoShowRiskAugmenter` interface                                                     | `Server/Modules/Risk/Interfaces/IAiNoShowRiskAugmenter.cs` (stub; implemented in task_003)                             |
+| CREATE | `NoShowRiskCalculationBackgroundService`                                               | `Server/Modules/Risk/BackgroundServices/NoShowRiskCalculationBackgroundService.cs`                                     |
+| CREATE | `CalculateNoShowRiskCommand` + `CalculateNoShowRiskCommandHandler`                     | `Server/Modules/Risk/Commands/`                                                                                        |
+| CREATE | `GetStaffAppointmentsQuery` + `GetStaffAppointmentsQueryHandler`                       | `Server/Modules/Risk/Queries/`                                                                                         |
+| CREATE | `StaffAppointmentsController`                                                          | `Server/Modules/Staff/StaffAppointmentsController.cs` (or extend existing)                                             |
+| CREATE | `RiskScoreResult` record                                                               | `Server/Modules/Risk/Models/RiskScoreResult.cs`                                                                        |
+| CREATE | `StaffAppointmentDto` + `NoShowRiskDto`                                                | `Server/Modules/Risk/Dtos/`                                                                                            |
+| CREATE | EF Core migration `AddSeverityToNoShowRisks` (if `severity` column absent from US_006) | `Server/Infrastructure/Migrations/`                                                                                    |
+| MODIFY | `Program.cs`                                                                           | Register `INoShowRiskCalculator`, `IAiNoShowRiskAugmenter`, `NoShowRiskCalculationBackgroundService`, MediatR handlers |
 
 ---
 
@@ -120,14 +120,13 @@ Implement the no-show risk calculation engine and its supporting infrastructure 
 
 1. **Factor scoring model** (`RuleBasedNoShowRiskCalculator`):
 
-   | Factor | Data Source | Weight | Rules |
-   |--------|-------------|--------|-------|
-   | Prior no-show history | `appointments WHERE patientId = @p AND status = 'NoShow'` | 0.35 | 0 prior = 0.0; 1 = 0.5; 2+ = 1.0; absent history = neutral 0.5 |
-   | Booking lead time | `appointment.date - UtcNow.Date` (days) | 0.25 | >14 days = 0.2 (low risk); 7–14 = 0.5; 3–6 = 0.7; <3 = 1.0 |
-   | Appointment type | `specialty.type` (e.g., Routine / Specialist / Emergency) | 0.15 | Routine = 0.5; Specialist = 0.3; Emergency = 0.1; unknown = 0.5 |
-   | Intake completion | `intakeRecords WHERE appointmentId = @a` | 0.15 | Completed = 0.0; Not completed = 0.8; No record = 0.5 |
-   | Reminder engagement | `notifications WHERE appointmentId = @a AND deliveredAt IS NOT NULL` | 0.10 | Any delivery confirmed = 0.2; No reminders sent = 0.5; Sent but not delivered = 0.8 |
-
+   | Factor                | Data Source                                                          | Weight | Rules                                                                               |
+   | --------------------- | -------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------- |
+   | Prior no-show history | `appointments WHERE patientId = @p AND status = 'NoShow'`            | 0.35   | 0 prior = 0.0; 1 = 0.5; 2+ = 1.0; absent history = neutral 0.5                      |
+   | Booking lead time     | `appointment.date - UtcNow.Date` (days)                              | 0.25   | >14 days = 0.2 (low risk); 7–14 = 0.5; 3–6 = 0.7; <3 = 1.0                          |
+   | Appointment type      | `specialty.type` (e.g., Routine / Specialist / Emergency)            | 0.15   | Routine = 0.5; Specialist = 0.3; Emergency = 0.1; unknown = 0.5                     |
+   | Intake completion     | `intakeRecords WHERE appointmentId = @a`                             | 0.15   | Completed = 0.0; Not completed = 0.8; No record = 0.5                               |
+   | Reminder engagement   | `notifications WHERE appointmentId = @a AND deliveredAt IS NOT NULL` | 0.10   | Any delivery confirmed = 0.2; No reminders sent = 0.5; Sent but not delivered = 0.8 |
    - `Score = Σ(factorScore × weight)` — result clamped to `[0.0, 1.0]`
    - `Severity`: score < 0.35 → `"Low"`; 0.35–0.70 → `"Medium"`; > 0.70 → `"High"`
    - Missing data default: any factor unavailable → use neutral value (0.5); add `{ "name": "DataAvailability", "note": "Insufficient data for full assessment", "contribution": 0 }` to JSONB factors list
@@ -143,7 +142,7 @@ Implement the no-show risk calculation engine and its supporting infrastructure 
    - AuditLog: `action = "NoShowRiskCalculated"`, `entityType = "NoShowRisk"`, `details = { score, severity, degradedMode }`
 
 4. **`NoShowRiskCalculationBackgroundService`**:
-   - Runs with a 1-hour periodic timer (`PeriodicTimer` .NET 8+ API — preferred over `Task.Delay`)
+   - Runs with a 1-hour periodic timer (`PeriodicTimer` .net 10+ API — preferred over `Task.Delay`)
    - On each tick: query `appointments WHERE status = 'Booked' AND date >= CURRENT_DATE` (using a dedicated `IServiceScope` — `BackgroundService` cannot inject scoped EF Core `DbContext` directly)
    - For each appointment: dispatch `CalculateNoShowRiskCommand` via `IMediator` from the scoped service provider
    - Log `Serilog.Information("NoShowRisk_BatchCompleted {@Count} appointments processed", count)`
@@ -166,6 +165,7 @@ Implement the no-show risk calculation engine and its supporting infrastructure 
    -- Down()
    ALTER TABLE no_show_risks DROP COLUMN severity;
    ```
+
    - EF Core entity: add `public string Severity { get; set; } = "Medium";` to `NoShowRisk`
    - `NoShowRiskConfiguration`: `builder.Property(r => r.Severity).HasMaxLength(10).IsRequired()`
 
@@ -186,19 +186,19 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Modules/Risk/Interfaces/INoShowRiskCalculator.cs` | `CalculateAsync(appointmentId): Task<RiskScoreResult>` |
-| CREATE | `Server/Modules/Risk/Interfaces/IAiNoShowRiskAugmenter.cs` | `GetAugmentationDeltaAsync(patientId, appointmentId, baseScore): Task<double>` — stub implemented in task_003 |
-| CREATE | `Server/Modules/Risk/Services/RuleBasedNoShowRiskCalculator.cs` | Five-factor weighted rule engine; neutral defaults; missing data handling |
-| CREATE | `Server/Modules/Risk/Models/RiskScoreResult.cs` | `{ Score, Severity, Factors: List<RiskFactor>, DegradedMode }` |
-| CREATE | `Server/Modules/Risk/BackgroundServices/NoShowRiskCalculationBackgroundService.cs` | `BackgroundService`; 1-hour `PeriodicTimer`; scoped service provider for EF Core; dispatches `CalculateNoShowRiskCommand` |
-| CREATE | `Server/Modules/Risk/Commands/CalculateNoShowRiskCommand.cs` | MediatR command + handler: compute score, UPSERT `NoShowRisk`, AuditLog |
-| CREATE | `Server/Modules/Risk/Queries/GetStaffAppointmentsQuery.cs` | MediatR query + handler: LEFT JOIN appointments with noShowRisk for a given date |
-| CREATE | `Server/Modules/Staff/StaffAppointmentsController.cs` | `GET /api/staff/appointments?date=` with `[Authorize(Roles="Staff")]` |
-| CREATE | `Server/Modules/Risk/Dtos/StaffAppointmentDto.cs` | Appointment + embedded `NoShowRiskDto?` |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddSeverityToNoShowRisks.cs` | `Up()`: ADD COLUMN severity; `Down()`: DROP COLUMN |
-| MODIFY | `Server/Program.cs` | Register `INoShowRiskCalculator → RuleBasedNoShowRiskCalculator`; register `NoShowRiskCalculationBackgroundService`; register MediatR handlers |
+| Action | File Path                                                                          | Description                                                                                                                                    |
+| ------ | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Modules/Risk/Interfaces/INoShowRiskCalculator.cs`                          | `CalculateAsync(appointmentId): Task<RiskScoreResult>`                                                                                         |
+| CREATE | `Server/Modules/Risk/Interfaces/IAiNoShowRiskAugmenter.cs`                         | `GetAugmentationDeltaAsync(patientId, appointmentId, baseScore): Task<double>` — stub implemented in task_003                                  |
+| CREATE | `Server/Modules/Risk/Services/RuleBasedNoShowRiskCalculator.cs`                    | Five-factor weighted rule engine; neutral defaults; missing data handling                                                                      |
+| CREATE | `Server/Modules/Risk/Models/RiskScoreResult.cs`                                    | `{ Score, Severity, Factors: List<RiskFactor>, DegradedMode }`                                                                                 |
+| CREATE | `Server/Modules/Risk/BackgroundServices/NoShowRiskCalculationBackgroundService.cs` | `BackgroundService`; 1-hour `PeriodicTimer`; scoped service provider for EF Core; dispatches `CalculateNoShowRiskCommand`                      |
+| CREATE | `Server/Modules/Risk/Commands/CalculateNoShowRiskCommand.cs`                       | MediatR command + handler: compute score, UPSERT `NoShowRisk`, AuditLog                                                                        |
+| CREATE | `Server/Modules/Risk/Queries/GetStaffAppointmentsQuery.cs`                         | MediatR query + handler: LEFT JOIN appointments with noShowRisk for a given date                                                               |
+| CREATE | `Server/Modules/Staff/StaffAppointmentsController.cs`                              | `GET /api/staff/appointments?date=` with `[Authorize(Roles="Staff")]`                                                                          |
+| CREATE | `Server/Modules/Risk/Dtos/StaffAppointmentDto.cs`                                  | Appointment + embedded `NoShowRiskDto?`                                                                                                        |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddSeverityToNoShowRisks.cs`         | `Up()`: ADD COLUMN severity; `Down()`: DROP COLUMN                                                                                             |
+| MODIFY | `Server/Program.cs`                                                                | Register `INoShowRiskCalculator → RuleBasedNoShowRiskCalculator`; register `NoShowRiskCalculationBackgroundService`; register MediatR handlers |
 
 ---
 

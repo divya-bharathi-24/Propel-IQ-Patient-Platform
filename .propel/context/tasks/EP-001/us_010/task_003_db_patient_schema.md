@@ -17,29 +17,29 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer       | Technology              | Version |
-| ----------- | ----------------------- | ------- |
-| Database    | PostgreSQL              | 16+     |
-| ORM         | Entity Framework Core   | 9.x     |
-| DB Hosting  | Neon PostgreSQL (free tier) | —   |
-| Testing     | xUnit                   | 2.x     |
-| AI/ML       | N/A                     | N/A     |
-| Mobile      | N/A                     | N/A     |
+| Layer      | Technology                  | Version |
+| ---------- | --------------------------- | ------- |
+| Database   | PostgreSQL                  | 16+     |
+| ORM        | Entity Framework Core       | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier) | —       |
+| Testing    | xUnit                       | 2.x     |
+| AI/ML      | N/A                         | N/A     |
+| Mobile     | N/A                         | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -47,25 +47,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -83,13 +83,13 @@ Create the EF Core code-first migrations for the `Patient`, `EmailVerificationTo
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `Patient` EF Core entity + type configuration | `Server/Infrastructure/Persistence/` |
-| CREATE | `EmailVerificationToken` EF Core entity + type configuration | `Server/Infrastructure/Persistence/` |
-| CREATE | `AuditLog` EF Core entity + type configuration (INSERT-only) | `Server/Infrastructure/Persistence/` |
-| CREATE | EF Core migration: `CreatePatientAndAuthTables` | `Server/Infrastructure/Migrations/` |
-| MODIFY | `AppDbContext.cs` | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>` |
+| Status | Component / Module                                           | Project                                                                  |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| CREATE | `Patient` EF Core entity + type configuration                | `Server/Infrastructure/Persistence/`                                     |
+| CREATE | `EmailVerificationToken` EF Core entity + type configuration | `Server/Infrastructure/Persistence/`                                     |
+| CREATE | `AuditLog` EF Core entity + type configuration (INSERT-only) | `Server/Infrastructure/Persistence/`                                     |
+| CREATE | EF Core migration: `CreatePatientAndAuthTables`              | `Server/Infrastructure/Migrations/`                                      |
+| MODIFY | `AppDbContext.cs`                                            | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>` |
 
 ---
 
@@ -171,29 +171,44 @@ Create the EF Core code-first migrations for the `Patient`, `EmailVerificationTo
 ## Current Project State
 
 ```
-Propel-IQ-Patient-Platform/
-├── .propel/
-├── .github/
-└── (no Server/ scaffold yet — greenfield ASP.NET Core project)
+server/
+├── Propel.Api.Gateway/
+│   ├── Data/
+│   │   ├── AppDbContext.cs                   ← DbSet<Patient>, DbSet<EmailVerificationToken>, DbSet<AuditLog>; ApplyConfigurationsFromAssembly
+│   │   └── Configurations/
+│   │       ├── PatientConfiguration.cs       ← functional unique index uq_patients_email_lower via SQL; soft-delete filter
+│   │       ├── EmailVerificationTokenConfiguration.cs ← FK CASCADE, token_hash unique index, patient_id index
+│   │       └── AuditLogConfiguration.cs      ← JSONB details, (entity_type, entity_id) composite index
+│   └── Migrations/
+│       ├── 20260420161639_Initial.cs         ← patients, users, appointments, specialties, waitlist_entries
+│       ├── 20260420171127_AddClinicalEntities.cs
+│       ├── 20260420190747_AddAuditNotificationEntities.cs ← audit_logs + INSERT-only trigger
+│       ├── 20260420191333_AddExtensionsSeedData.cs
+│       ├── 20260421033625_AddEmailVerificationTokens.cs   ← email_verification_tokens
+│       ├── 20260421120000_AddCaseInsensitiveEmailIndex.cs ← uq_patients_email_lower + ix_audit_logs_entity_type_entity_id
+│       └── AppDbContextModelSnapshot.cs
+└── Propel.Domain/
+    └── Entities/
+        ├── Patient.cs
+        ├── EmailVerificationToken.cs
+        └── AuditLog.cs
 ```
-
-> Update this section with the actual `Server/Infrastructure/Persistence/` tree after the backend scaffold is completed.
 
 ---
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Infrastructure/Persistence/Entities/Patient.cs` | EF Core entity for Patient domain object |
-| CREATE | `Server/Infrastructure/Persistence/Entities/EmailVerificationToken.cs` | EF Core entity for verification tokens |
-| CREATE | `Server/Infrastructure/Persistence/Entities/AuditLog.cs` | EF Core entity for immutable audit log |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/PatientConfiguration.cs` | EF Core fluent config: table name, constraints, indexes, soft-delete query filter |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/EmailVerificationTokenConfiguration.cs` | EF Core fluent config: FK, indexes, token hash length |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs` | EF Core fluent config: INSERT-only annotation, JSONB column, indexes |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreatePatientAndAuthTables.cs` | EF Core migration: Up() + Down() |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreatePatientAndAuthTables.Designer.cs` | EF Core migration snapshot |
-| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>`; apply configurations |
+| Action | File Path                                                                                 | Description                                                                                    |
+| ------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Infrastructure/Persistence/Entities/Patient.cs`                                   | EF Core entity for Patient domain object                                                       |
+| CREATE | `Server/Infrastructure/Persistence/Entities/EmailVerificationToken.cs`                    | EF Core entity for verification tokens                                                         |
+| CREATE | `Server/Infrastructure/Persistence/Entities/AuditLog.cs`                                  | EF Core entity for immutable audit log                                                         |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/PatientConfiguration.cs`                | EF Core fluent config: table name, constraints, indexes, soft-delete query filter              |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/EmailVerificationTokenConfiguration.cs` | EF Core fluent config: FK, indexes, token hash length                                          |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs`               | EF Core fluent config: INSERT-only annotation, JSONB column, indexes                           |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreatePatientAndAuthTables.cs`              | EF Core migration: Up() + Down()                                                               |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreatePatientAndAuthTables.Designer.cs`     | EF Core migration snapshot                                                                     |
+| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs`                                       | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>`; apply configurations |
 
 ---
 
@@ -245,14 +260,14 @@ dotnet ef migrations script --project Server/Server.csproj --output migrations.s
 
 ## Implementation Checklist
 
-- [ ] Create `Patient` EF Core entity with all columns from design.md DR-001 (id, name, email, phone, dateOfBirth, passwordHash, emailVerified, status, createdAt)
-- [ ] Create `EmailVerificationToken` EF Core entity (id, patientId, tokenHash, expiresAt, usedAt, createdAt)
-- [ ] Create `AuditLog` EF Core entity (id, userId, action, entityType, entityId, details JSONB, ipAddress, timestamp)
-- [ ] Configure `PatientConfiguration`: unique index on `lower(email)`, CHECK constraint on `status`, soft-delete query filter on `status != 'Deactivated'`
-- [ ] Configure `EmailVerificationTokenConfiguration`: FK to Patient with CASCADE DELETE, index on tokenHash, index on patientId
-- [ ] Configure `AuditLogConfiguration`: JSONB mapping for `details`, index on (entityType, entityId)
-- [ ] Write EF Core migration `CreatePatientAndAuthTables` with `Up()` and `Down()`
-- [ ] Add SQL for immutable audit log trigger inside migration `Up()` (via `migrationBuilder.Sql()`)
-- [ ] Drop trigger in migration `Down()` before dropping table
-- [ ] Register entity configurations in `AppDbContext.OnModelCreating()`
-- [ ] Generate SQL script (`dotnet ef migrations script`) and review for correctness before applying
+- [x] Create `Patient` EF Core entity with all columns from design.md DR-001 (id, name, email, phone, dateOfBirth, passwordHash, emailVerified, status, createdAt)
+- [x] Create `EmailVerificationToken` EF Core entity (id, patientId, tokenHash, expiresAt, usedAt, createdAt)
+- [x] Create `AuditLog` EF Core entity (id, userId, action, entityType, entityId, details JSONB, ipAddress, timestamp)
+- [x] Configure `PatientConfiguration`: case-insensitive functional unique index `uq_patients_email_lower ON patients (lower(email))` via `migrationBuilder.Sql()` (AC-3); soft-delete query filter on `status != 'Deactivated'`
+- [x] Configure `EmailVerificationTokenConfiguration`: FK to Patient with CASCADE DELETE, index on tokenHash, index on patientId
+- [x] Configure `AuditLogConfiguration`: JSONB mapping for `details`, index on (entityType, entityId), plus userId/patientId/timestamp indexes
+- [x] Write EF Core migration `AddCaseInsensitiveEmailIndex` with `Up()` and `Down()` (replaces case-sensitive `ix_patients_email` with `uq_patients_email_lower`, adds `ix_audit_logs_entity_type_entity_id`)
+- [x] Add SQL for immutable audit log trigger inside migration `Up()` (via `migrationBuilder.Sql()`) — already in `AddAuditNotificationEntities` migration
+- [x] Drop trigger in migration `Down()` before dropping table — implemented in `AddAuditNotificationEntities.Down()`
+- [x] Register entity configurations in `AppDbContext.OnModelCreating()` via `ApplyConfigurationsFromAssembly`
+- [x] Generate SQL script (`dotnet ef migrations script`) and review for correctness before applying

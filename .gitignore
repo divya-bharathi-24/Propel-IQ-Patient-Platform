@@ -3,6 +3,13 @@
 .env.local
 .env.*.local
 
+# ASP.NET Core development secrets — must never be committed (OWASP A02)
+**/appsettings.Development.json
+**/appsettings.*.local.json
+
+# Angular runtime env files with local overrides
+**/env.local.js
+
 # OS specific files
 .DS_Store
 Thumbs.db
@@ -13,6 +20,7 @@ Thumbs.db
 nul
 */settings.local.json
 .env
+.vs/
 # .github/*
 # .propel/templates/*
 # .vscode/mcp.json

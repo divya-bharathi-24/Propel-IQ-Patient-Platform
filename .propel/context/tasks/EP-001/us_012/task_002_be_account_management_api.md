@@ -17,35 +17,35 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer               | Technology                  | Version |
-| ------------------- | --------------------------- | ------- |
-| Backend             | ASP.NET Core Web API        | .net 10  |
-| Backend Messaging   | MediatR                     | 12.x    |
-| Backend Validation  | FluentValidation            | 11.x    |
-| ORM                 | Entity Framework Core       | 9.x     |
-| Password Hashing    | Isopoh.Cryptography.Argon2  | Latest  |
-| Email Service       | SendGrid SDK for .NET       | Latest  |
-| Logging             | Serilog                     | 4.x     |
-| Rate Limiting       | ASP.NET Core Rate Limiting  | .net 10  |
-| Testing — Unit      | xUnit + Moq                 | 2.x     |
-| Database            | PostgreSQL                  | 16+     |
-| AI/ML               | N/A                         | N/A     |
-| Mobile              | N/A                         | N/A     |
+| Layer              | Technology                 | Version |
+| ------------------ | -------------------------- | ------- |
+| Backend            | ASP.NET Core Web API       | .net 10 |
+| Backend Messaging  | MediatR                    | 12.x    |
+| Backend Validation | FluentValidation           | 11.x    |
+| ORM                | Entity Framework Core      | 9.x     |
+| Password Hashing   | Isopoh.Cryptography.Argon2 | Latest  |
+| Email Service      | SendGrid SDK for .NET      | Latest  |
+| Logging            | Serilog                    | 4.x     |
+| Rate Limiting      | ASP.NET Core Rate Limiting | .net 10 |
+| Testing — Unit     | xUnit + Moq                | 2.x     |
+| Database           | PostgreSQL                 | 16+     |
+| AI/ML              | N/A                        | N/A     |
+| Mobile             | N/A                        | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -53,25 +53,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -96,21 +96,21 @@ All endpoints enforce RBAC via `[Authorize(Roles = "Admin")]` / `[Authorize(Role
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `AdminController` | ASP.NET Core API (`Server/Modules/Admin/`) |
-| CREATE | `CreateUserAccountCommand` + `CreateUserAccountCommandHandler` | Admin Module — Application Layer |
-| CREATE | `ResendInviteCommand` + `ResendInviteCommandHandler` | Admin Module — Application Layer |
-| CREATE | `SetupCredentialsCommand` + `SetupCredentialsCommandHandler` | Auth Module — Application Layer |
-| CREATE | `CreateWalkInPatientCommand` + `CreateWalkInPatientCommandHandler` | Patient Module — Application Layer |
-| CREATE | `CreateUserAccountValidator` (FluentValidation) | Admin Module — Application Layer |
-| CREATE | `SetupCredentialsValidator` (FluentValidation) | Auth Module — Application Layer |
-| CREATE | `IUserRepository` + EF Core implementation | Admin Module — Infrastructure Layer |
-| CREATE | `ICredentialSetupTokenRepository` + EF Core implementation | Auth Module — Infrastructure Layer |
-| MODIFY | `AuthController` | Add `POST /api/auth/setup-credentials` endpoint |
-| MODIFY | `PatientController` (or create if not yet present) | Add `POST /api/patients/create` endpoint |
-| MODIFY | `AuditLogRepository` | Reuse INSERT-only pattern from US_010 |
-| MODIFY | `Program.cs` / `ServiceCollectionExtensions` | Register new Admin and Patient services |
+| Status | Component / Module                                                 | Project                                         |
+| ------ | ------------------------------------------------------------------ | ----------------------------------------------- |
+| CREATE | `AdminController`                                                  | ASP.NET Core API (`Server/Modules/Admin/`)      |
+| CREATE | `CreateUserAccountCommand` + `CreateUserAccountCommandHandler`     | Admin Module — Application Layer                |
+| CREATE | `ResendInviteCommand` + `ResendInviteCommandHandler`               | Admin Module — Application Layer                |
+| CREATE | `SetupCredentialsCommand` + `SetupCredentialsCommandHandler`       | Auth Module — Application Layer                 |
+| CREATE | `CreateWalkInPatientCommand` + `CreateWalkInPatientCommandHandler` | Patient Module — Application Layer              |
+| CREATE | `CreateUserAccountValidator` (FluentValidation)                    | Admin Module — Application Layer                |
+| CREATE | `SetupCredentialsValidator` (FluentValidation)                     | Auth Module — Application Layer                 |
+| CREATE | `IUserRepository` + EF Core implementation                         | Admin Module — Infrastructure Layer             |
+| CREATE | `ICredentialSetupTokenRepository` + EF Core implementation         | Auth Module — Infrastructure Layer              |
+| MODIFY | `AuthController`                                                   | Add `POST /api/auth/setup-credentials` endpoint |
+| MODIFY | `PatientController` (or create if not yet present)                 | Add `POST /api/patients/create` endpoint        |
+| MODIFY | `AuditLogRepository`                                               | Reuse INSERT-only pattern from US_010           |
+| MODIFY | `Program.cs` / `ServiceCollectionExtensions`                       | Register new Admin and Patient services         |
 
 ---
 
@@ -174,35 +174,89 @@ All endpoints enforce RBAC via `[Authorize(Roles = "Admin")]` / `[Authorize(Role
 
 ```
 Propel-IQ-Patient-Platform/
-├── .propel/
-├── .github/
-└── (no Server/ scaffold yet — greenfield ASP.NET Core project)
+├── server/
+│   ├── Propel.Api.Gateway/
+│   │   ├── Controllers/
+│   │   │   ├── AdminController.cs          ← POST /api/admin/users, POST /api/admin/users/{id}/resend-invite
+│   │   │   ├── AuthController.cs           ← POST /api/auth/setup-credentials added
+│   │   │   └── PatientController.cs        ← POST /api/patients/create added
+│   │   ├── Data/
+│   │   │   ├── AppDbContext.cs             ← CredentialSetupTokens DbSet added
+│   │   │   └── Configurations/
+│   │   │       ├── CredentialSetupTokenConfiguration.cs  ← NEW
+│   │   │       └── UserConfiguration.cs    ← updated (nullable PasswordHash, Name, CredentialEmailStatus)
+│   │   ├── Infrastructure/
+│   │   │   ├── Email/SendGridEmailService.cs ← SendCredentialSetupEmailAsync added
+│   │   │   └── Repositories/
+│   │   │       ├── UserRepository.cs       ← NEW
+│   │   │       └── CredentialSetupTokenRepository.cs ← NEW
+│   │   ├── Middleware/
+│   │   │   └── ExceptionHandlingMiddleware.cs ← DuplicateUserEmailException + WalkInPatientDuplicateEmailException mapped
+│   │   └── Program.cs                      ← IUserRepository, ICredentialSetupTokenRepository registered
+│   ├── Propel.Domain/
+│   │   ├── Entities/
+│   │   │   ├── CredentialSetupToken.cs     ← NEW
+│   │   │   └── User.cs                     ← updated (nullable PasswordHash, Name, CredentialEmailStatus, nav)
+│   │   └── Interfaces/
+│   │       ├── IUserRepository.cs          ← NEW
+│   │       ├── ICredentialSetupTokenRepository.cs ← NEW
+│   │       └── IEmailService.cs            ← SendCredentialSetupEmailAsync added
+│   ├── Propel.Modules.Admin/
+│   │   ├── Commands/
+│   │   │   ├── CreateUserAccountCommand.cs ← NEW
+│   │   │   └── ResendInviteCommand.cs      ← NEW
+│   │   ├── Exceptions/
+│   │   │   └── DuplicateUserEmailException.cs ← NEW
+│   │   ├── Handlers/
+│   │   │   ├── CreateUserAccountCommandHandler.cs ← NEW
+│   │   │   └── ResendInviteCommandHandler.cs ← NEW
+│   │   └── Validators/
+│   │       └── CreateUserAccountValidator.cs ← NEW
+│   ├── Propel.Modules.Auth/
+│   │   ├── Commands/
+│   │   │   └── SetupCredentialsCommand.cs  ← NEW
+│   │   ├── Handlers/
+│   │   │   └── SetupCredentialsCommandHandler.cs ← NEW
+│   │   └── Validators/
+│   │       └── SetupCredentialsValidator.cs ← NEW
+│   ├── Propel.Modules.Notification/
+│   │   ├── Commands/
+│   │   │   └── SendCredentialSetupEmailCommand.cs ← NEW
+│   │   └── Handlers/
+│   │       └── SendCredentialSetupEmailCommandHandler.cs ← NEW
+│   └── Propel.Modules.Patient/
+│       ├── Commands/
+│       │   └── CreateWalkInPatientCommand.cs ← NEW
+│       ├── Exceptions/
+│       │   └── WalkInPatientDuplicateEmailException.cs ← NEW
+│       ├── Handlers/
+│       │   └── CreateWalkInPatientCommandHandler.cs ← NEW
+│       └── Validators/
+│           └── CreateWalkInPatientValidator.cs ← NEW
 ```
-
-> Update this section with actual `Server/` tree after project scaffold is completed.
 
 ---
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Modules/Admin/AdminController.cs` | Endpoints: `POST /api/admin/users`, `POST /api/admin/users/{id}/resend-invite` |
-| CREATE | `Server/Modules/Admin/Commands/CreateUserAccountCommand.cs` | MediatR command + result |
-| CREATE | `Server/Modules/Admin/Commands/CreateUserAccountCommandHandler.cs` | User creation, token gen, email dispatch, audit log |
-| CREATE | `Server/Modules/Admin/Commands/ResendInviteCommand.cs` | MediatR command |
-| CREATE | `Server/Modules/Admin/Commands/ResendInviteCommandHandler.cs` | Token invalidation + new invite dispatch |
-| CREATE | `Server/Modules/Admin/Validators/CreateUserAccountValidator.cs` | FluentValidation: name, email, role |
-| CREATE | `Server/Modules/Auth/Commands/SetupCredentialsCommand.cs` | MediatR command + result |
-| CREATE | `Server/Modules/Auth/Commands/SetupCredentialsCommandHandler.cs` | Token validation, Argon2 hash, credential persist, audit log |
-| CREATE | `Server/Modules/Auth/Validators/SetupCredentialsValidator.cs` | FluentValidation: per-rule password checks |
-| CREATE | `Server/Modules/Patient/Commands/CreateWalkInPatientCommand.cs` | MediatR command + result |
-| CREATE | `Server/Modules/Patient/Commands/CreateWalkInPatientCommandHandler.cs` | Patient insert, duplicate email handling, audit log |
-| CREATE | `Server/Infrastructure/Repositories/UserRepository.cs` | EF Core user repository (`ExistsByEmailAsync`, CRUD) |
-| CREATE | `Server/Infrastructure/Repositories/CredentialSetupTokenRepository.cs` | Token CRUD with SHA-256 hash lookup |
-| MODIFY | `Server/Modules/Auth/AuthController.cs` | Add `POST /api/auth/setup-credentials` [AllowAnonymous] |
-| MODIFY | `Server/Modules/Patient/PatientController.cs` | Add `POST /api/patients/create` [Authorize(Roles="Staff")] |
-| MODIFY | `Server/Program.cs` | Register `IUserRepository`, `ICredentialSetupTokenRepository`, new MediatR handlers |
+| Action | File Path                                                              | Description                                                                         |
+| ------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| CREATE | `Server/Modules/Admin/AdminController.cs`                              | Endpoints: `POST /api/admin/users`, `POST /api/admin/users/{id}/resend-invite`      |
+| CREATE | `Server/Modules/Admin/Commands/CreateUserAccountCommand.cs`            | MediatR command + result                                                            |
+| CREATE | `Server/Modules/Admin/Commands/CreateUserAccountCommandHandler.cs`     | User creation, token gen, email dispatch, audit log                                 |
+| CREATE | `Server/Modules/Admin/Commands/ResendInviteCommand.cs`                 | MediatR command                                                                     |
+| CREATE | `Server/Modules/Admin/Commands/ResendInviteCommandHandler.cs`          | Token invalidation + new invite dispatch                                            |
+| CREATE | `Server/Modules/Admin/Validators/CreateUserAccountValidator.cs`        | FluentValidation: name, email, role                                                 |
+| CREATE | `Server/Modules/Auth/Commands/SetupCredentialsCommand.cs`              | MediatR command + result                                                            |
+| CREATE | `Server/Modules/Auth/Commands/SetupCredentialsCommandHandler.cs`       | Token validation, Argon2 hash, credential persist, audit log                        |
+| CREATE | `Server/Modules/Auth/Validators/SetupCredentialsValidator.cs`          | FluentValidation: per-rule password checks                                          |
+| CREATE | `Server/Modules/Patient/Commands/CreateWalkInPatientCommand.cs`        | MediatR command + result                                                            |
+| CREATE | `Server/Modules/Patient/Commands/CreateWalkInPatientCommandHandler.cs` | Patient insert, duplicate email handling, audit log                                 |
+| CREATE | `Server/Infrastructure/Repositories/UserRepository.cs`                 | EF Core user repository (`ExistsByEmailAsync`, CRUD)                                |
+| CREATE | `Server/Infrastructure/Repositories/CredentialSetupTokenRepository.cs` | Token CRUD with SHA-256 hash lookup                                                 |
+| MODIFY | `Server/Modules/Auth/AuthController.cs`                                | Add `POST /api/auth/setup-credentials` [AllowAnonymous]                             |
+| MODIFY | `Server/Modules/Patient/PatientController.cs`                          | Add `POST /api/patients/create` [Authorize(Roles="Staff")]                          |
+| MODIFY | `Server/Program.cs`                                                    | Register `IUserRepository`, `ICredentialSetupTokenRepository`, new MediatR handlers |
 
 ---
 
@@ -264,13 +318,13 @@ dotnet ef database update --project Server/Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `AdminController` with `[Authorize(Roles = "Admin")]`; implement `POST /api/admin/users` and `POST /api/admin/users/{id}/resend-invite`
-- [ ] Create `CreateUserAccountCommandHandler`: uniqueness check, User INSERT, token generation (SHA-256 hash stored), SendGrid invite dispatch, AuditLog INSERT
-- [ ] Create `SetupCredentialsCommandHandler`: SHA-256 hash lookup, expiry/used-at checks, Argon2id hash, `User.passwordHash` UPDATE, `CredentialSetupToken.UsedAt` SET, AuditLog INSERT
-- [ ] Create `CreateWalkInPatientCommandHandler`: email uniqueness check (409 + `existingPatientId`), Patient INSERT, AuditLog INSERT
-- [ ] Create `CreateUserAccountValidator` (name, email, role enum check)
-- [ ] Create `SetupCredentialsValidator` (per-rule password checks — reuse same rule logic as US_010 backend validator)
-- [ ] Add `[Authorize(Roles = "Staff")]` to `POST /api/patients/create` endpoint
-- [ ] Add `[AllowAnonymous]` to `POST /api/auth/setup-credentials` endpoint
-- [ ] Map `DuplicateEmailException`, `TokenExpiredException`, `TokenAlreadyUsedException` to correct HTTP codes in global exception filter
-- [ ] Register `IUserRepository`, `ICredentialSetupTokenRepository`, new handlers, and validators in `Program.cs`
+- [x] Create `AdminController` with `[Authorize(Roles = "Admin")]`; implement `POST /api/admin/users` and `POST /api/admin/users/{id}/resend-invite`
+- [x] Create `CreateUserAccountCommandHandler`: uniqueness check, User INSERT, token generation (SHA-256 hash stored), SendGrid invite dispatch, AuditLog INSERT
+- [x] Create `SetupCredentialsCommandHandler`: SHA-256 hash lookup, expiry/used-at checks, Argon2id hash, `User.passwordHash` UPDATE, `CredentialSetupToken.UsedAt` SET, AuditLog INSERT
+- [x] Create `CreateWalkInPatientCommandHandler`: email uniqueness check (409 + `existingPatientId`), Patient INSERT, AuditLog INSERT
+- [x] Create `CreateUserAccountValidator` (name, email, role enum check)
+- [x] Create `SetupCredentialsValidator` (per-rule password checks — reuse same rule logic as US_010 backend validator)
+- [x] Add `[Authorize(Roles = "Staff")]` to `POST /api/patients/create` endpoint
+- [x] Add `[AllowAnonymous]` to `POST /api/auth/setup-credentials` endpoint
+- [x] Map `DuplicateEmailException`, `TokenExpiredException`, `TokenAlreadyUsedException` to correct HTTP codes in global exception filter
+- [x] Register `IUserRepository`, `ICredentialSetupTokenRepository`, new handlers, and validators in `Program.cs`

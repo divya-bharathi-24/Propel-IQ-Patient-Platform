@@ -15,49 +15,49 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | ASP.NET Core Web API | .net 10 |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| Database Hosting | Neon PostgreSQL | Free tier |
-| AI/ML | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer            | Technology            | Version   |
+| ---------------- | --------------------- | --------- |
+| Backend          | ASP.NET Core Web API  | .net 10   |
+| ORM              | Entity Framework Core | 9.x       |
+| Database         | PostgreSQL            | 16+       |
+| Database Hosting | Neon PostgreSQL       | Free tier |
+| AI/ML            | N/A                   | N/A       |
+| Mobile           | N/A                   | N/A       |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -79,12 +79,12 @@ The `audit_logs` INSERT-only trigger installed by the US_010 migration remains i
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `AuditLog` (EF Core entity) | MODIFY | `Server/Infrastructure/Persistence/Entities/AuditLog.cs` |
-| `AuditLogConfiguration` (Fluent API) | MODIFY | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs` |
-| `AppDbContext` | NO CHANGE | (entity already registered; no DbSet change needed) |
-| EF Core migration | NEW | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.cs` |
+| Component                            | Status    | Location                                                                      |
+| ------------------------------------ | --------- | ----------------------------------------------------------------------------- |
+| `AuditLog` (EF Core entity)          | MODIFY    | `Server/Infrastructure/Persistence/Entities/AuditLog.cs`                      |
+| `AuditLogConfiguration` (Fluent API) | MODIFY    | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs`   |
+| `AppDbContext`                       | NO CHANGE | (entity already registered; no DbSet change needed)                           |
+| EF Core migration                    | NEW       | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.cs` |
 
 ## Implementation Plan
 
@@ -133,6 +133,7 @@ The `audit_logs` INSERT-only trigger installed by the US_010 migration remains i
    ```
 
    The `Down()` rollback must:
+
    ```sql
    -- Drop indexes first
    DROP INDEX IF EXISTS "IX_audit_logs_action_timestamp";
@@ -180,12 +181,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| MODIFY | `Server/Infrastructure/Persistence/Entities/AuditLog.cs` | Change `UserId` to `Guid?`; add `string? Role` property |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs` | Update FK to `IsRequired(false)` + `SetNull`; add `Role` column config; add 2 new indexes |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.cs` | `Up()`: nullable user_id, role column, 2 indexes. `Down()`: rollback with sentinel backfill |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.Designer.cs` | EF Core migration snapshot (auto-generated) |
+| Action | File Path                                                                              | Description                                                                                 |
+| ------ | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| MODIFY | `Server/Infrastructure/Persistence/Entities/AuditLog.cs`                               | Change `UserId` to `Guid?`; add `string? Role` property                                     |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs`            | Update FK to `IsRequired(false)` + `SetNull`; add `Role` column config; add 2 new indexes   |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.cs`          | `Up()`: nullable user_id, role column, 2 indexes. `Down()`: rollback with sentinel backfill |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendAuditLogForAuthEvents.Designer.cs` | EF Core migration snapshot (auto-generated)                                                 |
 
 ## External References
 
@@ -239,9 +240,9 @@ dotnet ef migrations list --project Server/PropelIQ.Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Modify `AuditLog.cs`: change `UserId` to `Guid?` (nullable), add `string? Role` property
-- [ ] Modify `AuditLogConfiguration.cs`: set `UserId` FK to `IsRequired(false)` + `DeleteBehavior.SetNull`; add `Role` column (max 50 chars, nullable); add `HasIndex(action, timestamp)` and `HasIndex(ipAddress)` with explicit database names
-- [ ] Generate `ExtendAuditLogForAuthEvents` migration and review the SQL output for correctness
-- [ ] Confirm `Down()` includes sentinel UUID backfill for nullable-to-not-null reversion and a comment explaining the limitation
+- [x] Modify `AuditLog.cs`: change `UserId` to `Guid?` (nullable), add `string? Role` property
+- [x] Modify `AuditLogConfiguration.cs`: set `UserId` FK to `IsRequired(false)` + `DeleteBehavior.SetNull`; add `Role` column (max 50 chars, nullable); add `HasIndex(action, timestamp)` and `HasIndex(ipAddress)` with explicit database names
+- [x] Generate `ExtendAuditLogForAuthEvents` migration and review the SQL output for correctness
+- [x] Confirm `Down()` includes sentinel UUID backfill for nullable-to-not-null reversion and a comment explaining the limitation
 - [ ] Apply migration to Neon PostgreSQL development instance and verify all 5 validation checks above
 - [ ] Verify INSERT-only trigger is unaffected after `Up()` by running UPDATE test against `audit_logs`

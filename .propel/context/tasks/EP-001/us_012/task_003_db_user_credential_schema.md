@@ -17,29 +17,29 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer      | Technology              | Version |
-| ---------- | ----------------------- | ------- |
-| Database   | PostgreSQL              | 16+     |
-| ORM        | Entity Framework Core   | 9.x     |
-| DB Hosting | Neon PostgreSQL (free tier) | —   |
-| Testing    | xUnit                   | 2.x     |
-| AI/ML      | N/A                     | N/A     |
-| Mobile     | N/A                     | N/A     |
+| Layer      | Technology                  | Version |
+| ---------- | --------------------------- | ------- |
+| Database   | PostgreSQL                  | 16+     |
+| ORM        | Entity Framework Core       | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier) | —       |
+| Testing    | xUnit                       | 2.x     |
+| AI/ML      | N/A                         | N/A     |
+| Mobile     | N/A                         | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -47,25 +47,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -83,12 +83,12 @@ Create EF Core code-first migrations for the `User` and `CredentialSetupToken` e
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `User` EF Core entity + type configuration | `Server/Infrastructure/Persistence/` |
-| CREATE | `CredentialSetupToken` EF Core entity + type configuration | `Server/Infrastructure/Persistence/` |
-| CREATE | EF Core migration: `CreateUserAndCredentialTables` | `Server/Infrastructure/Migrations/` |
-| MODIFY | `AppDbContext.cs` | Add `DbSet<User>`, `DbSet<CredentialSetupToken>`; apply configurations |
+| Status | Component / Module                                         | Project                                                                |
+| ------ | ---------------------------------------------------------- | ---------------------------------------------------------------------- |
+| CREATE | `User` EF Core entity + type configuration                 | `Server/Infrastructure/Persistence/`                                   |
+| CREATE | `CredentialSetupToken` EF Core entity + type configuration | `Server/Infrastructure/Persistence/`                                   |
+| CREATE | EF Core migration: `CreateUserAndCredentialTables`         | `Server/Infrastructure/Migrations/`                                    |
+| MODIFY | `AppDbContext.cs`                                          | Add `DbSet<User>`, `DbSet<CredentialSetupToken>`; apply configurations |
 
 ---
 
@@ -152,15 +152,15 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Infrastructure/Persistence/Entities/User.cs` | EF Core entity for User domain object (Staff/Admin) |
-| CREATE | `Server/Infrastructure/Persistence/Entities/CredentialSetupToken.cs` | EF Core entity for one-time invite tokens |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/UserConfiguration.cs` | EF Core fluent config: table name, CHECK constraints, case-insensitive unique index, soft-delete query filter |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/CredentialSetupTokenConfiguration.cs` | EF Core fluent config: FK to User CASCADE, token hash index, user index |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateUserAndCredentialTables.cs` | EF Core migration: Up() + Down() |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateUserAndCredentialTables.Designer.cs` | EF Core migration snapshot |
-| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` | Add `DbSet<User>`, `DbSet<CredentialSetupToken>`; apply configurations in `OnModelCreating` |
+| Action | File Path                                                                                | Description                                                                                                   |
+| ------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Infrastructure/Persistence/Entities/User.cs`                                     | EF Core entity for User domain object (Staff/Admin)                                                           |
+| CREATE | `Server/Infrastructure/Persistence/Entities/CredentialSetupToken.cs`                     | EF Core entity for one-time invite tokens                                                                     |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/UserConfiguration.cs`                  | EF Core fluent config: table name, CHECK constraints, case-insensitive unique index, soft-delete query filter |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/CredentialSetupTokenConfiguration.cs`  | EF Core fluent config: FK to User CASCADE, token hash index, user index                                       |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateUserAndCredentialTables.cs`          | EF Core migration: Up() + Down()                                                                              |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateUserAndCredentialTables.Designer.cs` | EF Core migration snapshot                                                                                    |
+| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs`                                      | Add `DbSet<User>`, `DbSet<CredentialSetupToken>`; apply configurations in `OnModelCreating`                   |
 
 ---
 
@@ -212,11 +212,11 @@ dotnet ef migrations script --project Server/Server.csproj --output migrations_u
 
 ## Implementation Checklist
 
-- [ ] Create `User` EF Core entity with columns: id, email, passwordHash (nullable), role, status, credentialEmailStatus, lastLoginAt, createdAt
-- [ ] Create `CredentialSetupToken` EF Core entity with columns: id, userId (FK), tokenHash, expiresAt, usedAt (nullable), createdAt
-- [ ] Configure `UserConfiguration`: case-insensitive unique index on `lower(email)`, `HasCheckConstraint` for role values, `HasCheckConstraint` for status values, soft-delete query filter
-- [ ] Configure `CredentialSetupTokenConfiguration`: FK to `users` with CASCADE DELETE, unique-enough index on `token_hash`, index on `user_id`
-- [ ] Write EF Core migration `CreateUserAndCredentialTables` with `Up()` (create tables + indexes) and `Down()` (drop indexes + tables)
-- [ ] Confirm migration does NOT touch `audit_logs` table (already created by US_010 migration)
-- [ ] Register `User` and `CredentialSetupToken` configurations in `AppDbContext.OnModelCreating()`
-- [ ] Generate SQL script and review before applying to confirm no unintended changes to existing tables
+- [x] Create `User` EF Core entity with columns: id, email, passwordHash (nullable), role, status, credentialEmailStatus, lastLoginAt, createdAt
+- [x] Create `CredentialSetupToken` EF Core entity with columns: id, userId (FK), tokenHash, expiresAt, usedAt (nullable), createdAt
+- [x] Configure `UserConfiguration`: case-insensitive unique index on `lower(email)`, `HasCheckConstraint` for role values, `HasCheckConstraint` for status values, soft-delete query filter
+- [x] Configure `CredentialSetupTokenConfiguration`: FK to `users` with CASCADE DELETE, unique-enough index on `token_hash`, index on `user_id`
+- [x] Write EF Core migration `CreateUserAndCredentialTables` with `Up()` (create tables + indexes) and `Down()` (drop indexes + tables)
+- [x] Confirm migration does NOT touch `audit_logs` table (already created by US_010 migration)
+- [x] Register `User` and `CredentialSetupToken` configurations in `AppDbContext.OnModelCreating()`
+- [x] Generate SQL script and review before applying to confirm no unintended changes to existing tables

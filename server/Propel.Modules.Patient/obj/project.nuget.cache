@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "yj/5Il+ese4=",
+  "success": true,
+  "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Patient\\Propel.Modules.Patient.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\fluentvalidation\\11.12.0\\fluentvalidation.11.12.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr\\12.5.0\\mediatr.12.5.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.6\\microsoft.extensions.dependencyinjection.abstractions.10.0.6.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.6\\microsoft.extensions.logging.abstractions.10.0.6.nupkg.sha512"
+  ],
+  "logs": []
+}

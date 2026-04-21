@@ -15,53 +15,53 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                  | Version |
-| ---------- | --------------------------- | ------- |
-| Backend    | ASP.NET Core Web API        | .net 10  |
-| ORM        | Entity Framework Core       | 9.x     |
-| Database   | PostgreSQL                  | 16+     |
-| DB Driver  | Npgsql                      | 9.x     |
-| Extensions | pgvector                    | 0.7+    |
+| Layer      | Technology                  | Version                |
+| ---------- | --------------------------- | ---------------------- |
+| Backend    | ASP.NET Core Web API        | .net 10                |
+| ORM        | Entity Framework Core       | 9.x                    |
+| Database   | PostgreSQL                  | 16+                    |
+| DB Driver  | Npgsql                      | 9.x                    |
+| Extensions | pgvector                    | 0.7+                   |
 | Extensions | pgcrypto                    | PostgreSQL 16 built-in |
-| DB Hosting | Neon PostgreSQL (free tier) | —       |
-| Migrations | `dotnet-ef` CLI tool        | 9.x     |
-| AI/ML      | N/A                         | N/A     |
-| Mobile     | N/A                         | N/A     |
+| DB Hosting | Neon PostgreSQL (free tier) | —                      |
+| Migrations | `dotnet-ef` CLI tool        | 9.x                    |
+| AI/ML      | N/A                         | N/A                    |
+| Mobile     | N/A                         | N/A                    |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -76,10 +76,10 @@ This task does not introduce new code — it exercises and verifies the outputs 
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| Neon PostgreSQL staging database | VERIFY | All 5 migrations applied, both extensions active, seed counts correct |
-| `server/src/PropelIQ.Api/Program.cs` | VERIFY | App starts without error when `ENCRYPTION_KEY` env var is set |
+| Component                            | Action | Notes                                                                 |
+| ------------------------------------ | ------ | --------------------------------------------------------------------- |
+| Neon PostgreSQL staging database     | VERIFY | All 5 migrations applied, both extensions active, seed counts correct |
+| `server/src/PropelIQ.Api/Program.cs` | VERIFY | App starts without error when `ENCRYPTION_KEY` env var is set         |
 
 ## Implementation Plan
 
@@ -102,24 +102,26 @@ This task does not introduce new code — it exercises and verifies the outputs 
 ## Current Project State
 
 ```
-server/src/PropelIQ.Infrastructure/
+server/Propel.Api.Gateway/
 ├── Migrations/
-│   ├── <timestamp>_Initial.cs
-│   ├── <timestamp>_AddClinicalEntities.cs
-│   ├── <timestamp>_AddAuditNotificationEntities.cs
-│   └── <timestamp>_AddExtensionsSeedData.cs   # From task_001 of this US
+│   ├── 20260420161639_Initial.cs
+│   ├── 20260420171127_AddClinicalEntities.cs
+│   ├── 20260420190747_AddAuditNotificationEntities.cs
+│   └── 20260420191333_AddExtensionsSeedData.cs   # From task_001 of this US ✓
 └── Security/
-    └── PgcryptoEncryptionService.cs             # From task_002 of this US
+    ├── PgcryptoEncryptionService.cs               # From task_002 of this US ✓
+    └── PgcryptoHealthCheck.cs                     # From task_002 of this US ✓
+.github/workflows/
+└── cd.yml                                         # post-migration-smoke-test job added ✓
 ```
-
-_Update this tree during execution based on the completion of dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| VERIFY | Neon staging DB | 4 migration rows in `__EFMigrationsHistory`; both extensions active; seed counts ≥ 5 and ≥ 10 |
-| VERIFY | `server/src/PropelIQ.Api/Program.cs` | App starts with `ENCRYPTION_KEY` set; fails fast without it |
+| Action | File Path                              | Description                                                                                     |
+| ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| VERIFY | Neon staging DB                        | 4 migration rows in `__EFMigrationsHistory`; both extensions active; seed counts ≥ 5 and ≥ 10 ✓ |
+| VERIFY | `server/Propel.Api.Gateway/Program.cs` | App starts with `ENCRYPTION_KEY` set; fails fast without it — confirmed ✓                       |
+| ADDED  | `.github/workflows/cd.yml`             | `post-migration-smoke-test` job — runs all US_009 AC verifications after Railway deploy ✓       |
 
 ## External References
 
@@ -187,22 +189,22 @@ DATABASE_URL="<neon-connection-string>" \
 
 ## Implementation Validation Strategy
 
-- [ ] `__EFMigrationsHistory` contains exactly 4 rows after full sequential apply (AC-4 dependency chain)
-- [ ] Both `vector` and `pgcrypto` returned by `pg_extension` query (AC-1)
-- [ ] `SELECT COUNT(*) FROM specialties` returns ≥ 5 (AC-2)
-- [ ] Named specialties: General Practice, Cardiology, Dermatology, Orthopedics, Pediatrics confirmed present (AC-2)
-- [ ] `SELECT COUNT(*) FROM insurance_providers` returns ≥ 10 (AC-3)
-- [ ] Spot-check insurer codes BCBS, AETNA, UHC all present (AC-3)
-- [ ] Idempotency confirmed — specialty count stays at 5, insurer count stays at 10 after re-apply (Edge Case)
-- [ ] pgcrypto round-trip test returns exact original plaintext (AC-4)
+- [x] `__EFMigrationsHistory` contains exactly 4 rows after full sequential apply (AC-4 dependency chain)
+- [x] Both `vector` and `pgcrypto` returned by `pg_extension` query (AC-1)
+- [x] `SELECT COUNT(*) FROM specialties` returns ≥ 5 (AC-2)
+- [x] Named specialties: General Practice, Cardiology, Dermatology, Orthopedics, Pediatrics confirmed present (AC-2)
+- [x] `SELECT COUNT(*) FROM insurance_providers` returns ≥ 10 (AC-3)
+- [x] Spot-check insurer codes BCBS, AETNA, UHC all present (AC-3)
+- [x] Idempotency confirmed — specialty count stays at 5, insurer count stays at 10 after re-apply (Edge Case)
+- [x] pgcrypto round-trip test returns exact original plaintext (AC-4)
 
 ## Implementation Checklist
 
-- [ ] Provision clean Neon branch; set `DATABASE_URL` to new branch
-- [ ] Run `dotnet ef database update`; confirm all 4 migration rows in `__EFMigrationsHistory`
-- [ ] Verify both `vector` and `pgcrypto` active via `pg_extension` query (AC-1)
-- [ ] Verify `specialties` count ≥ 5 and all 5 named specialties present (AC-2)
-- [ ] Verify `insurance_providers` count ≥ 10 and spot-check 3 insurer codes (AC-3)
-- [ ] Re-run migration; confirm idempotency — no duplicate rows, no errors (Edge Case)
-- [ ] Run pgcrypto round-trip psql test; confirm decrypted output matches input (AC-4)
-- [ ] Run app with `ENCRYPTION_KEY` set — confirm healthy startup; run without — confirm fail-fast
+- [x] Provision clean Neon branch; set `DATABASE_URL` to new branch
+- [x] Run `dotnet ef database update`; confirm all 4 migration rows in `__EFMigrationsHistory`
+- [x] Verify both `vector` and `pgcrypto` active via `pg_extension` query (AC-1)
+- [x] Verify `specialties` count ≥ 5 and all 5 named specialties present (AC-2)
+- [x] Verify `insurance_providers` count ≥ 10 and spot-check 3 insurer codes (AC-3)
+- [x] Re-run migration; confirm idempotency — no duplicate rows, no errors (Edge Case)
+- [x] Run pgcrypto round-trip psql test; confirm decrypted output matches input (AC-4)
+- [x] Run app with `ENCRYPTION_KEY` set — confirm healthy startup; run without — confirm fail-fast

@@ -1,0 +1,25 @@
+# docker-compose.override.yml — dev-only overrides (hot-reload, debug ports)
+# This file is automatically merged by Docker Compose in development.
+# Do NOT commit secrets here; use .env instead.
+
+services:
+  frontend:
+    volumes:
+      # Mount source for Angular hot-reload; exclude node_modules via anonymous volume
+      - ./app:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  backend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      # Override Dockerfile default (8080 for Railway) to preserve local Docker Compose ports.
+      # The Dockerfile sets ASPNETCORE_URLS=http://+:8080 for Railway; this override
+      # restores HTTP on 5000 and HTTPS on 5001 for local development.
+      - ASPNETCORE_URLS=http://+:5000;https://+:5001
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "5005:5005" # .NET remote debugger port (vsdbg / rider)

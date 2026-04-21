@@ -12,53 +12,53 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 > This task configures hosting infrastructure (not UI components), so Design References are N/A.
 
 ## Applicable Technology Stack
 
-| Layer          | Technology         | Version |
-| -------------- | ------------------ | ------- |
-| Frontend       | Angular            | 18.x    |
-| Hosting (FE)   | Netlify            | —       |
-| CI/CD          | GitHub Actions     | —       |
-| Container      | N/A                | N/A     |
-| AI/ML          | N/A                | N/A     |
-| Vector Store   | N/A                | N/A     |
-| AI Gateway     | N/A                | N/A     |
-| Mobile         | N/A                | N/A     |
+| Layer        | Technology     | Version |
+| ------------ | -------------- | ------- |
+| Frontend     | Angular        | 18.x    |
+| Hosting (FE) | Netlify        | —       |
+| CI/CD        | GitHub Actions | —       |
+| Container    | N/A            | N/A     |
+| AI/ML        | N/A            | N/A     |
+| Vector Store | N/A            | N/A     |
+| AI Gateway   | N/A            | N/A     |
+| Mobile       | N/A            | N/A     |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -73,11 +73,11 @@ This task covers only the **Netlify frontend hosting** configuration. Railway ba
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| `netlify.toml` (repository root) | CREATE | Netlify build, redirect, and header configuration |
-| `app/angular.json` | VERIFY | `outputPath` must match `netlify.toml` `publish` dir |
-| `app/src/index.html` | MODIFY | Add `<link rel="preconnect">` hints for API domain to aid LCP |
+| Component                        | Action | Notes                                                         |
+| -------------------------------- | ------ | ------------------------------------------------------------- |
+| `netlify.toml` (repository root) | CREATE | Netlify build, redirect, and header configuration             |
+| `app/angular.json`               | VERIFY | `outputPath` must match `netlify.toml` `publish` dir          |
+| `app/src/index.html`             | MODIFY | Add `<link rel="preconnect">` hints for API domain to aid LCP |
 
 ## Implementation Plan
 
@@ -123,11 +123,11 @@ _Update this tree during execution based on completed dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `netlify.toml` | Netlify build, SPA redirect, HTTPS enforcement, security and caching headers |
-| MODIFY | `app/src/index.html` | Add `<link rel="preconnect">` and `<link rel="dns-prefetch">` for API domain |
-| VERIFY | `app/angular.json` | Confirm `outputPath` under `projects.<name>.architect.build.options` matches `netlify.toml` `publish` dir |
+| Action | File Path            | Description                                                                                               |
+| ------ | -------------------- | --------------------------------------------------------------------------------------------------------- |
+| CREATE | `netlify.toml`       | Netlify build, SPA redirect, HTTPS enforcement, security and caching headers                              |
+| MODIFY | `app/src/index.html` | Add `<link rel="preconnect">` and `<link rel="dns-prefetch">` for API domain                              |
+| VERIFY | `app/angular.json`   | Confirm `outputPath` under `projects.<name>.architect.build.options` matches `netlify.toml` `publish` dir |
 
 ### Reference: `netlify.toml` Structure
 
@@ -226,9 +226,9 @@ lhci autorun --upload.target=temporary-public-storage
 
 - [ ] Create Netlify site via Netlify UI; record Site ID; generate Personal Access Token
 - [ ] Register `NETLIFY_SITE_ID` and `NETLIFY_AUTH_TOKEN` as GitHub repository secrets
-- [ ] Create `netlify.toml` at repository root with `[build]`, `[[redirects]]` (SPA + HTTPS), `[[headers]]` (security + caching)
-- [ ] Verify `app/angular.json` `outputPath` matches `netlify.toml` `publish` value
-- [ ] Add `<link rel="preconnect">` and `<link rel="dns-prefetch">` for API domain to `app/src/index.html`
+- [x] Create `netlify.toml` at repository root with `[build]`, `[[redirects]]` (SPA + HTTPS), `[[headers]]` (security + caching)
+- [x] Verify `app/angular.json` `outputPath` matches `netlify.toml` `publish` value
+- [x] Add `<link rel="preconnect">` and `<link rel="dns-prefetch">` for API domain to `app/src/index.html`
 - [ ] Trigger a CD deploy (push to `main`); confirm Netlify deploy log shows no errors
 - [ ] Validate HTTPS certificate and security response headers using `curl -I` or browser DevTools
 - [ ] Run Lighthouse against deployed URL; confirm LCP < 2.5s on shell page

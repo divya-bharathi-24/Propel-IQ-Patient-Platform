@@ -32,18 +32,18 @@
 
 ## Applicable Technology Stack
 
-| Layer                    | Technology                      | Version |
-| ------------------------ | ------------------------------- | ------- |
-| Backend                  | ASP.NET Core Web API            | .net 10  |
-| AI/ML — Orchestration    | Microsoft Semantic Kernel       | 1.x     |
-| AI/ML — Model Provider   | OpenAI API / Azure OpenAI       | GPT-4o  |
-| AI/ML — Embeddings       | text-embedding-3-small (OpenAI) | Latest  |
-| Vector Store             | pgvector (PostgreSQL extension) | 0.7+    |
-| ORM                      | Entity Framework Core           | 9.x     |
-| Backend Messaging        | MediatR                         | 12.x    |
-| Backend Validation       | FluentValidation                | 11.x    |
-| Database                 | PostgreSQL                      | 16+     |
-| Logging                  | Serilog                         | 4.x     |
+| Layer                  | Technology                      | Version |
+| ---------------------- | ------------------------------- | ------- |
+| Backend                | ASP.NET Core Web API            | .net 10 |
+| AI/ML — Orchestration  | Microsoft Semantic Kernel       | 1.x     |
+| AI/ML — Model Provider | OpenAI API / Azure OpenAI       | GPT-4o  |
+| AI/ML — Embeddings     | text-embedding-3-small (OpenAI) | Latest  |
+| Vector Store           | pgvector (PostgreSQL extension) | 0.7+    |
+| ORM                    | Entity Framework Core           | 9.x     |
+| Backend Messaging      | MediatR                         | 12.x    |
+| Backend Validation     | FluentValidation                | 11.x    |
+| Database               | PostgreSQL                      | 16+     |
+| Logging                | Serilog                         | 4.x     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -51,20 +51,21 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type          | Value                                                               |
-| ----------------------- | ------------------------------------------------------------------- |
-| **AI Impact**           | Yes                                                                 |
-| **AIR Requirements**    | AIR-005, AIR-006, AIR-Q03, AIR-O01, AIR-O02, AIR-S03, AIR-R02     |
-| **AI Pattern**          | Tool Calling                                                        |
-| **Prompt Template Path**| `prompts/medical-coding/`                                           |
-| **Guardrails Config**   | `config/ai-guardrails.json` (schema validation middleware + SK filters) |
-| **Model Provider**      | OpenAI API / Azure OpenAI (GPT-4o)                                  |
+| Reference Type           | Value                                                                   |
+| ------------------------ | ----------------------------------------------------------------------- |
+| **AI Impact**            | Yes                                                                     |
+| **AIR Requirements**     | AIR-005, AIR-006, AIR-Q03, AIR-O01, AIR-O02, AIR-S03, AIR-R02           |
+| **AI Pattern**           | Tool Calling                                                            |
+| **Prompt Template Path** | `prompts/medical-coding/`                                               |
+| **Guardrails Config**    | `config/ai-guardrails.json` (schema validation middleware + SK filters) |
+| **Model Provider**       | OpenAI API / Azure OpenAI (GPT-4o)                                      |
 
 > **AI Impact:** Yes — task involves LLM tool-calling orchestration via Semantic Kernel for ICD-10/CPT extraction from aggregated patient data.
 
 ### CRITICAL: AI Implementation Requirements
 
 **IF AI Impact = Yes:**
+
 - **MUST** reference prompt templates from `prompts/medical-coding/` during implementation
 - **MUST** implement input guardrails (PII redaction per AIR-S01 before sending to OpenAI)
 - **MUST** enforce token budget of 8,000 tokens per request (AIR-O01)
@@ -77,12 +78,12 @@
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -100,16 +101,16 @@ Implement the AI module's Semantic Kernel tool-calling pipeline that analyzes a 
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `MedicalCodingPlugin` (new) | AI Module | CREATE — Semantic Kernel plugin with `SuggestIcd10CodesAsync` and `SuggestCptCodesAsync` kernel functions |
-| `MedicalCodingOrchestrator` (new) | AI Module | CREATE — Orchestrates sequential tool calls, applies circuit breaker, aggregates results |
-| `MedicalCodeSchemaValidator` (new) | AI Module | CREATE — Validates AI output JSON against `MedicalCodeSuggestion` schema; enforces AIR-Q03 |
-| `AiAuditLogger` (existing) | Shared / Infrastructure | MODIFY — Extend to log medical coding prompt/response pairs with patient context reference |
-| `prompts/medical-coding/icd10-suggestion.yaml` (new) | Prompts | CREATE — Versioned prompt template for ICD-10 tool call |
-| `prompts/medical-coding/cpt-suggestion.yaml` (new) | Prompts | CREATE — Versioned prompt template for CPT tool call |
-| `MedicalCodeSuggestionDto` (new) | Shared Contracts | CREATE — Shared DTO: `{ code, codeType, description, confidence, sourceDocumentId, lowConfidence }` |
-| `CircuitBreakerPolicy` (existing) | AI Module | MODIFY — Register medical-coding circuit breaker (3 failures / 5 min window, per AIR-O02) |
+| Component                                            | Module                  | Action                                                                                                    |
+| ---------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------- |
+| `MedicalCodingPlugin` (new)                          | AI Module               | CREATE — Semantic Kernel plugin with `SuggestIcd10CodesAsync` and `SuggestCptCodesAsync` kernel functions |
+| `MedicalCodingOrchestrator` (new)                    | AI Module               | CREATE — Orchestrates sequential tool calls, applies circuit breaker, aggregates results                  |
+| `MedicalCodeSchemaValidator` (new)                   | AI Module               | CREATE — Validates AI output JSON against `MedicalCodeSuggestion` schema; enforces AIR-Q03                |
+| `AiAuditLogger` (existing)                           | Shared / Infrastructure | MODIFY — Extend to log medical coding prompt/response pairs with patient context reference                |
+| `prompts/medical-coding/icd10-suggestion.yaml` (new) | Prompts                 | CREATE — Versioned prompt template for ICD-10 tool call                                                   |
+| `prompts/medical-coding/cpt-suggestion.yaml` (new)   | Prompts                 | CREATE — Versioned prompt template for CPT tool call                                                      |
+| `MedicalCodeSuggestionDto` (new)                     | Shared Contracts        | CREATE — Shared DTO: `{ code, codeType, description, confidence, sourceDocumentId, lowConfidence }`       |
+| `CircuitBreakerPolicy` (existing)                    | AI Module               | MODIFY — Register medical-coding circuit breaker (3 failures / 5 min window, per AIR-O02)                 |
 
 ---
 
@@ -172,18 +173,18 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/AI/Plugins/MedicalCodingPlugin.cs` | Semantic Kernel plugin with ICD-10 and CPT `[KernelFunction]` tool methods |
-| CREATE | `Server/AI/Orchestrators/MedicalCodingOrchestrator.cs` | Service orchestrating sequential ICD-10 → CPT tool calls with circuit breaker |
-| CREATE | `Server/AI/Validators/MedicalCodeSchemaValidator.cs` | JSON output schema validator enforcing AIR-Q03 |
-| CREATE | `Server/Shared/Contracts/MedicalCodeSuggestionDto.cs` | Shared DTO: code, codeType, description, confidence, sourceDocumentId, lowConfidence |
-| CREATE | `Server/Shared/Contracts/MedicalCodingSuggestionResult.cs` | Wrapper: `List<MedicalCodeSuggestionDto> Suggestions`, `string? Message` |
-| CREATE | `Server/Shared/Exceptions/MedicalCodingUnavailableException.cs` | Thrown when circuit breaker is open after 2 failed retries |
-| CREATE | `Server/prompts/medical-coding/icd10-suggestion.yaml` | Versioned GPT-4o prompt template for ICD-10 tool call |
-| CREATE | `Server/prompts/medical-coding/cpt-suggestion.yaml` | Versioned GPT-4o prompt template for CPT tool call |
-| MODIFY | `Server/AI/Audit/AiAuditLogger.cs` | Add `LogMedicalCodingInvocationAsync` method for structured audit events |
-| MODIFY | `Server/AI/DependencyInjection/AiModuleRegistration.cs` | Register `MedicalCodingPlugin`, `MedicalCodingOrchestrator`, circuit breaker policy |
+| Action | File Path                                                       | Description                                                                          |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| CREATE | `Server/AI/Plugins/MedicalCodingPlugin.cs`                      | Semantic Kernel plugin with ICD-10 and CPT `[KernelFunction]` tool methods           |
+| CREATE | `Server/AI/Orchestrators/MedicalCodingOrchestrator.cs`          | Service orchestrating sequential ICD-10 → CPT tool calls with circuit breaker        |
+| CREATE | `Server/AI/Validators/MedicalCodeSchemaValidator.cs`            | JSON output schema validator enforcing AIR-Q03                                       |
+| CREATE | `Server/Shared/Contracts/MedicalCodeSuggestionDto.cs`           | Shared DTO: code, codeType, description, confidence, sourceDocumentId, lowConfidence |
+| CREATE | `Server/Shared/Contracts/MedicalCodingSuggestionResult.cs`      | Wrapper: `List<MedicalCodeSuggestionDto> Suggestions`, `string? Message`             |
+| CREATE | `Server/Shared/Exceptions/MedicalCodingUnavailableException.cs` | Thrown when circuit breaker is open after 2 failed retries                           |
+| CREATE | `Server/prompts/medical-coding/icd10-suggestion.yaml`           | Versioned GPT-4o prompt template for ICD-10 tool call                                |
+| CREATE | `Server/prompts/medical-coding/cpt-suggestion.yaml`             | Versioned GPT-4o prompt template for CPT tool call                                   |
+| MODIFY | `Server/AI/Audit/AiAuditLogger.cs`                              | Add `LogMedicalCodingInvocationAsync` method for structured audit events             |
+| MODIFY | `Server/AI/DependencyInjection/AiModuleRegistration.cs`         | Register `MedicalCodingPlugin`, `MedicalCodingOrchestrator`, circuit breaker policy  |
 
 ---
 
@@ -191,7 +192,7 @@ Server/
 
 - [Semantic Kernel .NET Tool Calling Docs](https://learn.microsoft.com/en-us/semantic-kernel/concepts/plugins/using-data-retrieval-functions-for-rag?pivots=programming-language-csharp) — `[KernelFunction]` attribute and plugin registration pattern
 - [Semantic Kernel Prompt Templates (YAML)](https://learn.microsoft.com/en-us/semantic-kernel/concepts/prompts/prompt-template-syntax) — YAML prompt authoring with variable substitution
-- [Polly Circuit Breaker (.NET 8/9)](https://www.pollydocs.org/strategies/circuit-breaker.html) — `CircuitBreakerStrategyOptions` configuration for Polly v8
+- [Polly Circuit Breaker (.net 10/9)](https://www.pollydocs.org/strategies/circuit-breaker.html) — `CircuitBreakerStrategyOptions` configuration for Polly v8
 - [OpenAI Structured Outputs / JSON Mode (GPT-4o)](https://platform.openai.com/docs/guides/structured-outputs) — Enforcing JSON schema on GPT-4o responses
 - [ICD-10-CM Code Set (CMS)](https://www.cms.gov/medicare/coding-billing/icd-10-codes) — Authoritative ICD-10 code lookup source
 - [CPT Code Set (AMA)](https://www.ama-assn.org/practice-management/cpt/cpt-overview-and-code-approval) — Authoritative CPT code reference
