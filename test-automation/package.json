@@ -1,0 +1,23 @@
+{
+  "name": "propeliq-test-automation",
+  "version": "1.0.0",
+  "description": "Playwright TypeScript automation for Unified Patient Access Platform",
+  "scripts": {
+    "test": "playwright test",
+    "test:feature": "playwright test --project=feature-patient --project=feature-staff --project=feature-admin",
+    "test:e2e": "playwright test --project=e2e",
+    "test:registration": "playwright test tests/patient_registration_booking.spec.ts",
+    "test:slot": "playwright test tests/slot_clinical_intelligence.spec.ts",
+    "test:admin": "playwright test tests/admin_notifications_calendar.spec.ts",
+    "test:onboarding": "playwright test e2e/patient_onboarding.spec.ts",
+    "test:walkin": "playwright test e2e/staff_walkin_clinical_workflow.spec.ts",
+    "test:setup": "playwright test --project=setup",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "staff": {
+    "email": "e2e.walkin.staff@propeliq.dev",
+    "password": "StaffP@ss001!",
+    "role": "Staff"
+  },
+  "patient": {
+    "email": "e2e.walkin.patient@propeliq.dev",
+    "name": "Walk-In Patient E2E",
+    "searchName": "Walk-In Patient",
+    "patientRef": "walkin-patient-e2e",
+    "patientId": "walkin-patient-e2e-id",
+    "profileStatus": "Verified"
+  },
+  "slot": {
+    "id": "walkin-e2e-001",
+    "date": "today",
+    "time": "11:00"
+  },
+  "clinicalCodes": {
+    "icd10": {
+      "code": "J06.9",
+      "description": "Acute upper respiratory infection, unspecified"
+    },
+    "cpt": {
+      "code": "99213",
+      "description": "Office or other outpatient visit, moderate complexity"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "tc_uc010_hp_001": {
+    "adminEmail": "admin@propeliq.dev",
+    "newStaffEmail": "new.staff@propeliq.dev",
+    "newStaffFirstName": "New",
+    "newStaffLastName": "Staff",
+    "role": "Staff",
+    "staffPassword": "StaffP@ss001!",
+    "activationToken": "staff-activation-token-001"
+  },
+  "tc_uc010_ec_001": {
+    "adminEmail": "admin@propeliq.dev",
+    "targetStaffEmail": "existing.staff@propeliq.dev",
+    "targetStaffRef": "existing-staff",
+    "oldRole": "Staff",
+    "newRole": "Admin",
+    "existingStaffPassword": "ExistingP@ss001!"
+  },
+  "tc_uc010_er_001": {
+    "adminEmail": "admin@propeliq.dev",
+    "targetStaffEmail": "deactivate.staff@propeliq.dev",
+    "targetStaffRef": "deactivate-staff",
+    "targetStaffId": "deactivate-staff-id"
+  },
+  "tc_uc011_hp_001": {
+    "patientEmail": "reminder.patient@propeliq.dev",
+    "appointmentId": "appt-remind-001",
+    "reminderWindows": [48, 24, 2],
+    "channels": ["Email", "SMS"]
+  },
+  "tc_uc011_ec_001": {
+    "adminEmail": "admin@propeliq.dev",
+    "appointmentId": "appt-adhoc-001",
+    "patientEmail": "adhoc.patient@propeliq.dev"
+  },
+  "tc_uc011_er_001": {
+    "patientEmail": "cancel.reminder@propeliq.dev",
+    "appointmentId": "appt-cancel-remind-001"
+  },
+  "tc_uc012_hp_001": {
+    "patientEmail": "calendar.patient@propeliq.dev",
+    "appointmentId": "appt-calendar-001",
+    "oauthProvider": "Google",
+    "mockAuthCode": "mock-auth-code-001",
+    "redirectUri": "/calendar/callback"
+  },
+  "tc_uc012_ec_001": {
+    "appointmentId": "appt-ics-001",
+    "expectedIcsFields": ["VEVENT", "DTSTART", "DTEND", "SUMMARY"]
+  },
+  "tc_uc012_er_001": {
+    "appointmentId": "appt-calendar-001",
+    "oauthError": "access_denied",
+    "callbackPath": "/calendar/callback"
+  }
+}
