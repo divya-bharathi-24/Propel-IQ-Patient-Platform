@@ -1,0 +1,357 @@
+name: CD — Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+# Cancel any in-flight deploy for the same ref — prevents concurrent production deploys
+# that could result in out-of-order releases.
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
+
+# Hard-fail the entire pipeline if the total deploy time exceeds 10 minutes (AC-2 SLA).
+timeout-minutes: 10
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 1 — Build Angular 18 SPA (production) and deploy to Netlify
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend (Netlify)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install npm dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build Angular application (production)
+        working-directory: app
+        run: npx ng build --configuration production
+
+      # Angular 18 application builder outputs static files under browser/ subfolder.
+      # Netlify NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID are read from environment — never
+      # echoed to logs by the action. GITHUB_TOKEN is used only for PR comment suppression.
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: app/dist/propel-iq-patient-platform/browser
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions — ${{ github.sha }}"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 2 — Build .NET 10 API Docker image and push to GitHub Container Registry
+  # Uses GITHUB_TOKEN (automatic, no extra secret) for GHCR authentication.
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-push-docker:
+    name: Build & Push Docker Image (GHCR)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-name: ${{ steps.image.outputs.name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # GHCR requires all-lowercase image names; github.repository may contain
+      # upper-case characters on some accounts — normalise before use.
+      - name: Derive lowercase image name
+        id: image
+        run: |
+          IMAGE="ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')/api"
+          echo "name=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          # Tag with both :latest and :<commit-sha> to enable pinned rollbacks.
+          tags: |
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 3 — EF Core migration smoke check, then deploy API to Railway
+  # Runs only after both Job 1 and Job 2 complete successfully.
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend (Railway)
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, build-push-docker]
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install dotnet-ef global tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      # Generates idempotent migration SQL without applying it to the database.
+      # If the migration model is inconsistent or a migration file is corrupt,
+      # this step fails and blocks traffic cutover (AC edge case: migration failures).
+      # DATABASE_URL is passed as an override for the EF context constructor.
+      # GitHub Actions automatically masks the secret value in all log output (AC-3).
+      - name: EF Core migration smoke check
+        run: |
+          dotnet ef migrations script \
+            --idempotent \
+            --project Propel.Api.Gateway \
+            --startup-project Propel.Api.Gateway \
+            --output /tmp/migration-check.sql
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_URL }}
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      # RAILWAY_TOKEN is consumed by the Railway CLI from the environment.
+      # GitHub Actions masks the secret — it never appears in plain text in logs (AC-3).
+      - name: Deploy API to Railway
+        run: railway up --service api
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      # Write a structured deploy summary to the GitHub Actions workflow run page.
+      # Runs even when earlier steps fail (if: always()) to preserve failure context.
+      - name: Write deploy summary
+        if: always()
+        run: |
+          {
+            echo "## Deploy Summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "| ----- | ----- |"
+            echo "| **Commit SHA** | \`${{ github.sha }}\` |"
+            echo "| **Triggered By** | @${{ github.actor }} |"
+            echo "| **Branch** | \`${{ github.ref_name }}\` |"
+            echo "| **Deploy Time (UTC)** | $(date -u '+%Y-%m-%d %H:%M:%S') |"
+            echo "| **Docker Image** | \`${{ needs.build-push-docker.outputs.image-name }}:${{ github.sha }}\` |"
+            echo "| **Frontend URL** | Netlify site — see Netlify dashboard or NETLIFY_SITE_ID |"
+            echo "| **Backend Health** | Railway service — \`/health\` endpoint on Railway app URL |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 4 — Post-migration smoke test (US_009 acceptance gate)
+  # Verifies all EP-DATA acceptance criteria after Railway deploy applies migrations:
+  #   AC-1: pgvector + pgcrypto extensions active
+  #   AC-2: specialties table has ≥ 5 named rows
+  #   AC-3: insurance_providers table has ≥ 10 rows; BCBS/AETNA/UHC spot-check
+  #   AC-4: pgcrypto round-trip encrypt/decrypt returns original plaintext
+  #   Edge: idempotency — re-running update produces zero new rows and zero errors
+  #
+  # Requires DATABASE_URL secret (Neon connection string) set in repository secrets.
+  # psql client is pre-installed on ubuntu-latest runners.
+  # ─────────────────────────────────────────────────────────────────────────────
+  post-migration-smoke-test:
+    name: Post-Migration Smoke Test (US_009)
+    runs-on: ubuntu-latest
+    needs: [deploy-backend]
+    defaults:
+      run:
+        working-directory: server
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install dotnet-ef global tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      # Apply all pending EF Core migrations to the Neon staging database.
+      # Idempotent: re-running against an already-migrated DB produces zero changes.
+      - name: Apply EF Core migrations (sequential apply)
+        run: |
+          dotnet ef database update \
+            --project Propel.Api.Gateway \
+            --startup-project Propel.Api.Gateway
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_URL }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+
+      # AC-1: Both vector and pgcrypto must be active in pg_extension.
+      # Returns 2 rows; any other count fails the gate.
+      - name: AC-1 — Verify pgvector and pgcrypto extensions active
+        run: |
+          COUNT=$(psql "$DATABASE_URL" -tAc \
+            "SELECT COUNT(*) FROM pg_extension WHERE extname IN ('vector','pgcrypto');")
+          echo "Active target extensions: ${COUNT}"
+          if [ "$COUNT" -ne 2 ]; then
+            echo "FAIL: Expected 2 active extensions (vector + pgcrypto), got ${COUNT}."
+            psql "$DATABASE_URL" -c \
+              "SELECT extname, extversion FROM pg_extension WHERE extname IN ('vector','pgcrypto') ORDER BY extname;"
+            exit 1
+          fi
+          echo "PASS: Both pgvector and pgcrypto extensions are active."
+
+      # AC-2: specialties table must have ≥ 5 rows; all 5 named specialties confirmed.
+      - name: AC-2 — Verify Specialty seed count and named rows
+        run: |
+          COUNT=$(psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM specialties;")
+          echo "Specialty row count: ${COUNT}"
+          if [ "$COUNT" -lt 5 ]; then
+            echo "FAIL: Expected ≥ 5 specialties, got ${COUNT}."
+            exit 1
+          fi
+
+          for SPECIALTY in "General Practice" "Cardiology" "Dermatology" "Orthopedics" "Pediatrics"; do
+            FOUND=$(psql "$DATABASE_URL" -tAc \
+              "SELECT COUNT(*) FROM specialties WHERE name = '${SPECIALTY}';")
+            if [ "$FOUND" -ne 1 ]; then
+              echo "FAIL: Specialty '${SPECIALTY}' not found in specialties table."
+              exit 1
+            fi
+            echo "  Found: ${SPECIALTY}"
+          done
+          echo "PASS: All 5 required specialties are present (count=${COUNT})."
+
+      # AC-3: insurance_providers table must have ≥ 10 rows; BCBS, AETNA, UHC spot-check.
+      - name: AC-3 — Verify InsuranceProvider seed count and spot-check codes
+        run: |
+          COUNT=$(psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM insurance_providers;")
+          echo "Insurance provider row count: ${COUNT}"
+          if [ "$COUNT" -lt 10 ]; then
+            echo "FAIL: Expected ≥ 10 insurance providers, got ${COUNT}."
+            exit 1
+          fi
+
+          for CODE in "BCBS" "AETNA" "UHC"; do
+            FOUND=$(psql "$DATABASE_URL" -tAc \
+              "SELECT COUNT(*) FROM insurance_providers WHERE insurer_code = '${CODE}';")
+            if [ "$FOUND" -ne 1 ]; then
+              echo "FAIL: Insurer code '${CODE}' not found in insurance_providers table."
+              exit 1
+            fi
+            echo "  Found: ${CODE}"
+          done
+          echo "PASS: ≥ 10 insurance providers present; BCBS, AETNA, UHC confirmed (count=${COUNT})."
+
+      # Idempotency gate: re-run migrations against the same (already-migrated) database.
+      # Counts must remain exactly at 5 and 10 — ON CONFLICT DO NOTHING prevents duplicates.
+      - name: Idempotency — Re-apply migrations; confirm zero new rows
+        run: |
+          dotnet ef database update \
+            --project Propel.Api.Gateway \
+            --startup-project Propel.Api.Gateway
+          SPECIALTY_COUNT=$(psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM specialties;")
+          INSURER_COUNT=$(psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM insurance_providers;")
+          echo "Specialty count after re-apply: ${SPECIALTY_COUNT}"
+          echo "Insurer count after re-apply: ${INSURER_COUNT}"
+          if [ "$SPECIALTY_COUNT" -ne 5 ] || [ "$INSURER_COUNT" -ne 10 ]; then
+            echo "FAIL: Idempotency check failed — counts changed after re-apply."
+            exit 1
+          fi
+          echo "PASS: Idempotency confirmed — specialty=5, insurer=10 after re-apply."
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_URL }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+
+      # AC-4: pgcrypto round-trip test — encrypt a known plaintext, decrypt it back,
+      # confirm exact match. Uses AES-256 cipher via pgp_sym_encrypt/pgp_sym_decrypt.
+      - name: AC-4 — pgcrypto AES-256 encrypt/decrypt round-trip
+        run: |
+          PLAINTEXT="Sensitive-PHI-Value-Test"
+          TEST_KEY="test-aes256-key-32bytes-minimum!!"
+          RESULT=$(psql "$DATABASE_URL" -tAc \
+            "SELECT pgp_sym_decrypt(
+               pgp_sym_encrypt('${PLAINTEXT}', '${TEST_KEY}', 'cipher-algo=aes256'),
+               '${TEST_KEY}'
+             );")
+          RESULT=$(echo "$RESULT" | xargs)
+          echo "Decrypted result: ${RESULT}"
+          if [ "$RESULT" != "$PLAINTEXT" ]; then
+            echo "FAIL: pgcrypto round-trip mismatch. Expected '${PLAINTEXT}', got '${RESULT}'."
+            exit 1
+          fi
+          echo "PASS: pgcrypto AES-256 round-trip verified."
+
+      # Verify __EFMigrationsHistory contains exactly 4 rows in the expected order.
+      - name: Verify migration history — exactly 4 rows in sequence
+        run: |
+          ROWS=$(psql "$DATABASE_URL" -tAc \
+            "SELECT COUNT(*) FROM \"__EFMigrationsHistory\";")
+          echo "Migration history row count: ${ROWS}"
+          if [ "$ROWS" -ne 4 ]; then
+            echo "FAIL: Expected 4 migration history rows, got ${ROWS}."
+            psql "$DATABASE_URL" -c \
+              "SELECT \"MigrationId\" FROM \"__EFMigrationsHistory\" ORDER BY \"MigrationId\";"
+            exit 1
+          fi
+
+          # Confirm all 4 expected migration IDs are present
+          for MIGRATION in \
+            "Initial" \
+            "AddClinicalEntities" \
+            "AddAuditNotificationEntities" \
+            "AddExtensionsSeedData"; do
+            FOUND=$(psql "$DATABASE_URL" -tAc \
+              "SELECT COUNT(*) FROM \"__EFMigrationsHistory\" WHERE \"MigrationId\" LIKE '%_${MIGRATION}';")
+            if [ "$FOUND" -ne 1 ]; then
+              echo "FAIL: Migration '${MIGRATION}' not found in __EFMigrationsHistory."
+              exit 1
+            fi
+            echo "  Found migration: ${MIGRATION}"
+          done
+          echo "PASS: All 4 migrations applied in correct sequence."
+
+      # Write smoke test summary to the GitHub Actions workflow run page.
+      - name: Write smoke test summary
+        if: always()
+        run: |
+          {
+            echo "## Post-Migration Smoke Test Summary (US_009)"
+            echo ""
+            echo "| Check | Criterion | Status |"
+            echo "| ----- | --------- | ------ |"
+            echo "| AC-1 | pgvector + pgcrypto extensions active | See step log |"
+            echo "| AC-2 | ≥ 5 specialties, all 5 named rows present | See step log |"
+            echo "| AC-3 | ≥ 10 insurance providers, BCBS/AETNA/UHC present | See step log |"
+            echo "| AC-4 | pgcrypto AES-256 round-trip verified | See step log |"
+            echo "| Edge | Idempotency — counts unchanged after re-apply | See step log |"
+            echo "| Gate | 4 migrations in \`__EFMigrationsHistory\` | See step log |"
+          } >> "$GITHUB_STEP_SUMMARY"

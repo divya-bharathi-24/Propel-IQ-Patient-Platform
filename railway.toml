@@ -1,0 +1,30 @@
+# railway.toml — Propel IQ API Gateway service manifest
+# Reference: https://docs.railway.app/reference/config-as-code
+#
+# TLS NOTE: TLS 1.2+ is terminated at Railway's edge proxy (managed certificate).
+# The container binds plain HTTP on port 8080 only.
+# NFR-005 (TLS 1.2+) is satisfied by Railway's managed edge certificate.
+# Verify: curl --tlsv1.2 https://<railway-domain>/health  →  HTTP 200
+#
+# FREE-TIER MONITORING: Railway free tier provides $5/month credit.
+# Alert threshold: 80% of $5/month free credit (~$4 usage).
+# Monitor at: https://railway.app/project/<project-id>/usage
+# Migration path: Upgrade to Railway Hobby ($5/mo) or Pro tier when credit usage
+# exceeds 80% to maintain NFR-003 (99.9% uptime SLA). Pipeline marks deploy step
+# as failed on resource exhaustion; previous deployment remains live (Railway atomic deploys).
+
+[build]
+  builder        = "DOCKERFILE"
+  # Path to Dockerfile relative to the repository root
+  dockerfilePath = "server/Dockerfile"
+
+[deploy]
+  # startCommand intentionally omitted — Railway uses the Docker ENTRYPOINT
+  # (server/docker-entrypoint.sh) which polls for PostgreSQL readiness before
+  # starting the API, ensuring EF Core migrations succeed on first connect.
+  port                    = 8080
+  healthcheckPath         = "/health"
+  healthcheckTimeout      = 30
+  restartPolicyType       = "ON_FAILURE"
+  restartPolicyMaxRetries = 3
+  numReplicas             = 1

@@ -1,0 +1,4 @@
+namespace Propel.Modules.Auth.Queries;
+
+// Placeholder namespace for Auth read-side query types.
+// Feature queries will be added in subsequent stories.

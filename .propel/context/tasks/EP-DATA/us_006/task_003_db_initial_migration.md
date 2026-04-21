@@ -12,51 +12,51 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer      | Technology            | Version  |
-| ---------- | --------------------- | -------- |
-| Backend    | ASP.NET Core Web API  | .net 10   |
-| ORM        | Entity Framework Core | 9.x      |
-| Database   | PostgreSQL            | 16+      |
-| DB Driver  | Npgsql EF Core Provider | 9.x    |
-| DB Hosting | Neon PostgreSQL (free tier) | —  |
-| Migrations | `dotnet-ef` CLI tool  | 9.x      |
-| AI/ML      | N/A                   | N/A      |
-| Mobile     | N/A                   | N/A      |
+| Layer      | Technology                  | Version |
+| ---------- | --------------------------- | ------- |
+| Backend    | ASP.NET Core Web API        | .net 10 |
+| ORM        | Entity Framework Core       | 9.x     |
+| Database   | PostgreSQL                  | 16+     |
+| DB Driver  | Npgsql EF Core Provider     | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier) | —       |
+| Migrations | `dotnet-ef` CLI tool        | 9.x     |
+| AI/ML      | N/A                         | N/A     |
+| Mobile     | N/A                         | N/A     |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -71,65 +71,62 @@ This task depends on both `task_001_be_core_entity_classes.md` and `task_002_db_
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| `server/.config/dotnet-tools.json` | CREATE/MODIFY | Register `dotnet-ef` as a local tool manifest |
-| `server/src/PropelIQ.Infrastructure/Persistence/AppDbContextFactory.cs` | CREATE | `IDesignTimeDbContextFactory<AppDbContext>` for CLI migration support |
-| `server/src/PropelIQ.Infrastructure/Migrations/` | CREATE | Auto-generated `Initial` migration files (`<timestamp>_Initial.cs` + `AppDbContextModelSnapshot.cs`) |
-| `server/src/PropelIQ.Infrastructure/PropelIQ.Infrastructure.csproj` | VERIFY | `Microsoft.EntityFrameworkCore.Design 9.x` NuGet package must be present for `dotnet ef` CLI |
+| Component                                                               | Action        | Notes                                                                                                |
+| ----------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| `server/.config/dotnet-tools.json`                                      | CREATE/MODIFY | Register `dotnet-ef` as a local tool manifest                                                        |
+| `server/src/PropelIQ.Infrastructure/Persistence/AppDbContextFactory.cs` | CREATE        | `IDesignTimeDbContextFactory<AppDbContext>` for CLI migration support                                |
+| `server/src/PropelIQ.Infrastructure/Migrations/`                        | CREATE        | Auto-generated `Initial` migration files (`<timestamp>_Initial.cs` + `AppDbContextModelSnapshot.cs`) |
+| `server/src/PropelIQ.Infrastructure/PropelIQ.Infrastructure.csproj`     | VERIFY        | `Microsoft.EntityFrameworkCore.Design 9.x` NuGet package must be present for `dotnet ef` CLI         |
 
 ## Implementation Plan
 
-1. **Install `dotnet-ef` local tool** — Create (or update) `server/.config/dotnet-tools.json` to include `dotnet-ef` version `9.*`. Run `dotnet tool restore` in `server/` to ensure the tool is available in CI and locally without global installation.
+- [x] **1. Install `dotnet-ef` local tool** — Created `server/.config/dotnet-tools.json` with `dotnet-ef` version `9.0.0`. Ran `dotnet tool restore` in `server/` — tool restored successfully.
 
-2. **Create `AppDbContextFactory`** — Implement `IDesignTimeDbContextFactory<AppDbContext>` in `PropelIQ.Infrastructure`. The factory reads `DATABASE_URL` from the `DATABASE_URL` environment variable (with a fallback to a local Neon connection string stored in `appsettings.Development.json`, which is gitignored). This decouples `dotnet ef` CLI from `Program.cs` DI registration.
+- [x] **2. Create `AppDbContextFactory`** — Implemented `IDesignTimeDbContextFactory<AppDbContext>` at `server/Propel.Api.Gateway/Data/AppDbContextFactory.cs`. The factory reads `DATABASE_URL` from environment variable → falls back to `ConnectionStrings:DefaultConnection` in `appsettings.Development.json` → falls back to a local dev placeholder. This decouples `dotnet ef` CLI from `Program.cs` env-var guards.
 
-3. **Generate the `Initial` migration** — Run `dotnet ef migrations add Initial --project src/PropelIQ.Infrastructure --startup-project src/PropelIQ.Api --output-dir Migrations`. Confirm EF generates the migration file without errors.
+- [x] **3. Generate the `Initial` migration** — Ran `dotnet ef migrations add Initial --project Propel.Api.Gateway --startup-project Propel.Api.Gateway --output-dir Migrations`. Migration `20260420161639_Initial.cs` generated without errors.
 
-4. **Review generated migration SQL** — Run `dotnet ef migrations script --idempotent --project src/PropelIQ.Infrastructure --startup-project src/PropelIQ.Api -o migration-initial.sql`. Open `migration-initial.sql` and verify:
-   - 5 `CREATE TABLE` statements (`patients`, `users`, `appointments`, `waitlist_entries`, `specialties`)
-   - All FK constraints reference correct parent tables with `ON DELETE RESTRICT`
-   - `ix_patients_email` and `ix_users_email` unique indexes are present
-   - `ix_appointments_slot_lookup` composite index on `(date, time_slot_start, specialty_id)` is present
-   - `ix_waitlist_enrolled_at` index is present
-   - `Up()` method contains no `DROP TABLE` or `DROP COLUMN` statements
+- [x] **4. Review generated migration SQL** — Ran `dotnet ef migrations script --idempotent` → `migration-initial.sql` verified:
+  - [x] 5 `CREATE TABLE` statements: `patients`, `users`, `appointments`, `waitlist_entries`, `specialties`
+  - [x] All FK constraints use `ON DELETE RESTRICT`
+  - [x] `ix_patients_email` (UNIQUE) and `ix_users_email` (UNIQUE) indexes present
+  - [x] `ix_appointments_slot_lookup` composite index on `(date, time_slot_start, specialty_id)` present
+  - [x] `ix_waitlist_enrolled_at` index present
+  - [x] `Up()` contains zero `DROP TABLE` / `DROP COLUMN` statements
 
-5. **Apply migration to staging database** — Set `DATABASE_URL` to the Neon PostgreSQL staging connection string. Run `dotnet ef database update --project src/PropelIQ.Infrastructure --startup-project src/PropelIQ.Api`. Confirm `__EFMigrationsHistory` table records the `Initial` migration.
+- [ ] **5. Apply migration to staging database** — Set `DATABASE_URL` to the Neon PostgreSQL staging connection string. Run `dotnet ef database update --project Propel.Api.Gateway --startup-project Propel.Api.Gateway`. Confirm `__EFMigrationsHistory` records the `Initial` migration. _(Requires Neon staging credentials — to be run by team with access.)_
 
-6. **Verify FK constraint enforcement** — Via `psql` or a quick integration test, attempt to `INSERT` into `appointments` with a non-existent `patient_id`. Confirm PostgreSQL raises error code `23503` (foreign_key_violation) — satisfying AC-4.
+- [ ] **6. Verify FK constraint enforcement** — Via `psql`, attempt to `INSERT` into `appointments` with a non-existent `patient_id`. Confirm error code `23503` (foreign*key_violation) satisfying AC-4. *(Requires staging access.)\_
 
-7. **Verify unique email constraint** — Via `psql`, attempt to `INSERT` two `Patient` rows with the same `email`. Confirm error code `23505` (unique_violation) is raised.
+- [ ] **7. Verify unique email constraint** — Via `psql`, attempt to `INSERT` two `Patient` rows with the same `email`. Confirm error code `23505` (unique*violation). *(Requires staging access.)\_
 
-8. **Confirm migration is backwards-compatible** — Re-run migration script against a fresh database; then apply it again to a database already containing the migration — `dotnet ef database update` is idempotent via `__EFMigrationsHistory` check.
+- [ ] **8. Confirm migration idempotency** — Run `dotnet ef database update` twice on a database already containing the migration — confirm no-op via `__EFMigrationsHistory` check. _(Requires staging access.)_
 
 ## Current Project State
 
 ```
 server/
 ├── .config/
-│   └── dotnet-tools.json          # To be created/updated
-└── src/
-    ├── PropelIQ.Domain/
-    │   ├── Entities/              # Completed in task_001
-    │   └── Enums/                 # Completed in task_001
-    └── PropelIQ.Infrastructure/
-        ├── Persistence/
-        │   ├── AppDbContext.cs    # Completed in task_002
-        │   ├── AppDbContextFactory.cs  # To be created
-        │   └── Configurations/   # Completed in task_002
-        └── Migrations/            # To be generated by dotnet ef
+│   └── dotnet-tools.json                          # [X] Created — dotnet-ef 9.0.0
+└── Propel.Api.Gateway/
+    ├── Data/
+    │   ├── AppDbContext.cs                         # [X] Completed in task_002
+    │   ├── AppDbContextFactory.cs                  # [X] Created in task_003
+    │   └── Configurations/                         # [X] Completed in task_002
+    └── Migrations/
+        ├── 20260420161639_Initial.cs               # [X] Generated by dotnet ef
+        ├── 20260420161639_Initial.Designer.cs      # [X] Auto-generated
+        └── AppDbContextModelSnapshot.cs            # [X] Auto-generated
 ```
-
-_Update this tree during execution based on completed dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE/MODIFY | `server/.config/dotnet-tools.json` | Add `dotnet-ef 9.*` local tool manifest |
-| CREATE | `server/src/PropelIQ.Infrastructure/Persistence/AppDbContextFactory.cs` | Design-time factory for `dotnet ef` CLI |
-| CREATE | `server/src/PropelIQ.Infrastructure/Migrations/<timestamp>_Initial.cs` | Generated initial migration (Up/Down methods) |
-| CREATE | `server/src/PropelIQ.Infrastructure/Migrations/AppDbContextModelSnapshot.cs` | EF model snapshot — auto-generated |
+| Action        | File Path                                                                    | Description                                   |
+| ------------- | ---------------------------------------------------------------------------- | --------------------------------------------- |
+| CREATE/MODIFY | `server/.config/dotnet-tools.json`                                           | Add `dotnet-ef 9.*` local tool manifest       |
+| CREATE        | `server/src/PropelIQ.Infrastructure/Persistence/AppDbContextFactory.cs`      | Design-time factory for `dotnet ef` CLI       |
+| CREATE        | `server/src/PropelIQ.Infrastructure/Migrations/<timestamp>_Initial.cs`       | Generated initial migration (Up/Down methods) |
+| CREATE        | `server/src/PropelIQ.Infrastructure/Migrations/AppDbContextModelSnapshot.cs` | EF model snapshot — auto-generated            |
 
 ### Reference: `AppDbContextFactory.cs`
 
@@ -175,19 +172,19 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
 ### Migration Verification Checklist (SQL Review)
 
-| Check | SQL Pattern to Verify | Required |
-| ----- | --------------------- | -------- |
-| 5 tables created | `CREATE TABLE "patients"`, `"users"`, `"appointments"`, `"waitlist_entries"`, `"specialties"` | Yes |
-| UUID primary keys | `"id" uuid NOT NULL` | Yes |
-| Patient email unique index | `CREATE UNIQUE INDEX "ix_patients_email"` | Yes |
-| User email unique index | `CREATE UNIQUE INDEX "ix_users_email"` | Yes |
-| Appointment slot index | `CREATE INDEX "ix_appointments_slot_lookup"` | Yes |
-| WaitlistEntry FIFO index | `CREATE INDEX "ix_waitlist_enrolled_at"` | Yes |
-| FK patient → appointments | `REFERENCES "patients" ("id") ON DELETE RESTRICT` | Yes |
-| FK specialty → appointments | `REFERENCES "specialties" ("id") ON DELETE RESTRICT` | Yes |
-| FK patient → waitlist_entries | `REFERENCES "patients" ("id")` | Yes |
-| FK appointment → waitlist_entries | `REFERENCES "appointments" ("id")` | Yes |
-| No destructive operations | No `DROP TABLE` or `DROP COLUMN` in `Up()` | Yes |
+| Check                             | SQL Pattern to Verify                                                                         | Required |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | -------- |
+| 5 tables created                  | `CREATE TABLE "patients"`, `"users"`, `"appointments"`, `"waitlist_entries"`, `"specialties"` | Yes      |
+| UUID primary keys                 | `"id" uuid NOT NULL`                                                                          | Yes      |
+| Patient email unique index        | `CREATE UNIQUE INDEX "ix_patients_email"`                                                     | Yes      |
+| User email unique index           | `CREATE UNIQUE INDEX "ix_users_email"`                                                        | Yes      |
+| Appointment slot index            | `CREATE INDEX "ix_appointments_slot_lookup"`                                                  | Yes      |
+| WaitlistEntry FIFO index          | `CREATE INDEX "ix_waitlist_enrolled_at"`                                                      | Yes      |
+| FK patient → appointments         | `REFERENCES "patients" ("id") ON DELETE RESTRICT`                                             | Yes      |
+| FK specialty → appointments       | `REFERENCES "specialties" ("id") ON DELETE RESTRICT`                                          | Yes      |
+| FK patient → waitlist_entries     | `REFERENCES "patients" ("id")`                                                                | Yes      |
+| FK appointment → waitlist_entries | `REFERENCES "appointments" ("id")`                                                            | Yes      |
+| No destructive operations         | No `DROP TABLE` or `DROP COLUMN` in `Up()`                                                    | Yes      |
 
 ## External References
 

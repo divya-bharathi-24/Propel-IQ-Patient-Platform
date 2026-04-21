@@ -13,52 +13,52 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer      | Technology      | Version  |
-| ---------- | --------------- | -------- |
-| Frontend   | Angular         | 18.x     |
-| Backend    | ASP.NET Core    | .net 10   |
-| CI/CD      | GitHub Actions  | —        |
-| Testing — Unit | xUnit + Moq | 2.x     |
-| Testing — E2E  | Playwright  | 1.x      |
-| AI/ML      | N/A             | N/A      |
-| Vector Store | N/A           | N/A      |
-| AI Gateway | N/A             | N/A      |
-| Mobile     | N/A             | N/A      |
+| Layer          | Technology     | Version |
+| -------------- | -------------- | ------- |
+| Frontend       | Angular        | 18.x    |
+| Backend        | ASP.NET Core   | .net 10 |
+| CI/CD          | GitHub Actions | —       |
+| Testing — Unit | xUnit + Moq    | 2.x     |
+| Testing — E2E  | Playwright     | 1.x     |
+| AI/ML          | N/A            | N/A     |
+| Vector Store   | N/A            | N/A     |
+| AI Gateway     | N/A            | N/A     |
+| Mobile         | N/A            | N/A     |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -73,12 +73,12 @@ This task covers only the **pull-request trigger** workflow (`ci.yml`). Deployme
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| `.github/workflows/ci.yml` | CREATE | New GitHub Actions CI workflow file |
-| `playwright.config.ts` (root) | MODIFY | Ensure `reporter: 'html'` and output dir `playwright-report/` are configured |
-| `package.json` / `angular.json` | VERIFY | `lint` and `build` scripts must match workflow invocation |
-| `PropelIQ.sln` (or equivalent) | VERIFY | Solution-level `dotnet test` executes all xUnit test projects |
+| Component                       | Action | Notes                                                                        |
+| ------------------------------- | ------ | ---------------------------------------------------------------------------- |
+| `.github/workflows/ci.yml`      | CREATE | New GitHub Actions CI workflow file                                          |
+| `playwright.config.ts` (root)   | MODIFY | Ensure `reporter: 'html'` and output dir `playwright-report/` are configured |
+| `package.json` / `angular.json` | VERIFY | `lint` and `build` scripts must match workflow invocation                    |
+| `PropelIQ.sln` (or equivalent)  | VERIFY | Solution-level `dotnet test` executes all xUnit test projects                |
 
 ## Implementation Plan
 
@@ -112,10 +112,10 @@ _Update this tree during execution based on completed dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `.github/workflows/ci.yml` | GitHub Actions workflow — PR quality gate pipeline |
-| MODIFY | `playwright.config.ts` | Ensure `reporter: ['html']` and `outputFolder: 'playwright-report'` are set |
+| Action | File Path                  | Description                                                                 |
+| ------ | -------------------------- | --------------------------------------------------------------------------- |
+| CREATE | `.github/workflows/ci.yml` | GitHub Actions workflow — PR quality gate pipeline                          |
+| MODIFY | `playwright.config.ts`     | Ensure `reporter: ['html']` and `outputFolder: 'playwright-report'` are set |
 
 ## External References
 
@@ -162,11 +162,11 @@ cd app && npx playwright test --project=chromium
 
 ## Implementation Checklist
 
-- [ ] Create `.github/workflows/ci.yml` with `pull_request` trigger targeting `main`
-- [ ] Add `lint-angular` job: `checkout` → `setup-node@v4 (node 20)` → `npm ci` → `npx ng lint`
-- [ ] Add `build-angular` job (needs `lint-angular`): `checkout` → `setup-node@v4` → `npm ci` → `npx ng build --configuration production`
-- [ ] Add `build-test-dotnet` job: `checkout` → `setup-dotnet@v4 (.net 10)` → `dotnet restore` → `dotnet build --no-restore` → `dotnet test --no-build`
-- [ ] Add `e2e-playwright` job (needs `build-angular`, `build-test-dotnet`): Node setup → `npm ci` → `npx playwright install --with-deps chromium` → start Angular dev server → run `npx playwright test --project=chromium`
-- [ ] Add `upload-artifact@v4` step in `e2e-playwright` job: path `playwright-report/`, name `playwright-report`, `if: always()`, retention-days 7
-- [ ] Add `concurrency` block at workflow level: group `ci-${{ github.ref }}`, `cancel-in-progress: true`
-- [ ] Verify `playwright.config.ts` has `reporter: [['html', { outputFolder: 'playwright-report' }]]`
+- [x] Create `.github/workflows/ci.yml` with `pull_request` trigger targeting `main`
+- [x] Add `lint-angular` job: `checkout` → `setup-node@v4 (node 20)` → `npm ci` → `npx ng lint`
+- [x] Add `build-angular` job (needs `lint-angular`): `checkout` → `setup-node@v4` → `npm ci` → `npx ng build --configuration production`
+- [x] Add `build-test-dotnet` job: `checkout` → `setup-dotnet@v4 (.net 10)` → `dotnet restore` → `dotnet build --no-restore` → `dotnet test --no-build`
+- [x] Add `e2e-playwright` job (needs `build-angular`, `build-test-dotnet`): Node setup → `npm ci` → `npx playwright install --with-deps chromium` → start Angular dev server → run `npx playwright test --project=chromium`
+- [x] Add `upload-artifact@v4` step in `e2e-playwright` job: path `playwright-report/`, name `playwright-report`, `if: always()`, retention-days 7
+- [x] Add `concurrency` block at workflow level: group `ci-${{ github.ref }}`, `cancel-in-progress: true`
+- [x] Verify `playwright.config.ts` has `reporter: [['html', { outputFolder: 'playwright-report' }]]`

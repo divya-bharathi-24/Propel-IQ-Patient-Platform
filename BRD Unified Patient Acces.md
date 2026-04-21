@@ -51,7 +51,7 @@ Frontend (UI Layer) Framework: Angular 18 (Standalone Components
 Architecture) Architecture Approach: Component-based, modular design
 with reactive programming using RxJS Forms Handling: Reactive Forms for
 scalable and testable form management State Management (Optional): NgRx
-/ Signals (based on complexity) Backend (API Layer) Framework: .NET 8
+/ Signals (based on complexity) Backend (API Layer) Framework: .NET 10
 (ASP.NET Core Web API) Architecture Style: Microservices Architecture
 Each core business domain (e.g., Appointment, Patient, Clinical Data)
 will be implemented as independent services Backend Layered Architecture

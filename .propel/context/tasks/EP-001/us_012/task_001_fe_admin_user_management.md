@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value                                                                                                                                                 |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **UI Impact**        | Yes                                                                                                                                                   |
-| **Figma URL**        | N/A                                                                                                                                                   |
-| **Wireframe Status** | PENDING                                                                                                                                               |
-| **Wireframe Type**   | N/A                                                                                                                                                   |
+| Reference Type         | Value                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                             |
+| **Figma URL**          | N/A                                                                                                                             |
+| **Wireframe Status**   | PENDING                                                                                                                         |
+| **Wireframe Type**     | N/A                                                                                                                             |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-admin-user-create.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec**      | N/A (figma_spec.md not yet generated)                                                                                                                 |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated)                                                                                                                 |
-| **Design Tokens**    | N/A (designsystem.md not yet generated)                                                                                                               |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                           |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                           |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                         |
 
 > **Wireframe Status:** PENDING — implement layout following Angular Material and WCAG 2.2 AA guidelines until wireframes are available. Run `/analyze-ux` once wireframe is provided.
 
@@ -34,17 +34,17 @@
 
 ## Applicable Technology Stack
 
-| Layer            | Technology       | Version |
-| ---------------- | ---------------- | ------- |
-| Frontend         | Angular          | 18.x    |
-| Frontend State   | NgRx Signals     | 18.x    |
-| Frontend Routing | Angular Router   | 18.x    |
-| HTTP Client      | Angular HttpClient | 18.x  |
-| UI Components    | Angular Material | 18.x    |
-| Testing — Unit   | Jest             | Latest  |
-| Testing — E2E    | Playwright       | 1.x     |
-| AI/ML            | N/A              | N/A     |
-| Mobile           | N/A              | N/A     |
+| Layer            | Technology         | Version |
+| ---------------- | ------------------ | ------- |
+| Frontend         | Angular            | 18.x    |
+| Frontend State   | NgRx Signals       | 18.x    |
+| Frontend Routing | Angular Router     | 18.x    |
+| HTTP Client      | Angular HttpClient | 18.x    |
+| UI Components    | Angular Material   | 18.x    |
+| Testing — Unit   | Jest               | Latest  |
+| Testing — E2E    | Playwright         | 1.x     |
+| AI/ML            | N/A                | N/A     |
+| Mobile           | N/A                | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -52,25 +52,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -96,16 +96,16 @@ Implement two frontend surface areas for US_012:
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `AdminUserListComponent` | Angular Frontend (`app/features/admin/`) |
-| CREATE | `CreateUserDialogComponent` (Angular Material dialog) | Angular Frontend (`app/features/admin/`) |
-| CREATE | `CredentialSetupComponent` | Angular Frontend (`app/features/auth/`) |
-| CREATE | `WalkInPatientCreateFormComponent` (inline sub-form) | Angular Frontend (`app/features/staff/`) |
-| CREATE | `AdminService` | Angular Frontend (`app/features/admin/services/`) |
-| MODIFY | `AuthService` | Angular Frontend — add `setupCredentials()` method |
-| CREATE | `AdminGuard` (route guard) | Angular Frontend (`app/core/guards/`) |
-| MODIFY | `AppRoutingModule` / route config | Add `/admin/users` and `/auth/setup-credentials` routes |
+| Status | Component / Module                                    | Project                                                 |
+| ------ | ----------------------------------------------------- | ------------------------------------------------------- |
+| CREATE | `AdminUserListComponent`                              | Angular Frontend (`app/features/admin/`)                |
+| CREATE | `CreateUserDialogComponent` (Angular Material dialog) | Angular Frontend (`app/features/admin/`)                |
+| CREATE | `CredentialSetupComponent`                            | Angular Frontend (`app/features/auth/`)                 |
+| CREATE | `WalkInPatientCreateFormComponent` (inline sub-form)  | Angular Frontend (`app/features/staff/`)                |
+| CREATE | `AdminService`                                        | Angular Frontend (`app/features/admin/services/`)       |
+| MODIFY | `AuthService`                                         | Angular Frontend — add `setupCredentials()` method      |
+| CREATE | `AdminGuard` (route guard)                            | Angular Frontend (`app/core/guards/`)                   |
+| MODIFY | `AppRoutingModule` / route config                     | Add `/admin/users` and `/auth/setup-credentials` routes |
 
 ---
 
@@ -164,22 +164,22 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/features/admin/admin.module.ts` | Lazy-loaded Admin feature module |
-| CREATE | `app/features/admin/admin-routing.module.ts` | Admin routes: `/admin/users` |
-| CREATE | `app/features/admin/components/user-list/admin-user-list.component.ts` | User list table with create button |
-| CREATE | `app/features/admin/components/user-list/admin-user-list.component.html` | Template: mat-table with user columns |
-| CREATE | `app/features/admin/components/create-user-dialog/create-user-dialog.component.ts` | MatDialog form: name, email, role |
-| CREATE | `app/features/admin/components/create-user-dialog/create-user-dialog.component.html` | Dialog template |
-| CREATE | `app/features/admin/services/admin.service.ts` | Service: `listUsers()`, `createUser()` |
-| CREATE | `app/features/auth/components/credential-setup/credential-setup.component.ts` | One-time credential setup page |
-| CREATE | `app/features/auth/components/credential-setup/credential-setup.component.html` | Password + confirm password form |
-| CREATE | `app/features/staff/components/walk-in-patient-create/walk-in-patient-create-form.component.ts` | Inline walk-in patient creation sub-form |
-| CREATE | `app/features/staff/components/walk-in-patient-create/walk-in-patient-create-form.component.html` | Template: name, phone, email fields |
-| CREATE | `app/core/guards/admin.guard.ts` | Route guard: allow Admin role only |
-| MODIFY | `app/features/auth/services/auth.service.ts` | Add `setupCredentials(token, password)` method |
-| MODIFY | `app/app-routing.module.ts` | Add lazy-loaded admin + credential-setup routes |
+| Action | File Path                                                                                         | Description                                     |
+| ------ | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| CREATE | `app/features/admin/admin.module.ts`                                                              | Lazy-loaded Admin feature module                |
+| CREATE | `app/features/admin/admin-routing.module.ts`                                                      | Admin routes: `/admin/users`                    |
+| CREATE | `app/features/admin/components/user-list/admin-user-list.component.ts`                            | User list table with create button              |
+| CREATE | `app/features/admin/components/user-list/admin-user-list.component.html`                          | Template: mat-table with user columns           |
+| CREATE | `app/features/admin/components/create-user-dialog/create-user-dialog.component.ts`                | MatDialog form: name, email, role               |
+| CREATE | `app/features/admin/components/create-user-dialog/create-user-dialog.component.html`              | Dialog template                                 |
+| CREATE | `app/features/admin/services/admin.service.ts`                                                    | Service: `listUsers()`, `createUser()`          |
+| CREATE | `app/features/auth/components/credential-setup/credential-setup.component.ts`                     | One-time credential setup page                  |
+| CREATE | `app/features/auth/components/credential-setup/credential-setup.component.html`                   | Password + confirm password form                |
+| CREATE | `app/features/staff/components/walk-in-patient-create/walk-in-patient-create-form.component.ts`   | Inline walk-in patient creation sub-form        |
+| CREATE | `app/features/staff/components/walk-in-patient-create/walk-in-patient-create-form.component.html` | Template: name, phone, email fields             |
+| CREATE | `app/core/guards/admin.guard.ts`                                                                  | Route guard: allow Admin role only              |
+| MODIFY | `app/features/auth/services/auth.service.ts`                                                      | Add `setupCredentials(token, password)` method  |
+| MODIFY | `app/app-routing.module.ts`                                                                       | Add lazy-loaded admin + credential-setup routes |
 
 ---
 
@@ -235,14 +235,14 @@ npx playwright test
 
 ## Implementation Checklist
 
-- [ ] Create `AdminGuard` (`CanActivateFn`): allow Admin role only; redirect non-Admin to `/access-denied`
-- [ ] Build `AdminUserListComponent` with `mat-table`, user data columns, and "Create User" button
-- [ ] Build `CreateUserDialogComponent` reactive form (name, email, role selector); handle 201, 409, 403 responses
-- [ ] Build `CredentialSetupComponent` at `/auth/setup-credentials?token=…`; handle success, expired (410), already-used (409), validation (400) states
-- [ ] Reuse `PasswordComplexityValidator` from Auth module (US_010 task_001); do NOT duplicate
-- [ ] Build `WalkInPatientCreateFormComponent` with `patientCreated` output event; handle 201, 409 (link offer), 403
-- [ ] Add `setupCredentials()` method to `AuthService`
-- [ ] Apply `AdminGuard` to `/admin/**` routes in lazy-loaded `AdminModule`
-- [ ] Register `/auth/setup-credentials` as a public route (no auth guard) in `AppRoutingModule`
+- [x] Create `AdminGuard` (`CanActivateFn`): allow Admin role only; redirect non-Admin to `/access-denied`
+- [x] Build `AdminUserListComponent` with `mat-table`, user data columns, and "Create User" button
+- [x] Build `CreateUserDialogComponent` reactive form (name, email, role selector); handle 201, 409, 403 responses
+- [x] Build `CredentialSetupComponent` at `/auth/setup-credentials?token=…`; handle success, expired (410), already-used (409), validation (400) states
+- [x] Reuse `PasswordComplexityValidator` from Auth module (US_010 task_001); do NOT duplicate
+- [x] Build `WalkInPatientCreateFormComponent` with `patientCreated` output event; handle 201, 409 (link offer), 403
+- [x] Add `setupCredentials()` method to `AuthService`
+- [x] Apply `AdminGuard` to `/admin/**` routes in lazy-loaded `AdminModule`
+- [x] Register `/auth/setup-credentials` as a public route (no auth guard) in `AppRoutingModule`
 - [ ] **[UI Tasks - MANDATORY]** Reference wireframe from Design References table during implementation (when AVAILABLE)
 - [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking task complete (when AVAILABLE)

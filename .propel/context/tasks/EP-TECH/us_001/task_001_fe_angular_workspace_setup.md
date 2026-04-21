@@ -15,47 +15,47 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type        | Value |
-|-----------------------|-------|
-| **UI Impact**         | No    |
-| **Figma URL**         | N/A   |
-| **Wireframe Status**  | N/A   |
-| **Wireframe Type**    | N/A   |
-| **Wireframe Path/URL**| N/A   |
-| **Screen Spec**       | N/A   |
-| **UXR Requirements**  | N/A   |
-| **Design Tokens**     | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer          | Technology        | Version |
-|----------------|-------------------|---------|
-| Frontend       | Angular           | 18.x    |
-| Frontend State | NgRx Signals      | 18.x    |
-| Testing — E2E  | Playwright        | 1.x     |
-| CI/CD          | GitHub Actions    | —       |
+| Layer          | Technology     | Version |
+| -------------- | -------------- | ------- |
+| Frontend       | Angular        | 18.x    |
+| Frontend State | NgRx Signals   | 18.x    |
+| Testing — E2E  | Playwright     | 1.x     |
+| CI/CD          | GitHub Actions | —       |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-|----------------------|-------|
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type     | Value |
-|--------------------|-------|
-| **Mobile Impact**  | No    |
-| **Platform Target**| N/A   |
-| **Min OS Version** | N/A   |
-| **Mobile Framework**| N/A  |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -67,19 +67,19 @@ Initialize the Angular 18 Single-Page Application (SPA) workspace for the Unifie
 
 ## Impacted Components
 
-| Component / Module        | Action    | Notes                                          |
-|---------------------------|-----------|------------------------------------------------|
-| `app/` (workspace root)   | CREATE    | Angular 18 CLI-generated workspace             |
-| `app/angular.json`        | CREATE    | Workspace configuration; port, build budgets   |
-| `app/package.json`        | CREATE    | Dependencies, scripts, `engines` Node constraint |
-| `app/tsconfig.json`       | CREATE    | Root TypeScript configuration                  |
-| `app/tsconfig.app.json`   | CREATE    | App-specific strict TypeScript config          |
-| `app/.eslintrc.json`      | CREATE    | ESLint rules for Angular 18 (or `eslint.config.mjs`) |
-| `app/src/main.ts`         | CREATE    | Application bootstrap with `bootstrapApplication()` |
-| `app/src/app/app.config.ts` | CREATE  | `ApplicationConfig` with `provideRouter`, `provideHttpClient`, `provideStore()` |
-| `app/src/app/app.component.ts` | CREATE | Root standalone `AppComponent` with `RouterOutlet` |
-| `app/src/app/store/app.store.ts` | CREATE | NgRx Signals feature slice — `app` feature (e.g., loading flag) |
-| `README.md`               | MODIFY    | Add "Getting Started" section with Node.js minimum version, `npm install && ng serve` instructions, and port override documentation |
+| Component / Module               | Action | Notes                                                                                                                               |
+| -------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `app/` (workspace root)          | CREATE | Angular 18 CLI-generated workspace                                                                                                  |
+| `app/angular.json`               | CREATE | Workspace configuration; port, build budgets                                                                                        |
+| `app/package.json`               | CREATE | Dependencies, scripts, `engines` Node constraint                                                                                    |
+| `app/tsconfig.json`              | CREATE | Root TypeScript configuration                                                                                                       |
+| `app/tsconfig.app.json`          | CREATE | App-specific strict TypeScript config                                                                                               |
+| `app/.eslintrc.json`             | CREATE | ESLint rules for Angular 18 (or `eslint.config.mjs`)                                                                                |
+| `app/src/main.ts`                | CREATE | Application bootstrap with `bootstrapApplication()`                                                                                 |
+| `app/src/app/app.config.ts`      | CREATE | `ApplicationConfig` with `provideRouter`, `provideHttpClient`, `provideStore()`                                                     |
+| `app/src/app/app.component.ts`   | CREATE | Root standalone `AppComponent` with `RouterOutlet`                                                                                  |
+| `app/src/app/store/app.store.ts` | CREATE | NgRx Signals feature slice — `app` feature (e.g., loading flag)                                                                     |
+| `README.md`                      | MODIFY | Add "Getting Started" section with Node.js minimum version, `npm install && ng serve` instructions, and port override documentation |
 
 ## Implementation Plan
 
@@ -100,7 +100,7 @@ Initialize the Angular 18 Single-Page Application (SPA) workspace for the Unifie
    - Configure build budgets: `maximumWarning: "500kb"`, `maximumError: "1mb"` for the initial bundle.
    - Set `buildOptimizer: true` (default in Angular 18).
    - Enable `@angular/build` (esbuild-based) builder for faster, smaller bundles: use `@angular-devkit/build-angular:application` builder.
-   This satisfies AC3 (LCP-optimized bundle, no TypeScript errors).
+     This satisfies AC3 (LCP-optimized bundle, no TypeScript errors).
 
 7. **Document port configuration** — In `angular.json` under `serve.options`, set `"port": 4200`. Add a note in `README.md` describing how to override: `ng serve --port 4201`. This satisfies the multi-developer port conflict edge case.
 
@@ -132,24 +132,24 @@ Propel-IQ-Patient-Platform/
 └── README.md
 ```
 
-*The `app/` Angular workspace folder does not yet exist. It will be created as part of this task.*
+_The `app/` Angular workspace folder does not yet exist. It will be created as part of this task._
 
 ## Expected Changes
 
-| Action  | File Path                                             | Description                                              |
-|---------|-------------------------------------------------------|----------------------------------------------------------|
-| CREATE  | `app/`                                                | Angular 18 SPA workspace root                            |
-| CREATE  | `app/angular.json`                                    | Workspace config: builder, build budgets, port 4200, production optimizations |
-| CREATE  | `app/package.json`                                    | NPM dependencies: `@angular/core@18.x`, `@ngrx/signals@18.x`, `@angular-eslint`; `engines.node >=20.0.0`; scripts: `start`, `build`, `lint`, `test` |
-| CREATE  | `app/tsconfig.json`                                   | Root strict TypeScript config (`strict: true`, `strictTemplates: true`) |
-| CREATE  | `app/tsconfig.app.json`                               | App-specific TypeScript config extending root            |
-| CREATE  | `app/.eslintrc.json` or `app/eslint.config.mjs`       | Angular ESLint rules; zero warnings on scaffold          |
-| CREATE  | `app/src/main.ts`                                     | `bootstrapApplication(AppComponent, appConfig)` entrypoint |
-| CREATE  | `app/src/app/app.config.ts`                           | `ApplicationConfig` wiring: `provideRouter(routes)`, `provideHttpClient()`, `withComponentInputBinding()` |
-| CREATE  | `app/src/app/app.component.ts`                        | Root standalone `AppComponent` with `<router-outlet>` template |
-| CREATE  | `app/src/app/app.routes.ts`                           | Root route array (empty shell, ready for feature routes) |
-| CREATE  | `app/src/app/store/app.store.ts`                      | `AppStore` using `signalStore()` with `isLoading: boolean` state and `setLoading` updater |
-| MODIFY  | `README.md`                                           | Add "Prerequisites" (Node ≥20), "Getting Started" (`npm install && ng serve`), and "Port Configuration" sections |
+| Action | File Path                                       | Description                                                                                                                                         |
+| ------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `app/`                                          | Angular 18 SPA workspace root                                                                                                                       |
+| CREATE | `app/angular.json`                              | Workspace config: builder, build budgets, port 4200, production optimizations                                                                       |
+| CREATE | `app/package.json`                              | NPM dependencies: `@angular/core@18.x`, `@ngrx/signals@18.x`, `@angular-eslint`; `engines.node >=20.0.0`; scripts: `start`, `build`, `lint`, `test` |
+| CREATE | `app/tsconfig.json`                             | Root strict TypeScript config (`strict: true`, `strictTemplates: true`)                                                                             |
+| CREATE | `app/tsconfig.app.json`                         | App-specific TypeScript config extending root                                                                                                       |
+| CREATE | `app/.eslintrc.json` or `app/eslint.config.mjs` | Angular ESLint rules; zero warnings on scaffold                                                                                                     |
+| CREATE | `app/src/main.ts`                               | `bootstrapApplication(AppComponent, appConfig)` entrypoint                                                                                          |
+| CREATE | `app/src/app/app.config.ts`                     | `ApplicationConfig` wiring: `provideRouter(routes)`, `provideHttpClient()`, `withComponentInputBinding()`                                           |
+| CREATE | `app/src/app/app.component.ts`                  | Root standalone `AppComponent` with `<router-outlet>` template                                                                                      |
+| CREATE | `app/src/app/app.routes.ts`                     | Root route array (empty shell, ready for feature routes)                                                                                            |
+| CREATE | `app/src/app/store/app.store.ts`                | `AppStore` using `signalStore()` with `isLoading: boolean` state and `setLoading` updater                                                           |
+| MODIFY | `README.md`                                     | Add "Prerequisites" (Node ≥20), "Getting Started" (`npm install && ng serve`), and "Port Configuration" sections                                    |
 
 ## External References
 
@@ -187,22 +187,22 @@ ng test
 
 ## Implementation Validation Strategy
 
-- [ ] `npm install` completes with zero `npm ERR!` errors and no critical vulnerability alerts
-- [ ] `ng serve` starts at http://localhost:4200 and the browser displays the bootstrapped Angular shell application with no console errors
-- [ ] `src/app/store/app.store.ts` exports `AppStore` using `signalStore()` with at least one state property and can be injected into `AppComponent`
-- [ ] `ng build --configuration production` exits with code 0 and outputs a production bundle under `dist/`; no TypeScript compile errors; initial bundle size < 1 MB (budget configured in `angular.json`)
-- [ ] `ng lint` exits with code 0 and reports zero errors across all scaffold `.ts` and `.html` files
-- [ ] `package.json` `engines.node` field is set to `">=20.0.0"`
-- [ ] Integration tests pass (if applicable)
+- [x] `npm install` completes with zero `npm ERR!` errors and no critical vulnerability alerts
+- [x] `ng serve` starts at http://localhost:4200 and the browser displays the bootstrapped Angular shell application with no console errors
+- [x] `src/app/store/app.store.ts` exports `AppStore` using `signalStore()` with at least one state property and can be injected into `AppComponent`
+- [x] `ng build --configuration production` exits with code 0 and outputs a production bundle under `dist/`; no TypeScript compile errors; initial bundle size < 1 MB (budget configured in `angular.json`)
+- [x] `ng lint` exits with code 0 and reports zero errors across all scaffold `.ts` and `.html` files
+- [x] `package.json` `engines.node` field is set to `">=20.0.0"`
+- [x] Integration tests pass (if applicable)
 - [ ] **[UI Tasks]** Visual comparison against wireframe completed at 375px, 768px, 1440px — N/A (no UI screens in this task)
 
 ## Implementation Checklist
 
-- [ ] Run `ng new propel-iq-patient-platform --standalone --routing --style=scss --strict` inside the `app/` directory (or scaffold equivalent `app/` folder structure)
-- [ ] Install NgRx Signals: `npm install @ngrx/signals@18` and verify `@ngrx/signals` appears in `package.json` dependencies at version `18.x`
-- [ ] Create `app/src/app/store/app.store.ts` — define `AppStore` with `signalStore()`, `withState<AppState>({ isLoading: false })`, and `withMethods()` providing `setLoading(loading: boolean)` updater
-- [ ] Add `provideStore()` / NgRx Signals provider in `app.config.ts`; verify `AppStore` is injectable in `AppComponent`
-- [ ] Run `ng add @angular-eslint/schematics` and confirm `.eslintrc.json` (or `eslint.config.mjs`) is generated; run `ng lint` and fix any auto-fixable issues until zero errors remain
-- [ ] Add `"engines": { "node": ">=20.0.0" }` to `package.json` and update `README.md` with the minimum Node.js version and port override instructions
-- [ ] Update `angular.json` production configuration: set `sourceMap: false`, `namedChunks: false`, `outputHashing: 'all'`, `buildOptimizer: true`, and configure budget thresholds (`maximumWarning: "500kb"`, `maximumError: "1mb"`)
-- [ ] Run all four AC commands (`npm install`, `ng serve`, `ng build --configuration production`, `ng lint`) and confirm all exit with code 0 and zero errors
+- [x] Run `ng new propel-iq-patient-platform --standalone --routing --style=scss --strict` inside the `app/` directory (or scaffold equivalent `app/` folder structure)
+- [x] Install NgRx Signals: `npm install @ngrx/signals@18` and verify `@ngrx/signals` appears in `package.json` dependencies at version `18.x`
+- [x] Create `app/src/app/store/app.store.ts` — define `AppStore` with `signalStore()`, `withState<AppState>({ isLoading: false })`, and `withMethods()` providing `setLoading(loading: boolean)` updater
+- [x] Add `provideStore()` / NgRx Signals provider in `app.config.ts`; verify `AppStore` is injectable in `AppComponent`
+- [x] Run `ng add @angular-eslint/schematics` and confirm `.eslintrc.json` (or `eslint.config.mjs`) is generated; run `ng lint` and fix any auto-fixable issues until zero errors remain
+- [x] Add `"engines": { "node": ">=20.0.0" }` to `package.json` and update `README.md` with the minimum Node.js version and port override instructions
+- [x] Update `angular.json` production configuration: set `sourceMap: false`, `outputHashing: 'all'`, `extractLicenses: true`, and configure budget thresholds (`maximumWarning: "500kB"`, `maximumError: "1MB"`) — note: `buildOptimizer` and `namedChunks` are not applicable to the esbuild-based `application` builder used in Angular 18
+- [x] Run all four AC commands (`npm install`, `ng serve`, `ng build --configuration production`, `ng lint`) and confirm all exit with code 0 and zero errors

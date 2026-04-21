@@ -1,0 +1,6 @@
+@Propel.Api.Gateway_HostAddress = http://localhost:5149
+
+GET {{Propel.Api.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

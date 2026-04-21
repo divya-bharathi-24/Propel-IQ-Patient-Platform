@@ -1,0 +1,40 @@
+/*
+  Netlify custom headers — applied to all routes served from this site.
+  References: Netlify docs (https://docs.netlify.com/routing/headers/)
+              OWASP Transport Layer Security Cheat Sheet
+              HIPAA Security Rule §164.312(e)(2)(ii) — Transmission Security
+              NFR-005 (AC-4): all client-server connections use TLS 1.2+
+*/
+
+/*
+  Strict-Transport-Security: 63072000 s (2 years) — tells browsers to always
+  use HTTPS and never downgrade to HTTP for this origin and all sub-domains.
+  "preload" opts the domain into the browser preload list (submit separately at
+  https://hstspreload.org after verifying production readiness).
+*/
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+  /*
+    X-Content-Type-Options: prevents browsers from MIME-type sniffing responses
+    away from the declared Content-Type (OWASP A05 — Security Misconfiguration).
+  */
+  X-Content-Type-Options: nosniff
+
+  /*
+    X-Frame-Options: blocks the site from being embedded in iframes on other
+    origins, mitigating clickjacking attacks (OWASP A05).
+  */
+  X-Frame-Options: DENY
+
+  /*
+    Referrer-Policy: only sends the origin (no path/query) to same-origin
+    requests, and nothing for cross-origin requests (prevents PHI leakage via
+    Referer header — HIPAA §164.312(e)).
+  */
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  /*
+    Permissions-Policy: explicitly disables sensitive browser features not used
+    by this SPA to reduce the attack surface.
+  */
+  Permissions-Policy: geolocation=(), microphone=(), camera=()

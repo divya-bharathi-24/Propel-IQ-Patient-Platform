@@ -30,7 +30,7 @@ The platform scope (Phase 1) encompasses patient registration and authentication
 
 **Out of Scope (Phase 1):** Provider logins or provider-facing actions, payment gateway integration, family member profiles, patient self-check-in (mobile/web/QR), direct bi-directional EHR integration, full claims submission, and paid cloud infrastructure.
 
-**Technology Stack:** Angular 18 (frontend), .NET 8 ASP.NET Core Web API (backend, microservices), Entity Framework Core (ORM), PostgreSQL (database), Upstash Redis (caching). Hosting on free/open-source platforms (Netlify, Vercel, GitHub Codespaces).
+**Technology Stack:** Angular 18 (frontend), .net 10 ASP.NET Core Web API (backend, microservices), Entity Framework Core (ORM), PostgreSQL (database), Upstash Redis (caching). Hosting on free/open-source platforms (Netlify, Vercel, GitHub Codespaces).
 
 ### Success Criteria
 

@@ -1,0 +1,199 @@
+<main class="auth-container" role="main" aria-labelledby="registration-title">
+  <section class="auth-card">
+    <h1 id="registration-title">Create Your Account</h1>
+    <p class="subtitle">Register to access Propel IQ Patient Platform</p>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      aria-describedby="form-instructions"
+    >
+      <p id="form-instructions" class="sr-only">
+        All fields marked with an asterisk are required.
+      </p>
+
+      <!-- Full Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Full Name</mat-label>
+        <input
+          matInput
+          id="name"
+          formControlName="name"
+          type="text"
+          autocomplete="name"
+          aria-required="true"
+          [attr.aria-describedby]="
+            nameControl.invalid && nameControl.touched ? 'name-error' : null
+          "
+          placeholder="Jane Smith"
+        />
+        @if (nameControl.invalid && nameControl.touched) {
+          <mat-error id="name-error" role="alert">
+            @if (nameControl.hasError("required")) {
+              Full name is required.
+            }
+            @if (nameControl.hasError("maxlength")) {
+              Full name must not exceed 200 characters.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email Address</mat-label>
+        <input
+          matInput
+          id="email"
+          formControlName="email"
+          type="email"
+          autocomplete="email"
+          aria-required="true"
+          [attr.aria-describedby]="
+            emailControl.invalid && emailControl.touched ? 'email-error' : null
+          "
+          placeholder="jane@example.com"
+        />
+        @if (emailControl.invalid && emailControl.touched) {
+          <mat-error id="email-error" role="alert">
+            @if (emailControl.hasError("required")) {
+              Email address is required.
+            }
+            @if (emailControl.hasError("email")) {
+              Please enter a valid email address.
+            }
+            @if (emailControl.hasError("alreadyRegistered")) {
+              Email already registered. Please
+              <a routerLink="/auth/login">sign in</a> instead.
+            }
+            @if (emailControl.hasError("serverError")) {
+              Unable to process your request. Please try again.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          id="password"
+          formControlName="password"
+          type="password"
+          autocomplete="new-password"
+          aria-required="true"
+          [attr.aria-describedby]="
+            'password-rules' +
+            (passwordControl.invalid && passwordControl.touched
+              ? ' password-error'
+              : '')
+          "
+          placeholder="Create a strong password"
+        />
+        <mat-hint id="password-rules">
+          Must be at least 8 characters with uppercase, number, and special
+          character.
+        </mat-hint>
+        @if (passwordControl.invalid && passwordControl.touched) {
+          <div
+            id="password-error"
+            role="alert"
+            aria-live="polite"
+            class="password-errors"
+          >
+            @if (passwordControl.hasError("minLength")) {
+              <mat-error>Must be at least 8 characters.</mat-error>
+            }
+            @if (passwordControl.hasError("uppercase")) {
+              <mat-error>Must include at least one uppercase letter.</mat-error>
+            }
+            @if (passwordControl.hasError("digit")) {
+              <mat-error>Must include at least one number.</mat-error>
+            }
+            @if (passwordControl.hasError("specialChar")) {
+              <mat-error
+                >Must include at least one special character.</mat-error
+              >
+            }
+          </div>
+        }
+      </mat-form-field>
+
+      <!-- Phone (optional) -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Phone Number (optional)</mat-label>
+        <input
+          matInput
+          id="phone"
+          formControlName="phone"
+          type="tel"
+          autocomplete="tel"
+          [attr.aria-describedby]="
+            phoneControl.invalid && phoneControl.touched ? 'phone-error' : null
+          "
+          placeholder="+1234567890"
+        />
+        <mat-hint>Include country code, e.g. +1234567890</mat-hint>
+        @if (phoneControl.invalid && phoneControl.touched) {
+          <mat-error id="phone-error" role="alert">
+            @if (phoneControl.hasError("pattern")) {
+              Please enter a valid phone number with country code.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Date of Birth -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Date of Birth</mat-label>
+        <input
+          matInput
+          id="dateOfBirth"
+          formControlName="dateOfBirth"
+          [matDatepicker]="dobPicker"
+          [max]="maxDob"
+          aria-required="true"
+          [attr.aria-describedby]="
+            dobControl.invalid && dobControl.touched ? 'dob-error' : null
+          "
+          placeholder="MM/DD/YYYY"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="dobPicker"
+          aria-label="Open calendar"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #dobPicker startView="multi-year"></mat-datepicker>
+        @if (dobControl.invalid && dobControl.touched) {
+          <mat-error id="dob-error" role="alert">
+            @if (dobControl.hasError("required")) {
+              Date of birth is required.
+            }
+            @if (dobControl.hasError("matDatepickerMax")) {
+              Date of birth cannot be in the future.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Submit -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="full-width submit-btn"
+        [disabled]="isSubmitting()"
+        aria-label="Create account"
+      >
+        @if (isSubmitting()) {
+          <mat-spinner diameter="20" aria-label="Submitting..."></mat-spinner>
+          <span>Creating account…</span>
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+  </section>
+</main>

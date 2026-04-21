@@ -1,0 +1,12 @@
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Release\net10.0\Propel.Domain.deps.json
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Release\net10.0\Propel.Domain.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Release\net10.0\Propel.Domain.pdb
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.AssemblyInfoInputs.cache
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.AssemblyInfo.cs
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.csproj.CoreCompileInputs.cache
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.sourcelink.json
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\refint\Propel.Domain.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\Propel.Domain.pdb
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Release\net10.0\ref\Propel.Domain.dll

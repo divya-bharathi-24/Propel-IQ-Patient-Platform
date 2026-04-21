@@ -12,52 +12,52 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer          | Technology             | Version |
-| -------------- | ---------------------- | ------- |
-| Backend        | ASP.NET Core Web API   | .net 10  |
-| Frontend       | Angular                | 18.x    |
-| Hosting (FE)   | Netlify                | —       |
-| Hosting (BE)   | Railway                | —       |
-| ORM/Config     | Entity Framework Core  | 9.x     |
-| Cache          | Upstash Redis          | Serverless |
-| Auth           | JWT                    | —       |
-| AI/ML          | N/A                    | N/A     |
-| Mobile         | N/A                    | N/A     |
+| Layer        | Technology            | Version    |
+| ------------ | --------------------- | ---------- |
+| Backend      | ASP.NET Core Web API  | .net 10    |
+| Frontend     | Angular               | 18.x       |
+| Hosting (FE) | Netlify               | —          |
+| Hosting (BE) | Railway               | —          |
+| ORM/Config   | Entity Framework Core | 9.x        |
+| Cache        | Upstash Redis         | Serverless |
+| Auth         | JWT                   | —          |
+| AI/ML        | N/A                   | N/A        |
+| Mobile       | N/A                   | N/A        |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -73,15 +73,15 @@ This task depends on `task_001_infra_netlify_frontend_deploy.md` and `task_002_i
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| `server/src/PropelIQ.Api/Program.cs` | MODIFY | Add CORS policy (`WithOrigins` from env var), add startup env validation guard |
-| `server/src/PropelIQ.Api/appsettings.json` | MODIFY | Remove any hardcoded connection strings or secrets; replace with empty/placeholder values |
-| `server/src/PropelIQ.Api/appsettings.Development.json` | VERIFY | Must be gitignored; never committed with real secrets |
-| `.gitignore` | MODIFY | Ensure `appsettings.Development.json` and `**/.env` are excluded |
-| `app/src/environments/environment.ts` | MODIFY | Replace hardcoded `apiUrl` with value read from `window.__env.apiUrl` (runtime injection) |
-| `app/src/assets/env.js` | CREATE | Runtime environment file injected by Netlify build env vars; loaded via `index.html` `<script>` |
-| `app/src/index.html` | MODIFY | Add `<script src="/assets/env.js"></script>` before Angular bootstrap |
+| Component                                              | Action | Notes                                                                                           |
+| ------------------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------- |
+| `server/src/PropelIQ.Api/Program.cs`                   | MODIFY | Add CORS policy (`WithOrigins` from env var), add startup env validation guard                  |
+| `server/src/PropelIQ.Api/appsettings.json`             | MODIFY | Remove any hardcoded connection strings or secrets; replace with empty/placeholder values       |
+| `server/src/PropelIQ.Api/appsettings.Development.json` | VERIFY | Must be gitignored; never committed with real secrets                                           |
+| `.gitignore`                                           | MODIFY | Ensure `appsettings.Development.json` and `**/.env` are excluded                                |
+| `app/src/environments/environment.ts`                  | MODIFY | Replace hardcoded `apiUrl` with value read from `window.__env.apiUrl` (runtime injection)       |
+| `app/src/assets/env.js`                                | CREATE | Runtime environment file injected by Netlify build env vars; loaded via `index.html` `<script>` |
+| `app/src/index.html`                                   | MODIFY | Add `<script src="/assets/env.js"></script>` before Angular bootstrap                           |
 
 ## Implementation Plan
 
@@ -128,14 +128,14 @@ _Update this tree during execution based on completed dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| MODIFY | `server/src/PropelIQ.Api/Program.cs` | Add CORS policy with env-driven origins; add startup env validation guard |
-| MODIFY | `server/src/PropelIQ.Api/appsettings.json` | Remove all hardcoded secrets; replace with `null`/`""` placeholders |
-| MODIFY | `.gitignore` | Add `appsettings.Development.json`, `**/env.local.js`, `**/.env` entries |
-| MODIFY | `app/src/environments/environment.ts` | Replace hardcoded `apiUrl` with `(window as any).__env?.apiUrl ?? ''` |
-| CREATE | `app/src/assets/env.js` | Runtime env file — `window.__env = { apiUrl: '%%API_URL%%' }` |
-| MODIFY | `app/src/index.html` | Add `<script src="/assets/env.js"></script>` in `<head>` before bootstrap |
+| Action | File Path                                  | Description                                                               |
+| ------ | ------------------------------------------ | ------------------------------------------------------------------------- |
+| MODIFY | `server/src/PropelIQ.Api/Program.cs`       | Add CORS policy with env-driven origins; add startup env validation guard |
+| MODIFY | `server/src/PropelIQ.Api/appsettings.json` | Remove all hardcoded secrets; replace with `null`/`""` placeholders       |
+| MODIFY | `.gitignore`                               | Add `appsettings.Development.json`, `**/env.local.js`, `**/.env` entries  |
+| MODIFY | `app/src/environments/environment.ts`      | Replace hardcoded `apiUrl` with `(window as any).__env?.apiUrl ?? ''`     |
+| CREATE | `app/src/assets/env.js`                    | Runtime env file — `window.__env = { apiUrl: '%%API_URL%%' }`             |
+| MODIFY | `app/src/index.html`                       | Add `<script src="/assets/env.js"></script>` in `<head>` before bootstrap |
 
 ### Reference: CORS policy in `Program.cs`
 
@@ -186,7 +186,7 @@ RequireEnvVar(builder.Configuration, "CORS__AllowedOrigins");
 // %%API_URL%% is replaced by the Netlify build command using sed.
 // DO NOT hardcode values here. This file is committed with placeholder tokens only.
 window.__env = {
-  apiUrl: '%%API_URL%%'
+  apiUrl: "%%API_URL%%",
 };
 ```
 
@@ -201,20 +201,20 @@ window.__env = {
 
 ### Required Railway Environment Variables
 
-| Variable Name | Purpose | Example Value |
-| ------------- | ------- | ------------- |
-| `DATABASE_URL` | Neon PostgreSQL connection string | `Host=...;Database=propeliq;Username=...;Password=...` |
-| `REDIS_URL` | Upstash Redis connection string | `rediss://:token@host:port` |
-| `JWT__SecretKey` | JWT signing key (min 256-bit) | `<32+ char random secret>` |
-| `JWT__Issuer` | JWT issuer claim | `https://propeliq.railway.app` |
-| `JWT__Audience` | JWT audience claim | `https://propeliq.netlify.app` |
-| `CORS__AllowedOrigins` | Netlify frontend domain (exact, no wildcard) | `https://propeliq.netlify.app` |
+| Variable Name          | Purpose                                      | Example Value                                          |
+| ---------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| `DATABASE_URL`         | Neon PostgreSQL connection string            | `Host=...;Database=propeliq;Username=...;Password=...` |
+| `REDIS_URL`            | Upstash Redis connection string              | `rediss://:token@host:port`                            |
+| `JWT__SecretKey`       | JWT signing key (min 256-bit)                | `<32+ char random secret>`                             |
+| `JWT__Issuer`          | JWT issuer claim                             | `https://propeliq.railway.app`                         |
+| `JWT__Audience`        | JWT audience claim                           | `https://propeliq.netlify.app`                         |
+| `CORS__AllowedOrigins` | Netlify frontend domain (exact, no wildcard) | `https://propeliq.netlify.app`                         |
 
 ### Required Netlify Build Environment Variables
 
-| Variable Name | Purpose | Example Value |
-| ------------- | ------- | ------------- |
-| `API_URL` | Railway API base URL injected into `env.js` at build time | `https://propeliq.up.railway.app` |
+| Variable Name | Purpose                                                   | Example Value                     |
+| ------------- | --------------------------------------------------------- | --------------------------------- |
+| `API_URL`     | Railway API base URL injected into `env.js` at build time | `https://propeliq.up.railway.app` |
 
 > **Security**: Never commit actual values. Register all secrets via Railway Dashboard → Variables and Netlify Dashboard → Environment Variables. Document only key names in this file.
 
@@ -272,11 +272,11 @@ curl -X OPTIONS https://<railway-domain>/api/appointments \
 
 ## Implementation Checklist
 
-- [ ] Sanitise `server/src/PropelIQ.Api/appsettings.json` — remove all hardcoded secrets; replace with `null` or `""`
-- [ ] Add startup validation guard to `Program.cs` — `RequireEnvVar` calls for `DATABASE_URL`, `REDIS_URL`, `JWT__SecretKey`, `CORS__AllowedOrigins`
-- [ ] Add CORS policy `"NetlifyPolicy"` to `Program.cs` — `WithOrigins` from `CORS__AllowedOrigins` env var; no wildcard; `app.UseCors("NetlifyPolicy")` before auth middleware
-- [ ] Create `app/src/assets/env.js` with `window.__env = { apiUrl: '%%API_URL%%' }` placeholder
-- [ ] Update `app/src/index.html` — add `<script src="/assets/env.js"></script>` as first script in `<head>`
-- [ ] Update `app/src/environments/environment.ts` — replace hardcoded `apiUrl` with `(window as any).__env?.apiUrl ?? ''`
-- [ ] Update `netlify.toml` build command to inject `$API_URL` into `env.js` via `sed` substitution
+- [x] Sanitise `server/src/PropelIQ.Api/appsettings.json` — remove all hardcoded secrets; replace with `null` or `""`
+- [x] Add startup validation guard to `Program.cs` — `RequireEnvVar` calls for `DATABASE_URL`, `REDIS_URL`, `JWT__SecretKey`, `CORS__AllowedOrigins`
+- [x] Add CORS policy `"NetlifyPolicy"` to `Program.cs` — `WithOrigins` from `CORS__AllowedOrigins` env var; no wildcard; `app.UseCors("NetlifyPolicy")` before auth middleware
+- [x] Create `app/src/assets/env.js` with `window.__env = { apiUrl: '%%API_URL%%' }` placeholder
+- [x] Update `app/src/index.html` — add `<script src="/assets/env.js"></script>` as first script in `<head>`
+- [x] Update `app/src/environments/environment.ts` — replace hardcoded `apiUrl` with `(window as any).__env?.apiUrl ?? ''`
+- [x] Update `netlify.toml` build command to inject `$API_URL` into `env.js` via `sed` substitution
 - [ ] Register Railway env vars: `DATABASE_URL`, `REDIS_URL`, `JWT__SecretKey`, `JWT__Issuer`, `JWT__Audience`, `CORS__AllowedOrigins`; register Netlify env var: `API_URL`

@@ -1,0 +1,131 @@
+<h2 mat-dialog-title id="create-user-dialog-title">Create User Account</h2>
+
+<mat-dialog-content aria-labelledby="create-user-dialog-title">
+  <!-- Server error -->
+  @if (serverError()) {
+    <div
+      class="server-error"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      {{ serverError() }}
+    </div>
+  }
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    id="create-user-form"
+    aria-describedby="create-user-instructions"
+  >
+    <p id="create-user-instructions" class="sr-only">
+      All fields are required.
+    </p>
+
+    <!-- Name -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Full Name</mat-label>
+      <input
+        matInput
+        id="user-name"
+        formControlName="name"
+        type="text"
+        autocomplete="name"
+        aria-required="true"
+        [attr.aria-describedby]="
+          nameControl.invalid && nameControl.touched ? 'name-error' : null
+        "
+        placeholder="Jane Smith"
+      />
+      @if (nameControl.invalid && nameControl.touched) {
+        <mat-error id="name-error" role="alert">
+          @if (nameControl.hasError("required")) {
+            Full name is required.
+          }
+          @if (nameControl.hasError("maxlength")) {
+            Name must not exceed 200 characters.
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Email -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email Address</mat-label>
+      <input
+        matInput
+        id="user-email"
+        formControlName="email"
+        type="email"
+        autocomplete="email"
+        aria-required="true"
+        [attr.aria-describedby]="
+          emailControl.invalid && emailControl.touched ? 'email-error' : null
+        "
+        placeholder="jane@example.com"
+      />
+      @if (emailControl.invalid && emailControl.touched) {
+        <mat-error id="email-error" role="alert">
+          @if (emailControl.hasError("required")) {
+            Email address is required.
+          }
+          @if (emailControl.hasError("email")) {
+            Please enter a valid email address.
+          }
+          @if (emailControl.hasError("alreadyExists")) {
+            Email already registered.
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Role -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Role</mat-label>
+      <mat-select
+        id="user-role"
+        formControlName="role"
+        aria-required="true"
+        [attr.aria-describedby]="
+          roleControl.invalid && roleControl.touched ? 'role-error' : null
+        "
+      >
+        @for (role of roles; track role) {
+          <mat-option [value]="role">{{ role }}</mat-option>
+        }
+      </mat-select>
+      @if (roleControl.invalid && roleControl.touched) {
+        <mat-error id="role-error" role="alert">
+          Role selection is required.
+        </mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="isSubmitting()"
+  >
+    Cancel
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="submit"
+    form="create-user-form"
+    [disabled]="isSubmitting()"
+    aria-label="Create user account"
+  >
+    @if (isSubmitting()) {
+      <mat-spinner diameter="20" aria-label="Creating account…"></mat-spinner>
+    } @else {
+      Create Account
+    }
+  </button>
+</mat-dialog-actions>

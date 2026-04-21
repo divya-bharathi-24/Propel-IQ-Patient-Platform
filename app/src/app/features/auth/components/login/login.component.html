@@ -1,0 +1,116 @@
+<main class="auth-container" role="main" aria-labelledby="login-title">
+  <section class="auth-card">
+    <h1 id="login-title">Sign In</h1>
+    <p class="subtitle">Access your Propel IQ Patient Platform account</p>
+
+    <!-- Session-expiry / idle-timeout banner (non-dismissable) -->
+    @if (sessionBannerMessage()) {
+      <div
+        class="session-banner"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        {{ sessionBannerMessage() }}
+      </div>
+    }
+
+    <!-- Server-side credential error -->
+    @if (serverError()) {
+      <div
+        class="server-error"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        {{ serverError() }}
+      </div>
+    }
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      aria-describedby="login-instructions"
+    >
+      <p id="login-instructions" class="sr-only">All fields are required.</p>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email Address</mat-label>
+        <input
+          matInput
+          id="email"
+          formControlName="email"
+          type="email"
+          autocomplete="email"
+          aria-required="true"
+          [attr.aria-describedby]="
+            emailControl.invalid && emailControl.touched ? 'email-error' : null
+          "
+          placeholder="jane@example.com"
+        />
+        @if (emailControl.invalid && emailControl.touched) {
+          <mat-error id="email-error" role="alert">
+            @if (emailControl.hasError("required")) {
+              Email address is required.
+            }
+            @if (emailControl.hasError("email")) {
+              Please enter a valid email address.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          id="password"
+          formControlName="password"
+          type="password"
+          autocomplete="current-password"
+          aria-required="true"
+          [attr.aria-describedby]="
+            passwordControl.invalid && passwordControl.touched
+              ? 'password-error'
+              : null
+          "
+          placeholder="Your password"
+        />
+        @if (passwordControl.invalid && passwordControl.touched) {
+          <mat-error id="password-error" role="alert">
+            @if (passwordControl.hasError("required")) {
+              Password is required.
+            }
+            @if (passwordControl.hasError("minlength")) {
+              Password must be at least 8 characters.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Submit -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="full-width submit-btn"
+        [disabled]="isSubmitting()"
+        aria-label="Sign in to your account"
+      >
+        @if (isSubmitting()) {
+          <mat-spinner diameter="20" aria-label="Signing in…"></mat-spinner>
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <p class="register-link">
+      Don't have an account?
+      <a routerLink="/auth/register">Create one</a>
+    </p>
+  </section>
+</main>

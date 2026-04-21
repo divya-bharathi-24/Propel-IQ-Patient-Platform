@@ -14,49 +14,49 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer    | Technology           | Version |
-| -------- | -------------------- | ------- |
-| Backend  | ASP.NET Core Web API | .net 10  |
-| ORM      | Entity Framework Core | 9.x    |
-| Database | PostgreSQL           | 16+     |
-| Language | C#                   | 13      |
-| AI/ML    | N/A                  | N/A     |
-| Mobile   | N/A                  | N/A     |
+| Layer    | Technology            | Version |
+| -------- | --------------------- | ------- |
+| Backend  | ASP.NET Core Web API  | .net 10 |
+| ORM      | Entity Framework Core | 9.x     |
+| Database | PostgreSQL            | 16+     |
+| Language | C#                    | 13      |
+| AI/ML    | N/A                   | N/A     |
+| Mobile   | N/A                   | N/A     |
 
 **Note**: All code, and libraries, MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -72,17 +72,17 @@ Enum types are defined in `PropelIQ.Domain/Enums/` following the same convention
 
 ## Impacted Components
 
-| Component | Action | Notes |
-| --------- | ------ | ----- |
-| `server/src/PropelIQ.Domain/Entities/AuditLog.cs` | CREATE | Immutable POCO — `init`-only properties, `JsonDocument` Details, no navigation properties |
-| `server/src/PropelIQ.Domain/Entities/Notification.cs` | CREATE | Mutable POCO — channel, templateType, status, sentAt, retryCount |
-| `server/src/PropelIQ.Domain/Entities/InsuranceValidation.cs` | CREATE | Mutable POCO — providerName, insuranceId, validationResult, validatedAt |
-| `server/src/PropelIQ.Domain/Entities/CalendarSync.cs` | CREATE | Mutable POCO — provider, externalEventId, syncStatus, syncedAt |
-| `server/src/PropelIQ.Domain/Enums/NotificationChannel.cs` | CREATE | SMS, Email, Push |
-| `server/src/PropelIQ.Domain/Enums/NotificationStatus.cs` | CREATE | Pending, Sent, Failed, Delivered |
-| `server/src/PropelIQ.Domain/Enums/InsuranceValidationResult.cs` | CREATE | Matched, NotMatched, Pending |
-| `server/src/PropelIQ.Domain/Enums/CalendarProvider.cs` | CREATE | Google, Apple, Outlook |
-| `server/src/PropelIQ.Domain/Enums/CalendarSyncStatus.cs` | CREATE | Synced, Failed, Pending |
+| Component                                                       | Action | Notes                                                                                     |
+| --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| `server/src/PropelIQ.Domain/Entities/AuditLog.cs`               | CREATE | Immutable POCO — `init`-only properties, `JsonDocument` Details, no navigation properties |
+| `server/src/PropelIQ.Domain/Entities/Notification.cs`           | CREATE | Mutable POCO — channel, templateType, status, sentAt, retryCount                          |
+| `server/src/PropelIQ.Domain/Entities/InsuranceValidation.cs`    | CREATE | Mutable POCO — providerName, insuranceId, validationResult, validatedAt                   |
+| `server/src/PropelIQ.Domain/Entities/CalendarSync.cs`           | CREATE | Mutable POCO — provider, externalEventId, syncStatus, syncedAt                            |
+| `server/src/PropelIQ.Domain/Enums/NotificationChannel.cs`       | CREATE | SMS, Email, Push                                                                          |
+| `server/src/PropelIQ.Domain/Enums/NotificationStatus.cs`        | CREATE | Pending, Sent, Failed, Delivered                                                          |
+| `server/src/PropelIQ.Domain/Enums/InsuranceValidationResult.cs` | CREATE | Matched, NotMatched, Pending                                                              |
+| `server/src/PropelIQ.Domain/Enums/CalendarProvider.cs`          | CREATE | Google, Apple, Outlook                                                                    |
+| `server/src/PropelIQ.Domain/Enums/CalendarSyncStatus.cs`        | CREATE | Synced, Failed, Pending                                                                   |
 
 ## Implementation Plan
 
@@ -145,17 +145,17 @@ _Update this tree during execution based on the completion of dependent tasks._
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `server/src/PropelIQ.Domain/Entities/AuditLog.cs` | Immutable POCO — `init`-only properties, `JsonDocument?` Details (JSONB), no navigation properties (AD-7 write-only pattern) |
-| CREATE | `server/src/PropelIQ.Domain/Entities/Notification.cs` | Notification delivery POCO — channel, templateType, status, sentAt, retryCount (DR-015) |
-| CREATE | `server/src/PropelIQ.Domain/Entities/InsuranceValidation.cs` | Insurance validation record POCO — providerName, insuranceId, validationResult, validatedAt (DR-014) |
-| CREATE | `server/src/PropelIQ.Domain/Entities/CalendarSync.cs` | Calendar sync POCO — provider, externalEventId, syncStatus, syncedAt (DR-017) |
-| CREATE | `server/src/PropelIQ.Domain/Enums/NotificationChannel.cs` | Enum: Sms, Email, Push |
-| CREATE | `server/src/PropelIQ.Domain/Enums/NotificationStatus.cs` | Enum: Pending, Sent, Failed, Delivered |
-| CREATE | `server/src/PropelIQ.Domain/Enums/InsuranceValidationResult.cs` | Enum: Matched, NotMatched, Pending |
-| CREATE | `server/src/PropelIQ.Domain/Enums/CalendarProvider.cs` | Enum: Google, Apple, Outlook |
-| CREATE | `server/src/PropelIQ.Domain/Enums/CalendarSyncStatus.cs` | Enum: Synced, Failed, Pending |
+| Action | File Path                                                       | Description                                                                                                                  |
+| ------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `server/src/PropelIQ.Domain/Entities/AuditLog.cs`               | Immutable POCO — `init`-only properties, `JsonDocument?` Details (JSONB), no navigation properties (AD-7 write-only pattern) |
+| CREATE | `server/src/PropelIQ.Domain/Entities/Notification.cs`           | Notification delivery POCO — channel, templateType, status, sentAt, retryCount (DR-015)                                      |
+| CREATE | `server/src/PropelIQ.Domain/Entities/InsuranceValidation.cs`    | Insurance validation record POCO — providerName, insuranceId, validationResult, validatedAt (DR-014)                         |
+| CREATE | `server/src/PropelIQ.Domain/Entities/CalendarSync.cs`           | Calendar sync POCO — provider, externalEventId, syncStatus, syncedAt (DR-017)                                                |
+| CREATE | `server/src/PropelIQ.Domain/Enums/NotificationChannel.cs`       | Enum: Sms, Email, Push                                                                                                       |
+| CREATE | `server/src/PropelIQ.Domain/Enums/NotificationStatus.cs`        | Enum: Pending, Sent, Failed, Delivered                                                                                       |
+| CREATE | `server/src/PropelIQ.Domain/Enums/InsuranceValidationResult.cs` | Enum: Matched, NotMatched, Pending                                                                                           |
+| CREATE | `server/src/PropelIQ.Domain/Enums/CalendarProvider.cs`          | Enum: Google, Apple, Outlook                                                                                                 |
+| CREATE | `server/src/PropelIQ.Domain/Enums/CalendarSyncStatus.cs`        | Enum: Synced, Failed, Pending                                                                                                |
 
 ## External References
 
@@ -180,22 +180,22 @@ dotnet build PropelIQ.sln
 
 ## Implementation Validation Strategy
 
-- [ ] `dotnet build src/PropelIQ.Domain` exits with code 0 — no compile errors
-- [ ] `AuditLog.cs` has ZERO `set` accessors — all properties use `init` (AC-1 / AD-7)
-- [ ] `AuditLog.Details` is typed `JsonDocument?` — enables JSONB mapping in task_002
-- [ ] `AuditLog` has no EF navigation properties (`Patient`, `User` navigations are absent)
-- [ ] `Notification` contains all AC-2 fields: `Channel`, `TemplateType`, `Status`, `SentAt`, `RetryCount`
-- [ ] `CalendarSync` contains all AC-3 fields: `Provider`, `ExternalEventId`, `SyncStatus`, `SyncedAt`, `PatientId`, `AppointmentId`
-- [ ] All 5 enum files created in `PropelIQ.Domain/Enums/`
-- [ ] Solution builds cleanly — `dotnet build PropelIQ.sln` exits 0
+- [x] `dotnet build src/PropelIQ.Domain` exits with code 0 — no compile errors
+- [x] `AuditLog.cs` has ZERO `set` accessors — all properties use `init` (AC-1 / AD-7)
+- [x] `AuditLog.Details` is typed `JsonDocument?` — enables JSONB mapping in task_002
+- [x] `AuditLog` has no EF navigation properties (`Patient`, `User` navigations are absent)
+- [x] `Notification` contains all AC-2 fields: `Channel`, `TemplateType`, `Status`, `SentAt`, `RetryCount`
+- [x] `CalendarSync` contains all AC-3 fields: `Provider`, `ExternalEventId`, `SyncStatus`, `SyncedAt`, `PatientId`, `AppointmentId`
+- [x] All 5 enum files created in `PropelIQ.Domain/Enums/`
+- [x] Solution builds cleanly — `dotnet build PropelIQ.sln` exits 0
 
 ## Implementation Checklist
 
-- [ ] Create `AuditLog.cs` — verify all properties use `init`, no `set`, no navigation properties
-- [ ] Create `Notification.cs` — verify `RetryCount` defaults to `0`, `AppointmentId` is nullable
-- [ ] Create `InsuranceValidation.cs` — verify `ValidatedAt` is nullable (validation may be async/deferred)
-- [ ] Create `CalendarSync.cs` — verify `AppointmentId` is non-nullable (sync always tied to an appointment)
-- [ ] Create enum files: `NotificationChannel`, `NotificationStatus`, `InsuranceValidationResult`, `CalendarProvider`, `CalendarSyncStatus`
-- [ ] Run `dotnet build src/PropelIQ.Domain` — confirm zero errors
-- [ ] Confirm no data annotations (`[Required]`, `[MaxLength]`, etc.) appear in any of the 4 entity classes
+- [x] Create `AuditLog.cs` — verify all properties use `init`, no `set`, no navigation properties
+- [x] Create `Notification.cs` — verify `RetryCount` defaults to `0`, `AppointmentId` is nullable
+- [x] Create `InsuranceValidation.cs` — verify `ValidatedAt` is nullable (validation may be async/deferred)
+- [x] Create `CalendarSync.cs` — verify `AppointmentId` is non-nullable (sync always tied to an appointment)
+- [x] Create enum files: `NotificationChannel`, `NotificationStatus`, `InsuranceValidationResult`, `CalendarProvider`, `CalendarSyncStatus`
+- [x] Run `dotnet build src/PropelIQ.Domain` — confirm zero errors
+- [x] Confirm no data annotations (`[Required]`, `[MaxLength]`, etc.) appear in any of the 4 entity classes
 - [ ] Run `dotnet build PropelIQ.sln` — confirm solution-level compile success

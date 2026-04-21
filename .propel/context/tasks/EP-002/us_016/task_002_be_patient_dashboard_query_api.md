@@ -16,58 +16,59 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | ASP.NET Core Web API | .net 10 |
-| Backend Messaging | MediatR | 12.x |
-| Backend Validation | FluentValidation | 11.x |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| Cache | Upstash Redis | Serverless |
-| Logging | Serilog | 4.x |
-| AI/ML | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer              | Technology            | Version    |
+| ------------------ | --------------------- | ---------- |
+| Backend            | ASP.NET Core Web API  | .net 10    |
+| Backend Messaging  | MediatR               | 12.x       |
+| Backend Validation | FluentValidation      | 11.x       |
+| ORM                | Entity Framework Core | 9.x        |
+| Database           | PostgreSQL            | 16+        |
+| Cache              | Upstash Redis         | Serverless |
+| Logging            | Serilog               | 4.x        |
+| AI/ML              | N/A                   | N/A        |
+| Mobile             | N/A                   | N/A        |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
 Implement the `GET /api/patient/dashboard` read endpoint following the CQRS query pattern (AD-2) via MediatR. This endpoint is called exactly once per dashboard page load and returns an aggregated `PatientDashboardResponse` combining data from four domain entities: `Appointment`, `IntakeRecord`, `ClinicalDocument`, and `Patient.view_verified_at`.
 
 **Performance target**: Response within 2 seconds at p95 under normal load (NFR-001). Achieved via:
+
 - A single EF Core projection query using `Select()` to fetch only required columns (no `Include()` → avoids N+1 and over-fetching)
 - Filtering `Appointment.status NOT IN ('Completed', 'Cancelled')` to limit "upcoming" set
 - Left-joining `IntakeRecord` on `appointmentId` to determine `hasPendingIntake` in one query
@@ -83,15 +84,15 @@ Implement the `GET /api/patient/dashboard` read endpoint following the CQRS quer
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `PatientController` | NEW | `Server/Modules/Patient/PatientController.cs` |
-| `GetPatientDashboardQuery` | NEW | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQuery.cs` |
-| `GetPatientDashboardQueryHandler` | NEW | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQueryHandler.cs` |
-| `PatientDashboardResponse` (DTO) | NEW | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs` |
-| `UpcomingAppointmentDto` (DTO) | NEW | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs` |
-| `DocumentHistoryDto` (DTO) | NEW | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs` |
-| `Program.cs` | MODIFY | Register `PatientController` (if using minimal API) or ensure controller scanning is active |
+| Component                         | Status | Location                                                                                    |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------- |
+| `PatientController`               | NEW    | `Server/Modules/Patient/PatientController.cs`                                               |
+| `GetPatientDashboardQuery`        | NEW    | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQuery.cs`            |
+| `GetPatientDashboardQueryHandler` | NEW    | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQueryHandler.cs`     |
+| `PatientDashboardResponse` (DTO)  | NEW    | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs`            |
+| `UpcomingAppointmentDto` (DTO)    | NEW    | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs`            |
+| `DocumentHistoryDto` (DTO)        | NEW    | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs`            |
+| `Program.cs`                      | MODIFY | Register `PatientController` (if using minimal API) or ensure controller scanning is active |
 
 ## Implementation Plan
 
@@ -219,7 +220,7 @@ Implement the `GET /api/patient/dashboard` read endpoint following the CQRS quer
 
 6. **Caching consideration** (NFR-001, NFR-010): Dashboard data is patient-specific and expected to change on each login session. No Redis cache is applied at this endpoint. If performance profiling reveals p95 > 2 s under load, a short-lived (30-second) per-patient Redis cache can be added as a delta task. Document this decision in the `Program.cs` registration comment.
 
-7. **Serialization**: The ASP.NET Core JSON serializer (`System.Text.Json`) will serialize `DateOnly` and `TimeOnly` correctly as ISO 8601 strings in .net 10. Ensure `JsonSerializerOptions` registered in `Program.cs` includes `DateOnly`/`TimeOnly` converters (built-in since .NET 8).
+7. **Serialization**: The ASP.NET Core JSON serializer (`System.Text.Json`) will serialize `DateOnly` and `TimeOnly` correctly as ISO 8601 strings in .net 10. Ensure `JsonSerializerOptions` registered in `Program.cs` includes `DateOnly`/`TimeOnly` converters (built-in since .net 10).
 
 ## Current Project State
 
@@ -236,13 +237,13 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/Modules/Patient/PatientController.cs` | `[Authorize(Roles="Patient")]` controller; `GET /api/patient/dashboard` dispatches to MediatR |
-| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQuery.cs` | MediatR query record wrapping `PatientId` |
-| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQueryHandler.cs` | 3-step EF Core projection; returns aggregated `PatientDashboardResponse` |
-| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs` | Immutable C# records: `PatientDashboardResponse`, `UpcomingAppointmentDto`, `DocumentHistoryDto` |
-| MODIFY | `Server/Program.cs` | Ensure controller discovery includes `Patient` module; confirm `DateOnly`/`TimeOnly` JSON serializer options registered |
+| Action | File Path                                                                               | Description                                                                                                             |
+| ------ | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Modules/Patient/PatientController.cs`                                           | `[Authorize(Roles="Patient")]` controller; `GET /api/patient/dashboard` dispatches to MediatR                           |
+| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQuery.cs`        | MediatR query record wrapping `PatientId`                                                                               |
+| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/GetPatientDashboardQueryHandler.cs` | 3-step EF Core projection; returns aggregated `PatientDashboardResponse`                                                |
+| CREATE | `Server/Modules/Patient/Queries/GetPatientDashboard/PatientDashboardResponse.cs`        | Immutable C# records: `PatientDashboardResponse`, `UpcomingAppointmentDto`, `DocumentHistoryDto`                        |
+| MODIFY | `Server/Program.cs`                                                                     | Ensure controller discovery includes `Patient` module; confirm `DateOnly`/`TimeOnly` JSON serializer options registered |
 
 ## External References
 
@@ -250,7 +251,7 @@ Server/
 - [EF Core 9 — Projections with `Select()` and `AsNoTracking()`](https://learn.microsoft.com/en-us/ef/core/querying/tracking#no-tracking-queries) — Efficient read-only projections without entity materialization
 - [EF Core — Correlated subquery in `Select()`](https://learn.microsoft.com/en-us/ef/core/querying/related-data/select) — Nested `Any()` translated to EXISTS subquery in SQL
 - [MediatR 12.x — Request/Handler pattern](https://github.com/jbogard/MediatR/wiki) — `IRequest<T>` / `IRequestHandler<TRequest, TResponse>`
-- [System.Text.Json — DateOnly/TimeOnly support (.NET 8+)](https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support) — Built-in ISO 8601 serialization for `DateOnly` and `TimeOnly`
+- [System.Text.Json — DateOnly/TimeOnly support (.net 10+)](https://learn.microsoft.com/en-us/dotnet/standard/datetime/system-text-json-support) — Built-in ISO 8601 serialization for `DateOnly` and `TimeOnly`
 - [OWASP A01 — Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/) — Never use client-supplied IDs for data scoping; always use authenticated identity claims
 - [OWASP A03 — Injection](https://owasp.org/Top10/A03_2021-Injection/) — EF Core parameterized queries prevent SQL injection; never interpolate user input into raw SQL
 - [AD-2: CQRS within Services (design.md)](../.propel/context/docs/design.md) — Separate query/command handlers; optimized read models for dashboards

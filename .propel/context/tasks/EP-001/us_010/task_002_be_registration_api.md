@@ -17,35 +17,35 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer               | Technology                  | Version |
-| ------------------- | --------------------------- | ------- |
-| Backend             | ASP.NET Core Web API        | .net 10  |
-| Backend Messaging   | MediatR                     | 12.x    |
-| Backend Validation  | FluentValidation            | 11.x    |
-| ORM                 | Entity Framework Core       | 9.x     |
-| Password Hashing    | BCrypt.Net-Next / Isopoh.Cryptography.Argon2 | Latest |
-| Email Service       | SendGrid SDK for .NET       | Latest  |
-| Logging             | Serilog                     | 4.x     |
-| Rate Limiting       | ASP.NET Core Rate Limiting  | .net 10  |
-| Testing — Unit      | xUnit + Moq                 | 2.x     |
-| Database            | PostgreSQL                  | 16+     |
-| AI/ML               | N/A                         | N/A     |
-| Mobile              | N/A                         | N/A     |
+| Layer              | Technology                                   | Version |
+| ------------------ | -------------------------------------------- | ------- |
+| Backend            | ASP.NET Core Web API                         | .net 10 |
+| Backend Messaging  | MediatR                                      | 12.x    |
+| Backend Validation | FluentValidation                             | 11.x    |
+| ORM                | Entity Framework Core                        | 9.x     |
+| Password Hashing   | BCrypt.Net-Next / Isopoh.Cryptography.Argon2 | Latest  |
+| Email Service      | SendGrid SDK for .NET                        | Latest  |
+| Logging            | Serilog                                      | 4.x     |
+| Rate Limiting      | ASP.NET Core Rate Limiting                   | .net 10 |
+| Testing — Unit     | xUnit + Moq                                  | 2.x     |
+| Database           | PostgreSQL                                   | 16+     |
+| AI/ML              | N/A                                          | N/A     |
+| Mobile             | N/A                                          | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -53,25 +53,25 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type        | Value |
-| --------------------- | ----- |
-| **AI Impact**         | No    |
-| **AIR Requirements**  | N/A   |
-| **AI Pattern**        | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A   |
-| **Model Provider**    | N/A   |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ---
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-| ------------------- | ----- |
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ---
 
@@ -96,18 +96,18 @@ Security controls enforced: Argon2 password hashing (NFR-008), FluentValidation 
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `AuthController` | ASP.NET Core API (`Server/`) |
-| CREATE | `RegisterPatientCommand` + `RegisterPatientCommandHandler` | Auth Module — Application Layer |
-| CREATE | `VerifyEmailCommand` + `VerifyEmailCommandHandler` | Auth Module — Application Layer |
-| CREATE | `ResendVerificationCommand` + `ResendVerificationCommandHandler` | Auth Module — Application Layer |
-| CREATE | `RegistrationRequestValidator` (FluentValidation) | Auth Module — Application Layer |
-| CREATE | `IEmailVerificationTokenRepository` + EF Core implementation | Auth Module — Infrastructure Layer |
-| CREATE | `IPatientRepository` + EF Core implementation | Patient Module — Infrastructure Layer |
-| CREATE | `IEmailService` interface + `SendGridEmailService` implementation | Notification Module — Infrastructure Layer |
-| MODIFY | `AuditLogRepository` (INSERT-only, write-through) | Shared Infrastructure |
-| MODIFY | `Program.cs` / `ServiceCollectionExtensions` | Register new services and rate limiting policies |
+| Status | Component / Module                                                | Project                                          |
+| ------ | ----------------------------------------------------------------- | ------------------------------------------------ |
+| CREATE | `AuthController`                                                  | ASP.NET Core API (`Server/`)                     |
+| CREATE | `RegisterPatientCommand` + `RegisterPatientCommandHandler`        | Auth Module — Application Layer                  |
+| CREATE | `VerifyEmailCommand` + `VerifyEmailCommandHandler`                | Auth Module — Application Layer                  |
+| CREATE | `ResendVerificationCommand` + `ResendVerificationCommandHandler`  | Auth Module — Application Layer                  |
+| CREATE | `RegistrationRequestValidator` (FluentValidation)                 | Auth Module — Application Layer                  |
+| CREATE | `IEmailVerificationTokenRepository` + EF Core implementation      | Auth Module — Infrastructure Layer               |
+| CREATE | `IPatientRepository` + EF Core implementation                     | Patient Module — Infrastructure Layer            |
+| CREATE | `IEmailService` interface + `SendGridEmailService` implementation | Notification Module — Infrastructure Layer       |
+| MODIFY | `AuditLogRepository` (INSERT-only, write-through)                 | Shared Infrastructure                            |
+| MODIFY | `Program.cs` / `ServiceCollectionExtensions`                      | Register new services and rate limiting policies |
 
 ---
 
@@ -182,25 +182,25 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Modules/Auth/AuthController.cs` | REST endpoints: register, verify, resend-verification |
-| CREATE | `Server/Modules/Auth/Commands/RegisterPatientCommand.cs` | MediatR command + result types |
-| CREATE | `Server/Modules/Auth/Commands/RegisterPatientCommandHandler.cs` | Registration handler with Argon2 hashing, token generation, email dispatch |
-| CREATE | `Server/Modules/Auth/Commands/VerifyEmailCommand.cs` | MediatR command + result types |
-| CREATE | `Server/Modules/Auth/Commands/VerifyEmailCommandHandler.cs` | Token validation, account activation, audit log write |
-| CREATE | `Server/Modules/Auth/Commands/ResendVerificationCommand.cs` | MediatR command |
-| CREATE | `Server/Modules/Auth/Commands/ResendVerificationCommandHandler.cs` | Token invalidation + new token dispatch |
-| CREATE | `Server/Modules/Auth/Validators/RegistrationRequestValidator.cs` | FluentValidation validator with per-rule password rules |
-| CREATE | `Server/Modules/Auth/Exceptions/DuplicateEmailException.cs` | Domain exception |
-| CREATE | `Server/Modules/Auth/Exceptions/TokenExpiredException.cs` | Domain exception |
-| CREATE | `Server/Modules/Auth/Exceptions/TokenAlreadyUsedException.cs` | Domain exception |
-| CREATE | `Server/Infrastructure/Repositories/PatientRepository.cs` | EF Core patient repository with `ExistsByEmailAsync` |
-| CREATE | `Server/Infrastructure/Repositories/EmailVerificationTokenRepository.cs` | Token CRUD with SHA-256 hash lookup |
-| CREATE | `Server/Infrastructure/Email/IEmailService.cs` | Email service abstraction |
-| CREATE | `Server/Infrastructure/Email/SendGridEmailService.cs` | SendGrid SDK implementation |
-| MODIFY | `Server/Program.cs` | Register MediatR, FluentValidation, rate limiting, SendGrid, Serilog |
-| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>` |
+| Action | File Path                                                                | Description                                                                |
+| ------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| CREATE | `Server/Modules/Auth/AuthController.cs`                                  | REST endpoints: register, verify, resend-verification                      |
+| CREATE | `Server/Modules/Auth/Commands/RegisterPatientCommand.cs`                 | MediatR command + result types                                             |
+| CREATE | `Server/Modules/Auth/Commands/RegisterPatientCommandHandler.cs`          | Registration handler with Argon2 hashing, token generation, email dispatch |
+| CREATE | `Server/Modules/Auth/Commands/VerifyEmailCommand.cs`                     | MediatR command + result types                                             |
+| CREATE | `Server/Modules/Auth/Commands/VerifyEmailCommandHandler.cs`              | Token validation, account activation, audit log write                      |
+| CREATE | `Server/Modules/Auth/Commands/ResendVerificationCommand.cs`              | MediatR command                                                            |
+| CREATE | `Server/Modules/Auth/Commands/ResendVerificationCommandHandler.cs`       | Token invalidation + new token dispatch                                    |
+| CREATE | `Server/Modules/Auth/Validators/RegistrationRequestValidator.cs`         | FluentValidation validator with per-rule password rules                    |
+| CREATE | `Server/Modules/Auth/Exceptions/DuplicateEmailException.cs`              | Domain exception                                                           |
+| CREATE | `Server/Modules/Auth/Exceptions/TokenExpiredException.cs`                | Domain exception                                                           |
+| CREATE | `Server/Modules/Auth/Exceptions/TokenAlreadyUsedException.cs`            | Domain exception                                                           |
+| CREATE | `Server/Infrastructure/Repositories/PatientRepository.cs`                | EF Core patient repository with `ExistsByEmailAsync`                       |
+| CREATE | `Server/Infrastructure/Repositories/EmailVerificationTokenRepository.cs` | Token CRUD with SHA-256 hash lookup                                        |
+| CREATE | `Server/Infrastructure/Email/IEmailService.cs`                           | Email service abstraction                                                  |
+| CREATE | `Server/Infrastructure/Email/SendGridEmailService.cs`                    | SendGrid SDK implementation                                                |
+| MODIFY | `Server/Program.cs`                                                      | Register MediatR, FluentValidation, rate limiting, SendGrid, Serilog       |
+| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs`                      | Add `DbSet<Patient>`, `DbSet<EmailVerificationToken>`, `DbSet<AuditLog>`   |
 
 ---
 
@@ -263,13 +263,13 @@ dotnet ef database update --project Server/Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `AuthController` with `POST /api/auth/register`, `GET /api/auth/verify`, `POST /api/auth/resend-verification` endpoints
-- [ ] Create `RegisterPatientCommandHandler`: uniqueness check, Argon2 hashing, patient INSERT, token generation (raw → SHA-256 hash stored), email dispatch
-- [ ] Create `RegistrationRequestValidator` with per-rule FluentValidation password checks
-- [ ] Create `VerifyEmailCommandHandler`: SHA-256 hash lookup, expiry/used checks, `emailVerified=true` UPDATE, AuditLog INSERT with IP + UTC timestamp
-- [ ] Create `ResendVerificationCommandHandler`: invalidate existing tokens, issue new token, dispatch email (enumeration-safe 200 response)
-- [ ] Create `SendGridEmailService` implementing `IEmailService`; log delivery result; degrade gracefully on failure
-- [ ] Apply ASP.NET Core rate limiting policies to `/register` (5/10min/IP) and `/resend-verification` (3/5min/email-hash)
-- [ ] Map domain exceptions to HTTP status codes via global exception filter (no stack trace exposure)
-- [ ] Register all dependencies in `Program.cs` (MediatR, FluentValidation, rate limiter, Serilog, EF Core)
-- [ ] Write AuditLog as INSERT-only via repository (no UPDATE/DELETE permitted at the repository layer — AD-7)
+- [x] Create `AuthController` with `POST /api/auth/register`, `GET /api/auth/verify`, `POST /api/auth/resend-verification` endpoints
+- [x] Create `RegisterPatientCommandHandler`: uniqueness check, Argon2 hashing, patient INSERT, token generation (raw → SHA-256 hash stored), email dispatch
+- [x] Create `RegistrationRequestValidator` with per-rule FluentValidation password checks
+- [x] Create `VerifyEmailCommandHandler`: SHA-256 hash lookup, expiry/used checks, `emailVerified=true` UPDATE, AuditLog INSERT with IP + UTC timestamp
+- [x] Create `ResendVerificationCommandHandler`: invalidate existing tokens, issue new token, dispatch email (enumeration-safe 200 response)
+- [x] Create `SendGridEmailService` implementing `IEmailService`; log delivery result; degrade gracefully on failure
+- [x] Apply ASP.NET Core rate limiting policies to `/register` (5/10min/IP) and `/resend-verification` (3/5min/email-hash)
+- [x] Map domain exceptions to HTTP status codes via global exception filter (no stack trace exposure)
+- [x] Register all dependencies in `Program.cs` (MediatR, FluentValidation, rate limiter, Serilog, EF Core)
+- [x] Write AuditLog as INSERT-only via repository (no UPDATE/DELETE permitted at the repository layer — AD-7)
