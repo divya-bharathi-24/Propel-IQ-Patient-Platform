@@ -1,0 +1,96 @@
+<mat-card class="appointment-card" aria-label="Appointment details">
+  <mat-card-header>
+    <mat-card-title>{{ appointment.specialtyName }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ appointment.date | date: "longDate" }} &bull;
+      {{ appointment.timeStart | date: "shortTime" }} –
+      {{ appointment.timeEnd | date: "shortTime" }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <!-- Preferred Slot Waitlisted indicator (AC-3) -->
+  @if (waitlistEntry()) {
+    <mat-card-content class="waitlist-section">
+      <mat-chip-set aria-label="Waitlist status">
+        <mat-chip
+          color="accent"
+          highlighted
+          [attr.aria-label]="
+            'Waitlisted for ' +
+            (waitlistEntry()!.preferredDate | date: 'mediumDate') +
+            ' at ' +
+            (waitlistEntry()!.preferredTimeSlot | date: 'shortTime')
+          "
+        >
+          Preferred Slot Waitlisted &mdash;
+          {{ waitlistEntry()!.preferredDate | date: "mediumDate" }}
+          at
+          {{ waitlistEntry()!.preferredTimeSlot | date: "shortTime" }}
+        </mat-chip>
+      </mat-chip-set>
+
+      <!-- Remove Preference action (AC-4) -->
+      @if (!showRemoveConfirmation()) {
+        <button
+          mat-button
+          color="warn"
+          (click)="onRemovePreference()"
+          aria-label="Remove preferred slot waitlist designation"
+        >
+          Remove Preference
+        </button>
+      }
+
+      <!-- Inline confirmation (AC-4) -->
+      @if (showRemoveConfirmation()) {
+        <div
+          class="remove-confirmation"
+          role="region"
+          aria-live="polite"
+          aria-label="Confirm removal of waitlist preference"
+        >
+          <span>Remove your preferred slot designation?</span>
+          <button
+            mat-flat-button
+            color="warn"
+            (click)="onConfirmRemovePreference()"
+            aria-label="Confirm removal of waitlist preference"
+          >
+            Confirm
+          </button>
+          <button
+            mat-stroked-button
+            (click)="onCancelRemovePreference()"
+            aria-label="Cancel removal"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    </mat-card-content>
+  }
+
+  <!-- Action buttons: only visible for future appointments (AC edge case) -->
+  @if (isFuture()) {
+    <mat-card-actions align="end">
+      <app-calendar-sync-button [appointmentId]="appointment.id" />
+
+      <button
+        mat-stroked-button
+        (click)="onReschedule()"
+        aria-label="Reschedule this appointment"
+      >
+        Reschedule
+      </button>
+
+      <button
+        mat-stroked-button
+        color="warn"
+        (click)="openCancelDialog()"
+        aria-label="Cancel this appointment"
+      >
+        Cancel Appointment
+      </button>
+    </mat-card-actions>
+  }
+</mat-card>

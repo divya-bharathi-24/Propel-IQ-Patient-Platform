@@ -19,6 +19,12 @@ public sealed class NoShowRisk
     /// </summary>
     public decimal Score { get; set; }
 
+    /// <summary>
+    /// Severity band derived from <see cref="Score"/>: Low (&lt;0.35), Medium (0.35–0.70), High (&gt;0.70).
+    /// Added via <c>AddSeverityToNoShowRisks</c> EF Core migration (us_031, task_002).
+    /// </summary>
+    public string Severity { get; set; } = "Medium";
+
     // JSONB column — mapped via HasColumnType("jsonb") in fluent config (task_002)
     public JsonDocument Factors { get; set; } = null!;
 
@@ -26,4 +32,11 @@ public sealed class NoShowRisk
 
     // Navigation property — one-to-one
     public Appointment Appointment { get; set; } = null!;
+
+    /// <summary>
+    /// Interventions generated when this risk record crosses the High threshold (US_032, FR-030).
+    /// One-to-many: each High-risk UPSERT may produce <c>AdditionalReminder</c> and
+    /// <c>CallbackRequest</c> rows (idempotent guard in <c>NoShowRiskAssessedEventHandler</c>).
+    /// </summary>
+    public ICollection<RiskIntervention> RiskInterventions { get; set; } = [];
 }

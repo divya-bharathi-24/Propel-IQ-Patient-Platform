@@ -24,21 +24,21 @@
 | **Wireframe Path/URL** | N/A   |
 | **Screen Spec**        | N/A   |
 | **UXR Requirements**   | N/A   |
-| **Design Tokens**      |N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                               | Version |
-| ---------- | ---------------------------------------- | ------- |
-| Database   | PostgreSQL                               | 16+     |
-| ORM        | Entity Framework Core                    | 9.x     |
-| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL    | 9.x     |
-| DB Hosting | Neon PostgreSQL (free tier)              | —       |
-| Testing    | xUnit                                    | 2.x     |
-| AI/ML      | N/A                                      | N/A     |
-| Mobile     | N/A                                      | N/A     |
+| Layer      | Technology                            | Version |
+| ---------- | ------------------------------------- | ------- |
+| Database   | PostgreSQL                            | 16+     |
+| ORM        | Entity Framework Core                 | 9.x     |
+| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier)           | —       |
+| Testing    | xUnit                                 | 2.x     |
+| AI/ML      | N/A                                   | N/A     |
+| Mobile     | N/A                                   | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -84,20 +84,21 @@ All changes are additive or column-constraint relaxations — no data is deleted
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| MODIFY | `Appointment` EF Core entity | `Server/Infrastructure/Persistence/Entities/Appointment.cs` — `PatientId` becomes `Guid?`; add `AnonymousVisitId: Guid?` |
-| MODIFY | `QueueEntry` EF Core entity | `Server/Infrastructure/Persistence/Entities/QueueEntry.cs` — `PatientId` becomes `Guid?` |
-| MODIFY | `AppointmentConfiguration.cs` | Update FK constraint to `IsRequired(false)` |
-| MODIFY | `QueueEntryConfiguration.cs` | Update FK constraint to `IsRequired(false)` |
-| CREATE | EF Core migration: `AllowAnonymousWalkIn` | `Server/Infrastructure/Migrations/` |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.Designer.cs` | Migration snapshot |
+| Status | Component / Module                                                              | Project                                                                                                                  |
+| ------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| MODIFY | `Appointment` EF Core entity                                                    | `Server/Infrastructure/Persistence/Entities/Appointment.cs` — `PatientId` becomes `Guid?`; add `AnonymousVisitId: Guid?` |
+| MODIFY | `QueueEntry` EF Core entity                                                     | `Server/Infrastructure/Persistence/Entities/QueueEntry.cs` — `PatientId` becomes `Guid?`                                 |
+| MODIFY | `AppointmentConfiguration.cs`                                                   | Update FK constraint to `IsRequired(false)`                                                                              |
+| MODIFY | `QueueEntryConfiguration.cs`                                                    | Update FK constraint to `IsRequired(false)`                                                                              |
+| CREATE | EF Core migration: `AllowAnonymousWalkIn`                                       | `Server/Infrastructure/Migrations/`                                                                                      |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.Designer.cs` | Migration snapshot                                                                                                       |
 
 ---
 
 ## Implementation Plan
 
 1. **Modify `Appointment` entity**:
+
    ```csharp
    public Guid? PatientId { get; set; }          // was Guid (non-nullable FK)
    public Guid? AnonymousVisitId { get; set; }   // NEW — populated only for anonymous walk-ins
@@ -106,11 +107,13 @@ All changes are additive or column-constraint relaxations — no data is deleted
    ```
 
 2. **Modify `QueueEntry` entity**:
+
    ```csharp
    public Guid? PatientId { get; set; }          // was Guid (non-nullable FK)
    ```
 
 3. **Update `AppointmentConfiguration.cs`**:
+
    ```csharp
    builder.HasOne(a => a.Patient)
        .WithMany(p => p.Appointments)
@@ -124,6 +127,7 @@ All changes are additive or column-constraint relaxations — no data is deleted
    ```
 
 4. **Update `QueueEntryConfiguration.cs`**:
+
    ```csharp
    builder.HasOne(q => q.Patient)
        .WithMany()
@@ -176,14 +180,14 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| MODIFY | `Server/Infrastructure/Persistence/Entities/Appointment.cs` | `PatientId` → `Guid?`; add `AnonymousVisitId: Guid?`; `TimeSlotStart`/`TimeSlotEnd` → nullable |
-| MODIFY | `Server/Infrastructure/Persistence/Entities/QueueEntry.cs` | `PatientId` → `Guid?` |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/AppointmentConfiguration.cs` | FK `IsRequired(false)`, `AnonymousVisitId` nullable property, time slot nullable properties |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/QueueEntryConfiguration.cs` | FK `IsRequired(false)` |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.cs` | `Up()`: DROP NOT NULL on patient_id, ADD COLUMN anonymous_visit_id, DROP NOT NULL on time slots, DROP NOT NULL on queue patient_id; `Down()` reversal |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.Designer.cs` | Migration snapshot |
+| Action | File Path                                                                       | Description                                                                                                                                           |
+| ------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MODIFY | `Server/Infrastructure/Persistence/Entities/Appointment.cs`                     | `PatientId` → `Guid?`; add `AnonymousVisitId: Guid?`; `TimeSlotStart`/`TimeSlotEnd` → nullable                                                        |
+| MODIFY | `Server/Infrastructure/Persistence/Entities/QueueEntry.cs`                      | `PatientId` → `Guid?`                                                                                                                                 |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/AppointmentConfiguration.cs`  | FK `IsRequired(false)`, `AnonymousVisitId` nullable property, time slot nullable properties                                                           |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/QueueEntryConfiguration.cs`   | FK `IsRequired(false)`                                                                                                                                |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.cs`          | `Up()`: DROP NOT NULL on patient_id, ADD COLUMN anonymous_visit_id, DROP NOT NULL on time slots, DROP NOT NULL on queue patient_id; `Down()` reversal |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AllowAnonymousWalkIn.Designer.cs` | Migration snapshot                                                                                                                                    |
 
 ---
 
@@ -230,10 +234,10 @@ dotnet ef migrations script --project Server/Server.csproj --output migration_al
 
 ## Implementation Checklist
 
-- [ ] Update `Appointment` entity: `PatientId → Guid?`, add `AnonymousVisitId: Guid?`, confirm `TimeSlotStart`/`TimeSlotEnd` are `TimeOnly?`
-- [ ] Update `QueueEntry` entity: `PatientId → Guid?`
-- [ ] Update `AppointmentConfiguration`: FK `IsRequired(false)`; map `AnonymousVisitId`, `TimeSlotStart`, `TimeSlotEnd` as nullable
-- [ ] Update `QueueEntryConfiguration`: FK `IsRequired(false)`
-- [ ] Write migration `AllowAnonymousWalkIn` `Up()`: 5x `ALTER COLUMN DROP NOT NULL` + `ADD COLUMN anonymous_visit_id UUID NULL`
-- [ ] Add partial unique index on `anonymous_visit_id WHERE NOT NULL` in the same migration
+- [x] Update `Appointment` entity: `PatientId → Guid?`, add `AnonymousVisitId: Guid?`, confirm `TimeSlotStart`/`TimeSlotEnd` are `TimeOnly?`
+- [x] Update `QueueEntry` entity: `PatientId → Guid?`
+- [x] Update `AppointmentConfiguration`: FK `IsRequired(false)`; map `AnonymousVisitId`, `TimeSlotStart`, `TimeSlotEnd` as nullable
+- [x] Update `QueueEntryConfiguration`: FK `IsRequired(false)`
+- [x] Write migration `AllowAnonymousWalkIn` `Up()`: 5x `ALTER COLUMN DROP NOT NULL` + `ADD COLUMN anonymous_visit_id UUID NULL`
+- [x] Add partial unique index on `anonymous_visit_id WHERE NOT NULL` in the same migration
 - [ ] Generate SQL script and review before applying to Neon production database

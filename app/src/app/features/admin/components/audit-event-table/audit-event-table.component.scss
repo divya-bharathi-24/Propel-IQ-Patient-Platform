@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.count-badge {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant, #555);
+  font-weight: 500;
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 8px;
+}
+
+.audit-table {
+  width: 100%;
+  min-width: 900px;
+}
+
+.mono {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.8125rem;
+}
+
+/* Role badges */
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--admin {
+    background: #e8f0fe;
+    color: #1a56db;
+  }
+
+  &--staff {
+    background: #e3f9e5;
+    color: #1a7f37;
+  }
+
+  &--patient {
+    background: #fff3e0;
+    color: #e65100;
+  }
+}
+
+/* Action type badges */
+.action-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &--create {
+    background: #e3f9e5;
+    color: #1a7f37;
+  }
+
+  &--read {
+    background: #e8f0fe;
+    color: #1a56db;
+  }
+
+  &--update {
+    background: #fff8e1;
+    color: #795548;
+  }
+
+  &--delete {
+    background: #fdecea;
+    color: #c62828;
+  }
+}
+
+.event-row {
+  cursor: default;
+
+  &--expandable {
+    cursor: pointer;
+  }
+
+  &--expanded td {
+    border-bottom: none;
+  }
+}
+
+.expansion-row {
+  display: none;
+
+  &--visible {
+    display: table-row;
+  }
+
+  td {
+    padding: 0;
+  }
+}
+
+.expansion-panel {
+  padding: 12px 16px 16px;
+  background: var(--mat-sys-surface-container-lowest, #fafafa);
+  border-top: 1px dashed var(--mat-sys-outline-variant, #e0e0e0);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  color: var(--mat-sys-on-surface-variant, #666);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+}
+
+.load-more-row {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  min-height: 56px;
+  align-items: center;
+}

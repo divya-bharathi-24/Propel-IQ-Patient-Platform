@@ -18,5 +18,8 @@ public sealed record LoginCommand(
 public sealed record LoginResult(
     string AccessToken,
     string RefreshToken,
-    int ExpiresIn
+    int ExpiresIn,
+    string UserId,
+    string Role,
+    string DeviceId
 );

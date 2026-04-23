@@ -251,11 +251,11 @@ OPENAI_API_KEY=sk-... dotnet run --project Server/Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `AiNoShowRiskUnavailableException`; ensure it is caught in task_002 `CalculateNoShowRiskCommandHandler` (coordinate with task_002 stub)
-- [ ] Create `risk-assessment-v1.txt` prompt: delta constraints `[-0.15, +0.15]`, strict JSON-only output, neutral fallback instruction for no/insufficient history
-- [ ] Create `RiskAssessmentPromptBuilder`: system prompt + structured JSON user message with `baseScore`, `historyLast24Months` (max 50 entries), `upcomingAppointmentLeadTimeDays`; history trimmed to last 24 months for AIR-O01 budget compliance
-- [ ] Create `SemanticKernelNoShowRiskAugmenter`: Semantic Kernel `IChatCompletionService` call; `MaxTokens = 8000`; Polly circuit breaker pipeline (keyed for risk augmenter); JSON parse + delta clamp `[-0.15, +0.15]`; return `0.0` on parse failure
-- [ ] Add Polly circuit breaker for risk augmenter (3 failures / 300s window, keyed independently from US_028 intake circuit breaker); `BrokenCircuitException` → throw `AiNoShowRiskUnavailableException`
-- [ ] Implement Serilog audit log per augmentation call: `NoShowRisk_AiAugmented { AppointmentId, Delta, Confidence, PromptTokens, LatencyMs }` (AIR-O04)
-- [ ] Support prompt version switching: load from `Prompts/risk-assessment-{AiSettings.RiskAssessmentPromptVersion}.txt`; add `RiskAssessmentPromptVersion` key to `appsettings.json "Ai"` section (AIR-O03)
-- [ ] Register `IAiNoShowRiskAugmenter → SemanticKernelNoShowRiskAugmenter` in `Program.cs`; verify `OPENAI_API_KEY` loaded from environment variable only (OWASP A02)
+- [X] Create `AiNoShowRiskUnavailableException`; ensure it is caught in task_002 `CalculateNoShowRiskCommandHandler` (coordinate with task_002 stub)
+- [X] Create `risk-assessment-v1.txt` prompt: delta constraints `[-0.15, +0.15]`, strict JSON-only output, neutral fallback instruction for no/insufficient history
+- [X] Create `RiskAssessmentPromptBuilder`: system prompt + structured JSON user message with `baseScore`, `historyLast24Months` (max 50 entries), `upcomingAppointmentLeadTimeDays`; history trimmed to last 24 months for AIR-O01 budget compliance
+- [X] Create `SemanticKernelNoShowRiskAugmenter`: Semantic Kernel `IChatCompletionService` call; `MaxTokens = 8000`; Polly circuit breaker pipeline (keyed for risk augmenter); JSON parse + delta clamp `[-0.15, +0.15]`; return `0.0` on parse failure
+- [X] Add Polly circuit breaker for risk augmenter (3 failures / 300s window, keyed independently from US_028 intake circuit breaker); `BrokenCircuitException` → throw `AiNoShowRiskUnavailableException`
+- [X] Implement Serilog audit log per augmentation call: `NoShowRisk_AiAugmented { AppointmentId, Delta, Confidence, PromptTokens, LatencyMs }` (AIR-O04)
+- [X] Support prompt version switching: load from `Prompts/risk-assessment-{AiSettings.RiskAssessmentPromptVersion}.txt`; add `RiskAssessmentPromptVersion` key to `appsettings.json "Ai"` section (AIR-O03)
+- [X] Register `IAiNoShowRiskAugmenter → SemanticKernelNoShowRiskAugmenter` in `Program.cs`; verify `OPENAI_API_KEY` loaded from environment variable only (OWASP A02)

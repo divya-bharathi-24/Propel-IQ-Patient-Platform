@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type         | Value                                                                                                                                               |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **UI Impact**          | Yes                                                                                                                                                 |
-| **Figma URL**          | N/A                                                                                                                                                 |
-| **Wireframe Status**   | PENDING                                                                                                                                             |
-| **Wireframe Type**     | N/A                                                                                                                                                 |
-| **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-admin-user-management.[html\|png\|jpg]` or provide external URL                 |
-| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                                               |
-| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                                               |
-| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                                             |
+| Reference Type         | Value                                                                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                                 |
+| **Figma URL**          | N/A                                                                                                                                 |
+| **Wireframe Status**   | PENDING                                                                                                                             |
+| **Wireframe Type**     | N/A                                                                                                                                 |
+| **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-admin-user-management.[html\|png\|jpg]` or provide external URL |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                               |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                               |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                             |
 
 > **Wireframe Status: PENDING** — Implement using component-level layout described in the Implementation Plan. Align to wireframe when it becomes AVAILABLE.
 
@@ -34,16 +34,16 @@
 
 ## Applicable Technology Stack
 
-| Layer             | Technology             | Version |
-| ----------------- | ---------------------- | ------- |
-| Frontend          | Angular                | 18.x    |
-| Frontend State    | NgRx Signals           | 18.x    |
-| Frontend UI       | Angular Material       | 18.x    |
-| Frontend Routing  | Angular Router         | 18.x    |
-| HTTP Client       | Angular HttpClient     | 18.x    |
-| Testing — Unit    | Jest / Angular Testing Library | — |
-| AI/ML             | N/A                    | N/A     |
-| Mobile            | N/A                    | N/A     |
+| Layer            | Technology                     | Version |
+| ---------------- | ------------------------------ | ------- |
+| Frontend         | Angular                        | 18.x    |
+| Frontend State   | NgRx Signals                   | 18.x    |
+| Frontend UI      | Angular Material               | 18.x    |
+| Frontend Routing | Angular Router                 | 18.x    |
+| HTTP Client      | Angular HttpClient             | 18.x    |
+| Testing — Unit   | Jest / Angular Testing Library | —       |
+| AI/ML            | N/A                            | N/A     |
+| Mobile           | N/A                            | N/A     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -88,16 +88,16 @@ Implement the Angular Admin Panel "User Management" page that gives Admins full 
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `UserManagementPageComponent` (new) | Admin Feature Module | CREATE — Routed page; hosts user table, toolbar, and action dispatch |
-| `UserTableComponent` (new) | Admin Feature Module | CREATE — `mat-table` with sort, filter, pagination; row-level Deactivate/Edit/Resend actions |
-| `UserFormDialogComponent` (new) | Admin Feature Module | CREATE — `MatDialog` reactive form for Create and Edit user (name, email, role) |
-| `UserStatusBadgeComponent` (new) | Admin Feature Module | CREATE — Status chip: green for Active, grey for Deactivated |
-| `AdminUserStore` (new) | Admin State | CREATE — NgRx Signals store: `users`, `loading`, `createUser`, `updateUser`, `deactivateUser` methods |
-| `AdminUserService` (new) | Admin Data Access | CREATE — Angular service: `getUsers`, `createUser`, `updateUser`, `deactivateUser`, `resendCredentialEmail` |
-| `AdminRoleGuard` (new) | Auth Guards | CREATE — `CanActivateFn` that checks `role === 'Admin'` in JWT claims; redirects to dashboard if not Admin |
-| `admin.routes.ts` (new) | App Routing | CREATE — Admin module routes: `/admin/users` → `UserManagementPageComponent`, protected by `AdminRoleGuard` |
+| Component                           | Module               | Action                                                                                                      |
+| ----------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `UserManagementPageComponent` (new) | Admin Feature Module | CREATE — Routed page; hosts user table, toolbar, and action dispatch                                        |
+| `UserTableComponent` (new)          | Admin Feature Module | CREATE — `mat-table` with sort, filter, pagination; row-level Deactivate/Edit/Resend actions                |
+| `UserFormDialogComponent` (new)     | Admin Feature Module | CREATE — `MatDialog` reactive form for Create and Edit user (name, email, role)                             |
+| `UserStatusBadgeComponent` (new)    | Admin Feature Module | CREATE — Status chip: green for Active, grey for Deactivated                                                |
+| `AdminUserStore` (new)              | Admin State          | CREATE — NgRx Signals store: `users`, `loading`, `createUser`, `updateUser`, `deactivateUser` methods       |
+| `AdminUserService` (new)            | Admin Data Access    | CREATE — Angular service: `getUsers`, `createUser`, `updateUser`, `deactivateUser`, `resendCredentialEmail` |
+| `AdminRoleGuard` (new)              | Auth Guards          | CREATE — `CanActivateFn` that checks `role === 'Admin'` in JWT claims; redirects to dashboard if not Admin  |
+| `admin.routes.ts` (new)             | App Routing          | CREATE — Admin module routes: `/admin/users` → `UserManagementPageComponent`, protected by `AdminRoleGuard` |
 
 ---
 
@@ -163,17 +163,17 @@ app/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/admin/pages/user-management/user-management.page.ts` | Routed page: loads user list, orchestrates create/edit/deactivate |
-| CREATE | `app/admin/components/user-table/user-table.component.ts` | mat-table with sort, filter, pagination, row actions |
-| CREATE | `app/admin/components/user-form-dialog/user-form-dialog.component.ts` | MatDialog reactive form for Create/Edit user |
-| CREATE | `app/admin/components/user-status-badge/user-status-badge.component.ts` | Status chip: Active (green) / Deactivated (grey) |
-| CREATE | `app/admin/store/admin-user.store.ts` | NgRx Signals store: users, loading, CRUD methods |
-| CREATE | `app/admin/services/admin-user.service.ts` | HTTP service: getUsers, createUser, updateUser, deactivateUser, resendCredentialEmail |
-| CREATE | `app/auth/guards/admin-role.guard.ts` | CanActivateFn: role === 'Admin' check |
-| CREATE | `app/admin/admin.routes.ts` | Admin module routes with AdminRoleGuard |
-| MODIFY | `app/app.routes.ts` | Add admin routes lazy-loaded from admin.routes.ts |
+| Action | File Path                                                               | Description                                                                           |
+| ------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| CREATE | `app/admin/pages/user-management/user-management.page.ts`               | Routed page: loads user list, orchestrates create/edit/deactivate                     |
+| CREATE | `app/admin/components/user-table/user-table.component.ts`               | mat-table with sort, filter, pagination, row actions                                  |
+| CREATE | `app/admin/components/user-form-dialog/user-form-dialog.component.ts`   | MatDialog reactive form for Create/Edit user                                          |
+| CREATE | `app/admin/components/user-status-badge/user-status-badge.component.ts` | Status chip: Active (green) / Deactivated (grey)                                      |
+| CREATE | `app/admin/store/admin-user.store.ts`                                   | NgRx Signals store: users, loading, CRUD methods                                      |
+| CREATE | `app/admin/services/admin-user.service.ts`                              | HTTP service: getUsers, createUser, updateUser, deactivateUser, resendCredentialEmail |
+| CREATE | `app/auth/guards/admin-role.guard.ts`                                   | CanActivateFn: role === 'Admin' check                                                 |
+| CREATE | `app/admin/admin.routes.ts`                                             | Admin module routes with AdminRoleGuard                                               |
+| MODIFY | `app/app.routes.ts`                                                     | Add admin routes lazy-loaded from admin.routes.ts                                     |
 
 ---
 
@@ -216,11 +216,11 @@ app/
 
 ## Implementation Checklist
 
-- [ ] Create `AdminUserService` with five HTTP methods (getUsers, createUser, updateUser, deactivateUser, resendCredentialEmail)
-- [ ] Create `AdminUserStore` (NgRx Signals): users, loading, loadUsers, createUser, updateUser, deactivateUser
-- [ ] Create `AdminRoleGuard` (`CanActivateFn`): checks `role === 'Admin'`, redirects on failure
-- [ ] Create `UserStatusBadgeComponent`: Active (green chip) / Deactivated (grey chip)
-- [ ] Create `UserTableComponent`: mat-table, sort, paginator, filter, row actions with self-deactivate disable logic
-- [ ] Create `UserFormDialogComponent`: reactive form (name, email read-only on edit, role select); create/edit mode
-- [ ] Create `UserManagementPageComponent`: load on init, handle all action events, show snackbars
-- [ ] Create `admin.routes.ts` and extend `app.routes.ts` with lazy-loaded admin routes
+- [x] Create `AdminUserService` with five HTTP methods (getUsers, createUser, updateUser, deactivateUser, resendCredentialEmail)
+- [x] Create `AdminUserStore` (NgRx Signals): users, loading, loadUsers, createUser, updateUser, deactivateUser
+- [x] Create `AdminRoleGuard` (`CanActivateFn`): checks `role === 'Admin'`, redirects on failure
+- [x] Create `UserStatusBadgeComponent`: Active (green chip) / Deactivated (grey chip)
+- [x] Create `UserTableComponent`: mat-table, sort, paginator, filter, row actions with self-deactivate disable logic
+- [x] Create `UserFormDialogComponent`: reactive form (name, email read-only on edit, role select); create/edit mode
+- [x] Create `UserManagementPageComponent`: load on init, handle all action events, show snackbars
+- [x] Create `admin.routes.ts` and extend `app.routes.ts` with lazy-loaded admin routes

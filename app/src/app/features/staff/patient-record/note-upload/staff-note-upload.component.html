@@ -1,0 +1,102 @@
+<section class="note-upload-panel" aria-labelledby="upload-heading">
+  <h2 id="upload-heading" class="panel-title">Upload Clinical Note</h2>
+
+  <form (ngSubmit)="upload()" novalidate>
+    <!-- ── File input ─────────────────────────────────────────────────── -->
+    <div class="form-field">
+      <label for="noteFile" class="field-label">
+        Clinical Note (PDF, max 25 MB)
+      </label>
+      <input
+        id="noteFile"
+        type="file"
+        accept=".pdf"
+        class="file-input"
+        (change)="onFileSelected($event)"
+        [attr.aria-describedby]="
+          uploadState().validationErrors.file ? 'fileError' : null
+        "
+        [attr.aria-invalid]="!!uploadState().validationErrors.file"
+      />
+      @if (uploadState().validationErrors.file) {
+        <span id="fileError" class="field-error" role="alert">
+          {{ uploadState().validationErrors.file }}
+        </span>
+      }
+    </div>
+
+    <!-- ── Encounter reference ────────────────────────────────────────── -->
+    <div class="form-field">
+      <label for="encounterRef" class="field-label">
+        Encounter Reference <span class="optional-hint">(optional)</span>
+      </label>
+      <input
+        id="encounterRef"
+        type="text"
+        class="text-input"
+        placeholder="e.g. APT-20260423-001"
+        [value]="encounterRef()"
+        (input)="encounterRef.set($any($event.target).value)"
+        aria-describedby="encounterRefHint"
+      />
+      <span id="encounterRefHint" class="field-hint">
+        Leave blank if no appointment reference is available.
+      </span>
+    </div>
+
+    <!-- ── Encounter warning banner ───────────────────────────────────── -->
+    @if (uploadState().encounterWarning) {
+      <div class="warning-banner" role="alert">
+        <span class="warning-icon" aria-hidden="true">⚠</span>
+        Encounter reference not found — document linked to patient without
+        appointment reference.
+        <button
+          type="button"
+          class="dismiss-btn"
+          aria-label="Dismiss encounter warning"
+          (click)="dismissEncounterWarning()"
+        >
+          Dismiss
+        </button>
+      </div>
+    }
+
+    <!-- ── Upload progress bar ────────────────────────────────────────── -->
+    @if (uploadState().isUploading) {
+      <div class="progress-container">
+        <progress
+          [value]="uploadState().uploadProgress"
+          max="100"
+          class="upload-progress"
+          aria-label="Upload progress"
+        >
+          {{ uploadState().uploadProgress }}%
+        </progress>
+        <span class="progress-label" aria-hidden="true">
+          {{ uploadState().uploadProgress }}%
+        </span>
+      </div>
+    }
+
+    <!-- ── Server error ───────────────────────────────────────────────── -->
+    @if (uploadState().serverError) {
+      <span class="server-error" role="alert">
+        {{ uploadState().serverError }}
+      </span>
+    }
+
+    <!-- ── Submit button ──────────────────────────────────────────────── -->
+    <button
+      type="submit"
+      class="upload-btn"
+      [disabled]="!selectedFile() || uploadState().isUploading"
+      [attr.aria-busy]="uploadState().isUploading"
+    >
+      @if (uploadState().isUploading) {
+        Uploading…
+      } @else {
+        Upload Note
+      }
+    </button>
+  </form>
+</section>

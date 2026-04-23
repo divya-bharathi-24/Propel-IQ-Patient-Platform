@@ -16,31 +16,31 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type         | Value |
-| ---------------------- | ----- |
-| **UI Impact**          | Yes   |
-| **Figma URL**          | N/A   |
-| **Wireframe Status**   | PENDING |
-| **Wireframe Type**     | N/A   |
+| Reference Type         | Value                                                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **UI Impact**          | Yes                                                                                                                                  |
+| **Figma URL**          | N/A                                                                                                                                  |
+| **Wireframe Status**   | PENDING                                                                                                                              |
+| **Wireframe Type**     | N/A                                                                                                                                  |
 | **Wireframe Path/URL** | TODO: Provide wireframe — upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-DOC-upload.[html\|png\|jpg]` or add external URL |
-| **Screen Spec**        | N/A (figma_spec.md not yet generated) |
-| **UXR Requirements**   | N/A (figma_spec.md not yet generated) |
-| **Design Tokens**      | N/A (designsystem.md not yet generated) |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                                |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                                |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                              |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer             | Technology               | Version |
-| ----------------- | ------------------------ | ------- |
-| Frontend          | Angular                  | 18.x    |
-| Frontend State    | NgRx Signals             | 18.x    |
-| UI Components     | Angular Material         | 18.x    |
-| HTTP Client       | Angular HttpClient       | 18.x    |
-| Styling           | Angular Material + SCSS  | 18.x    |
-| Testing           | Playwright               | 1.x     |
-| AI/ML             | N/A                      | N/A     |
-| Mobile            | N/A                      | N/A     |
+| Layer          | Technology              | Version |
+| -------------- | ----------------------- | ------- |
+| Frontend       | Angular                 | 18.x    |
+| Frontend State | NgRx Signals            | 18.x    |
+| UI Components  | Angular Material        | 18.x    |
+| HTTP Client    | Angular HttpClient      | 18.x    |
+| Styling        | Angular Material + SCSS | 18.x    |
+| Testing        | Playwright              | 1.x     |
+| AI/ML          | N/A                     | N/A     |
+| Mobile         | N/A                     | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -75,6 +75,7 @@
 Build the patient-facing document upload UI within the Patient Dashboard. The feature includes a drag-and-drop / file-picker upload zone with full client-side validation, batch upload orchestration, a real-time upload history table, per-file status tracking, and graceful handling of storage-unavailable errors and partial batch failures.
 
 **Components to create:**
+
 - `DocumentUploadComponent` — host for the upload zone and upload history (lazy-loaded under `PatientModule`, route: `/patient/documents`)
 - `DocumentUploadStore` (NgRx Signals) — reactive state for files, validation errors, upload progress, history list, and flags
 - `DocumentUploadService` — HTTP client wrapper for `POST /api/documents/upload` with per-file progress
@@ -92,29 +93,31 @@ Build the patient-facing document upload UI within the Patient Dashboard. The fe
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `DocumentUploadComponent` | `Client/src/app/patient/document-upload/` |
-| CREATE | `DocumentUploadStore` (NgRx Signals) | `Client/src/app/patient/document-upload/document-upload.store.ts` |
-| CREATE | `DocumentUploadService` | `Client/src/app/patient/document-upload/document-upload.service.ts` |
-| MODIFY | `PatientModule` / patient routes | Add `/patient/documents` lazy route |
+| Status | Component / Module                   | Project                                                             |
+| ------ | ------------------------------------ | ------------------------------------------------------------------- |
+| CREATE | `DocumentUploadComponent`            | `Client/src/app/patient/document-upload/`                           |
+| CREATE | `DocumentUploadStore` (NgRx Signals) | `Client/src/app/patient/document-upload/document-upload.store.ts`   |
+| CREATE | `DocumentUploadService`              | `Client/src/app/patient/document-upload/document-upload.service.ts` |
+| MODIFY | `PatientModule` / patient routes     | Add `/patient/documents` lazy route                                 |
 
 ---
 
 ## Implementation Plan
 
 1. **`DocumentUploadStore`** (NgRx Signals):
+
    ```typescript
    interface DocumentUploadState {
      selectedFiles: File[];
-     validationErrors: Record<string, string>;  // filename -> error message
-     uploadProgress: number;                    // 0–100 overall batch progress
+     validationErrors: Record<string, string>; // filename -> error message
+     uploadProgress: number; // 0–100 overall batch progress
      isUploading: boolean;
-     uploadHistory: ClinicalDocumentDto[];      // loaded from GET /api/documents
-     uploadResult: UploadFileResult[] | null;   // per-file result after batch
-     storageUnavailable: boolean;               // 503 response received
+     uploadHistory: ClinicalDocumentDto[]; // loaded from GET /api/documents
+     uploadResult: UploadFileResult[] | null; // per-file result after batch
+     storageUnavailable: boolean; // 503 response received
    }
    ```
+
    Signals: `files`, `validationErrors`, `uploadProgress`, `isUploading`, `uploadHistory`, `uploadResult`, `storageUnavailable`.
    Methods: `validateFiles(files: FileList)`, `resetUpload()`, `loadHistory()`, `handleUploadResult(results)`, `retryFiles(failedFileNames: string[])`.
 
@@ -131,6 +134,7 @@ Build the patient-facing document upload UI within the Patient Dashboard. The fe
    - **Storage unavailable banner**: `<mat-banner *ngIf="storageUnavailable()">Service temporarily unavailable. Please try again shortly.</mat-banner>`
 
 3. **`DocumentUploadService`**:
+
    ```typescript
    uploadDocuments(validFiles: File[]): Observable<HttpEvent<UploadBatchResultDto>> {
      const formData = new FormData();
@@ -145,14 +149,17 @@ Build the patient-facing document upload UI within the Patient Dashboard. The fe
      return this.http.get<ClinicalDocumentDto[]>('/api/documents');
    }
    ```
+
    - On `HttpEventType.UploadProgress`: compute `Math.round(100 * event.loaded / event.total)` → update `uploadProgress` signal
    - On `HttpEventType.Response` (200): parse `UploadBatchResultDto.files[]` → `store.handleUploadResult(results)`
    - On 503: set `store.storageUnavailable = true`; do NOT retain partial file list in `selectedFiles`
 
 4. **Upload History `mat-table`** (AC-3):
+
    ```
    Columns: File Name | Upload Date | File Size | Status
    ```
+
    - `processingStatus` rendered as a `mat-chip`: Pending → grey (#9E9E9E), Processing → blue (#1565C0), Completed → green (#2E7D32), Failed → red (#C62828); all white text ≥4.5:1 contrast (WCAG 2.2 AA, NFR visual)
    - `aria-label` on each chip: `"Processing status: <status>"` (WCAG 2.2 AA — text alongside color)
    - Loading state: `<mat-progress-bar mode="indeterminate">` while `loadingHistory` is true
@@ -190,15 +197,15 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Client/src/app/patient/document-upload/document-upload.component.ts` | Host component: drop zone, file picker, validation display, upload button, result summary |
-| CREATE | `Client/src/app/patient/document-upload/document-upload.component.html` | Template: mat-card layout, drop zone, file list, mat-table history, banners |
-| CREATE | `Client/src/app/patient/document-upload/document-upload.component.scss` | Drop zone hover state, drag-over highlight, status chip colour classes |
-| CREATE | `Client/src/app/patient/document-upload/document-upload.store.ts` | NgRx Signals store: file state, validation errors, progress, history, result |
-| CREATE | `Client/src/app/patient/document-upload/document-upload.service.ts` | HTTP client: POST upload with progress, GET history |
-| CREATE | `Client/src/app/patient/document-upload/models/clinical-document.dto.ts` | `ClinicalDocumentDto`, `UploadBatchResultDto`, `UploadFileResult` interfaces |
-| MODIFY | `Client/src/app/patient/patient-routing.module.ts` | Add `/patient/documents` lazy route with `AuthGuard` |
+| Action | File Path                                                                | Description                                                                               |
+| ------ | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| CREATE | `Client/src/app/patient/document-upload/document-upload.component.ts`    | Host component: drop zone, file picker, validation display, upload button, result summary |
+| CREATE | `Client/src/app/patient/document-upload/document-upload.component.html`  | Template: mat-card layout, drop zone, file list, mat-table history, banners               |
+| CREATE | `Client/src/app/patient/document-upload/document-upload.component.scss`  | Drop zone hover state, drag-over highlight, status chip colour classes                    |
+| CREATE | `Client/src/app/patient/document-upload/document-upload.store.ts`        | NgRx Signals store: file state, validation errors, progress, history, result              |
+| CREATE | `Client/src/app/patient/document-upload/document-upload.service.ts`      | HTTP client: POST upload with progress, GET history                                       |
+| CREATE | `Client/src/app/patient/document-upload/models/clinical-document.dto.ts` | `ClinicalDocumentDto`, `UploadBatchResultDto`, `UploadFileResult` interfaces              |
+| MODIFY | `Client/src/app/patient/patient-routing.module.ts`                       | Add `/patient/documents` lazy route with `AuthGuard`                                      |
 
 ---
 
@@ -249,11 +256,11 @@ npx playwright test --grep "document upload"
 
 ## Implementation Checklist
 
-- [ ] Create `DocumentUploadComponent` with drag-and-drop drop zone (`role="button"`, `aria-label`), hidden `<input type="file" accept=".pdf,application/pdf" multiple>`, keyboard-accessible click handler (WCAG 2.2 AA)
-- [ ] Implement client-side validation: MIME type + `.pdf` extension check, per-file ≤25 MB, max 20 files batch; render per-file `mat-error` messages "File too large" / "Only PDF files are accepted" (AC-1, AC-4, FR-042)
-- [ ] Create `DocumentUploadStore` (NgRx Signals): signals for `selectedFiles`, `validationErrors`, `uploadProgress`, `isUploading`, `uploadHistory`, `uploadResult`, `storageUnavailable`
-- [ ] Create `DocumentUploadService`: `uploadDocuments(validFiles)` with `reportProgress: true` + `observe: 'events'` for progress tracking; `getUploadHistory()` for history panel
-- [ ] Build upload history `mat-table` (AC-3): columns `fileName`, `uploadedAt`, `fileSize`, `processingStatus`; status chips colour-coded (Pending/Processing/Completed/Failed) with `aria-label="Processing status: <value>"` (WCAG 2.2 AA text-alongside-colour)
-- [ ] Handle 503 storage-unavailable: show `mat-banner` "Please try again shortly"; reset `selectedFiles` to empty; do NOT show partial history entries
-- [ ] Handle partial batch failures: per-file `UploadFileResult` rendered in result summary; "Retry" button re-queues only failed `File` objects from cached `selectedFiles`
-- [ ] Add lazy route `/patient/documents` in `patient-routing.module.ts` guarded by `AuthGuard` (Patient role)
+- [x] Create `DocumentUploadComponent` with drag-and-drop drop zone (`role="button"`, `aria-label`), hidden `<input type="file" accept=".pdf,application/pdf" multiple>`, keyboard-accessible click handler (WCAG 2.2 AA)
+- [x] Implement client-side validation: MIME type + `.pdf` extension check, per-file ≤25 MB, max 20 files batch; render per-file `mat-error` messages "File too large" / "Only PDF files are accepted" (AC-1, AC-4, FR-042)
+- [x] Create `DocumentUploadStore` (NgRx Signals): signals for `selectedFiles`, `validationErrors`, `uploadProgress`, `isUploading`, `uploadHistory`, `uploadResult`, `storageUnavailable`
+- [x] Create `DocumentUploadService`: `uploadDocuments(validFiles)` with `reportProgress: true` + `observe: 'events'` for progress tracking; `getUploadHistory()` for history panel
+- [x] Build upload history `mat-table` (AC-3): columns `fileName`, `uploadedAt`, `fileSize`, `processingStatus`; status chips colour-coded (Pending/Processing/Completed/Failed) with `aria-label="Processing status: <value>"` (WCAG 2.2 AA text-alongside-colour)
+- [x] Handle 503 storage-unavailable: show `mat-banner` "Please try again shortly"; reset `selectedFiles` to empty; do NOT show partial history entries
+- [x] Handle partial batch failures: per-file `UploadFileResult` rendered in result summary; "Retry" button re-queues only failed `File` objects from cached `selectedFiles`
+- [x] Add lazy route `/patient/documents` in `patient-routing.module.ts` guarded by `AuthGuard` (Patient role)

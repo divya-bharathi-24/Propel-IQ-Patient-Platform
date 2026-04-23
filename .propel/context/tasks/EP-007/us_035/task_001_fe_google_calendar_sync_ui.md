@@ -17,31 +17,31 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type         | Value |
-| ---------------------- | ----- |
-| **UI Impact**          | Yes   |
-| **Figma URL**          | N/A   |
-| **Wireframe Status**   | PENDING |
-| **Wireframe Type**     | N/A   |
+| Reference Type         | Value                                                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **UI Impact**          | Yes                                                                                                                                  |
+| **Figma URL**          | N/A                                                                                                                                  |
+| **Wireframe Status**   | PENDING                                                                                                                              |
+| **Wireframe Type**     | N/A                                                                                                                                  |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-CALENDAR-SYNC-confirmation.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec**        | N/A (figma_spec.md not yet generated) |
-| **UXR Requirements**   | N/A (figma_spec.md not yet generated) |
-| **Design Tokens**      | N/A (designsystem.md not yet generated) |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                                |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                                |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                              |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer              | Technology            | Version |
-| ------------------ | --------------------- | ------- |
-| Frontend           | Angular               | 18.x    |
-| Frontend State     | NgRx Signals          | 18.x    |
-| Frontend UI        | Angular Material      | 18.x    |
-| Frontend Routing   | Angular Router        | 18.x    |
-| HTTP Client        | Angular HttpClient    | 18.x    |
-| Testing — Unit     | Jest / Angular Testing Library | — |
-| AI/ML              | N/A                   | N/A     |
-| Mobile             | N/A                   | N/A     |
+| Layer            | Technology                     | Version |
+| ---------------- | ------------------------------ | ------- |
+| Frontend         | Angular                        | 18.x    |
+| Frontend State   | NgRx Signals                   | 18.x    |
+| Frontend UI      | Angular Material               | 18.x    |
+| Frontend Routing | Angular Router                 | 18.x    |
+| HTTP Client      | Angular HttpClient             | 18.x    |
+| Testing — Unit   | Jest / Angular Testing Library | —       |
+| AI/ML            | N/A                            | N/A     |
+| Mobile           | N/A                            | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -76,6 +76,7 @@
 Implement the Angular 18 Google Calendar sync UI layer. The FE does not participate directly in the OAuth token exchange (server-side flow) — it initiates the flow by navigating to the BE-generated authorization URL and reacts to the result after the BE callback redirects back.
 
 **Key components:**
+
 - `CalendarSyncButtonComponent` — context-aware button: "Add to Google Calendar" (no sync), "Update Calendar Event" (already synced), "Reconnect Google" (token expired); disabled during `pending` state
 - `CalendarSyncStatusComponent` — renders sync status badge + event link (Synced) or ICS fallback + Retry button (Failed) or guidance message (Declined)
 - `CalendarSyncService` — HTTP client: `initiateGoogleSync(appointmentId)`, `getSyncStatus(appointmentId)`, `downloadIcs(appointmentId)`, `retrySyncRelink(appointmentId)`
@@ -94,14 +95,14 @@ Implement the Angular 18 Google Calendar sync UI layer. The FE does not particip
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `CalendarSyncButtonComponent` (standalone) | `client/src/app/shared/components/calendar-sync-button/` |
-| CREATE | `CalendarSyncStatusComponent` (standalone) | `client/src/app/shared/components/calendar-sync-status/` |
-| CREATE | `CalendarSyncStore` (NgRx Signals) | `client/src/app/features/patient/calendar/calendar-sync.store.ts` |
-| CREATE | `CalendarSyncService` | `client/src/app/core/services/calendar-sync.service.ts` |
-| MODIFY | Booking confirmation page component | Add `<app-calendar-sync-button>` and `<app-calendar-sync-status>` after appointment details section |
-| MODIFY | Patient dashboard appointment card component | Add `<app-calendar-sync-button>` to upcoming appointment card actions |
+| Status | Component / Module                           | Project                                                                                             |
+| ------ | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| CREATE | `CalendarSyncButtonComponent` (standalone)   | `client/src/app/shared/components/calendar-sync-button/`                                            |
+| CREATE | `CalendarSyncStatusComponent` (standalone)   | `client/src/app/shared/components/calendar-sync-status/`                                            |
+| CREATE | `CalendarSyncStore` (NgRx Signals)           | `client/src/app/features/patient/calendar/calendar-sync.store.ts`                                   |
+| CREATE | `CalendarSyncService`                        | `client/src/app/core/services/calendar-sync.service.ts`                                             |
+| MODIFY | Booking confirmation page component          | Add `<app-calendar-sync-button>` and `<app-calendar-sync-status>` after appointment details section |
+| MODIFY | Patient dashboard appointment card component | Add `<app-calendar-sync-button>` to upcoming appointment card actions                               |
 
 ---
 
@@ -163,14 +164,14 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `client/src/app/shared/components/calendar-sync-button/calendar-sync-button.component.ts` | Context-aware OAuth initiation button; full-window redirect; disabled state during pending |
-| CREATE | `client/src/app/shared/components/calendar-sync-status/calendar-sync-status.component.ts` | Sync status badge; event link (Synced); ICS download + Retry (Failed); guidance (Declined) |
-| CREATE | `client/src/app/features/patient/calendar/calendar-sync.store.ts` | NgRx Signals: syncStatus, eventLink, isSyncing signals; loadSyncStatus(), handleOAuthResult() |
-| CREATE | `client/src/app/core/services/calendar-sync.service.ts` | initiateGoogleSync (window.location.href redirect), getSyncStatus, downloadIcs (anchor download) |
-| MODIFY | `client/src/app/features/patient/appointments/booking-confirmation/booking-confirmation.component.ts` | Read `calendarResult` query param on init; dispatch to CalendarSyncStore; embed CalendarSyncButtonComponent + CalendarSyncStatusComponent |
-| MODIFY | `client/src/app/features/patient/appointments/upcoming-appointment-card/upcoming-appointment-card.component.ts` | Add `<app-calendar-sync-button>` to card actions |
+| Action | File Path                                                                                                       | Description                                                                                                                               |
+| ------ | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `client/src/app/shared/components/calendar-sync-button/calendar-sync-button.component.ts`                       | Context-aware OAuth initiation button; full-window redirect; disabled state during pending                                                |
+| CREATE | `client/src/app/shared/components/calendar-sync-status/calendar-sync-status.component.ts`                       | Sync status badge; event link (Synced); ICS download + Retry (Failed); guidance (Declined)                                                |
+| CREATE | `client/src/app/features/patient/calendar/calendar-sync.store.ts`                                               | NgRx Signals: syncStatus, eventLink, isSyncing signals; loadSyncStatus(), handleOAuthResult()                                             |
+| CREATE | `client/src/app/core/services/calendar-sync.service.ts`                                                         | initiateGoogleSync (window.location.href redirect), getSyncStatus, downloadIcs (anchor download)                                          |
+| MODIFY | `client/src/app/features/patient/appointments/booking-confirmation/booking-confirmation.component.ts`           | Read `calendarResult` query param on init; dispatch to CalendarSyncStore; embed CalendarSyncButtonComponent + CalendarSyncStatusComponent |
+| MODIFY | `client/src/app/features/patient/appointments/upcoming-appointment-card/upcoming-appointment-card.component.ts` | Add `<app-calendar-sync-button>` to card actions                                                                                          |
 
 ---
 
@@ -206,22 +207,22 @@ ng test
 
 ## Implementation Validation Strategy
 
-- [ ] "Add to Google Calendar" button on booking confirmation page: clicking performs `window.location.href` to `GET /api/calendar/google/auth?appointmentId={id}` (NOT Angular router navigation)
-- [ ] After OAuth success: `calendarResult=success` query param → `CalendarSyncStore.syncStatus = 'synced'`; Google Calendar event link shown in `CalendarSyncStatusComponent`
-- [ ] After OAuth decline: `calendarResult=declined` → amber "Not connected" badge + guidance text shown; "Add to Google Calendar" button still present
-- [ ] `syncStatus = 'failed'`: ICS download button triggers browser download (Content-Disposition: attachment); Retry button re-initiates OAuth flow
-- [ ] External Google Calendar event link has `rel="noopener noreferrer"` and `target="_blank"` (security)
-- [ ] Duplicate sync: second visit shows "Update Calendar Event" button when `syncStatus = 'synced'`
-- [ ] Query params cleaned from URL after reading `calendarResult` (`replaceUrl: true`)
+- [x] "Add to Google Calendar" button on booking confirmation page: clicking performs `window.location.href` to `GET /api/calendar/google/auth?appointmentId={id}` (NOT Angular router navigation)
+- [x] After OAuth success: `calendarResult=success` query param → `CalendarSyncStore.syncStatus = 'synced'`; Google Calendar event link shown in `CalendarSyncStatusComponent`
+- [x] After OAuth decline: `calendarResult=declined` → amber "Not connected" badge + guidance text shown; "Add to Google Calendar" button still present
+- [x] `syncStatus = 'failed'`: ICS download button triggers browser download (Content-Disposition: attachment); Retry button re-initiates OAuth flow
+- [x] External Google Calendar event link has `rel="noopener noreferrer"` and `target="_blank"` (security)
+- [x] Duplicate sync: second visit shows "Update Calendar Event" button when `syncStatus = 'synced'`
+- [x] Query params cleaned from URL after reading `calendarResult` (`replaceUrl: true`)
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Create `CalendarSyncStore` (NgRx Signals): `syncStatus`, `eventLink`, `isSyncing` signals; `loadSyncStatus(appointmentId)` calls `GET /api/calendar/google/status/{id}`; `handleOAuthResult(result)` updates local signal
-- [ ] Create `CalendarSyncService`: `initiateGoogleSync()` → `window.location.href` redirect to `GET /api/calendar/google/auth?appointmentId=`; `getSyncStatus()` → `GET /api/calendar/google/status/{id}`; `downloadIcs()` → anchor download
-- [ ] Create `CalendarSyncButtonComponent`: context-aware label (Add / Update / Reconnect / disabled-spinner); `window.location.href` on click; `aria-label` on button
-- [ ] Create `CalendarSyncStatusComponent`: Synced → green chip + external link (`rel="noopener noreferrer"`); Failed → red chip + ICS download + Retry; Declined → amber chip + guidance text
-- [ ] Modify booking confirmation component: read `calendarResult` + `appointmentId` from `queryParamMap` on init; dispatch to store; clean params with `replaceUrl: true`; embed `<app-calendar-sync-button>` and `<app-calendar-sync-status>`
-- [ ] Modify upcoming appointment card: embed `<app-calendar-sync-button [appointmentId]="appointment.id" />`
-- [ ] Validate WCAG 2.2 AA: status badges include text label alongside color; external link aria-label includes destination description
+- [x] Create `CalendarSyncStore` (NgRx Signals): `syncStatus`, `eventLink`, `isSyncing` signals; `loadSyncStatus(appointmentId)` calls `GET /api/calendar/google/status/{id}`; `handleOAuthResult(result)` updates local signal
+- [x] Create `CalendarSyncService`: `initiateGoogleSync()` → `window.location.href` redirect to `GET /api/calendar/google/auth?appointmentId=`; `getSyncStatus()` → `GET /api/calendar/google/status/{id}`; `downloadIcs()` → anchor download
+- [x] Create `CalendarSyncButtonComponent`: context-aware label (Add / Update / Reconnect / disabled-spinner); `window.location.href` on click; `aria-label` on button
+- [x] Create `CalendarSyncStatusComponent`: Synced → green chip + external link (`rel="noopener noreferrer"`); Failed → red chip + ICS download + Retry; Declined → amber chip + guidance text
+- [x] Modify booking confirmation component: read `calendarResult` + `appointmentId` from `queryParamMap` on init; dispatch to store; clean params with `replaceUrl: true`; embed `<app-calendar-sync-button>` and `<app-calendar-sync-status>`
+- [x] Modify upcoming appointment card: embed `<app-calendar-sync-button [appointmentId]="appointment.id" />`
+- [x] Validate WCAG 2.2 AA: status badges include text label alongside color; external link aria-label includes destination description

@@ -1,0 +1,162 @@
+<section class="history-panel" aria-labelledby="history-heading">
+  <h2 id="history-heading" class="panel-title">Document History</h2>
+
+  <!-- ── Loading state ─────────────────────────────────────────────────── -->
+  @if (isLoading()) {
+    <p class="state-message" role="status" aria-label="Loading documents…">
+      Loading documents…
+    </p>
+  }
+
+  <!-- ── Load error ────────────────────────────────────────────────────── -->
+  @else if (loadError()) {
+    <p class="state-message error-message" role="alert">
+      {{ loadError() }}
+    </p>
+  }
+
+  <!-- ── Empty state ───────────────────────────────────────────────────── -->
+  @else if (documents().length === 0) {
+    <p class="state-message empty-message">No documents uploaded yet.</p>
+  }
+
+  <!-- ── Document list ─────────────────────────────────────────────────── -->
+  @else {
+    <ul class="document-list" aria-label="Patient document history">
+      @for (doc of documents(); track doc.id) {
+        <li class="document-row">
+          <!-- File name & size -->
+          <div class="doc-primary">
+            <span class="doc-name" title="{{ doc.fileName }}">
+              {{ doc.fileName }}
+            </span>
+            <span class="doc-size">{{ formatFileSize(doc.fileSize) }}</span>
+          </div>
+
+          <!-- Source type badge -->
+          <span
+            class="source-badge"
+            [class.badge--staff]="doc.sourceType === 'StaffUpload'"
+            [class.badge--patient]="doc.sourceType === 'PatientUpload'"
+            [attr.aria-label]="
+              doc.sourceType === 'StaffUpload'
+                ? 'Source: Staff Upload'
+                : 'Source: Patient Upload'
+            "
+          >
+            {{
+              doc.sourceType === "StaffUpload"
+                ? "Staff Upload"
+                : "Patient Upload"
+            }}
+          </span>
+
+          <!-- Staff name (Staff uploads only) -->
+          @if (doc.sourceType === "StaffUpload" && doc.uploadedByName) {
+            <span class="doc-meta">
+              <span class="meta-label">By:</span>
+              {{ doc.uploadedByName }}
+            </span>
+          }
+
+          <!-- Encounter reference -->
+          <span class="doc-meta">
+            <span class="meta-label">Encounter:</span>
+            {{ doc.encounterReference ?? "—" }}
+          </span>
+
+          <!-- Upload timestamp -->
+          <span class="doc-meta">
+            <span class="meta-label">Uploaded:</span>
+            {{ doc.uploadedAt | date: "dd MMM yyyy, HH:mm" }}
+          </span>
+
+          <!-- Processing status chip -->
+          <span
+            class="status-chip"
+            [class.chip--pending]="doc.processingStatus === 'Pending'"
+            [class.chip--processing]="doc.processingStatus === 'Processing'"
+            [class.chip--completed]="doc.processingStatus === 'Completed'"
+            [class.chip--failed]="doc.processingStatus === 'Failed'"
+          >
+            {{ doc.processingStatus }}
+          </span>
+
+          <!-- Soft-delete button (staff uploads within 24 h) -->
+          @if (doc.isDeletable) {
+            <button
+              type="button"
+              class="delete-btn"
+              aria-label="Delete {{ doc.fileName }}"
+              (click)="openDeleteConfirmation(doc.id)"
+            >
+              🗑
+            </button>
+          }
+
+          <!-- Inline delete confirmation panel -->
+          @if (deletingId() === doc.id) {
+            <div
+              class="delete-confirm-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirm deletion of {{ doc.fileName }}"
+            >
+              <p class="confirm-message">
+                Please provide a reason for deleting this document.
+              </p>
+              <label for="deletionReason-{{ doc.id }}" class="field-label">
+                Deletion Reason
+                <span class="required-star" aria-hidden="true">*</span>
+              </label>
+              <textarea
+                id="deletionReason-{{ doc.id }}"
+                class="reason-textarea"
+                rows="3"
+                placeholder="Minimum 10 characters"
+                [value]="deletionReason()"
+                (input)="deletionReason.set($any($event.target).value)"
+                aria-required="true"
+                aria-describedby="deleteError-{{ doc.id }}"
+              ></textarea>
+
+              @if (deleteError()) {
+                <span
+                  id="deleteError-{{ doc.id }}"
+                  class="field-error"
+                  role="alert"
+                >
+                  {{ deleteError() }}
+                </span>
+              }
+
+              <div class="confirm-actions">
+                <button
+                  type="button"
+                  class="cancel-btn"
+                  (click)="cancelDelete()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="confirm-delete-btn"
+                  (click)="confirmDelete(doc.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <!-- ── Global delete error (revert notification) ─────────────────────── -->
+  @if (!deletingId() && deleteError()) {
+    <p class="state-message error-message" role="alert">
+      {{ deleteError() }}
+    </p>
+  }
+</section>

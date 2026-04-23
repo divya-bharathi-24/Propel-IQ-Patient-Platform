@@ -10,6 +10,8 @@ namespace Propel.Api.Gateway.Data.Configurations;
 /// Key design decisions:
 ///   - <c>score</c> is constrained to [0, 1] by a database CHECK constraint (AC-edge).
 ///   - <c>factors</c> is mapped as JSONB to hold contributing risk factor payloads (FR-040).
+///   - <c>severity</c> VARCHAR(10) NOT NULL DEFAULT 'Medium' added by migration
+///     <c>AddSeverityToNoShowRisks</c> (us_031, task_002).
 ///   - One-to-one relationship with <see cref="Appointment"/>: the risk record is
 ///     fully derived from the appointment and should cascade-delete when the appointment
 ///     is removed (acceptable deviation from DR-009 for this derived entity).
@@ -28,6 +30,12 @@ public sealed class NoShowRiskConfiguration : IEntityTypeConfiguration<NoShowRis
         builder.Property(r => r.Score)
                .HasPrecision(4, 3);
 
+        // severity VARCHAR(10) NOT NULL DEFAULT 'Medium' (us_031, AddSeverityToNoShowRisks migration)
+        builder.Property(r => r.Severity)
+               .HasMaxLength(10)
+               .IsRequired()
+               .HasDefaultValue("Medium");
+
         // JSONB column — stores contributing risk factor breakdown (FR-040)
         builder.Property(r => r.Factors)
                .HasColumnType("jsonb")
@@ -37,10 +45,11 @@ public sealed class NoShowRiskConfiguration : IEntityTypeConfiguration<NoShowRis
                .HasColumnType("timestamp with time zone");
 
         // One-to-one with Appointment — Cascade: risk record is derived from appointment (FR-040)
-        // Appointment entity does not expose NoShowRisk navigation property → WithOne() is parameterless.
+        // Appointment.NoShowRisk navigation property added in us_031/task_002.
         builder.HasOne(r => r.Appointment)
-               .WithOne()
+               .WithOne(a => a.NoShowRisk)
                .HasForeignKey<NoShowRisk>(r => r.AppointmentId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }
+

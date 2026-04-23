@@ -1,0 +1,58 @@
+<h2 mat-dialog-title id="reauth-dialog-title">Confirm your password</h2>
+
+<mat-dialog-content>
+  <p class="action-description">
+    Enter your current password to {{ data.actionLabel }}.
+  </p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Current password</mat-label>
+    <input
+      matInput
+      type="password"
+      [formControl]="passwordControl"
+      autocomplete="current-password"
+      aria-label="Current password"
+      (keyup.enter)="onSubmit()"
+    />
+  </mat-form-field>
+
+  @if (inlineError()) {
+    <p class="inline-error" role="alert" aria-live="assertive">
+      <mat-icon aria-hidden="true" class="error-icon">error_outline</mat-icon>
+      {{ inlineError() }}
+    </p>
+  }
+
+  <p class="countdown-text" aria-live="polite">
+    Action will time out in
+    <strong>{{ countdownDisplay() }}</strong>
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="loading()"
+    aria-label="Cancel re-authentication"
+  >
+    Cancel
+  </button>
+
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="passwordControl.invalid || loading()"
+    aria-label="Confirm password and proceed"
+  >
+    @if (loading()) {
+      <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
+    } @else {
+      Confirm
+    }
+  </button>
+</mat-dialog-actions>

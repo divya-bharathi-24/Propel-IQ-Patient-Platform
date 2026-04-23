@@ -43,6 +43,24 @@ public sealed class CalendarSyncConfiguration : IEntityTypeConfiguration<Calenda
         builder.Property(cs => cs.SyncedAt)
                .HasColumnType("timestamp with time zone");
 
+        builder.Property(cs => cs.EventLink)
+               .HasMaxLength(2000);
+
+        builder.Property(cs => cs.RetryScheduledAt)
+               .HasColumnType("timestamp with time zone");
+
+        // ── US_037 retry queue columns ────────────────────────────────────────────────
+        // RetryAt: set to UtcNow+10min on failure; null when no retry is pending (AC-3).
+        builder.Property(cs => cs.RetryAt)
+               .HasColumnType("timestamp with time zone")
+               .IsRequired(false);
+
+        // LastOperation: "Update" or "Delete" — drives the re-invocation path in the
+        // retry processor; null until US_037 propagation logic sets it (AC-3).
+        builder.Property(cs => cs.LastOperation)
+               .HasMaxLength(10)
+               .IsRequired(false);
+
         builder.Property(cs => cs.CreatedAt)
                .HasColumnType("timestamp with time zone");
 
@@ -69,5 +87,11 @@ public sealed class CalendarSyncConfiguration : IEntityTypeConfiguration<Calenda
         // Index: appointment-scoped calendar sync lookups
         builder.HasIndex(cs => cs.AppointmentId)
                .HasDatabaseName("ix_calendar_sync_appointment_id");
+
+        // Partial index: drives the efficient retry-queue poll in GetDueForRetryAsync (AC-3, EC-2).
+        // Covers only rows where sync_status = 'Failed', avoiding full-table scans on large datasets.
+        builder.HasIndex(cs => cs.RetryAt)
+               .HasFilter("\"sync_status\" = 'Failed'")
+               .HasDatabaseName("ix_calendar_syncs_retry_at_failed");
     }
 }

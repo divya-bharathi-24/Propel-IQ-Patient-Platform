@@ -1,0 +1,132 @@
+<main class="ai-intake-page" aria-label="AI-Assisted Intake Chat">
+  <!-- ── Page header ─────────────────────────────────────────────────── -->
+  <header class="ai-intake-page__header">
+    <h1 class="ai-intake-page__title">AI-Assisted Intake</h1>
+    <p class="ai-intake-page__subtitle">
+      Answer the questions below. Your responses will auto-fill the form on the
+      right.
+    </p>
+  </header>
+
+  <!-- ── Two-panel layout ───────────────────────────────────────────── -->
+  <div class="ai-intake-layout">
+    <!-- ── LEFT: Chat panel ─────────────────────────────────────────── -->
+    <section class="chat-panel" aria-label="Intake conversation">
+      <!-- Message log -->
+      <div
+        #chatContainer
+        class="chat-panel__messages"
+        role="log"
+        aria-live="polite"
+        aria-label="Conversation messages"
+        aria-atomic="false"
+      >
+        @for (msg of store.messages(); track msg.timestamp) {
+          <div
+            class="chat-message"
+            [class.chat-message--user]="msg.role === 'user'"
+            [class.chat-message--assistant]="msg.role === 'assistant'"
+          >
+            <span class="sr-only"
+              >{{ msg.role === "user" ? "You" : "AI Assistant" }}:</span
+            >
+            <p class="chat-message__text">{{ msg.content }}</p>
+            <time
+              class="chat-message__time"
+              [attr.datetime]="msg.timestamp.toISOString()"
+            >
+              {{ msg.timestamp | date: "shortTime" }}
+            </time>
+          </div>
+        }
+
+        @if (isPending()) {
+          <div
+            class="chat-message chat-message--assistant chat-message--pending"
+            aria-live="polite"
+            aria-label="AI is typing"
+          >
+            <span class="chat-message__typing-dots">
+              <span></span><span></span><span></span>
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- ── Confirmation step ─────────────────────────────────────── -->
+      @if (showConfirmation()) {
+        <div
+          class="chat-panel__confirmation"
+          role="region"
+          aria-label="Review and confirm your intake information"
+        >
+          <p class="chat-panel__confirmation-prompt">
+            Please review your information on the right and confirm below.
+          </p>
+          <button
+            mat-flat-button
+            color="primary"
+            class="chat-panel__confirm-btn"
+            (click)="submitIntake()"
+            [disabled]="store.isSubmitting()"
+            aria-label="Confirm and submit intake form"
+          >
+            @if (store.isSubmitting()) {
+              <mat-spinner diameter="20" strokeWidth="2" aria-hidden="true" />
+              Submitting…
+            } @else {
+              Confirm &amp; Submit
+            }
+          </button>
+        </div>
+      }
+
+      <!-- ── Input area ────────────────────────────────────────────── -->
+      @if (!showConfirmation()) {
+        <div
+          class="chat-panel__input-row"
+          role="group"
+          aria-label="Message input area"
+        >
+          <mat-form-field appearance="outline" class="chat-panel__input-field">
+            <textarea
+              matInput
+              rows="2"
+              placeholder="Type your response…"
+              [ngModel]="userInput()"
+              (ngModelChange)="userInput.set($event)"
+              (keydown)="onKeydown($event)"
+              [disabled]="isPending() || store.chatMode() === 'fallback_manual'"
+              aria-label="Your message"
+              aria-multiline="true"
+            ></textarea>
+          </mat-form-field>
+
+          <button
+            mat-icon-button
+            color="primary"
+            class="chat-panel__send-btn"
+            (click)="sendMessage()"
+            [disabled]="
+              isPending() ||
+              !userInput().trim() ||
+              store.chatMode() === 'fallback_manual'
+            "
+            aria-label="Send message"
+          >
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- ── RIGHT: Live preview panel ────────────────────────────────── -->
+    <aside class="preview-column" aria-label="Live form preview">
+      <app-intake-preview-panel
+        #previewPanel
+        [extractedFields]="store.extractedFields()"
+        [editMode]="showConfirmation()"
+      />
+    </aside>
+  </div>
+</main>

@@ -26,23 +26,25 @@ public sealed class QueueEntryConfiguration : IEntityTypeConfiguration<QueueEntr
                .IsRequired();
 
         builder.Property(q => q.ArrivalTime)
-               .HasColumnType("timestamp with time zone");
+               .HasColumnType("timestamp with time zone")
+               .IsRequired(false);
 
         builder.Property(q => q.Status)
                .HasConversion<string>()
                .HasMaxLength(20)
                .IsRequired();
 
-        // FK: queue_entries → patients (Restrict — no cascade delete per DR-009)
+        // FK: queue_entries → patients (optional for anonymous walk-ins; Restrict — no cascade delete per DR-009)
         builder.HasOne(q => q.Patient)
                .WithMany()
                .HasForeignKey(q => q.PatientId)
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Restrict);
 
         // One-to-one with Appointment — Restrict: appointment record must be preserved (DR-009)
-        // Appointment entity does not expose QueueEntry navigation property → WithOne() is parameterless.
+        // Appointment.QueueEntry navigation property enables same-day queue projection (US_027).
         builder.HasOne(q => q.Appointment)
-               .WithOne()
+               .WithOne(a => a.QueueEntry)
                .HasForeignKey<QueueEntry>(q => q.AppointmentId)
                .OnDelete(DeleteBehavior.Restrict);
 

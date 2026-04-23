@@ -1,0 +1,157 @@
+<section class="quick-create-patient" aria-label="Create new patient record">
+  <h3 id="quick-create-title" class="form-section-title">
+    New Patient Details
+  </h3>
+
+  <!-- Duplicate email warning (HTTP 409) -->
+  @if (store.duplicatePatient()) {
+    <mat-card
+      class="duplicate-warning"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <mat-card-content>
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <p>
+          A patient with this email already exists:
+          <strong>{{ store.duplicatePatient()!.name }}</strong>
+        </p>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="onLinkToExisting()"
+          [disabled]="store.actionState() === 'submitting'"
+          [attr.aria-label]="
+            'Link to existing patient ' + store.duplicatePatient()!.name
+          "
+        >
+          @if (store.actionState() === "submitting") {
+            <mat-spinner diameter="16" aria-label="Linking…"></mat-spinner>
+          } @else {
+            Link to existing patient
+          }
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- General submission error -->
+  @if (store.actionState() === "error" && store.errorMessage()) {
+    <div
+      class="inline-error"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      {{ store.errorMessage() }}
+    </div>
+  }
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    aria-describedby="quick-create-instructions"
+  >
+    <p id="quick-create-instructions" class="sr-only">
+      Name and email are required. Contact number is optional and must be in
+      E.164 international format.
+    </p>
+
+    <!-- Patient Name -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Patient Name</mat-label>
+      <input
+        matInput
+        id="qc-name"
+        formControlName="name"
+        type="text"
+        autocomplete="name"
+        [attr.aria-invalid]="nameControl.invalid && nameControl.touched"
+        aria-required="true"
+      />
+      @if (nameControl.hasError("required") && nameControl.touched) {
+        <mat-error>Name is required.</mat-error>
+      }
+      @if (nameControl.hasError("maxlength") && nameControl.touched) {
+        <mat-error>Name must not exceed 200 characters.</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Contact Number -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contact Number (optional)</mat-label>
+      <input
+        matInput
+        id="qc-contact"
+        formControlName="contactNumber"
+        type="tel"
+        autocomplete="tel"
+        placeholder="+14155552671"
+        [attr.aria-invalid]="
+          contactNumberControl.invalid && contactNumberControl.touched
+        "
+      />
+      <mat-hint>International format, e.g. +14155552671</mat-hint>
+      @if (
+        contactNumberControl.hasError("pattern") && contactNumberControl.touched
+      ) {
+        <mat-error
+          >Enter a valid phone number in international format (e.g.
+          +14155552671).</mat-error
+        >
+      }
+    </mat-form-field>
+
+    <!-- Email -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email Address</mat-label>
+      <input
+        matInput
+        id="qc-email"
+        formControlName="email"
+        type="email"
+        autocomplete="email"
+        [attr.aria-invalid]="emailControl.invalid && emailControl.touched"
+        aria-required="true"
+      />
+      @if (emailControl.hasError("required") && emailControl.touched) {
+        <mat-error>Email is required.</mat-error>
+      }
+      @if (emailControl.hasError("email") && emailControl.touched) {
+        <mat-error>Enter a valid email address.</mat-error>
+      }
+      @if (emailControl.hasError("maxlength") && emailControl.touched) {
+        <mat-error>Email must not exceed 254 characters.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-actions">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="onBack()"
+        aria-label="Back to patient search"
+      >
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        Back
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="store.actionState() === 'submitting'"
+        aria-label="Create patient and book walk-in"
+      >
+        @if (store.actionState() === "submitting") {
+          <mat-spinner diameter="20" aria-label="Submitting…"></mat-spinner>
+        } @else {
+          Create & Book Walk-In
+        }
+      </button>
+    </div>
+  </form>
+</section>

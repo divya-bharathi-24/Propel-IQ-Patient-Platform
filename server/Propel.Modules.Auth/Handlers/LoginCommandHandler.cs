@@ -92,7 +92,8 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         var refreshToken = new RefreshToken
         {
             Id        = Guid.NewGuid(),
-            UserId    = patient.Id,
+            PatientId = patient.Id,
+            UserId    = null,
             TokenHash = tokenHash,
             FamilyId  = Guid.NewGuid(), // new family per login session
             DeviceId  = request.DeviceId,
@@ -120,6 +121,6 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
 
         _logger.LogInformation("Patient {PatientId} logged in from device {DeviceId}", patient.Id, request.DeviceId);
 
-        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900);
+        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900, patient.Id.ToString(), PatientRole, request.DeviceId);
     }
 }

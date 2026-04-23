@@ -1,0 +1,29 @@
+.action-description {
+  margin: 0 0 16px;
+  color: var(--mat-dialog-subheader-text-color, rgba(0, 0, 0, 0.6));
+}
+
+.full-width {
+  width: 100%;
+}
+
+.inline-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  color: var(--mat-error-color, #b00020);
+  font-size: 14px;
+
+  .error-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+}
+
+.countdown-text {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--mat-dialog-subheader-text-color, rgba(0, 0, 0, 0.54));
+}

@@ -36,4 +36,5 @@ public sealed class InsuranceValidation
 
     // Navigation properties
     public Patient Patient { get; set; } = null!;
+    public Appointment? Appointment { get; set; }
 }

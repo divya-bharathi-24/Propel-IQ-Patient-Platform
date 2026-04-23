@@ -14,16 +14,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | Yes |
-| **Figma URL** | N/A |
-| **Wireframe Status** | PENDING |
-| **Wireframe Type** | N/A |
+| Reference Type         | Value                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                             |
+| **Figma URL**          | N/A                                                                                                                             |
+| **Wireframe Status**   | PENDING                                                                                                                         |
+| **Wireframe Type**     | N/A                                                                                                                             |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-staff-note-upload.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec** | N/A (figma_spec.md not yet generated) |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated) |
-| **Design Tokens** | N/A (designsystem.md not yet generated) |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                           |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                           |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                         |
 
 ### **CRITICAL: Wireframe Implementation Requirement**
 
@@ -36,46 +36,47 @@
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | Angular | 18.x |
-| Frontend State | NgRx Signals | 18.x |
-| Backend | ASP.NET Core Web API | .net 10 |
-| Database | PostgreSQL | 16+ |
-| Library | Angular Router | 18.x |
-| Library | Angular `HttpClient` | 18.x |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer          | Technology           | Version |
+| -------------- | -------------------- | ------- |
+| Frontend       | Angular              | 18.x    |
+| Frontend State | NgRx Signals         | 18.x    |
+| Backend        | ASP.NET Core Web API | .net 10 |
+| Database       | PostgreSQL           | 16+     |
+| Library        | Angular Router       | 18.x    |
+| Library        | Angular `HttpClient` | 18.x    |
+| AI/ML          | N/A                  | N/A     |
+| Vector Store   | N/A                  | N/A     |
+| AI Gateway     | N/A                  | N/A     |
+| Mobile         | N/A                  | N/A     |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
 Implement `StaffNoteUploadComponent` — an Angular 18 standalone, `ChangeDetectionStrategy.OnPush` component surfaced on the patient record page (`/staff/patients/:patientId`). The component allows authenticated Staff users to upload a single post-visit clinical note PDF with an optional encounter reference, view the patient's full document history, and soft-delete their own recently uploaded notes.
 
 **Upload flow:**
+
 1. Staff selects a single PDF file via `<input type="file" accept=".pdf">`.
 2. Client-side validation: MIME type (`application/pdf`) + size ≤ 25 MB. Display per-field error if invalid.
 3. Staff enters an optional encounter reference (appointment ID or reference string).
@@ -85,6 +86,7 @@ Implement `StaffNoteUploadComponent` — an Angular 18 standalone, `ChangeDetect
 7. On success: reset form, reload document history.
 
 **Document history (`DocumentHistoryListComponent`):**
+
 - Displays `DocumentHistoryItemDto[]` loaded from `GET /api/staff/patients/{patientId}/documents`.
 - Each row shows: file name, file size, `sourceType` badge ("Staff Upload" amber / "Patient Upload" blue), staff member name (if Staff Upload), encounter reference (or "—"), upload timestamp, processing status chip (Pending / Processing / Completed / Failed).
 - **Soft-delete:** For `sourceType = 'StaffUpload'` documents uploaded within 24 hours of current time, render a "Delete" icon button. Clicking opens a confirmation dialog with a required `DeletionReason` text area (min 10 chars). On confirm → `DELETE /api/staff/documents/{id}` with `{ reason }` body. Optimistically removes from list; reverts on error.
@@ -113,33 +115,37 @@ interface StaffNoteUploadState {
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `StaffNoteUploadComponent` | NEW | `app/features/staff/patient-record/note-upload/staff-note-upload.component.ts` |
-| `DocumentHistoryListComponent` | NEW or EXTEND | `app/features/documents/document-history-list/document-history-list.component.ts` |
-| `StaffDocumentService` | NEW | `app/features/staff/patient-record/staff-document.service.ts` |
-| `StaffDocumentModels` | NEW | `app/features/staff/patient-record/staff-document.models.ts` |
-| `StaffPatientRecordComponent` | MODIFY | Add `<app-staff-note-upload [patientId]="...">` and `<app-document-history-list [patientId]="...">` tabs |
-| `AppRoutingModule` | VERIFY | `/staff/patients/:patientId` route protected by `staffGuard` |
+| Component                      | Status        | Location                                                                                                 |
+| ------------------------------ | ------------- | -------------------------------------------------------------------------------------------------------- |
+| `StaffNoteUploadComponent`     | NEW           | `app/features/staff/patient-record/note-upload/staff-note-upload.component.ts`                           |
+| `DocumentHistoryListComponent` | NEW or EXTEND | `app/features/documents/document-history-list/document-history-list.component.ts`                        |
+| `StaffDocumentService`         | NEW           | `app/features/staff/patient-record/staff-document.service.ts`                                            |
+| `StaffDocumentModels`          | NEW           | `app/features/staff/patient-record/staff-document.models.ts`                                             |
+| `StaffPatientRecordComponent`  | MODIFY        | Add `<app-staff-note-upload [patientId]="...">` and `<app-document-history-list [patientId]="...">` tabs |
+| `AppRoutingModule`             | VERIFY        | `/staff/patients/:patientId` route protected by `staffGuard`                                             |
 
 ## Implementation Plan
 
 1. **TypeScript models** (`staff-document.models.ts`):
 
    ```typescript
-   export type DocumentSourceType = 'PatientUpload' | 'StaffUpload';
-   export type DocumentProcessingStatus = 'Pending' | 'Processing' | 'Completed' | 'Failed';
+   export type DocumentSourceType = "PatientUpload" | "StaffUpload";
+   export type DocumentProcessingStatus =
+     | "Pending"
+     | "Processing"
+     | "Completed"
+     | "Failed";
 
    export interface DocumentHistoryItemDto {
      id: string;
      fileName: string;
      fileSize: number;
      sourceType: DocumentSourceType;
-     uploadedByName: string | null;  // staff full name for StaffUpload
+     uploadedByName: string | null; // staff full name for StaffUpload
      encounterReference: string | null;
      processingStatus: DocumentProcessingStatus;
-     uploadedAt: string;             // ISO 8601
-     isDeletable: boolean;           // computed by BE: StaffUpload && within 24h
+     uploadedAt: string; // ISO 8601
+     isDeletable: boolean; // computed by BE: StaffUpload && within 24h
    }
 
    export interface UploadNoteResponse {
@@ -152,27 +158,41 @@ interface StaffNoteUploadState {
 2. **`StaffDocumentService`**:
 
    ```typescript
-   @Injectable({ providedIn: 'root' })
+   @Injectable({ providedIn: "root" })
    export class StaffDocumentService {
      private readonly http = inject(HttpClient);
 
-     uploadNote(patientId: string, file: File, encounterRef: string | null): Observable<HttpEvent<UploadNoteResponse>> {
+     uploadNote(
+       patientId: string,
+       file: File,
+       encounterRef: string | null,
+     ): Observable<HttpEvent<UploadNoteResponse>> {
        const form = new FormData();
-       form.append('patientId', patientId);
-       form.append('file', file, file.name);
-       if (encounterRef) form.append('encounterReference', encounterRef);
-       return this.http.post<UploadNoteResponse>('/api/staff/documents/upload', form, {
-         reportProgress: true,
-         observe: 'events'
-       });
+       form.append("patientId", patientId);
+       form.append("file", file, file.name);
+       if (encounterRef) form.append("encounterReference", encounterRef);
+       return this.http.post<UploadNoteResponse>(
+         "/api/staff/documents/upload",
+         form,
+         {
+           reportProgress: true,
+           observe: "events",
+         },
+       );
      }
 
-     getDocumentHistory(patientId: string): Observable<DocumentHistoryItemDto[]> {
-       return this.http.get<DocumentHistoryItemDto[]>(`/api/staff/patients/${patientId}/documents`);
+     getDocumentHistory(
+       patientId: string,
+     ): Observable<DocumentHistoryItemDto[]> {
+       return this.http.get<DocumentHistoryItemDto[]>(
+         `/api/staff/patients/${patientId}/documents`,
+       );
      }
 
      deleteDocument(id: string, reason: string): Observable<void> {
-       return this.http.delete<void>(`/api/staff/documents/${id}`, { body: { reason } });
+       return this.http.delete<void>(`/api/staff/documents/${id}`, {
+         body: { reason },
+       });
      }
    }
    ```
@@ -182,7 +202,7 @@ interface StaffNoteUploadState {
    ```typescript
    @Component({
      standalone: true,
-     selector: 'app-staff-note-upload',
+     selector: "app-staff-note-upload",
      changeDetection: ChangeDetectionStrategy.OnPush,
    })
    export class StaffNoteUploadComponent {
@@ -191,48 +211,75 @@ interface StaffNoteUploadState {
      private readonly destroyRef = inject(DestroyRef);
 
      uploadState = signal<StaffNoteUploadState>({
-       isUploading: false, uploadProgress: 0, encounterWarning: false,
-       serverError: null, validationErrors: {}
+       isUploading: false,
+       uploadProgress: 0,
+       encounterWarning: false,
+       serverError: null,
+       validationErrors: {},
      });
 
      selectedFile = signal<File | null>(null);
-     encounterRef = signal<string>('');
+     encounterRef = signal<string>("");
 
      onFileSelected(event: Event): void {
        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
        if (!file) return;
        const errors: { file?: string } = {};
-       if (file.type !== 'application/pdf') errors.file = 'Only PDF files are accepted';
-       else if (file.size > 25 * 1024 * 1024) errors.file = 'File too large — maximum 25 MB';
-       this.uploadState.update(s => ({ ...s, validationErrors: errors, serverError: null }));
+       if (file.type !== "application/pdf")
+         errors.file = "Only PDF files are accepted";
+       else if (file.size > 25 * 1024 * 1024)
+         errors.file = "File too large — maximum 25 MB";
+       this.uploadState.update((s) => ({
+         ...s,
+         validationErrors: errors,
+         serverError: null,
+       }));
        if (!errors.file) this.selectedFile.set(file);
      }
 
      upload(): void {
        const file = this.selectedFile();
        if (!file) return;
-       this.uploadState.update(s => ({ ...s, isUploading: true, uploadProgress: 0, encounterWarning: false }));
+       this.uploadState.update((s) => ({
+         ...s,
+         isUploading: true,
+         uploadProgress: 0,
+         encounterWarning: false,
+       }));
 
-       this.svc.uploadNote(this.patientId, file, this.encounterRef() || null).pipe(
-         takeUntilDestroyed(this.destroyRef)
-       ).subscribe({
-         next: event => {
-           if (event.type === HttpEventType.UploadProgress && event.total) {
-             this.uploadState.update(s => ({ ...s, uploadProgress: Math.round(100 * event.loaded / event.total!) }));
-           } else if (event.type === HttpEventType.Response && event.body) {
-             this.uploadState.update(s => ({
-               ...s, isUploading: false, uploadProgress: 100,
-               encounterWarning: event.body!.encounterWarning
-             }));
-             this.selectedFile.set(null);
-             this.encounterRef.set('');
-           }
-         },
-         error: err => this.uploadState.update(s => ({
-           ...s, isUploading: false,
-           serverError: err.status === 403 ? 'Access denied.' : 'Upload failed. Please try again.'
-         }))
-       });
+       this.svc
+         .uploadNote(this.patientId, file, this.encounterRef() || null)
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe({
+           next: (event) => {
+             if (event.type === HttpEventType.UploadProgress && event.total) {
+               this.uploadState.update((s) => ({
+                 ...s,
+                 uploadProgress: Math.round(
+                   (100 * event.loaded) / event.total!,
+                 ),
+               }));
+             } else if (event.type === HttpEventType.Response && event.body) {
+               this.uploadState.update((s) => ({
+                 ...s,
+                 isUploading: false,
+                 uploadProgress: 100,
+                 encounterWarning: event.body!.encounterWarning,
+               }));
+               this.selectedFile.set(null);
+               this.encounterRef.set("");
+             }
+           },
+           error: (err) =>
+             this.uploadState.update((s) => ({
+               ...s,
+               isUploading: false,
+               serverError:
+                 err.status === 403
+                   ? "Access denied."
+                   : "Upload failed. Please try again.",
+             })),
+         });
      }
    }
    ```
@@ -243,32 +290,54 @@ interface StaffNoteUploadState {
    <form (ngSubmit)="upload()">
      <div>
        <label for="noteFile">Clinical Note (PDF, max 25 MB)</label>
-       <input id="noteFile" type="file" accept=".pdf" (change)="onFileSelected($event)"
-              [attr.aria-describedby]="uploadState().validationErrors.file ? 'fileError' : null">
+       <input
+         id="noteFile"
+         type="file"
+         accept=".pdf"
+         (change)="onFileSelected($event)"
+         [attr.aria-describedby]="uploadState().validationErrors.file ? 'fileError' : null"
+       />
        @if (uploadState().validationErrors.file) {
-         <span id="fileError" role="alert">{{ uploadState().validationErrors.file }}</span>
+       <span id="fileError" role="alert"
+         >{{ uploadState().validationErrors.file }}</span
+       >
        }
      </div>
      <div>
        <label for="encounterRef">Encounter Reference (optional)</label>
-       <input id="encounterRef" type="text" [value]="encounterRef()"
-              (input)="encounterRef.set($any($event.target).value)">
+       <input
+         id="encounterRef"
+         type="text"
+         [value]="encounterRef()"
+         (input)="encounterRef.set($any($event.target).value)"
+       />
      </div>
      @if (uploadState().encounterWarning) {
-       <div role="alert" class="warning-banner">
-         Encounter reference not found — document linked to patient without appointment reference.
-         <button type="button" (click)="uploadState.update(s => ({...s, encounterWarning: false}))">Dismiss</button>
-       </div>
+     <div role="alert" class="warning-banner">
+       Encounter reference not found — document linked to patient without
+       appointment reference.
+       <button
+         type="button"
+         (click)="uploadState.update(s => ({...s, encounterWarning: false}))"
+       >
+         Dismiss
+       </button>
+     </div>
+     } @if (uploadState().isUploading) {
+     <progress
+       [value]="uploadState().uploadProgress"
+       max="100"
+       aria-label="Upload progress"
+     >
+       {{ uploadState().uploadProgress }}%
+     </progress>
+     } @if (uploadState().serverError) {
+     <span role="alert">{{ uploadState().serverError }}</span>
      }
-     @if (uploadState().isUploading) {
-       <progress [value]="uploadState().uploadProgress" max="100" aria-label="Upload progress">
-         {{ uploadState().uploadProgress }}%
-       </progress>
-     }
-     @if (uploadState().serverError) {
-       <span role="alert">{{ uploadState().serverError }}</span>
-     }
-     <button type="submit" [disabled]="!selectedFile() || uploadState().isUploading">
+     <button
+       type="submit"
+       [disabled]="!selectedFile() || uploadState().isUploading"
+     >
        Upload Note
      </button>
    </form>
@@ -279,7 +348,7 @@ interface StaffNoteUploadState {
    ```typescript
    @Component({
      standalone: true,
-     selector: 'app-document-history-list',
+     selector: "app-document-history-list",
      changeDetection: ChangeDetectionStrategy.OnPush,
    })
    export class DocumentHistoryListComponent implements OnInit {
@@ -289,32 +358,41 @@ interface StaffNoteUploadState {
 
      documents = signal<DocumentHistoryItemDto[]>([]);
      deletingId = signal<string | null>(null);
-     deletionReason = signal<string>('');
+     deletionReason = signal<string>("");
      deleteError = signal<string | null>(null);
 
      ngOnInit(): void {
-       this.svc.getDocumentHistory(this.patientId).pipe(
-         takeUntilDestroyed(this.destroyRef),
-         catchError(() => of([]))
-       ).subscribe(docs => this.documents.set(docs));
+       this.svc
+         .getDocumentHistory(this.patientId)
+         .pipe(
+           takeUntilDestroyed(this.destroyRef),
+           catchError(() => of([])),
+         )
+         .subscribe((docs) => this.documents.set(docs));
      }
 
      confirmDelete(id: string): void {
        const reason = this.deletionReason().trim();
        if (reason.length < 10) {
-         this.deleteError.set('Please provide a reason (minimum 10 characters).');
+         this.deleteError.set(
+           "Please provide a reason (minimum 10 characters).",
+         );
          return;
        }
        // Optimistic removal
        const original = this.documents();
-       this.documents.update(docs => docs.filter(d => d.id !== id));
+       this.documents.update((docs) => docs.filter((d) => d.id !== id));
        this.deletingId.set(null);
 
-       this.svc.deleteDocument(id, reason).pipe(
-         takeUntilDestroyed(this.destroyRef)
-       ).subscribe({
-         error: () => { this.documents.set(original); this.deleteError.set('Delete failed. Please try again.'); }
-       });
+       this.svc
+         .deleteDocument(id, reason)
+         .pipe(takeUntilDestroyed(this.destroyRef))
+         .subscribe({
+           error: () => {
+             this.documents.set(original);
+             this.deleteError.set("Delete failed. Please try again.");
+           },
+         });
      }
    }
    ```
@@ -345,13 +423,13 @@ app/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `app/features/staff/patient-record/staff-document.models.ts` | `DocumentSourceType`, `DocumentProcessingStatus`, `DocumentHistoryItemDto`, `UploadNoteResponse` |
-| CREATE | `app/features/staff/patient-record/staff-document.service.ts` | `StaffDocumentService`: `uploadNote()` (multipart, `reportProgress`), `getDocumentHistory()`, `deleteDocument()` |
-| CREATE | `app/features/staff/patient-record/note-upload/staff-note-upload.component.ts` | `StaffNoteUploadComponent`: signal state, client-side validation, `HttpEventType.UploadProgress` tracking, encounter warning banner |
-| CREATE | `app/features/documents/document-history-list/document-history-list.component.ts` | `DocumentHistoryListComponent`: loads history, renders source-type badges, 24h soft-delete with reason dialog, optimistic removal |
-| MODIFY | `app/features/staff/patient-record/staff-patient-record.component.ts` | Add `<app-staff-note-upload>` and `<app-document-history-list>` as tabs in patient record view |
+| Action | File Path                                                                         | Description                                                                                                                         |
+| ------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `app/features/staff/patient-record/staff-document.models.ts`                      | `DocumentSourceType`, `DocumentProcessingStatus`, `DocumentHistoryItemDto`, `UploadNoteResponse`                                    |
+| CREATE | `app/features/staff/patient-record/staff-document.service.ts`                     | `StaffDocumentService`: `uploadNote()` (multipart, `reportProgress`), `getDocumentHistory()`, `deleteDocument()`                    |
+| CREATE | `app/features/staff/patient-record/note-upload/staff-note-upload.component.ts`    | `StaffNoteUploadComponent`: signal state, client-side validation, `HttpEventType.UploadProgress` tracking, encounter warning banner |
+| CREATE | `app/features/documents/document-history-list/document-history-list.component.ts` | `DocumentHistoryListComponent`: loads history, renders source-type badges, 24h soft-delete with reason dialog, optimistic removal   |
+| MODIFY | `app/features/staff/patient-record/staff-patient-record.component.ts`             | Add `<app-staff-note-upload>` and `<app-document-history-list>` as tabs in patient record view                                      |
 
 ## External References
 
@@ -380,10 +458,10 @@ app/
 
 ## Implementation Checklist
 
-- [ ] Create `StaffNoteUploadComponent` (standalone, `OnPush`, `staffGuard`-protected route): file input (`accept=".pdf"`), `encounterRef` text input, `upload()` button; client-side validate MIME type (`application/pdf`) + size ≤ 25 MB before any HTTP call (AC-1)
-- [ ] `upload()` uses `HttpClient` with `reportProgress: true, observe: 'events'`; tracks `HttpEventType.UploadProgress` → `uploadProgress` signal (0–100); renders `<progress>` element with `aria-label` during upload
-- [ ] On `UploadCompleteResponse.encounterWarning = true`, render dismissible amber warning banner with `role="alert"` — "Encounter reference not found — document linked to patient without appointment reference" (edge case — encounter ref not found)
-- [ ] Create `DocumentHistoryListComponent`: loads from `GET /api/staff/patients/{patientId}/documents`; renders "Staff Upload" amber badge vs "Patient Upload" blue badge; shows staff member name, encounter reference, upload timestamp, processing status chip (AC-2)
-- [ ] For `isDeletable = true` rows, render "Delete" icon button; clicking opens inline confirmation panel with required `DeletionReason` textarea (min 10 chars) and Cancel/Confirm buttons; optimistic list removal on confirm; revert on API error (edge case — wrong patient upload)
-- [ ] `StaffDocumentService.uploadNote()` constructs `FormData` with `patientId`, `file`, optional `encounterReference`; all HTTP calls carry Bearer token via `AuthInterceptor` (US_011); `takeUntilDestroyed(destroyRef)` on all subscriptions
-- [ ] `staffGuard` (role check `'Staff' || 'Admin'`) applied to `/staff/patients/:patientId` route; Patient-role users receive HTTP 403 from the underlying API endpoint (AC-4 — role enforcement at both FE routing and BE controller level)
+- [x] Create `StaffNoteUploadComponent` (standalone, `OnPush`, `staffGuard`-protected route): file input (`accept=".pdf"`), `encounterRef` text input, `upload()` button; client-side validate MIME type (`application/pdf`) + size ≤ 25 MB before any HTTP call (AC-1)
+- [x] `upload()` uses `HttpClient` with `reportProgress: true, observe: 'events'`; tracks `HttpEventType.UploadProgress` → `uploadProgress` signal (0–100); renders `<progress>` element with `aria-label` during upload
+- [x] On `UploadCompleteResponse.encounterWarning = true`, render dismissible amber warning banner with `role="alert"` — "Encounter reference not found — document linked to patient without appointment reference" (edge case — encounter ref not found)
+- [x] Create `DocumentHistoryListComponent`: loads from `GET /api/staff/patients/{patientId}/documents`; renders "Staff Upload" amber badge vs "Patient Upload" blue badge; shows staff member name, encounter reference, upload timestamp, processing status chip (AC-2)
+- [x] For `isDeletable = true` rows, render "Delete" icon button; clicking opens inline confirmation panel with required `DeletionReason` textarea (min 10 chars) and Cancel/Confirm buttons; optimistic list removal on confirm; revert on API error (edge case — wrong patient upload)
+- [x] `StaffDocumentService.uploadNote()` constructs `FormData` with `patientId`, `file`, optional `encounterReference`; all HTTP calls carry Bearer token via `AuthInterceptor` (US_011); `takeUntilDestroyed(destroyRef)` on all subscriptions
+- [x] `staffGuard` (role check `'Staff' || 'Admin'`) applied to `/staff/patients/:patientId` route; Patient-role users receive HTTP 403 from the underlying API endpoint (AC-4 — role enforcement at both FE routing and BE controller level)

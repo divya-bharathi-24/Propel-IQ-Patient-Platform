@@ -1,0 +1,114 @@
+<div
+  class="conflict-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="conflict-modal-title"
+  aria-describedby="conflict-modal-desc"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+>
+  <h2 id="conflict-modal-title" class="conflict-modal__title">
+    Edit Conflict Detected
+  </h2>
+  <p id="conflict-modal-desc" class="conflict-modal__desc">
+    Another version of this intake record was saved while you were editing.
+    Choose which version to keep before saving.
+  </p>
+
+  <div class="conflict-modal__versions">
+    <!-- My Version -->
+    <div
+      class="conflict-version"
+      [class.conflict-version--selected]="chosenVersion === 'local'"
+      role="region"
+      aria-label="My version"
+    >
+      <div class="conflict-version__header">
+        <h3 class="conflict-version__label">My Version</h3>
+        <button
+          type="button"
+          mat-stroked-button
+          [color]="chosenVersion === 'local' ? 'primary' : undefined"
+          [attr.aria-pressed]="chosenVersion === 'local'"
+          (click)="selectLocal()"
+        >
+          {{ chosenVersion === "local" ? "Selected" : "Use My Version" }}
+        </button>
+      </div>
+
+      <dl class="conflict-version__fields">
+        <!-- Demographics summary -->
+        <dt>Name</dt>
+        <dd>
+          {{ conflict.localVersion.demographics.firstName }}
+          {{ conflict.localVersion.demographics.lastName }}
+        </dd>
+        <dt>Date of Birth</dt>
+        <dd>{{ conflict.localVersion.demographics.dateOfBirth }}</dd>
+        <dt>Phone</dt>
+        <dd>{{ conflict.localVersion.demographics.phone }}</dd>
+        <dt>Symptoms (count)</dt>
+        <dd>{{ conflict.localVersion.symptoms.length }}</dd>
+        <dt>Medications (count)</dt>
+        <dd>{{ conflict.localVersion.medications.length }}</dd>
+      </dl>
+    </div>
+
+    <!-- Staff / Server Version -->
+    <div
+      class="conflict-version"
+      [class.conflict-version--selected]="chosenVersion === 'server'"
+      role="region"
+      aria-label="Staff version"
+    >
+      <div class="conflict-version__header">
+        <h3 class="conflict-version__label">Staff Version</h3>
+        <button
+          type="button"
+          mat-stroked-button
+          [color]="chosenVersion === 'server' ? 'primary' : undefined"
+          [attr.aria-pressed]="chosenVersion === 'server'"
+          (click)="selectServer()"
+        >
+          {{ chosenVersion === "server" ? "Selected" : "Use Staff Version" }}
+        </button>
+      </div>
+
+      <dl class="conflict-version__fields">
+        <dt>Name</dt>
+        <dd>
+          {{ conflict.serverVersion.demographics.firstName }}
+          {{ conflict.serverVersion.demographics.lastName }}
+        </dd>
+        <dt>Date of Birth</dt>
+        <dd>{{ conflict.serverVersion.demographics.dateOfBirth }}</dd>
+        <dt>Phone</dt>
+        <dd>{{ conflict.serverVersion.demographics.phone }}</dd>
+        <dt>Symptoms (count)</dt>
+        <dd>{{ conflict.serverVersion.symptoms.length }}</dd>
+        <dt>Medications (count)</dt>
+        <dd>{{ conflict.serverVersion.medications.length }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="conflict-modal__actions">
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="cancel()"
+      aria-label="Cancel conflict resolution and continue editing"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="confirm()"
+      aria-label="Confirm version selection and re-submit intake"
+    >
+      Confirm &amp; Save
+    </button>
+  </div>
+</div>

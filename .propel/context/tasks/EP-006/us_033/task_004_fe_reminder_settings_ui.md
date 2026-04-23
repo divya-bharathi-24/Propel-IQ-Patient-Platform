@@ -207,11 +207,11 @@ ng build --configuration production
 
 ## Implementation Checklist
 
-- [ ] Create `ReminderSettingsComponent` (standalone) with `ReactiveFormsModule` and dynamic `FormArray`
-- [ ] Load current intervals on `ngOnInit` via `ReminderSettingsService.getIntervals()`
-- [ ] Implement "Add Interval" and "Remove" buttons with minimum-1-item enforcement
-- [ ] Add cross-field `FormArray` validator for unique values and max-10 limit
-- [ ] Implement save action with `isSaving` NgRx signal — disable form controls while in-flight to prevent double-submit
-- [ ] Display success toast on 200; display backend validation message on 400 (OWASP A03 — no raw error stack displayed)
-- [ ] Guard `/settings/reminders` route with `StaffAdminGuard`; hide nav link using `@if (isStaffOrAdmin())` Angular control flow
-- [ ] Apply `aria-label` to each interval input and `aria-busy` to save button (WCAG 2.2 AA)
+- [x] Create `ReminderSettingsComponent` (standalone) with `ReactiveFormsModule` and dynamic `FormArray`
+- [x] Load current intervals on `ngOnInit` via `ReminderSettingsService.getIntervals()`
+- [x] Implement "Add Interval" and "Remove" buttons with minimum-1-item enforcement
+- [x] Add cross-field `FormArray` validator for unique values and max-10 limit
+- [x] Implement save action with `isSaving` NgRx signal — disable form controls while in-flight to prevent double-submit
+- [x] Display success toast on 200; display backend validation message on 400 (OWASP A03 — no raw error stack displayed)
+- [x] Guard `/settings/reminders` route with `StaffAdminGuard`; hide nav link using `@if (isStaffOrAdmin())` Angular control flow
+- [x] Apply `aria-label` to each interval input and `aria-busy` to save button (WCAG 2.2 AA)

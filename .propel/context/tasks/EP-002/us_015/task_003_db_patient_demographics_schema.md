@@ -15,30 +15,30 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value |
-| -------------------- | ----- |
-| **UI Impact**        | No    |
-| **Figma URL**        | N/A   |
-| **Wireframe Status** | N/A   |
-| **Wireframe Type**   | N/A   |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec**      | N/A   |
-| **UXR Requirements** | N/A   |
-| **Design Tokens**    | N/A   |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ---
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                | Version |
-| ---------- | ------------------------- | ------- |
-| Database   | PostgreSQL                | 16+     |
-| ORM        | Entity Framework Core     | 9.x     |
-| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x |
-| DB Hosting | Neon PostgreSQL (free tier) | —     |
-| Testing    | xUnit                     | 2.x     |
-| AI/ML      | N/A                       | N/A     |
-| Mobile     | N/A                       | N/A     |
+| Layer      | Technology                            | Version |
+| ---------- | ------------------------------------- | ------- |
+| Database   | PostgreSQL                            | 16+     |
+| ORM        | Entity Framework Core                 | 9.x     |
+| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier)           | —       |
+| Testing    | xUnit                                 | 2.x     |
+| AI/ML      | N/A                                   | N/A     |
+| Mobile     | N/A                                   | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -93,12 +93,12 @@ All new columns are nullable (existing patients created via registration have no
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| MODIFY | `Patient` EF Core entity | `Server/Infrastructure/Persistence/Entities/Patient.cs` |
-| MODIFY | `PatientConfiguration.cs` (EF Core fluent config) | Add JSONB mappings, `HasConversion` for new PHI columns, `UseXminAsConcurrencyToken` |
-| CREATE | EF Core migration: `ExtendPatientDemographics` | `Server/Infrastructure/Migrations/` |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.Designer.cs` | EF Core snapshot |
+| Status | Component / Module                                                                   | Project                                                                              |
+| ------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| MODIFY | `Patient` EF Core entity                                                             | `Server/Infrastructure/Persistence/Entities/Patient.cs`                              |
+| MODIFY | `PatientConfiguration.cs` (EF Core fluent config)                                    | Add JSONB mappings, `HasConversion` for new PHI columns, `UseXminAsConcurrencyToken` |
+| CREATE | EF Core migration: `ExtendPatientDemographics`                                       | `Server/Infrastructure/Migrations/`                                                  |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.Designer.cs` | EF Core snapshot                                                                     |
 
 ---
 
@@ -187,15 +187,15 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| MODIFY | `Server/Infrastructure/Persistence/Entities/Patient.cs` | Add new nullable properties: BiologicalSex, Address, EmergencyContact, CommunicationPreferences, InsurerName, MemberId, GroupNumber, RowVersion (xmin) |
-| CREATE | `Server/Infrastructure/Persistence/ValueObjects/AddressValue.cs` | Owned JSON value object |
-| CREATE | `Server/Infrastructure/Persistence/ValueObjects/EmergencyContactValue.cs` | Owned JSON value object |
-| CREATE | `Server/Infrastructure/Persistence/ValueObjects/CommunicationPreferencesValue.cs` | Owned JSON value object |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/PatientConfiguration.cs` | Add `UseXminAsConcurrencyToken()`, `OwnsOne(...).ToJson()` for JSONB columns, `HasConversion` for InsurerName + MemberId |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.cs` | Migration Up() + Down() |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.Designer.cs` | Migration snapshot |
+| Action | File Path                                                                            | Description                                                                                                                                            |
+| ------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MODIFY | `Server/Infrastructure/Persistence/Entities/Patient.cs`                              | Add new nullable properties: BiologicalSex, Address, EmergencyContact, CommunicationPreferences, InsurerName, MemberId, GroupNumber, RowVersion (xmin) |
+| CREATE | `Server/Infrastructure/Persistence/ValueObjects/AddressValue.cs`                     | Owned JSON value object                                                                                                                                |
+| CREATE | `Server/Infrastructure/Persistence/ValueObjects/EmergencyContactValue.cs`            | Owned JSON value object                                                                                                                                |
+| CREATE | `Server/Infrastructure/Persistence/ValueObjects/CommunicationPreferencesValue.cs`    | Owned JSON value object                                                                                                                                |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/PatientConfiguration.cs`           | Add `UseXminAsConcurrencyToken()`, `OwnsOne(...).ToJson()` for JSONB columns, `HasConversion` for InsurerName + MemberId                               |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.cs`          | Migration Up() + Down()                                                                                                                                |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_ExtendPatientDemographics.Designer.cs` | Migration snapshot                                                                                                                                     |
 
 ---
 
@@ -243,9 +243,9 @@ dotnet ef migrations script --project Server/Server.csproj --output migrations_p
 
 ## Implementation Checklist
 
-- [ ] Add `BiologicalSex`, `Address`, `EmergencyContact`, `CommunicationPreferences`, `InsurerName`, `MemberId`, `GroupNumber`, `RowVersion` properties to `Patient` entity
-- [ ] Create `AddressValue`, `EmergencyContactValue`, `CommunicationPreferencesValue` record types as owned JSON value objects
-- [ ] Update `PatientConfiguration`: call `UseXminAsConcurrencyToken()`, map JSONB owned entities with `OwnsOne(...).ToJson()`, add `HasConversion` for `InsurerName` and `MemberId` PHI fields
-- [ ] Write EF Core migration `ExtendPatientDemographics` with `Up()` (7x `ALTER TABLE ADD COLUMN NULL`) and `Down()` (7x `DROP COLUMN`)
-- [ ] Confirm migration does NOT modify any existing column or table (additive only)
-- [ ] Generate SQL script and review before applying to Neon PostgreSQL
+- [x] Add `BiologicalSex`, `Address`, `EmergencyContact`, `CommunicationPreferences`, `InsurerName`, `MemberId`, `GroupNumber`, `RowVersion` properties to `Patient` entity
+- [x] Create `AddressValue`, `EmergencyContactValue`, `CommunicationPreferencesValue` record types as owned JSON value objects (implemented as `PatientAddress`, `PatientEmergencyContact`, `PatientCommunicationPreferences` sealed records in `Propel.Domain.Entities`)
+- [x] Update `PatientConfiguration`: xmin concurrency mapped via `.HasColumnName("xmin").HasColumnType("xid").IsRowVersion()` (equivalent to `UseXminAsConcurrencyToken()`); PHI columns (address, emergency contact) encrypted at handler layer via `IPhiEncryptionService`; JSONB column mapped for `CommunicationPreferencesJson`
+- [x] Write EF Core migration `AddPatientDemographics` with `Up()` (7x `ALTER TABLE ADD COLUMN NULL`) and `Down()` (7x `DROP COLUMN`)
+- [x] Confirm migration does NOT modify any existing column or table (additive only)
+- [x] Create Designer.cs snapshot file `20260422000000_AddPatientDemographics.Designer.cs` with full model state

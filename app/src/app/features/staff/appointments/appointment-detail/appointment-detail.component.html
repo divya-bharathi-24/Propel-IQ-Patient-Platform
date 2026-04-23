@@ -1,0 +1,137 @@
+<div class="detail-page">
+  <!-- Back navigation -->
+  <a
+    routerLink="/staff/appointments"
+    mat-button
+    class="back-link"
+    aria-label="Back to appointment list"
+  >
+    <mat-icon>arrow_back</mat-icon>
+    Back to Appointments
+  </a>
+
+  <!-- ── Loading skeleton ──────────────────────────────────────────────── -->
+  @if (store.detailLoadingState() === "loading") {
+    <div
+      class="loading-container"
+      role="status"
+      aria-label="Loading appointment details…"
+    >
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  <!-- ── Load error ────────────────────────────────────────────────────── -->
+  @else if (store.detailLoadingState() === "error") {
+    <p class="load-error" role="alert">{{ store.detailErrorMessage() }}</p>
+  }
+
+  <!-- ── Appointment detail ────────────────────────────────────────────── -->
+  @else if (store.selectedAppointment(); as appt) {
+    <header class="detail-header">
+      <h1 class="detail-title">Appointment Detail</h1>
+    </header>
+
+    <section class="info-section" aria-label="Appointment information">
+      <dl class="info-grid">
+        <dt>Patient</dt>
+        <dd>{{ appt.patientName }}</dd>
+
+        <dt>Time</dt>
+        <dd>{{ appt.timeSlot }}</dd>
+
+        <dt>Specialty</dt>
+        <dd>{{ appt.specialty }}</dd>
+
+        <dt>Status</dt>
+        <dd>{{ appt.status }}</dd>
+      </dl>
+    </section>
+
+    <!-- ── Manual reminder panel (US-034) ────────────────────────────── -->
+    <section class="reminder-section" aria-label="Manual reminder">
+      <h2 class="section-title">Manual Reminder</h2>
+
+      <app-send-reminder-now-button
+        [isLoading]="store.reminderState() === 'loading'"
+        [disabled]="
+          store.reminderState() === 'cooldown' ||
+          store.reminderState() === 'loading'
+        "
+        (sendClicked)="onSendReminderClicked()"
+      />
+
+      <!--
+        aria-live region — wraps all reminder feedback panels so that
+        assistive technologies announce state transitions politely
+        (WCAG 2.2 AA — SC 4.1.3 Status Messages).
+      -->
+      <div aria-live="polite" aria-atomic="false" class="reminder-feedback">
+        <!-- Success: last reminder sent confirmation (AC-3) -->
+        @if (
+          store.reminderState() === "success" && store.lastManualReminder();
+          as reminder
+        ) {
+          <mat-card
+            class="feedback-card feedback-card--success"
+            appearance="outlined"
+          >
+            <mat-card-content>
+              <mat-icon class="feedback-icon" aria-hidden="true"
+                >check_circle</mat-icon
+              >
+              <span class="feedback-text">
+                Last reminder sent:
+                <strong>{{ reminder.sentAt | date: "medium" }}</strong>
+                by
+                <strong>{{ reminder.triggeredByStaffName }}</strong>
+              </span>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        <!-- Cooldown: retry not yet available -->
+        @if (store.reminderState() === "cooldown") {
+          <div class="feedback-cooldown" role="status">
+            <mat-icon class="feedback-icon" aria-hidden="true"
+              >schedule</mat-icon
+            >
+            <span class="feedback-text">
+              Reminder recently sent — retry available in
+              <strong>
+                {{ cooldownMinutes() }}
+                {{ cooldownMinutes() === 1 ? "minute" : "minutes" }}
+              </strong>
+            </span>
+          </div>
+        }
+
+        <!-- Error: failure reason + Retry button (AC-4) -->
+        @if (store.reminderState() === "error") {
+          <mat-card
+            class="feedback-card feedback-card--error"
+            appearance="outlined"
+          >
+            <mat-card-content>
+              <mat-icon class="feedback-icon" aria-hidden="true"
+                >error_outline</mat-icon
+              >
+              <p class="feedback-text error-reason" role="alert">
+                {{ store.reminderErrorReason() }}
+              </p>
+              <button
+                mat-button
+                color="primary"
+                class="retry-btn"
+                (click)="onRetry()"
+                aria-label="Retry sending the reminder"
+              >
+                Retry
+              </button>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </section>
+  }
+</div>

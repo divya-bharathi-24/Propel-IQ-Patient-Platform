@@ -13,53 +13,53 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | ASP.NET Core Web API | .net 10 |
-| ORM | Entity Framework Core | 9.x |
-| Mediator | MediatR | 12.x |
-| Validation | FluentValidation | 11.x |
-| Cache | Upstash Redis (StackExchange.Redis) | — |
-| Database | PostgreSQL | 16+ |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer        | Technology                          | Version |
+| ------------ | ----------------------------------- | ------- |
+| Backend      | ASP.NET Core Web API                | .net 10 |
+| ORM          | Entity Framework Core               | 9.x     |
+| Mediator     | MediatR                             | 12.x    |
+| Validation   | FluentValidation                    | 11.x    |
+| Cache        | Upstash Redis (StackExchange.Redis) | —       |
+| Database     | PostgreSQL                          | 16+     |
+| AI/ML        | N/A                                 | N/A     |
+| Vector Store | N/A                                 | N/A     |
+| AI Gateway   | N/A                                 | N/A     |
+| Mobile       | N/A                                 | N/A     |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -68,6 +68,7 @@ Implement the appointment booking backend comprising two endpoints and their ful
 **`POST /api/appointments/hold-slot`** — Places a short-lived Redis slot-hold entry (`slot_hold:{specialtyId}:{date}:{timeSlot}:{patientId}`, TTL = 300 s) when a patient selects a slot in the wizard. This prevents the slot from being shown as available to other patients during the 5-minute selection window. Requires `[Authorize(Roles="Patient")]`; `patientId` is always resolved from JWT claims.
 
 **`POST /api/appointments/book`** — The main booking command endpoint driven by `CreateBookingCommand` (MediatR). The handler:
+
 1. Resolves `patientId` from JWT claims only (OWASP A01 — never from request body).
 2. Clears the Redis slot-hold key and attempts to INSERT a new `Appointment` (status = `Booked`) within an EF Core `SaveChangesAsync()` call. A `DbUpdateException` caused by the unique partial index on `(specialty_id, date, time_slot_start)` is caught and mapped to `SlotConflictException`.
 3. Performs an inline insurance soft check: queries the `DummyInsurers` seed table by `InsuranceName` + `InsuranceId`; derives `InsuranceValidationResult` (Matched → Verified, no match → NotRecognized, missing fields → Incomplete). Any query exception sets result to `CheckPending`. Inserts an `InsuranceValidation` record.
@@ -86,16 +87,16 @@ Implement the appointment booking backend comprising two endpoints and their ful
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `BookingController` | NEW | `Server/Controllers/BookingController.cs` |
-| `HoldSlotCommand` + `HoldSlotCommandHandler` | NEW | `Server/Features/Booking/HoldSlot/` |
-| `CreateBookingCommand` + `CreateBookingCommandValidator` | NEW | `Server/Features/Booking/CreateBooking/CreateBookingCommand.cs` |
-| `CreateBookingCommandHandler` | NEW | `Server/Features/Booking/CreateBooking/CreateBookingCommandHandler.cs` |
-| `BookingResponseDto` | NEW | `Server/Features/Booking/CreateBooking/BookingResponseDto.cs` |
-| `InsuranceSoftCheckService` | NEW | `Server/Features/Booking/InsuranceSoftCheckService.cs` |
-| `SlotConflictException` | NEW | `Server/Common/Exceptions/SlotConflictException.cs` |
-| `GlobalExceptionHandler` / `ProblemDetailsFactory` | MODIFY | Add `SlotConflictException` → 409 mapping |
+| Component                                                | Status | Location                                                               |
+| -------------------------------------------------------- | ------ | ---------------------------------------------------------------------- |
+| `BookingController`                                      | NEW    | `Server/Controllers/BookingController.cs`                              |
+| `HoldSlotCommand` + `HoldSlotCommandHandler`             | NEW    | `Server/Features/Booking/HoldSlot/`                                    |
+| `CreateBookingCommand` + `CreateBookingCommandValidator` | NEW    | `Server/Features/Booking/CreateBooking/CreateBookingCommand.cs`        |
+| `CreateBookingCommandHandler`                            | NEW    | `Server/Features/Booking/CreateBooking/CreateBookingCommandHandler.cs` |
+| `BookingResponseDto`                                     | NEW    | `Server/Features/Booking/CreateBooking/BookingResponseDto.cs`          |
+| `InsuranceSoftCheckService`                              | NEW    | `Server/Features/Booking/InsuranceSoftCheckService.cs`                 |
+| `SlotConflictException`                                  | NEW    | `Server/Common/Exceptions/SlotConflictException.cs`                    |
+| `GlobalExceptionHandler` / `ProblemDetailsFactory`       | MODIFY | Add `SlotConflictException` → 409 mapping                              |
 
 ## Implementation Plan
 
@@ -106,6 +107,7 @@ Implement the appointment booking backend comprising two endpoints and their ful
    ```
 
    **`HoldSlotCommandHandler`**: Resolves `patientId` from `IHttpContextAccessor`; writes Redis key:
+
    ```csharp
    var key = $"slot_hold:{request.SpecialtyId}:{request.Date:yyyy-MM-dd}:{request.TimeSlotStart:HH\\:mm}:{patientId}";
    await _redis.StringSetAsync(key, "1", TimeSpan.FromSeconds(300));
@@ -127,6 +129,7 @@ Implement the appointment booking backend comprising two endpoints and their ful
    ```
 
    **`CreateBookingCommandValidator`** (FluentValidation):
+
    ```csharp
    RuleFor(x => x.SlotSpecialtyId).NotEmpty();
    RuleFor(x => x.SlotDate).GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow));
@@ -162,6 +165,7 @@ Implement the appointment booking backend comprising two endpoints and their ful
    // insuranceName null or memberId null → Incomplete
    // Match found → Verified (Matched); no match → NotRecognized
    ```
+
    INSERT `InsuranceValidation` with derived `Result`.
 
 5. **Conditional `WaitlistEntry` INSERT**:
@@ -218,7 +222,9 @@ Implement the appointment booking backend comprising two endpoints and their ful
            => Ok(await mediator.Send(command));
    }
    ```
+
    `SlotConflictException` is mapped to 409 in `GlobalExceptionHandler`:
+
    ```csharp
    case SlotConflictException ex:
        return Problem(statusCode: 409, title: "SLOT_CONFLICT", detail: ex.Message);
@@ -249,17 +255,17 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/Controllers/BookingController.cs` | `[Authorize(Roles="Patient")]` controller: `POST /hold-slot` and `POST /book` endpoints |
-| CREATE | `Server/Features/Booking/HoldSlot/HoldSlotCommand.cs` | MediatR command record + handler: writes Redis hold key (300 s TTL) |
-| CREATE | `Server/Features/Booking/HoldSlot/HoldSlotCommandHandler.cs` | Resolves patientId from JWT; sets Redis `slot_hold:*` key |
-| CREATE | `Server/Features/Booking/CreateBooking/CreateBookingCommand.cs` | Command record + FluentValidation: slot, intakeMode, optional insurance fields, optional preferredSlotId |
+| Action | File Path                                                              | Description                                                                                                                |
+| ------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Controllers/BookingController.cs`                              | `[Authorize(Roles="Patient")]` controller: `POST /hold-slot` and `POST /book` endpoints                                    |
+| CREATE | `Server/Features/Booking/HoldSlot/HoldSlotCommand.cs`                  | MediatR command record + handler: writes Redis hold key (300 s TTL)                                                        |
+| CREATE | `Server/Features/Booking/HoldSlot/HoldSlotCommandHandler.cs`           | Resolves patientId from JWT; sets Redis `slot_hold:*` key                                                                  |
+| CREATE | `Server/Features/Booking/CreateBooking/CreateBookingCommand.cs`        | Command record + FluentValidation: slot, intakeMode, optional insurance fields, optional preferredSlotId                   |
 | CREATE | `Server/Features/Booking/CreateBooking/CreateBookingCommandHandler.cs` | Full booking orchestration: INSERT Appointment, InsuranceValidation, optional WaitlistEntry; Redis invalidation; audit log |
-| CREATE | `Server/Features/Booking/CreateBooking/BookingResponseDto.cs` | Response DTO: appointmentId, referenceNumber, date, timeSlotStart, specialtyName, insuranceStatus |
-| CREATE | `Server/Features/Booking/InsuranceSoftCheckService.cs` | Queries `DummyInsurers` table; returns `InsuranceValidationResult` enum; catches exceptions → `CheckPending` |
-| CREATE | `Server/Common/Exceptions/SlotConflictException.cs` | Typed exception for unique constraint collision |
-| MODIFY | `Server/Common/Middleware/GlobalExceptionHandler.cs` | Add `SlotConflictException` → 409 Problem Details mapping |
+| CREATE | `Server/Features/Booking/CreateBooking/BookingResponseDto.cs`          | Response DTO: appointmentId, referenceNumber, date, timeSlotStart, specialtyName, insuranceStatus                          |
+| CREATE | `Server/Features/Booking/InsuranceSoftCheckService.cs`                 | Queries `DummyInsurers` table; returns `InsuranceValidationResult` enum; catches exceptions → `CheckPending`               |
+| CREATE | `Server/Common/Exceptions/SlotConflictException.cs`                    | Typed exception for unique constraint collision                                                                            |
+| MODIFY | `Server/Common/Middleware/GlobalExceptionHandler.cs`                   | Add `SlotConflictException` → 409 Problem Details mapping                                                                  |
 
 ## External References
 
@@ -287,11 +293,11 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] `POST /api/appointments/hold-slot` endpoint — place Redis key `slot_hold:{specialtyId}:{date}:{timeSlot}:{patientId}` with 300 s TTL; `patientId` from JWT `NameIdentifier` claim; `[Authorize(Roles="Patient")]`
-- [ ] `CreateBookingCommand` record + `CreateBookingCommandValidator` (FluentValidation): `SlotSpecialtyId` non-empty, `SlotDate` ≥ today, `IntakeMode` valid enum; `InsuranceName`/`InsuranceId` optional; `patientId` injected from JWT claims, never from request body (OWASP A01)
-- [ ] `CreateBookingCommandHandler`: clear Redis slot-hold key; INSERT `Appointment` (status = Booked); catch `DbUpdateException` on unique partial index violation and throw `SlotConflictException`
-- [ ] `InsuranceSoftCheckService.CheckAsync()`: query `DummyInsurers` by `InsuranceName`+`InsuranceId`; return `Verified/NotRecognized/Incomplete`; any exception → `CheckPending`; INSERT `InsuranceValidation` record
-- [ ] Conditional INSERT `WaitlistEntry` when `PreferredSlotId` is non-null: `enrolledAt = UtcNow`, `status = Active`, FK to `currentAppointmentId` (DR-003 FIFO ordering)
-- [ ] Invalidate Redis slot availability cache key `slots:{specialtyId}:{date}` on successful commit (AD-8, NFR-020 staleness ≤ 5 s)
-- [ ] Audit log INSERT via `IAuditLogRepository`: action = `AppointmentBooked`, entityType = `Appointment`, entityId = new appointment GUID, `ipAddress` from `IHttpContextAccessor`
-- [ ] `BookingController` `[Authorize(Roles="Patient")]`; map `SlotConflictException` → 409 Problem Details `{"code":"SLOT_CONFLICT","message":"Slot no longer available"}` in `GlobalExceptionHandler`
+- [x] `POST /api/appointments/hold-slot` endpoint — place Redis key `slot_hold:{specialtyId}:{date}:{timeSlot}:{patientId}` with 300 s TTL; `patientId` from JWT `NameIdentifier` claim; `[Authorize(Roles="Patient")]`
+- [x] `CreateBookingCommand` record + `CreateBookingCommandValidator` (FluentValidation): `SlotSpecialtyId` non-empty, `SlotDate` ≥ today, `IntakeMode` valid enum; `InsuranceName`/`InsuranceId` optional; `patientId` injected from JWT claims, never from request body (OWASP A01)
+- [x] `CreateBookingCommandHandler`: clear Redis slot-hold key; INSERT `Appointment` (status = Booked); catch `DbUpdateException` on unique partial index violation and throw `SlotConflictException`
+- [x] `InsuranceSoftCheckService.CheckAsync()`: query `DummyInsurers` by `InsuranceName`+`InsuranceId`; return `Verified/NotRecognized/Incomplete`; any exception → `CheckPending`; INSERT `InsuranceValidation` record
+- [x] Conditional INSERT `WaitlistEntry` when `PreferredSlotId` is non-null: `enrolledAt = UtcNow`, `status = Active`, FK to `currentAppointmentId` (DR-003 FIFO ordering)
+- [x] Invalidate Redis slot availability cache key `slots:{specialtyId}:{date}` on successful commit (AD-8, NFR-020 staleness ≤ 5 s)
+- [x] Audit log INSERT via `IAuditLogRepository`: action = `AppointmentBooked`, entityType = `Appointment`, entityId = new appointment GUID, `ipAddress` from `IHttpContextAccessor`
+- [x] `BookingController` `[Authorize(Roles="Patient")]`; map `SlotConflictException` → 409 Problem Details `{"code":"SLOT_CONFLICT","message":"Slot no longer available"}` in `GlobalExceptionHandler`

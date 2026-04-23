@@ -1,0 +1,18 @@
+<main class="patient-record-page" aria-label="Patient record">
+  @if (patientId) {
+    <div class="record-layout">
+      <!-- Upload panel -->
+      <app-staff-note-upload
+        [patientId]="patientId"
+        (uploadComplete)="onUploadComplete()"
+      />
+
+      <!-- Document history -->
+      <app-document-history-list [patientId]="patientId" />
+    </div>
+  } @else {
+    <p class="error-state" role="alert">
+      Patient ID is missing. Please navigate from the patient list.
+    </p>
+  }
+</main>

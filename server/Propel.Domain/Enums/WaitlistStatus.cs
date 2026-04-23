@@ -8,5 +8,6 @@ public enum WaitlistStatus
 {
     Active,
     Swapped,
-    Expired
+    Expired,
+    Cancelled
 }

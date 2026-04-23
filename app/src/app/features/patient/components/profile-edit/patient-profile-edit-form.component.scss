@@ -1,0 +1,80 @@
+.section-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.sub-heading {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.half-width {
+  width: calc(50% - 8px);
+}
+
+.address-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.info-banner {
+  background-color: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: #0d47a1;
+}
+
+.warn-banner {
+  background-color: #fff8e1;
+  border-left: 4px solid #f9a825;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: #e65100;
+}
+
+@media (max-width: 600px) {
+  .half-width {
+    width: 100%;
+  }
+
+  .address-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .action-row {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

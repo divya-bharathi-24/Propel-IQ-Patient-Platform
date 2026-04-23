@@ -15,6 +15,7 @@ namespace Propel.Modules.Auth.Handlers;
 /// 3. Validate expiry and Redis session alive check.
 /// 4. Atomically revoke old token and insert new token in a single DB transaction.
 /// 5. Issue new JWT and slide the Redis session TTL.
+/// Supports both Patient and User (Staff/Admin) authentication via PatientId/UserId.
 /// </summary>
 public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>
 {
@@ -40,30 +41,47 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
 
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation(
+            "[REFRESH DEBUG] Starting refresh. RefreshToken hash will be computed, DeviceId: {DeviceId}",
+            request.DeviceId ?? "NULL");
+
         string tokenHash = _jwtService.HashToken(request.RefreshToken);
         var storedToken = await _refreshTokenRepo.GetByTokenHashAsync(tokenHash, cancellationToken);
 
         if (storedToken is null)
+        {
+            _logger.LogWarning("[REFRESH DEBUG] Stored token not found in database");
             throw new UnauthorizedAccessException("refresh_token_invalid");
+        }
+
+        // Determine user ID and role based on which FK is set
+        Guid userId = storedToken.PatientId ?? storedToken.UserId 
+            ?? throw new InvalidOperationException("RefreshToken must have either PatientId or UserId set");
+        string role = storedToken.PatientId.HasValue ? "Patient" : "Staff"; // Staff is default; actual role should be from DB for Users
+
+        _logger.LogInformation(
+            "[REFRESH DEBUG] Found token. UserId: {UserId}, StoredDeviceId: {StoredDeviceId}, RequestDeviceId: {RequestDeviceId}, FamilyId: {FamilyId}",
+            userId, storedToken.DeviceId, request.DeviceId, storedToken.FamilyId);
 
         // Reuse detection — token family invalidation (OWASP refresh-token-rotation pattern)
         if (storedToken.RevokedAt is not null)
         {
             _logger.LogWarning(
-                "Refresh token reuse detected for family {FamilyId}, user {UserId}",
-                storedToken.FamilyId, storedToken.UserId);
+                "Refresh token reuse detected for family {FamilyId}, user {UserId}, role {Role}",
+                storedToken.FamilyId, userId, role);
 
             await _refreshTokenRepo.RevokeTokenFamilyAsync(storedToken.FamilyId, cancellationToken);
-            await _sessionService.DeleteAllUserSessionsAsync(storedToken.UserId, cancellationToken);
+            await _sessionService.DeleteAllUserSessionsAsync(userId, cancellationToken);
 
             await _auditLogRepo.AppendAsync(new AuditLog
             {
                 Id = Guid.NewGuid(),
-                UserId = storedToken.UserId,
-                PatientId = storedToken.UserId,
+                UserId = userId,
+                PatientId = storedToken.PatientId,
                 Action = "SECURITY_ALERT_REFRESH_TOKEN_REUSE",
                 EntityType = nameof(RefreshToken),
                 EntityId = storedToken.Id,
+                Role = role,
                 Timestamp = DateTime.UtcNow
             }, cancellationToken);
 
@@ -71,13 +89,30 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         }
 
         if (storedToken.ExpiresAt < DateTime.UtcNow)
+        {
+            _logger.LogWarning("[REFRESH DEBUG] Token expired at {ExpiresAt}", storedToken.ExpiresAt);
             throw new UnauthorizedAccessException("refresh_token_expired");
+        }
+
+        _logger.LogInformation(
+            "[REFRESH DEBUG] Checking Redis session. UserId: {UserId}, DeviceId: {DeviceId}",
+            userId, storedToken.DeviceId);
 
         // Redis alive check (AC-2)
         bool sessionAlive = await _sessionService.ExistsAsync(
-            storedToken.UserId, storedToken.DeviceId, cancellationToken);
+            userId, storedToken.DeviceId, cancellationToken);
+        
+        _logger.LogInformation(
+            "[REFRESH DEBUG] Redis session check result: {SessionAlive}",
+            sessionAlive);
+
         if (!sessionAlive)
+        {
+            _logger.LogWarning(
+                "[REFRESH DEBUG] Session NOT found in Redis. UserId: {UserId}, DeviceId: {DeviceId}",
+                userId, storedToken.DeviceId);
             throw new UnauthorizedAccessException("session_expired");
+        }
 
         // Atomic rotation: revoke old, insert new (AC-3)
         string rawNewRefreshToken = _jwtService.GenerateRefreshToken();
@@ -86,6 +121,7 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         var newRefreshToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
+            PatientId = storedToken.PatientId,
             UserId = storedToken.UserId,
             TokenHash = newTokenHash,
             FamilyId = storedToken.FamilyId,   // same family chain
@@ -99,15 +135,15 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         // Issue new JWT
         var jti = Guid.NewGuid();
         string accessToken = _jwtService.GenerateAccessToken(
-            storedToken.UserId, "Patient", jti, storedToken.DeviceId);
+            userId, role, jti, storedToken.DeviceId);
 
         // Slide session TTL
-        await _sessionService.ResetTtlAsync(storedToken.UserId, storedToken.DeviceId, cancellationToken);
+        await _sessionService.ResetTtlAsync(userId, storedToken.DeviceId, cancellationToken);
 
         _logger.LogInformation(
-            "Refresh token rotated for user {UserId}, device {DeviceId}",
-            storedToken.UserId, storedToken.DeviceId);
+            "Refresh token rotated for user {UserId}, role {Role}, device {DeviceId}",
+            userId, role, storedToken.DeviceId);
 
-        return new RefreshTokenResult(accessToken, rawNewRefreshToken, ExpiresIn: 900);
+        return new RefreshTokenResult(accessToken, rawNewRefreshToken, ExpiresIn: 900, userId.ToString(), role, storedToken.DeviceId);
     }
 }

@@ -35,8 +35,37 @@ public sealed class Notification
     /// <summary>Number of delivery attempts made. Starts at 0.</summary>
     public int RetryCount { get; set; } = 0;
 
+    /// <summary>UTC timestamp of the most recent failed delivery attempt (set by retry orchestrator).</summary>
+    public DateTime? LastRetryAt { get; set; }
+
     /// <summary>Error message captured on the most recent failed delivery attempt.</summary>
     public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// UTC timestamp of the reminder window for which this notification is scheduled (US_033, AC-1).
+    /// Non-null when this record represents a pending reminder job (48h, 24h, 2h before appointment).
+    /// Null for ad-hoc / immediate notifications (e.g. booking confirmations).
+    /// </summary>
+    public DateTime? ScheduledAt { get; set; }
+
+    /// <summary>
+    /// UTC timestamp when this reminder was suppressed due to appointment cancellation (US_033, AC-4).
+    /// Non-null only when <see cref="Status"/> is <see cref="NotificationStatus.Suppressed"/>.
+    /// </summary>
+    public DateTime? SuppressedAt { get; set; }
+
+    /// <summary>
+    /// Staff user who manually triggered this reminder (US_034, AC-2).
+    /// Null for automated (system-scheduled) reminders. Non-null only for ad-hoc manual triggers.
+    /// FK to <c>Users.Id</c>; nullable; ON DELETE SET NULL.
+    /// </summary>
+    public Guid? TriggeredBy { get; set; }
+
+    /// <summary>
+    /// Raw error message or code returned by SendGrid or Twilio when delivery fails (US_034, AC-4).
+    /// Null for successful deliveries. Max 1000 characters.
+    /// </summary>
+    public string? ErrorReason { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

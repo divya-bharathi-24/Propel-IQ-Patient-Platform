@@ -1,0 +1,469 @@
+<main class="intake-edit-page" aria-labelledby="intake-edit-heading">
+  <header class="intake-edit-page__header">
+    <h1 id="intake-edit-heading" class="intake-edit-page__title">
+      Edit Intake Form
+    </h1>
+  </header>
+
+  <!-- ── Loading skeleton ───────────────────────────────────────────────── -->
+  @if (store.loadingState() === "loading" || store.loadingState() === "idle") {
+    <div
+      class="skeleton-container"
+      aria-busy="true"
+      aria-label="Loading intake form"
+    >
+      <div class="skeleton skeleton--title"></div>
+      <div class="skeleton skeleton--field"></div>
+      <div class="skeleton skeleton--field"></div>
+      <div class="skeleton skeleton--field"></div>
+    </div>
+  }
+
+  <!-- ── API Error ──────────────────────────────────────────────────────── -->
+  @if (store.loadingState() === "error") {
+    <div class="error-banner" role="alert" aria-live="assertive">
+      <span>Unable to load your intake record. Please try again later.</span>
+      <button
+        type="button"
+        class="error-banner__retry"
+        (click)="loadData(appointmentId())"
+        aria-label="Retry loading intake"
+      >
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- ── Draft restored banner ──────────────────────────────────────────── -->
+  @if (store.draftSavedAt()) {
+    <div class="draft-indicator" role="status" aria-live="polite">
+      Draft saved at {{ store.draftSavedAt() | date: "shortTime" }}
+    </div>
+  }
+
+  <!-- ── Missing-fields summary banner (AC-3) ───────────────────────────── -->
+  @if (store.missingFields().length > 0) {
+    <div class="validation-banner" role="alert" aria-live="assertive">
+      <strong>Incomplete fields — draft saved:</strong>
+      <ul class="validation-banner__list">
+        @for (field of store.missingFields(); track field) {
+          <li>{{ field }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <!-- ── Form (shown once load succeeds) ───────────────────────────────── -->
+  @if (store.loadingState() === "success") {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSave()"
+      novalidate
+      aria-label="Edit Intake Form"
+    >
+      <!-- ── Demographics ──────────────────────────────────────────────── -->
+      <mat-card class="form-section" formGroupName="demographics">
+        <mat-card-header>
+          <mat-card-title>Demographics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>First Name</mat-label>
+              <input
+                matInput
+                formControlName="firstName"
+                aria-required="true"
+                [attr.aria-describedby]="
+                  hasError('demographics.firstName', 'required')
+                    ? 'firstName-error'
+                    : null
+                "
+              />
+              @if (hasError("demographics.firstName", "required")) {
+                <mat-error id="firstName-error"
+                  >First name is required.</mat-error
+                >
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Last Name</mat-label>
+              <input
+                matInput
+                formControlName="lastName"
+                aria-required="true"
+                [attr.aria-describedby]="
+                  hasError('demographics.lastName', 'required')
+                    ? 'lastName-error'
+                    : null
+                "
+              />
+              @if (hasError("demographics.lastName", "required")) {
+                <mat-error id="lastName-error"
+                  >Last name is required.</mat-error
+                >
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Date of Birth</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="dateOfBirth"
+                aria-required="true"
+                [attr.aria-describedby]="
+                  hasError('demographics.dateOfBirth', 'required')
+                    ? 'dob-error'
+                    : null
+                "
+              />
+              @if (hasError("demographics.dateOfBirth", "required")) {
+                <mat-error id="dob-error">Date of birth is required.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Biological Sex</mat-label>
+              <mat-select
+                formControlName="biologicalSex"
+                aria-required="true"
+                [attr.aria-describedby]="
+                  hasError('demographics.biologicalSex', 'required')
+                    ? 'sex-error'
+                    : null
+                "
+              >
+                <mat-option value="Male">Male</mat-option>
+                <mat-option value="Female">Female</mat-option>
+                <mat-option value="Other">Other</mat-option>
+                <mat-option value="PreferNotToSay"
+                  >Prefer not to say</mat-option
+                >
+              </mat-select>
+              @if (hasError("demographics.biologicalSex", "required")) {
+                <mat-error id="sex-error"
+                  >Biological sex is required.</mat-error
+                >
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field
+            appearance="outline"
+            class="form-field form-field--full"
+          >
+            <mat-label>Phone</mat-label>
+            <input
+              matInput
+              type="tel"
+              formControlName="phone"
+              aria-required="true"
+              placeholder="+1 555 000 0000"
+              [attr.aria-describedby]="
+                hasError('demographics.phone', 'required')
+                  ? 'phone-error'
+                  : null
+              "
+            />
+            @if (hasError("demographics.phone", "required")) {
+              <mat-error id="phone-error">Phone number is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <fieldset class="address-fieldset">
+            <legend class="address-legend">Address</legend>
+            <mat-form-field
+              appearance="outline"
+              class="form-field form-field--full"
+            >
+              <mat-label>Street</mat-label>
+              <input matInput formControlName="street" />
+            </mat-form-field>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>City</mat-label>
+                <input matInput formControlName="city" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>State / Province</mat-label>
+                <input matInput formControlName="state" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Postal Code</mat-label>
+                <input matInput formControlName="postalCode" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Country</mat-label>
+                <input matInput formControlName="country" />
+              </mat-form-field>
+            </div>
+          </fieldset>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- ── Medical History ────────────────────────────────────────────── -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>Medical History</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div
+            formArrayName="medicalHistory"
+            aria-label="Medical history items"
+          >
+            @for (
+              item of medicalHistoryArray.controls;
+              track $index;
+              let i = $index
+            ) {
+              <div [formGroupName]="i" class="array-item">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Condition</mat-label>
+                  <input
+                    matInput
+                    formControlName="condition"
+                    aria-required="true"
+                    [attr.aria-label]="'Condition ' + (i + 1)"
+                  />
+                  @if (
+                    item.get("condition")?.touched &&
+                    item.get("condition")?.hasError("required")
+                  ) {
+                    <mat-error>Condition is required.</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Diagnosed At</mat-label>
+                  <input matInput type="date" formControlName="diagnosedAt" />
+                </mat-form-field>
+
+                <mat-form-field
+                  appearance="outline"
+                  class="form-field form-field--full"
+                >
+                  <mat-label>Notes</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="notes"
+                    rows="2"
+                  ></textarea>
+                </mat-form-field>
+
+                <button
+                  type="button"
+                  mat-stroked-button
+                  color="warn"
+                  class="remove-btn"
+                  (click)="removeMedicalHistoryItem(i)"
+                  [attr.aria-label]="'Remove medical history item ' + (i + 1)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+          </div>
+
+          <button
+            type="button"
+            mat-stroked-button
+            class="add-btn"
+            (click)="addMedicalHistoryItem()"
+            aria-label="Add medical history item"
+          >
+            + Add Condition
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- ── Symptoms ───────────────────────────────────────────────────── -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>Symptoms</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div formArrayName="symptoms" aria-label="Symptom items">
+            @for (
+              item of symptomsArray.controls;
+              track $index;
+              let i = $index
+            ) {
+              <div [formGroupName]="i" class="array-item">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Symptom</mat-label>
+                  <input
+                    matInput
+                    formControlName="name"
+                    aria-required="true"
+                    [attr.aria-label]="'Symptom ' + (i + 1)"
+                  />
+                  @if (
+                    item.get("name")?.touched &&
+                    item.get("name")?.hasError("required")
+                  ) {
+                    <mat-error>Symptom name is required.</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Severity</mat-label>
+                  <mat-select formControlName="severity">
+                    <mat-option value="">Not specified</mat-option>
+                    <mat-option value="Mild">Mild</mat-option>
+                    <mat-option value="Moderate">Moderate</mat-option>
+                    <mat-option value="Severe">Severe</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Onset Date</mat-label>
+                  <input matInput type="date" formControlName="onsetDate" />
+                </mat-form-field>
+
+                <button
+                  type="button"
+                  mat-stroked-button
+                  color="warn"
+                  class="remove-btn"
+                  (click)="removeSymptomItem(i)"
+                  [attr.aria-label]="'Remove symptom ' + (i + 1)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+          </div>
+
+          <button
+            type="button"
+            mat-stroked-button
+            class="add-btn"
+            (click)="addSymptomItem()"
+            aria-label="Add symptom"
+          >
+            + Add Symptom
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- ── Medications ────────────────────────────────────────────────── -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>Medications</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div formArrayName="medications" aria-label="Medication items">
+            @for (
+              item of medicationsArray.controls;
+              track $index;
+              let i = $index
+            ) {
+              <div [formGroupName]="i" class="array-item">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Medication Name</mat-label>
+                  <input
+                    matInput
+                    formControlName="name"
+                    aria-required="true"
+                    [attr.aria-label]="'Medication ' + (i + 1)"
+                  />
+                  @if (
+                    item.get("name")?.touched &&
+                    item.get("name")?.hasError("required")
+                  ) {
+                    <mat-error>Medication name is required.</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Dosage</mat-label>
+                  <input matInput formControlName="dosage" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Frequency</mat-label>
+                  <input matInput formControlName="frequency" />
+                </mat-form-field>
+
+                <button
+                  type="button"
+                  mat-stroked-button
+                  color="warn"
+                  class="remove-btn"
+                  (click)="removeMedicationItem(i)"
+                  [attr.aria-label]="'Remove medication ' + (i + 1)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+          </div>
+
+          <button
+            type="button"
+            mat-stroked-button
+            class="add-btn"
+            (click)="addMedicationItem()"
+            aria-label="Add medication"
+          >
+            + Add Medication
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- ── Form Actions ───────────────────────────────────────────────── -->
+      <div class="form-actions">
+        <button
+          type="button"
+          mat-stroked-button
+          (click)="onCancel()"
+          aria-label="Cancel and return to dashboard"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          mat-flat-button
+          color="primary"
+          [disabled]="store.savingState() === 'saving'"
+          aria-label="Save intake form"
+        >
+          @if (store.savingState() === "saving") {
+            <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
+          } @else {
+            Save
+          }
+        </button>
+      </div>
+    </form>
+  }
+
+  <!-- ── Conflict reconciliation modal ──────────────────────────────────── -->
+  @if (showConflictModal() && store.conflictPayload()) {
+    <div
+      class="modal-overlay"
+      role="presentation"
+      (click)="onConflictCancelled()"
+      (keydown.escape)="onConflictCancelled()"
+    >
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <app-intake-conflict-modal
+          [conflict]="store.conflictPayload()!"
+          (resolved)="onConflictResolved($event)"
+          (cancelled)="onConflictCancelled()"
+        />
+      </div>
+    </div>
+  }
+</main>

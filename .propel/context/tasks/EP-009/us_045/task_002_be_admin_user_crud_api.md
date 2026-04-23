@@ -32,17 +32,17 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology              | Version    |
-| ------------------ | ----------------------- | ---------- |
-| Backend            | ASP.NET Core Web API    | .net 10     |
-| Backend Messaging  | MediatR                 | 12.x       |
-| Backend Validation | FluentValidation        | 11.x       |
-| ORM                | Entity Framework Core   | 9.x        |
-| Database           | PostgreSQL              | 16+        |
-| Cache              | Upstash Redis           | Serverless |
-| Email Service      | SendGrid                | —          |
-| Authentication     | JWT + Argon2            | —          |
-| Logging            | Serilog                 | 4.x        |
+| Layer              | Technology            | Version    |
+| ------------------ | --------------------- | ---------- |
+| Backend            | ASP.NET Core Web API  | .net 10    |
+| Backend Messaging  | MediatR               | 12.x       |
+| Backend Validation | FluentValidation      | 11.x       |
+| ORM                | Entity Framework Core | 9.x        |
+| Database           | PostgreSQL            | 16+        |
+| Cache              | Upstash Redis         | Serverless |
+| Email Service      | SendGrid              | —          |
+| Authentication     | JWT + Argon2          | —          |
+| Logging            | Serilog               | 4.x        |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -94,25 +94,25 @@ All endpoints are `[Authorize(Roles = "Admin")]`, follow the CQRS MediatR patter
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `AdminUsersController` (new) | Admin Module | CREATE — REST controller: GET, POST, PATCH, DELETE, POST resend |
-| `GetManagedUsersQuery` (new) | Admin Module | CREATE — MediatR query: returns Staff + Admin users |
-| `GetManagedUsersQueryHandler` (new) | Admin Module | CREATE — EF Core query on `Users` filtered by role IN (Staff, Admin) |
-| `CreateManagedUserCommand` (new) | Admin Module | CREATE — MediatR command: name, email, role |
-| `CreateManagedUserCommandHandler` (new) | Admin Module | CREATE — Creates User, sends credential email, writes AuditLog |
-| `UpdateManagedUserCommand` (new) | Admin Module | CREATE — MediatR command: id, name?, role? |
-| `UpdateManagedUserCommandHandler` (new) | Admin Module | CREATE — Updates User, writes AuditLog with before/after state |
-| `DeactivateUserCommand` (new) | Admin Module | CREATE — MediatR command: targetUserId, requestingAdminId |
-| `DeactivateUserCommandHandler` (new) | Admin Module | CREATE — Self-deactivation guard, soft-delete, Redis session flush, AuditLog |
-| `ResendCredentialEmailCommand` (new) | Admin Module | CREATE — MediatR command: targetUserId |
-| `ResendCredentialEmailCommandHandler` (new) | Admin Module | CREATE — SendGrid email trigger; returns success/failure |
-| `ICredentialEmailService` (new) | Infrastructure | CREATE — Interface for sending credential setup emails |
-| `SendGridCredentialEmailService` (new) | Infrastructure | CREATE — SendGrid implementation; graceful degradation on failure |
-| `ISessionInvalidationService` (new) | Infrastructure | CREATE — Interface for flushing Redis sessions by userId |
-| `RedisSessionInvalidationService` (new) | Infrastructure | CREATE — Deletes all Redis keys matching `session:{userId}:*` |
-| `ManagedUserDto` (new) | Shared Contracts | CREATE — API-safe DTO: id, name, email, role, status, lastLoginAt, emailDeliveryFailed? |
-| `AdminModuleRegistration` (existing) | DI Bootstrap | MODIFY — Register all new commands, handlers, services |
+| Component                                   | Module           | Action                                                                                  |
+| ------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------- |
+| `AdminUsersController` (new)                | Admin Module     | CREATE — REST controller: GET, POST, PATCH, DELETE, POST resend                         |
+| `GetManagedUsersQuery` (new)                | Admin Module     | CREATE — MediatR query: returns Staff + Admin users                                     |
+| `GetManagedUsersQueryHandler` (new)         | Admin Module     | CREATE — EF Core query on `Users` filtered by role IN (Staff, Admin)                    |
+| `CreateManagedUserCommand` (new)            | Admin Module     | CREATE — MediatR command: name, email, role                                             |
+| `CreateManagedUserCommandHandler` (new)     | Admin Module     | CREATE — Creates User, sends credential email, writes AuditLog                          |
+| `UpdateManagedUserCommand` (new)            | Admin Module     | CREATE — MediatR command: id, name?, role?                                              |
+| `UpdateManagedUserCommandHandler` (new)     | Admin Module     | CREATE — Updates User, writes AuditLog with before/after state                          |
+| `DeactivateUserCommand` (new)               | Admin Module     | CREATE — MediatR command: targetUserId, requestingAdminId                               |
+| `DeactivateUserCommandHandler` (new)        | Admin Module     | CREATE — Self-deactivation guard, soft-delete, Redis session flush, AuditLog            |
+| `ResendCredentialEmailCommand` (new)        | Admin Module     | CREATE — MediatR command: targetUserId                                                  |
+| `ResendCredentialEmailCommandHandler` (new) | Admin Module     | CREATE — SendGrid email trigger; returns success/failure                                |
+| `ICredentialEmailService` (new)             | Infrastructure   | CREATE — Interface for sending credential setup emails                                  |
+| `SendGridCredentialEmailService` (new)      | Infrastructure   | CREATE — SendGrid implementation; graceful degradation on failure                       |
+| `ISessionInvalidationService` (new)         | Infrastructure   | CREATE — Interface for flushing Redis sessions by userId                                |
+| `RedisSessionInvalidationService` (new)     | Infrastructure   | CREATE — Deletes all Redis keys matching `session:{userId}:*`                           |
+| `ManagedUserDto` (new)                      | Shared Contracts | CREATE — API-safe DTO: id, name, email, role, status, lastLoginAt, emailDeliveryFailed? |
+| `AdminModuleRegistration` (existing)        | DI Bootstrap     | MODIFY — Register all new commands, handlers, services                                  |
 
 ---
 
@@ -121,9 +121,11 @@ All endpoints are `[Authorize(Roles = "Admin")]`, follow the CQRS MediatR patter
 1. **Define `ManagedUserDto`** — Safe DTO for all user management responses: `id` (Guid), `name` (string), `email` (string), `role` (enum: Staff | Admin), `status` (enum: Active | Deactivated), `lastLoginAt` (DateTimeOffset?), `emailDeliveryFailed` (bool, nullable — populated only in creation/resend responses).
 
 2. **Implement `GET /api/admin/users`** — `GetManagedUsersQuery` handler executes:
+
    ```
    SELECT * FROM Users WHERE role IN ('Staff', 'Admin') ORDER BY name ASC
    ```
+
    Maps to `List<ManagedUserDto>`. No pagination in Phase 1 (user count bounded by team size).
 
 3. **Implement `POST /api/admin/users`** — `CreateManagedUserCommand` handler:
@@ -184,23 +186,23 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Admin/Controllers/AdminUsersController.cs` | REST controller: GET list, POST create, PATCH update, DELETE deactivate, POST resend |
-| CREATE | `Server/Admin/Queries/GetManagedUsersQuery.cs` | MediatR query: returns `List<ManagedUserDto>` |
-| CREATE | `Server/Admin/Queries/GetManagedUsersQueryHandler.cs` | EF Core query: Users WHERE role IN (Staff, Admin) |
-| CREATE | `Server/Admin/Commands/CreateManagedUserCommand.cs` | MediatR command: name, email, role |
-| CREATE | `Server/Admin/Commands/CreateManagedUserCommandHandler.cs` | Create user, send email, AuditLog, return DTO with emailDeliveryFailed flag |
-| CREATE | `Server/Admin/Commands/UpdateManagedUserCommand.cs` | MediatR command: id, name?, role? |
-| CREATE | `Server/Admin/Commands/UpdateManagedUserCommandHandler.cs` | Update user fields, AuditLog before/after |
-| CREATE | `Server/Admin/Commands/DeactivateUserCommand.cs` | MediatR command: targetUserId, requestingAdminId |
-| CREATE | `Server/Admin/Commands/DeactivateUserCommandHandler.cs` | Self-deactivation guard, soft-delete, Redis session flush, AuditLog |
-| CREATE | `Server/Admin/Commands/ResendCredentialEmailCommand.cs` | MediatR command: targetUserId |
-| CREATE | `Server/Admin/Commands/ResendCredentialEmailCommandHandler.cs` | Regenerate token, send email, return success/failure |
-| CREATE | `Server/Infrastructure/Email/CredentialEmailService.cs` | SendGrid credential setup email implementation |
-| CREATE | `Server/Infrastructure/Session/RedisSessionInvalidationService.cs` | Redis SCAN+DEL for all user sessions |
-| CREATE | `Server/Shared/Contracts/ManagedUserDto.cs` | API DTO: id, name, email, role, status, lastLoginAt, emailDeliveryFailed? |
-| MODIFY | `Server/DI/AdminModuleRegistration.cs` | Register all new commands, handlers, services |
+| Action | File Path                                                          | Description                                                                          |
+| ------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| CREATE | `Server/Admin/Controllers/AdminUsersController.cs`                 | REST controller: GET list, POST create, PATCH update, DELETE deactivate, POST resend |
+| CREATE | `Server/Admin/Queries/GetManagedUsersQuery.cs`                     | MediatR query: returns `List<ManagedUserDto>`                                        |
+| CREATE | `Server/Admin/Queries/GetManagedUsersQueryHandler.cs`              | EF Core query: Users WHERE role IN (Staff, Admin)                                    |
+| CREATE | `Server/Admin/Commands/CreateManagedUserCommand.cs`                | MediatR command: name, email, role                                                   |
+| CREATE | `Server/Admin/Commands/CreateManagedUserCommandHandler.cs`         | Create user, send email, AuditLog, return DTO with emailDeliveryFailed flag          |
+| CREATE | `Server/Admin/Commands/UpdateManagedUserCommand.cs`                | MediatR command: id, name?, role?                                                    |
+| CREATE | `Server/Admin/Commands/UpdateManagedUserCommandHandler.cs`         | Update user fields, AuditLog before/after                                            |
+| CREATE | `Server/Admin/Commands/DeactivateUserCommand.cs`                   | MediatR command: targetUserId, requestingAdminId                                     |
+| CREATE | `Server/Admin/Commands/DeactivateUserCommandHandler.cs`            | Self-deactivation guard, soft-delete, Redis session flush, AuditLog                  |
+| CREATE | `Server/Admin/Commands/ResendCredentialEmailCommand.cs`            | MediatR command: targetUserId                                                        |
+| CREATE | `Server/Admin/Commands/ResendCredentialEmailCommandHandler.cs`     | Regenerate token, send email, return success/failure                                 |
+| CREATE | `Server/Infrastructure/Email/CredentialEmailService.cs`            | SendGrid credential setup email implementation                                       |
+| CREATE | `Server/Infrastructure/Session/RedisSessionInvalidationService.cs` | Redis SCAN+DEL for all user sessions                                                 |
+| CREATE | `Server/Shared/Contracts/ManagedUserDto.cs`                        | API DTO: id, name, email, role, status, lastLoginAt, emailDeliveryFailed?            |
+| MODIFY | `Server/DI/AdminModuleRegistration.cs`                             | Register all new commands, handlers, services                                        |
 
 ---
 
@@ -247,13 +249,13 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `ManagedUserDto` shared contract
-- [ ] Implement `GetManagedUsersQuery` + handler (EF Core filter: role IN Staff, Admin)
-- [ ] Implement `CreateManagedUserCommand` + handler (token gen, user insert, SendGrid call, AuditLog, emailDeliveryFailed flag)
-- [ ] Implement `UpdateManagedUserCommand` + handler (404 guard, field update, AuditLog before/after)
-- [ ] Implement `DeactivateUserCommand` + handler (self-deactivation 422 guard, soft-delete, Redis session flush, AuditLog)
-- [ ] Implement `ResendCredentialEmailCommand` + handler (token refresh, SendGrid retry, graceful failure response)
-- [ ] Implement `ICredentialEmailService` / `SendGridCredentialEmailService` (try/catch, returns bool)
-- [ ] Implement `ISessionInvalidationService` / `RedisSessionInvalidationService` (SCAN+DEL pipeline)
-- [ ] Implement `AdminUsersController` with all five endpoints, `[Authorize(Roles = "Admin")]`, ProducesResponseType annotations
-- [ ] Register all new components in `AdminModuleRegistration`
+- [x] Create `ManagedUserDto` shared contract
+- [x] Implement `GetManagedUsersQuery` + handler (EF Core filter: role IN Staff, Admin)
+- [x] Implement `CreateManagedUserCommand` + handler (token gen, user insert, SendGrid call, AuditLog, emailDeliveryFailed flag)
+- [x] Implement `UpdateManagedUserCommand` + handler (404 guard, field update, AuditLog before/after)
+- [x] Implement `DeactivateUserCommand` + handler (self-deactivation 422 guard, soft-delete, Redis session flush, AuditLog)
+- [x] Implement `ResendCredentialEmailCommand` + handler (token refresh, SendGrid retry, graceful failure response)
+- [x] Implement `ICredentialEmailService` / `SendGridCredentialEmailService` (try/catch, returns bool)
+- [x] Implement `ISessionInvalidationService` / `RedisSessionInvalidationService` (SCAN+DEL pipeline)
+- [x] Implement `AdminUsersController` with all five endpoints, `[Authorize(Roles = "Admin")]`, ProducesResponseType annotations
+- [x] Register all new components in `AdminModuleRegistration`

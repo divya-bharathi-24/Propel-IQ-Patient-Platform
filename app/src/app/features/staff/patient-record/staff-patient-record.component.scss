@@ -1,0 +1,34 @@
+:host {
+  display: block;
+}
+
+.patient-record-page {
+  padding: 1.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.record-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.error-state {
+  font-size: 0.875rem;
+  color: var(--error-color, #dc2626);
+  padding: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .record-layout {
+    grid-template-columns: 400px 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-record-page {
+    padding: 1rem;
+  }
+}

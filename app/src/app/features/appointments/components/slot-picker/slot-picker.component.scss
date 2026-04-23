@@ -1,0 +1,90 @@
+// ── Layout ────────────────────────────────────────────────────────────────────
+
+.slot-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  max-width: 640px;
+}
+
+.date-field {
+  width: 100%;
+  max-width: 280px;
+}
+
+// ── Slot grid ─────────────────────────────────────────────────────────────────
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.slot-btn {
+  min-width: 0;
+  width: 100%;
+  font-size: 0.875rem;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &--selected {
+    // Visually distinct selected state; border uses theme primary
+    border-width: 2px;
+    font-weight: 600;
+  }
+
+  // Unavailable slot: greyed out with strikethrough
+  // Must achieve ≥ 3:1 non-text contrast against the background (WCAG 2.2 AA §1.4.11)
+  &--unavailable {
+    color: #767676; // 4.54:1 on white — satisfies both text and non-text contrast
+    border-color: #b0b0b0;
+    text-decoration: line-through;
+    opacity: 1; // override Material's 0.38 opacity to keep contrast ratio
+  }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+// ── Fully booked / empty ──────────────────────────────────────────────────────
+
+.fully-booked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.no-slots-label {
+  margin: 0;
+  color: #767676; // ≥ 4.54:1 on white
+  font-size: 0.875rem;
+}
+
+// ── Conflict banner ───────────────────────────────────────────────────────────
+
+.conflict-warning {
+  border-left: 4px solid #b00020; // error-red accent
+  background-color: #fff3f3;
+
+  mat-card-content {
+    color: #b00020;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+  }
+}
+
+// ── Error ─────────────────────────────────────────────────────────────────────
+
+.error-message {
+  color: #b00020;
+  font-size: 0.875rem;
+  margin: 0;
+}

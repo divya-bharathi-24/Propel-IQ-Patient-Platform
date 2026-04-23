@@ -8,7 +8,9 @@ using System.Security.Claims;
 namespace Propel.Api.Gateway.Controllers;
 
 /// <summary>
-/// Handles admin-only account management operations (US_012, AC-4).
+/// Admin-only utility endpoints (US_012, AC-4).
+/// Full user CRUD (list, create, update, deactivate, resend-credentials) is in
+/// <see cref="AdminUsersController"/> (US_045).
 /// The controller-level <c>[Authorize(Roles = "Admin")]</c> attribute rejects non-Admin
 /// callers with HTTP 403 before any handler logic executes (NFR-006).
 /// </summary>
@@ -36,42 +38,10 @@ public sealed class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new Staff or Admin user account, generates a credential setup token,
-    /// and dispatches a SendGrid invite email (US_012, AC-1).
-    /// Admin-only: HTTP 403 for all other roles.
-    /// </summary>
-    [HttpPost("users")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateUserAccount(
-        [FromBody] CreateUserAccountRequest request,
-        CancellationToken cancellationToken)
-    {
-        var adminId = GetCurrentUserId();
-        string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-        string? correlationId = HttpContext.Items["CorrelationId"]?.ToString();
-        string setupBaseUrl = _configuration["App:CredentialSetupUrl"]
-            ?? "https://propeliq.app/setup-credentials";
-
-        var command = new CreateUserAccountCommand(
-            request.Name,
-            request.Email,
-            request.Role,
-            adminId,
-            ipAddress,
-            correlationId,
-            setupBaseUrl);
-
-        var result = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(CreateUserAccount), new { userId = result.UserId },
-            new { result.UserId, message = "User account created. An invite email has been dispatched." });
-    }
-
-    /// <summary>
     /// Resends the credential setup invite email for a given user (US_012, AC-1 edge case).
     /// Always returns HTTP 200 to prevent user enumeration (OWASP A07).
+    /// For the US_045 resend endpoint that returns structured success/failure, see
+    /// POST /api/admin/users/{id}/resend-credentials in <see cref="AdminUsersController"/>.
     /// Admin-only: HTTP 403 for all other roles.
     /// </summary>
     [HttpPost("users/{id:guid}/resend-invite")]
@@ -101,7 +71,4 @@ public sealed class AdminController : ControllerBase
         return Guid.TryParse(sub, out var id) ? id : Guid.Empty;
     }
 }
-
-/// <summary>Request body for POST /api/admin/users.</summary>
-public sealed record CreateUserAccountRequest(string Name, string Email, string Role);
 

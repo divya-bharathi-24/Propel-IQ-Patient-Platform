@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type         | Value                                                                                                                                         |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **UI Impact**          | Yes                                                                                                                                           |
-| **Figma URL**          | N/A                                                                                                                                           |
-| **Wireframe Status**   | PENDING                                                                                                                                       |
-| **Wireframe Type**     | N/A                                                                                                                                           |
-| **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-audit-log.[html\|png\|jpg]` or provide external URL                       |
-| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                                         |
-| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                                         |
-| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                                       |
+| Reference Type         | Value                                                                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                     |
+| **Figma URL**          | N/A                                                                                                                     |
+| **Wireframe Status**   | PENDING                                                                                                                 |
+| **Wireframe Type**     | N/A                                                                                                                     |
+| **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-audit-log.[html\|png\|jpg]` or provide external URL |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                   |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                   |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                 |
 
 > **Wireframe Status: PENDING** — Implement using component-level layout described in the Implementation Plan. Align to wireframe when it becomes AVAILABLE.
 
@@ -34,16 +34,16 @@
 
 ## Applicable Technology Stack
 
-| Layer             | Technology                     | Version |
-| ----------------- | ------------------------------ | ------- |
-| Frontend          | Angular                        | 18.x    |
-| Frontend State    | NgRx Signals                   | 18.x    |
-| Frontend UI       | Angular Material               | 18.x    |
-| Frontend Routing  | Angular Router                 | 18.x    |
-| HTTP Client       | Angular HttpClient             | 18.x    |
-| Testing — Unit    | Jest / Angular Testing Library | —       |
-| AI/ML             | N/A                            | N/A     |
-| Mobile            | N/A                            | N/A     |
+| Layer            | Technology                     | Version |
+| ---------------- | ------------------------------ | ------- |
+| Frontend         | Angular                        | 18.x    |
+| Frontend State   | NgRx Signals                   | 18.x    |
+| Frontend UI      | Angular Material               | 18.x    |
+| Frontend Routing | Angular Router                 | 18.x    |
+| HTTP Client      | Angular HttpClient             | 18.x    |
+| Testing — Unit   | Jest / Angular Testing Library | —       |
+| AI/ML            | N/A                            | N/A     |
+| Mobile           | N/A                            | N/A     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -95,29 +95,30 @@ The route `/admin/audit-log` is protected by the existing `AdminRoleGuard` (crea
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `AuditLogPageComponent` (new) | Admin Feature Module | CREATE — Routed page: hosts filter panel, event table, load-more pagination |
-| `AuditEventTableComponent` (new) | Admin Feature Module | CREATE — `mat-table` with 7 columns + expand toggle; renders `DiffViewComponent` in expansion row |
-| `AuditFilterPanelComponent` (new) | Admin Feature Module | CREATE — Filter controls: date range, userId text, actionType select, entityType select |
-| `DiffViewComponent` (new) | Admin Shared | CREATE — Renders before/after state from JSONB `details` as a structured two-column table |
-| `AuditLogStore` (new) | Admin State | CREATE — NgRx Signals store: `events`, `loading`, `filters`, `nextCursor`, `totalCount`, `loadAuditLogs()`, `loadMore()`, `applyFilters()` |
-| `AuditLogService` (new) | Admin Data Access | CREATE — Angular service: `getAuditLogs(params)` → `GET /api/admin/audit-logs` with filter query params and cursor |
-| `admin.routes.ts` (existing — US_045) | App Routing | MODIFY — Add `{ path: 'audit-log', component: AuditLogPageComponent, canActivate: [AdminRoleGuard] }` |
+| Component                             | Module               | Action                                                                                                                                     |
+| ------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AuditLogPageComponent` (new)         | Admin Feature Module | CREATE — Routed page: hosts filter panel, event table, load-more pagination                                                                |
+| `AuditEventTableComponent` (new)      | Admin Feature Module | CREATE — `mat-table` with 7 columns + expand toggle; renders `DiffViewComponent` in expansion row                                          |
+| `AuditFilterPanelComponent` (new)     | Admin Feature Module | CREATE — Filter controls: date range, userId text, actionType select, entityType select                                                    |
+| `DiffViewComponent` (new)             | Admin Shared         | CREATE — Renders before/after state from JSONB `details` as a structured two-column table                                                  |
+| `AuditLogStore` (new)                 | Admin State          | CREATE — NgRx Signals store: `events`, `loading`, `filters`, `nextCursor`, `totalCount`, `loadAuditLogs()`, `loadMore()`, `applyFilters()` |
+| `AuditLogService` (new)               | Admin Data Access    | CREATE — Angular service: `getAuditLogs(params)` → `GET /api/admin/audit-logs` with filter query params and cursor                         |
+| `admin.routes.ts` (existing — US_045) | App Routing          | MODIFY — Add `{ path: 'audit-log', component: AuditLogPageComponent, canActivate: [AdminRoleGuard] }`                                      |
 
 ---
 
 ## Implementation Plan
 
 1. **Define `AuditEventDto` interface** — Client-side type:
+
    ```typescript
    interface AuditEventDto {
      id: string;
      userId: string;
-     userRole: 'Patient' | 'Staff' | 'Admin';
+     userRole: "Patient" | "Staff" | "Admin";
      entityType: string;
      entityId: string;
-     actionType: 'Create' | 'Read' | 'Update' | 'Delete';
+     actionType: "Create" | "Read" | "Update" | "Delete";
      ipAddress: string;
      timestamp: string; // ISO 8601 UTC
      details: AuditEventDetails | null; // non-null for FR-058 clinical events
@@ -198,15 +199,15 @@ app/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/admin/pages/audit-log/audit-log.page.ts` | Routed page: loads on init, hosts filter panel + event table |
-| CREATE | `app/admin/components/audit-event-table/audit-event-table.component.ts` | mat-table with 7 columns, row expand toggle, DiffViewComponent, Load More button, total-count badge |
-| CREATE | `app/admin/components/audit-filter-panel/audit-filter-panel.component.ts` | Reactive filter form: date range, userId, actionType, entityType selects; Apply/Clear actions |
-| CREATE | `app/admin/components/diff-view/diff-view.component.ts` | Before/after structured diff table from JSONB details; null-safe fallback |
-| CREATE | `app/admin/store/audit-log.store.ts` | NgRx Signals store: events, loading, filters, nextCursor, totalCount; loadAuditLogs, loadMore, applyFilters |
-| CREATE | `app/admin/services/audit-log.service.ts` | HTTP service: getAuditLogs(params) → GET /api/admin/audit-logs |
-| MODIFY | `app/admin/admin.routes.ts` | Add `/audit-log` route with `AuditLogPageComponent` and `AdminRoleGuard` |
+| Action | File Path                                                                 | Description                                                                                                 |
+| ------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| CREATE | `app/admin/pages/audit-log/audit-log.page.ts`                             | Routed page: loads on init, hosts filter panel + event table                                                |
+| CREATE | `app/admin/components/audit-event-table/audit-event-table.component.ts`   | mat-table with 7 columns, row expand toggle, DiffViewComponent, Load More button, total-count badge         |
+| CREATE | `app/admin/components/audit-filter-panel/audit-filter-panel.component.ts` | Reactive filter form: date range, userId, actionType, entityType selects; Apply/Clear actions               |
+| CREATE | `app/admin/components/diff-view/diff-view.component.ts`                   | Before/after structured diff table from JSONB details; null-safe fallback                                   |
+| CREATE | `app/admin/store/audit-log.store.ts`                                      | NgRx Signals store: events, loading, filters, nextCursor, totalCount; loadAuditLogs, loadMore, applyFilters |
+| CREATE | `app/admin/services/audit-log.service.ts`                                 | HTTP service: getAuditLogs(params) → GET /api/admin/audit-logs                                              |
+| MODIFY | `app/admin/admin.routes.ts`                                               | Add `/audit-log` route with `AuditLogPageComponent` and `AdminRoleGuard`                                    |
 
 ---
 
@@ -248,11 +249,11 @@ app/
 
 ## Implementation Checklist
 
-- [ ] Define `AuditEventDto`, `AuditEventDetails`, `AuditLogResponse`, `AuditLogQueryParams` interfaces
-- [ ] Create `AuditLogService` with `getAuditLogs(params)` HTTP method (GET with query string)
-- [ ] Create `AuditLogStore` (NgRx Signals): events, loading, filters, nextCursor, totalCount; loadAuditLogs, loadMore, applyFilters
-- [ ] Create `DiffViewComponent`: before/after table from JSONB details; null-safe fallback text
-- [ ] Create `AuditFilterPanelComponent`: date range + userId + actionType + entityType; Apply/Clear buttons
-- [ ] Create `AuditEventTableComponent`: 7-column mat-table, expand toggle, DiffViewComponent row, Load More button, total-count badge — **no export controls**
-- [ ] Create `AuditLogPageComponent`: ngOnInit load, renders filter panel + table stacked
-- [ ] Extend `admin.routes.ts` with `/audit-log` route protected by `AdminRoleGuard`
+- [x] Define `AuditEventDto`, `AuditEventDetails`, `AuditLogResponse`, `AuditLogQueryParams` interfaces
+- [x] Create `AuditLogService` with `getAuditLogs(params)` HTTP method (GET with query string)
+- [x] Create `AuditLogStore` (NgRx Signals): events, loading, filters, nextCursor, totalCount; loadAuditLogs, loadMore, applyFilters
+- [x] Create `DiffViewComponent`: before/after table from JSONB details; null-safe fallback text
+- [x] Create `AuditFilterPanelComponent`: date range + userId + actionType + entityType; Apply/Clear buttons
+- [x] Create `AuditEventTableComponent`: 7-column mat-table, expand toggle, DiffViewComponent row, Load More button, total-count badge — **no export controls**
+- [x] Create `AuditLogPageComponent`: ngOnInit load, renders filter panel + table stacked
+- [x] Extend `admin.routes.ts` with `/audit-log` route protected by `AdminRoleGuard`

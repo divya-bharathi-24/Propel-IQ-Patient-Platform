@@ -1,0 +1,102 @@
+<section class="slot-picker" aria-label="Appointment slot picker">
+  <!-- Date picker -->
+  <mat-form-field appearance="outline" class="date-field">
+    <mat-label>Select a date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="datepicker"
+      [ngModel]="selectedDate()"
+      (ngModelChange)="onDateChange($event)"
+      [min]="today"
+      aria-label="Appointment date"
+      placeholder="DD/MM/YYYY"
+    />
+    <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+    <mat-datepicker #datepicker />
+  </mat-form-field>
+
+  <!-- Conflict banner -->
+  @if (store.conflictMessage()) {
+    <mat-card class="conflict-warning" role="alert" aria-live="assertive">
+      <mat-card-content>{{ store.conflictMessage() }}</mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Loading state -->
+  @if (store.loadingState() === "loading") {
+    <div
+      class="loading-container"
+      aria-busy="true"
+      aria-label="Loading available slots"
+    >
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (store.loadingState() === "error") {
+    <p class="error-message" role="alert">
+      Unable to load slots. Please try again.
+    </p>
+  }
+
+  <!-- Fully booked day -->
+  @if (store.loadingState() === "loaded" && isFullyBooked()) {
+    <div class="fully-booked" aria-label="No slots available for selected date">
+      <p class="no-slots-label">No slots available</p>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="onJoinWaitlist()"
+        aria-label="Join the waitlist for this date"
+      >
+        Join Waitlist
+      </button>
+    </div>
+  }
+
+  <!-- Slot grid -->
+  @if (
+    store.loadingState() === "loaded" &&
+    !isFullyBooked() &&
+    store.slots().length > 0
+  ) {
+    <div class="slot-grid" role="grid" aria-label="Available appointment slots">
+      <!-- Available slots -->
+      @for (slot of availableSlots(); track slot.timeSlotStart) {
+        <button
+          mat-stroked-button
+          class="slot-btn slot-btn--available"
+          [class.slot-btn--selected]="isSelected(slot)"
+          (click)="onSlotSelect(slot)"
+          [attr.aria-label]="'Book slot ' + slotLabel(slot)"
+          [attr.aria-pressed]="isSelected(slot)"
+          role="gridcell"
+        >
+          {{ slotLabel(slot) }}
+        </button>
+      }
+
+      <!-- Unavailable slots -->
+      @for (slot of unavailableSlots(); track slot.timeSlotStart) {
+        <button
+          mat-stroked-button
+          class="slot-btn slot-btn--unavailable"
+          [disabled]="true"
+          aria-disabled="true"
+          [attr.aria-label]="'Unavailable slot ' + slotLabel(slot)"
+          role="gridcell"
+        >
+          {{ slotLabel(slot) }}
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Empty state (date selected, no slots returned) -->
+  @if (store.loadingState() === "loaded" && store.slots().length === 0) {
+    <p class="no-slots-label" aria-live="polite">
+      No slots found for the selected date.
+    </p>
+  }
+</section>

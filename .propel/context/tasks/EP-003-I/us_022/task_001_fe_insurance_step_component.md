@@ -14,18 +14,19 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | Yes |
-| **Figma URL** | N/A |
-| **Wireframe Status** | PENDING |
-| **Wireframe Type** | N/A |
+| Reference Type         | Value                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                           |
+| **Figma URL**          | N/A                                                                                                                           |
+| **Wireframe Status**   | PENDING                                                                                                                       |
+| **Wireframe Type**     | N/A                                                                                                                           |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-insurance-check.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec** | N/A (figma_spec.md not yet generated) |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated) |
-| **Design Tokens** | N/A (designsystem.md not yet generated) |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                         |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                         |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                       |
 
 > **Wireframe Status = PENDING:** When wireframe becomes available, implementation MUST:
+>
 > - Match layout, spacing, typography, and colors from the wireframe
 > - Implement all 5 states: Default (empty form), Loading (API call in-flight), Verified (green badge), Not Recognized / Incomplete (amber badge), Check Pending (blue/info badge)
 > - Validate implementation against wireframe at breakpoints: 375px, 768px, 1440px
@@ -33,38 +34,38 @@
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | Angular | 18.x |
-| Frontend State | NgRx Signals | 18.x |
-| Backend | ASP.NET Core Web API | .net 10 |
-| Database | PostgreSQL | 16+ |
-| Library | Angular Reactive Forms | 18.x |
-| Library | Angular Router | 18.x |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer          | Technology             | Version |
+| -------------- | ---------------------- | ------- |
+| Frontend       | Angular                | 18.x    |
+| Frontend State | NgRx Signals           | 18.x    |
+| Backend        | ASP.NET Core Web API   | .net 10 |
+| Database       | PostgreSQL             | 16+     |
+| Library        | Angular Reactive Forms | 18.x    |
+| Library        | Angular Router         | 18.x    |
+| AI/ML          | N/A                    | N/A     |
+| Vector Store   | N/A                    | N/A     |
+| AI Gateway     | N/A                    | N/A     |
+| Mobile         | N/A                    | N/A     |
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -91,14 +92,14 @@ Implement the Angular 18 `InsuranceStepComponent` — the dedicated insurance pr
 
 ## Impacted Components
 
-| Component | Action | Module / Project |
-|-----------|--------|-----------------|
-| `InsuranceStepComponent` | CREATE | `app/appointment/booking/steps/insurance-step/` |
-| `InsuranceStatusBadgeComponent` | CREATE | `app/shared/components/insurance-status-badge/` |
-| `InsuranceService` | CREATE | `app/appointment/booking/services/` |
-| `BookingWizardStateSignal` | MODIFY | `app/appointment/booking/state/booking-wizard.state.ts` — add `insuranceResult` signal |
-| `BookingWizardComponent` (Step 3 slot) | MODIFY | `app/appointment/booking/` — embed `InsuranceStepComponent` as Step 3 |
-| `PatientDashboardComponent` | MODIFY | `app/patient/dashboard/` — embed `InsuranceStatusBadgeComponent` for last insurance result |
+| Component                              | Action | Module / Project                                                                           |
+| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| `InsuranceStepComponent`               | CREATE | `app/appointment/booking/steps/insurance-step/`                                            |
+| `InsuranceStatusBadgeComponent`        | CREATE | `app/shared/components/insurance-status-badge/`                                            |
+| `InsuranceService`                     | CREATE | `app/appointment/booking/services/`                                                        |
+| `BookingWizardStateSignal`             | MODIFY | `app/appointment/booking/state/booking-wizard.state.ts` — add `insuranceResult` signal     |
+| `BookingWizardComponent` (Step 3 slot) | MODIFY | `app/appointment/booking/` — embed `InsuranceStepComponent` as Step 3                      |
+| `PatientDashboardComponent`            | MODIFY | `app/patient/dashboard/` — embed `InsuranceStatusBadgeComponent` for last insurance result |
 
 ## Implementation Plan
 
@@ -148,18 +149,18 @@ app/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.ts` | Standalone component — insurance form fields, "Check Insurance" button, "Skip" link, "Continue" button, loading state, signal-based result |
-| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.html` | Template — reactive form, status badge slot, guidance text, skip/continue controls |
-| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.scss` | Scoped styles — badge colour variants (green/amber/blue), form layout, loading spinner |
-| CREATE | `app/appointment/booking/services/insurance.service.ts` | Angular service — wraps `POST /api/insurance/pre-check`; graceful degradation on error |
-| CREATE | `app/shared/components/insurance-status-badge/insurance-status-badge.component.ts` | Reusable status badge — `@Input() result: InsuranceCheckResult`; colour-coded chip |
-| CREATE | `app/shared/components/insurance-status-badge/insurance-status-badge.component.html` | Badge template — colour-coded chip with icon and `aria-live` |
-| CREATE | `app/shared/models/insurance.models.ts` | TypeScript interfaces: `InsurancePreCheckRequest`, `InsurancePreCheckResponse`, `InsuranceCheckResult`, `InsuranceStatus` enum |
-| MODIFY | `app/appointment/booking/state/booking-wizard.state.ts` | Add `insuranceResult: WritableSignal<InsuranceCheckResult \| null>` |
-| MODIFY | `app/appointment/booking/booking-wizard.component.ts` | Embed `InsuranceStepComponent` as Step 3; handle `insuranceChecked` event; update state signal |
-| MODIFY | `app/patient/dashboard/patient-dashboard.component.ts` | Embed `InsuranceStatusBadgeComponent` to display last `InsuranceValidation.result` from dashboard API response |
+| Action | File Path                                                                            | Description                                                                                                                                |
+| ------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.ts`           | Standalone component — insurance form fields, "Check Insurance" button, "Skip" link, "Continue" button, loading state, signal-based result |
+| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.html`         | Template — reactive form, status badge slot, guidance text, skip/continue controls                                                         |
+| CREATE | `app/appointment/booking/steps/insurance-step/insurance-step.component.scss`         | Scoped styles — badge colour variants (green/amber/blue), form layout, loading spinner                                                     |
+| CREATE | `app/appointment/booking/services/insurance.service.ts`                              | Angular service — wraps `POST /api/insurance/pre-check`; graceful degradation on error                                                     |
+| CREATE | `app/shared/components/insurance-status-badge/insurance-status-badge.component.ts`   | Reusable status badge — `@Input() result: InsuranceCheckResult`; colour-coded chip                                                         |
+| CREATE | `app/shared/components/insurance-status-badge/insurance-status-badge.component.html` | Badge template — colour-coded chip with icon and `aria-live`                                                                               |
+| CREATE | `app/shared/models/insurance.models.ts`                                              | TypeScript interfaces: `InsurancePreCheckRequest`, `InsurancePreCheckResponse`, `InsuranceCheckResult`, `InsuranceStatus` enum             |
+| MODIFY | `app/appointment/booking/state/booking-wizard.state.ts`                              | Add `insuranceResult: WritableSignal<InsuranceCheckResult \| null>`                                                                        |
+| MODIFY | `app/appointment/booking/booking-wizard.component.ts`                                | Embed `InsuranceStepComponent` as Step 3; handle `insuranceChecked` event; update state signal                                             |
+| MODIFY | `app/patient/dashboard/patient-dashboard.component.ts`                               | Embed `InsuranceStatusBadgeComponent` to display last `InsuranceValidation.result` from dashboard API response                             |
 
 ## External References
 
@@ -191,14 +192,14 @@ app/
 
 ## Implementation Checklist
 
-- [ ] Create `InsuranceService` with `POST /api/insurance/pre-check` call and `catchError` → `CheckPending` fallback
-- [ ] Define `InsuranceCheckResult`, `InsuranceStatus` enum, and request/response interfaces in `insurance.models.ts`
-- [ ] Implement `InsuranceStepComponent` reactive form with `insurerName` and `memberId` controls (no required validators)
-- [ ] Implement "Check Insurance" button with `checking` signal, API dispatch, and result signal update
-- [ ] Implement status badge rendering via `@switch` on result status with colour variants and guidance text (FR-039)
-- [ ] Implement "Skip" link emitting `Incomplete` status to parent and showing skip confirmation message
-- [ ] Implement always-enabled "Continue to Confirmation" button emitting current result (FR-040)
-- [ ] Create `InsuranceStatusBadgeComponent` with `@Input() result` and `aria-live="polite"` for reuse on dashboard
-- [ ] Add `insuranceResult` signal to `BookingWizardStateSignal` and wire `insuranceChecked` output from Step 3
+- [x] Create `InsuranceService` with `POST /api/insurance/pre-check` call and `catchError` → `CheckPending` fallback
+- [x] Define `InsuranceCheckResult`, `InsuranceStatus` enum, and request/response interfaces in `insurance.models.ts`
+- [x] Implement `InsuranceStepComponent` reactive form with `insurerName` and `memberId` controls (no required validators)
+- [x] Implement "Check Insurance" button with `checking` signal, API dispatch, and result signal update
+- [x] Implement status badge rendering via `@switch` on result status with colour variants and guidance text (FR-039)
+- [x] Implement "Skip" link emitting `Incomplete` status to parent and showing skip confirmation message
+- [x] Implement always-enabled "Continue to Confirmation" button emitting current result (FR-040)
+- [x] Create `InsuranceStatusBadgeComponent` with `@Input() result` and `aria-live="polite"` for reuse on dashboard
+- [x] Add `insuranceResult` signal to `BookingWizardStateSignal` and wire `insuranceChecked` output from Step 3
 - [ ] **[UI Tasks - MANDATORY]** Reference wireframe from Design References table during implementation
 - [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking task complete
