@@ -4,6 +4,7 @@ export interface AuthState {
   refreshToken: string | null;
   userId: string | null;
   role: string | null;
+  deviceId: string | null;
   /** UTC epoch milliseconds at which the access token expires. */
   expiresAt: number | null;
 }
@@ -16,4 +17,5 @@ export interface TokenResponse {
   expiresIn: number;
   userId: string;
   role: string;
+  deviceId: string;
 }

@@ -30,10 +30,12 @@ public sealed class AppointmentConfiguration : IEntityTypeConfiguration<Appointm
                .HasColumnType("date");
 
         builder.Property(a => a.TimeSlotStart)
-               .HasColumnType("time");
+               .HasColumnType("time")
+               .IsRequired(false);
 
         builder.Property(a => a.TimeSlotEnd)
-               .HasColumnType("time");
+               .HasColumnType("time")
+               .IsRequired(false);
 
         builder.Property(a => a.Status)
                .HasConversion<string>()
@@ -54,11 +56,16 @@ public sealed class AppointmentConfiguration : IEntityTypeConfiguration<Appointm
                .HasColumnType("xid")
                .IsRowVersion();
 
-        // FK: appointments → patients  (Restrict prevents cascade-delete per DR-009)
+        // FK: appointments → patients  (optional for anonymous walk-ins; Restrict prevents cascade-delete per DR-009)
         builder.HasOne(a => a.Patient)
                .WithMany(p => p.Appointments)
                .HasForeignKey(a => a.PatientId)
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Restrict);
+
+        // anonymous_visit_id: UUID generated for anonymous walk-in appointments (US_026, AC-3)
+        builder.Property(a => a.AnonymousVisitId)
+               .IsRequired(false);
 
         // FK: appointments → specialties (Restrict prevents cascade-delete per DR-009)
         builder.HasOne(a => a.Specialty)

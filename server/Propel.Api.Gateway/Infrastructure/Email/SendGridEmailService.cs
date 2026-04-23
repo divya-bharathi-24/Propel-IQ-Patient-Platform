@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Propel.Domain.Interfaces;
+using Propel.Modules.Notification.Exceptions;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -138,5 +139,127 @@ public sealed class SendGridEmailService : IEmailService
                 "Credential setup email sent to {Email} via SendGrid (status {StatusCode}).",
                 toEmail, (int)response.StatusCode);
         }
+    }
+
+    public async Task SendEmailWithAttachmentAsync(
+        string toEmail,
+        string subject,
+        string htmlBody,
+        byte[] attachmentBytes,
+        string attachmentFileName,
+        CancellationToken cancellationToken = default)
+    {
+        string? apiKey = _configuration["SendGrid:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            _logger.LogWarning(
+                "SendGrid:ApiKey is not configured. Attachment email to {Email} was not sent.",
+                toEmail);
+            throw new EmailDeliveryException(
+                $"SendGrid:ApiKey is not configured. Email with attachment to {toEmail} could not be sent.");
+        }
+
+        string fromEmail = _configuration["SendGrid:FromEmail"] ?? "noreply@propeliq.app";
+        string fromName = _configuration["SendGrid:FromName"] ?? "PropelIQ";
+
+        var message = new SendGridMessage();
+        message.SetFrom(new EmailAddress(fromEmail, fromName));
+        message.AddTo(new EmailAddress(toEmail));
+        message.SetSubject(subject);
+        message.AddContent(MimeType.Html, htmlBody);
+        message.AddAttachment(
+            attachmentFileName,
+            Convert.ToBase64String(attachmentBytes),
+            "application/pdf");
+
+        var client = new SendGridClient(apiKey);
+        var response = await client.SendEmailAsync(message, cancellationToken);
+
+        if ((int)response.StatusCode >= 400)
+        {
+            string responseBody = await response.Body.ReadAsStringAsync(cancellationToken);
+            _logger.LogError(
+                "SendGrid returned {StatusCode} for attachment email to {Email}. Response: {Body}",
+                (int)response.StatusCode, toEmail, responseBody);
+            throw new EmailDeliveryException(
+                $"SendGrid returned {response.StatusCode} for {toEmail}");
+        }
+
+        _logger.LogInformation(
+            "Attachment email sent to {Email} via SendGrid (status {StatusCode}).",
+            toEmail, (int)response.StatusCode);
+    }
+
+    public async Task<bool> SendSlotSwapEmailAsync(
+        string toEmail,
+        string patientName,
+        DateOnly appointmentDate,
+        TimeOnly appointmentTimeStart,
+        string specialtyName,
+        string bookingReference,
+        CancellationToken cancellationToken = default)
+    {
+        string? apiKey = _configuration["SendGrid:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            _logger.LogWarning(
+                "SendGrid:ApiKey is not configured. Slot swap email for {BookingReference} was not sent.",
+                bookingReference);
+            return false;
+        }
+
+        string fromEmail = _configuration["SendGrid:FromEmail"] ?? "noreply@propeliq.app";
+        string fromName  = _configuration["SendGrid:FromName"]  ?? "PropelIQ";
+
+        var client = new SendGridClient(apiKey);
+        var from   = new EmailAddress(fromEmail, fromName);
+        var to     = new EmailAddress(toEmail, patientName);
+        string subject = $"Your appointment has been updated — {bookingReference}";
+
+        string dateStr = appointmentDate.ToString("MMMM d, yyyy");
+        string timeStr = appointmentTimeStart.ToString("h:mm tt");
+
+        string textContent =
+            $"Hi {patientName},\n\n" +
+            $"Your appointment slot has been swapped and confirmed:\n\n" +
+            $"  Specialty : {specialtyName}\n" +
+            $"  Date      : {dateStr}\n" +
+            $"  Time      : {timeStr}\n" +
+            $"  Reference : {bookingReference}\n\n" +
+            "If you have questions, please contact our support team.\n\n" +
+            "— PropelIQ";
+
+        string encodedName      = System.Net.WebUtility.HtmlEncode(patientName);
+        string encodedSpecialty = System.Net.WebUtility.HtmlEncode(specialtyName);
+        string encodedRef       = System.Net.WebUtility.HtmlEncode(bookingReference);
+
+        string htmlContent =
+            $"<p>Hi {encodedName},</p>" +
+            "<p>Your appointment slot has been swapped and confirmed:</p>" +
+            "<table style=\"border-collapse:collapse;margin-bottom:16px;\">" +
+            $"<tr><td style=\"padding:4px 12px 4px 0;\"><strong>Specialty</strong></td><td>{encodedSpecialty}</td></tr>" +
+            $"<tr><td style=\"padding:4px 12px 4px 0;\"><strong>Date</strong></td><td>{dateStr}</td></tr>" +
+            $"<tr><td style=\"padding:4px 12px 4px 0;\"><strong>Time</strong></td><td>{timeStr}</td></tr>" +
+            $"<tr><td style=\"padding:4px 12px 4px 0;\"><strong>Reference</strong></td><td>{encodedRef}</td></tr>" +
+            "</table>" +
+            "<p>If you have questions, please contact our support team.</p>" +
+            "<p>— PropelIQ</p>";
+
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, textContent, htmlContent);
+        var response = await client.SendEmailAsync(msg, cancellationToken);
+
+        if ((int)response.StatusCode >= 400)
+        {
+            string body = await response.Body.ReadAsStringAsync(cancellationToken);
+            _logger.LogError(
+                "SendGrid returned {StatusCode} for slot swap email {BookingReference}. Response: {Body}",
+                (int)response.StatusCode, bookingReference, body);
+            return false;
+        }
+
+        _logger.LogInformation(
+            "Slot swap email sent for {BookingReference} via SendGrid (status {StatusCode}).",
+            bookingReference, (int)response.StatusCode);
+        return true;
     }
 }

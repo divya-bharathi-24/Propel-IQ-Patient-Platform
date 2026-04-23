@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Cancel Appointment</h2>
+
+<mat-dialog-content>
+  <p>
+    Are you sure you want to cancel your appointment on
+    <strong>{{ data.appointment.date | date: "longDate" }}</strong> at
+    <strong>{{ data.appointment.timeStart | date: "shortTime" }}</strong
+    >? This action cannot be undone.
+  </p>
+
+  @if (store.actionState() === "error" && store.errorMessage()) {
+    <p class="cancel-dialog__error" role="alert" aria-live="assertive">
+      {{ store.errorMessage() }}
+    </p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-stroked-button
+    (click)="onKeep()"
+    [disabled]="store.actionState() === 'cancelling'"
+    aria-label="Keep appointment — close dialog without cancelling"
+  >
+    Keep Appointment
+  </button>
+
+  <button
+    mat-flat-button
+    color="warn"
+    (click)="onConfirm()"
+    [disabled]="store.actionState() === 'cancelling'"
+    aria-label="Confirm cancellation of this appointment"
+  >
+    @if (store.actionState() === "cancelling") {
+      <mat-spinner diameter="20" aria-label="Cancelling…" />
+    } @else {
+      Confirm Cancellation
+    }
+  </button>
+</mat-dialog-actions>

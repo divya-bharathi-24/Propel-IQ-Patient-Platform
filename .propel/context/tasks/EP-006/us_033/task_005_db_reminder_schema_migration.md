@@ -14,7 +14,7 @@
 ## Design References (Frontend Tasks Only)
 
 | Reference Type         | Value |
-|------------------------|-------|
+| ---------------------- | ----- |
 | **UI Impact**          | No    |
 | **Figma URL**          | N/A   |
 | **Wireframe Status**   | N/A   |
@@ -27,10 +27,10 @@
 ## Applicable Technology Stack
 
 | Layer    | Technology            | Version |
-|----------|-----------------------|---------|
+| -------- | --------------------- | ------- |
 | ORM      | Entity Framework Core | 9.x     |
 | Database | PostgreSQL            | 16+     |
-| Backend  | ASP.NET Core Web API  | .net 10  |
+| Backend  | ASP.NET Core Web API  | .net 10 |
 | AI/ML    | N/A                   | N/A     |
 | Mobile   | N/A                   | N/A     |
 
@@ -38,23 +38,23 @@
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-|----------------------|-------|
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template**  | N/A   |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type        | Value |
+| --------------------- | ----- |
+| **AI Impact**         | No    |
+| **AIR Requirements**  | N/A   |
+| **AI Pattern**        | N/A   |
+| **Prompt Template**   | N/A   |
+| **Guardrails Config** | N/A   |
+| **Model Provider**    | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-|---------------------|-------|
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -66,14 +66,14 @@ Create and apply EF Core 9 database migrations to support US_033 reminder functi
 
 ## Impacted Components
 
-| Component | Project | Action |
-|-----------|---------|--------|
-| `SystemSetting` entity | `PropelIQ.Domain` | CREATE |
-| `Notification` entity | `PropelIQ.Domain` | MODIFY (add columns) |
-| `SystemSettingsConfiguration` | `PropelIQ.Infrastructure` | CREATE |
-| `NotificationConfiguration` | `PropelIQ.Infrastructure` | MODIFY |
-| `AppDbContext` | `PropelIQ.Infrastructure` | MODIFY (add `DbSet<SystemSetting>`) |
-| Migration `20260420_AddSystemSettingsAndNotificationColumns` | `PropelIQ.Infrastructure` | CREATE |
+| Component                                                    | Project                   | Action                              |
+| ------------------------------------------------------------ | ------------------------- | ----------------------------------- |
+| `SystemSetting` entity                                       | `PropelIQ.Domain`         | CREATE                              |
+| `Notification` entity                                        | `PropelIQ.Domain`         | MODIFY (add columns)                |
+| `SystemSettingsConfiguration`                                | `PropelIQ.Infrastructure` | CREATE                              |
+| `NotificationConfiguration`                                  | `PropelIQ.Infrastructure` | MODIFY                              |
+| `AppDbContext`                                               | `PropelIQ.Infrastructure` | MODIFY (add `DbSet<SystemSetting>`) |
+| Migration `20260420_AddSystemSettingsAndNotificationColumns` | `PropelIQ.Infrastructure` | CREATE                              |
 
 ## Implementation Plan
 
@@ -142,14 +142,14 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/PropelIQ.Domain/Entities/SystemSetting.cs` | New domain entity for key-value settings |
-| MODIFY | `Server/PropelIQ.Domain/Entities/Notification.cs` | Add `ScheduledAt` and `SuppressedAt` nullable datetime properties |
-| CREATE | `Server/PropelIQ.Infrastructure/Configurations/SystemSettingsConfiguration.cs` | EF Core entity type configuration |
-| MODIFY | `Server/PropelIQ.Infrastructure/Configurations/NotificationConfiguration.cs` | Map new `ScheduledAt` and `SuppressedAt` columns |
-| MODIFY | `Server/PropelIQ.Infrastructure/Data/AppDbContext.cs` | Add `DbSet<SystemSetting> SystemSettings` |
-| CREATE | `Server/PropelIQ.Infrastructure/Migrations/20260420_AddSystemSettingsAndNotificationColumns.cs` | EF Core migration with Up() and Down() |
+| Action | File Path                                                                                       | Description                                                       |
+| ------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| CREATE | `Server/PropelIQ.Domain/Entities/SystemSetting.cs`                                              | New domain entity for key-value settings                          |
+| MODIFY | `Server/PropelIQ.Domain/Entities/Notification.cs`                                               | Add `ScheduledAt` and `SuppressedAt` nullable datetime properties |
+| CREATE | `Server/PropelIQ.Infrastructure/Configurations/SystemSettingsConfiguration.cs`                  | EF Core entity type configuration                                 |
+| MODIFY | `Server/PropelIQ.Infrastructure/Configurations/NotificationConfiguration.cs`                    | Map new `ScheduledAt` and `SuppressedAt` columns                  |
+| MODIFY | `Server/PropelIQ.Infrastructure/Data/AppDbContext.cs`                                           | Add `DbSet<SystemSetting> SystemSettings`                         |
+| CREATE | `Server/PropelIQ.Infrastructure/Migrations/20260420_AddSystemSettingsAndNotificationColumns.cs` | EF Core migration with Up() and Down()                            |
 
 ## External References
 
@@ -183,21 +183,21 @@ dotnet ef database update \
 ## Implementation Validation Strategy
 
 - [ ] Unit tests pass
-- [ ] Migration `Up()` creates `SystemSettings` table with `Key` (PK), `Value`, `UpdatedAt`, `UpdatedByUserId` columns
-- [ ] Migration `Up()` seeds `SystemSettings` with `reminder_interval_hours = '[48,24,2]'`
-- [ ] Migration `Up()` adds `ScheduledAt` and `SuppressedAt` columns to `Notifications` (nullable)
-- [ ] Migration `Up()` creates composite index on `Notifications(AppointmentId, TemplateType, ScheduledAt)`
-- [ ] Migration `Down()` fully reverses all changes without errors
-- [ ] EF Core model snapshot is updated correctly after migration generation
-- [ ] `AppDbContext` resolves `DbSet<SystemSetting>` without EF Core mapping errors
+- [x] Migration `Up()` creates `SystemSettings` table with `Key` (PK), `Value`, `UpdatedAt`, `UpdatedByUserId` columns
+- [x] Migration `Up()` seeds `SystemSettings` with `reminder_interval_hours = '[48,24,2]'`
+- [x] Migration `Up()` adds `ScheduledAt` and `SuppressedAt` columns to `Notifications` (nullable)
+- [x] Migration `Up()` creates composite index on `Notifications(AppointmentId, TemplateType, ScheduledAt)`
+- [x] Migration `Down()` fully reverses all changes without errors
+- [x] EF Core model snapshot is updated correctly after migration generation
+- [x] `AppDbContext` resolves `DbSet<SystemSetting>` without EF Core mapping errors
 
 ## Implementation Checklist
 
-- [ ] Create `SystemSetting` domain entity with `Key` (PK, max 100 chars), `Value` (TEXT), `UpdatedAt`, `UpdatedByUserId`
-- [ ] Add `ScheduledAt` (nullable `DateTime?`) and `SuppressedAt` (nullable `DateTime?`) properties to `Notification` entity
-- [ ] Create `SystemSettingsConfiguration` mapping PK on `Key`, column type TEXT for `Value`
-- [ ] Update `NotificationConfiguration` to map `ScheduledAt` and `SuppressedAt` as nullable timestamp with time zone columns
-- [ ] Add `DbSet<SystemSetting> SystemSettings` to `AppDbContext`
-- [ ] Generate and review EF Core migration `20260420_AddSystemSettingsAndNotificationColumns`
-- [ ] Add seed data for `reminder_interval_hours = '[48,24,2]'` in `Up()` method
-- [ ] Write `Down()` rollback: drop index, drop columns, delete seed data, drop table
+- [x] Create `SystemSetting` domain entity with `Key` (PK, max 100 chars), `Value` (TEXT), `UpdatedAt`, `UpdatedByUserId`
+- [x] Add `ScheduledAt` (nullable `DateTime?`) and `SuppressedAt` (nullable `DateTime?`) properties to `Notification` entity
+- [x] Create `SystemSettingsConfiguration` mapping PK on `Key`, column type TEXT for `Value`
+- [x] Update `NotificationConfiguration` to map `ScheduledAt` and `SuppressedAt` as nullable timestamp with time zone columns
+- [x] Add `DbSet<SystemSetting> SystemSettings` to `AppDbContext`
+- [x] Generate and review EF Core migration `20260420_AddSystemSettingsAndNotificationColumns`
+- [x] Add seed data for `reminder_interval_hours = '[48,24,2]'` in `Up()` method
+- [x] Write `Down()` rollback: drop index, drop columns, delete seed data, drop table

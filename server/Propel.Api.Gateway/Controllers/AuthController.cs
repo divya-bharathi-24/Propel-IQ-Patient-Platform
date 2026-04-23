@@ -105,10 +105,14 @@ public sealed class AuthController : ControllerBase
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new LoginCommand(request.Email, request.Password, request.DeviceId,
+        var deviceId = string.IsNullOrWhiteSpace(request.DeviceId)
+            ? $"auto-{Guid.NewGuid()}"
+            : request.DeviceId;
+
+        var command = new LoginCommand(request.Email, request.Password, deviceId,
             HttpContext.Connection.RemoteIpAddress?.ToString());
         var result = await _mediator.Send(command, cancellationToken);
-        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn });
+        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn, result.UserId, result.Role, result.DeviceId });
     }
 
     /// <summary>
@@ -125,7 +129,7 @@ public sealed class AuthController : ControllerBase
     {
         var command = new RefreshTokenCommand(request.RefreshToken, request.DeviceId);
         var result = await _mediator.Send(command, cancellationToken);
-        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn });
+        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn, result.UserId, result.Role, result.DeviceId });
     }
 
     /// <summary>
@@ -197,7 +201,7 @@ public sealed record RegisterPatientRequest(
 public sealed record ResendVerificationRequest(string Email);
 
 /// <summary>Request body for POST /api/auth/login.</summary>
-public sealed record LoginRequest(string Email, string Password, string DeviceId);
+public sealed record LoginRequest(string Email, string Password, string? DeviceId);
 
 /// <summary>Request body for POST /api/auth/refresh.</summary>
 public sealed record RefreshRequest(string RefreshToken, string DeviceId);

@@ -1,13 +1,42 @@
 {
   "version": 2,
-  "dgSpecHash": "Qx8xiOhFXgE=",
+  "dgSpecHash": "cWY/SNfkNAQ=",
   "success": true,
   "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Appointment\\Propel.Modules.Appointment.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\fluentvalidation\\11.12.0\\fluentvalidation.11.12.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr\\12.5.0\\mediatr.12.5.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
-    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512"
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.7\\microsoft.extensions.logging.abstractions.10.0.7.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.options\\10.0.7\\microsoft.extensions.options.10.0.7.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\pipelines.sockets.unofficial\\2.2.8\\pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\stackexchange.redis\\2.12.14\\stackexchange.redis.2.12.14.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.io.hashing\\10.0.2\\system.io.hashing.10.0.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Appointment\\Propel.Modules.Appointment.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Appointment\\Propel.Modules.Appointment.csproj",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Options will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Appointment\\Propel.Modules.Appointment.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Appointment\\Propel.Modules.Appointment.csproj",
+      "libraryId": "Microsoft.Extensions.Options",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

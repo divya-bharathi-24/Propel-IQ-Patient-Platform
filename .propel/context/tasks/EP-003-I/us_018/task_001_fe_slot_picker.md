@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type         | Value                                                                                                                                     |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **UI Impact**          | Yes                                                                                                                                       |
-| **Figma URL**          | N/A                                                                                                                                       |
-| **Wireframe Status**   | PENDING                                                                                                                                   |
-| **Wireframe Type**     | N/A                                                                                                                                       |
+| Reference Type         | Value                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                       |
+| **Figma URL**          | N/A                                                                                                                       |
+| **Wireframe Status**   | PENDING                                                                                                                   |
+| **Wireframe Type**     | N/A                                                                                                                       |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-slot-picker.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                                     |
-| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                                     |
-| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                                   |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                     |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                     |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                   |
 
 > **Wireframe Status:** PENDING — implement following Angular Material and WCAG 2.2 AA guidelines. Run `/analyze-ux` once wireframe is provided.
 
@@ -89,13 +89,13 @@ Implement the slot picker UI step in the appointment booking flow. The component
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `SlotPickerComponent` | Angular Frontend (`app/features/appointments/`) |
-| CREATE | `SlotAvailabilityService` | Angular Frontend (`app/features/appointments/services/`) |
-| CREATE | `SlotAvailabilityStore` (NgRx Signals) | Angular Frontend (`app/features/appointments/state/`) |
-| MODIFY | `AppointmentsModule` routing | Add slot picker step to booking route |
-| MODIFY | `AppRoutingModule` | Ensure appointments lazy-loaded route is guarded by `AuthGuard` (Patient role) |
+| Status | Component / Module                     | Project                                                                        |
+| ------ | -------------------------------------- | ------------------------------------------------------------------------------ |
+| CREATE | `SlotPickerComponent`                  | Angular Frontend (`app/features/appointments/`)                                |
+| CREATE | `SlotAvailabilityService`              | Angular Frontend (`app/features/appointments/services/`)                       |
+| CREATE | `SlotAvailabilityStore` (NgRx Signals) | Angular Frontend (`app/features/appointments/state/`)                          |
+| MODIFY | `AppointmentsModule` routing           | Add slot picker step to booking route                                          |
+| MODIFY | `AppRoutingModule`                     | Ensure appointments lazy-loaded route is guarded by `AuthGuard` (Patient role) |
 
 ---
 
@@ -146,17 +146,17 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/features/appointments/appointments.module.ts` | Lazy-loaded Appointments feature module |
-| CREATE | `app/features/appointments/appointments-routing.module.ts` | Booking wizard routes including slot picker step |
-| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.ts` | Slot picker with date selector, slot grid, booked-day handling |
-| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.html` | Template: loading skeleton, slot grid, fully-booked state, conflict banner |
-| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.scss` | Greyed-out slot and fully-booked day styles |
-| CREATE | `app/features/appointments/services/slot-availability.service.ts` | `getAvailableSlots(specialtyId, date)` HTTP service |
-| CREATE | `app/features/appointments/state/slot-availability.store.ts` | NgRx Signals store: slots, selectedSlot, loadingState, conflictMessage |
-| CREATE | `app/features/appointments/models/slot.models.ts` | Interfaces: `SlotDto`, `SlotAvailabilityResponseDto` |
-| MODIFY | `app/app-routing.module.ts` | Add lazy-loaded `/appointments` route guarded by `AuthGuard` (Patient role) |
+| Action | File Path                                                                     | Description                                                                 |
+| ------ | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| CREATE | `app/features/appointments/appointments.module.ts`                            | Lazy-loaded Appointments feature module                                     |
+| CREATE | `app/features/appointments/appointments-routing.module.ts`                    | Booking wizard routes including slot picker step                            |
+| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.ts`   | Slot picker with date selector, slot grid, booked-day handling              |
+| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.html` | Template: loading skeleton, slot grid, fully-booked state, conflict banner  |
+| CREATE | `app/features/appointments/components/slot-picker/slot-picker.component.scss` | Greyed-out slot and fully-booked day styles                                 |
+| CREATE | `app/features/appointments/services/slot-availability.service.ts`             | `getAvailableSlots(specialtyId, date)` HTTP service                         |
+| CREATE | `app/features/appointments/state/slot-availability.store.ts`                  | NgRx Signals store: slots, selectedSlot, loadingState, conflictMessage      |
+| CREATE | `app/features/appointments/models/slot.models.ts`                             | Interfaces: `SlotDto`, `SlotAvailabilityResponseDto`                        |
+| MODIFY | `app/app-routing.module.ts`                                                   | Add lazy-loaded `/appointments` route guarded by `AuthGuard` (Patient role) |
 
 ---
 
@@ -196,14 +196,14 @@ npx playwright test
 
 ## Implementation Validation Strategy
 
-- [ ] Slot grid renders available slots as enabled buttons and unavailable slots as disabled with `aria-disabled="true"`
-- [ ] When all slots for a day are booked: slot grid is hidden; "No slots available" label is visible; "Join Waitlist" CTA is rendered
-- [ ] "Join Waitlist" click emits `joinWaitlistRequested` output event with `{specialtyId, date}`
-- [ ] Loading state shows `<mat-spinner>` while `loadingState === 'loading'`
-- [ ] Conflict banner appears when `store.conflictMessage()` is non-null; disappears on new slot selection
-- [ ] `SlotAvailabilityService` issues fresh GET on every `loadSlots()` call (no client-side caching)
-- [ ] `AuthGuard` blocks unauthenticated access to `/appointments` (redirects to login)
-- [ ] Greyed-out slots meet WCAG 2.2 AA non-text contrast ratio ≥ 3:1
+- [x] Slot grid renders available slots as enabled buttons and unavailable slots as disabled with `aria-disabled="true"`
+- [x] When all slots for a day are booked: slot grid is hidden; "No slots available" label is visible; "Join Waitlist" CTA is rendered
+- [x] "Join Waitlist" click emits `joinWaitlistRequested` output event with `{specialtyId, date}`
+- [x] Loading state shows `<mat-spinner>` while `loadingState === 'loading'`
+- [x] Conflict banner appears when `store.conflictMessage()` is non-null; disappears on new slot selection
+- [x] `SlotAvailabilityService` issues fresh GET on every `loadSlots()` call (no client-side caching)
+- [x] `AuthGuard` blocks unauthenticated access to `/appointments` (redirects to login)
+- [x] Greyed-out slots meet WCAG 2.2 AA non-text contrast ratio ≥ 3:1
 - [ ] **[UI Tasks]** Visual comparison against wireframe at 375px, 768px, 1440px (when wireframe becomes AVAILABLE)
 - [ ] **[UI Tasks]** Run `/analyze-ux` to validate wireframe alignment (when wireframe becomes AVAILABLE)
 
@@ -211,12 +211,12 @@ npx playwright test
 
 ## Implementation Checklist
 
-- [ ] Create `SlotAvailabilityService` with `getAvailableSlots(specialtyId, date)` returning `SlotDto[]`
-- [ ] Create `SlotAvailabilityStore` (NgRx Signals): state shape `{ slots, selectedSlot, loadingState, conflictMessage }`; methods `loadSlots()`, `selectSlot()`, `setConflict()`, `clearConflict()`
-- [ ] Build `SlotPickerComponent`: date picker triggers `loadSlots()`; slot grid renders per-slot buttons; selected slot emits to parent
-- [ ] Implement fully-booked-day state: hide slot grid, show "No slots available" + "Join Waitlist" button when all slots `isAvailable = false`
-- [ ] Implement conflict banner: show message from `store.conflictMessage()`, auto-clear on slot re-selection
-- [ ] Add ARIA attributes: `role="grid"` on slot container, `aria-label` per slot button, `aria-pressed` for selected slot, `aria-disabled` for unavailable slots
-- [ ] Apply `AuthGuard` (Patient role) to lazy-loaded `/appointments` route
+- [x] Create `SlotAvailabilityService` with `getAvailableSlots(specialtyId, date)` returning `SlotDto[]`
+- [x] Create `SlotAvailabilityStore` (NgRx Signals): state shape `{ slots, selectedSlot, loadingState, conflictMessage }`; methods `loadSlots()`, `selectSlot()`, `setConflict()`, `clearConflict()`
+- [x] Build `SlotPickerComponent`: date picker triggers `loadSlots()`; slot grid renders per-slot buttons; selected slot emits to parent
+- [x] Implement fully-booked-day state: hide slot grid, show "No slots available" + "Join Waitlist" button when all slots `isAvailable = false`
+- [x] Implement conflict banner: show message from `store.conflictMessage()`, auto-clear on slot re-selection
+- [x] Add ARIA attributes: `role="grid"` on slot container, `aria-label` per slot button, `aria-pressed` for selected slot, `aria-disabled` for unavailable slots
+- [x] Apply `AuthGuard` (Patient role) to lazy-loaded `/appointments` route
 - [ ] **[UI Tasks - MANDATORY]** Reference wireframe from Design References table during implementation (when AVAILABLE)
 - [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking task complete (when AVAILABLE)

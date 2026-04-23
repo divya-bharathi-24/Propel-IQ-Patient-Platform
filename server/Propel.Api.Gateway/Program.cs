@@ -15,13 +15,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Polly;
+using Polly.CircuitBreaker;
 using Propel.Api.Gateway.Data;
 using Propel.Api.Gateway.Endpoints;
 using Propel.Api.Gateway.Infrastructure.BackgroundServices;
+using Propel.Api.Gateway.Infrastructure.Behaviors;
+using Propel.Api.Gateway.Infrastructure.Cache;
 using Propel.Api.Gateway.Infrastructure.Email;
 using Propel.Api.Gateway.Infrastructure.Filters;
+using Propel.Api.Gateway.Infrastructure.Models;
+using Propel.Api.Gateway.Infrastructure.Documents;
+using Propel.Api.Gateway.Infrastructure.Pdf;
 using Propel.Api.Gateway.Infrastructure.Repositories;
+using Propel.Api.Gateway.Infrastructure.Persistence.AuditLog;
 using Propel.Api.Gateway.Infrastructure.Security;
+using Propel.Api.Gateway.Infrastructure.Session;
+using Propel.Api.Gateway.Infrastructure.ReAuth;
+using Propel.Api.Gateway.Infrastructure.Sms;
 using Propel.Api.Gateway.Middleware;
 using Propel.Api.Gateway.Security;
 using Propel.Domain.Interfaces;
@@ -32,12 +45,33 @@ using StackExchange.Redis;
 
 // ── Module assembly references ────────────────────────────────────────────────
 using Propel.Modules.Admin.Commands;
+using Propel.Modules.Admin.Queries;
 using Propel.Modules.AI.Commands;
+using Propel.Modules.AI.Interfaces;
+using Propel.Modules.AI.Options;
+using Propel.Modules.AI.Services;
 using Propel.Modules.Appointment.Commands;
+using Propel.Modules.Appointment.Configuration;
+using Propel.Modules.Appointment.Infrastructure;
 using Propel.Modules.Auth.Commands;
+using Propel.Modules.Calendar.BackgroundServices;
+using Propel.Modules.Calendar.Commands;
+using Propel.Modules.Calendar.Interfaces;
+using Propel.Modules.Calendar.Options;
+using Propel.Modules.Calendar.Queries;
+using Propel.Modules.Calendar.Services;
 using Propel.Modules.Clinical.Commands;
 using Propel.Modules.Notification.Commands;
+using Propel.Modules.Notification.Dispatchers;
+using Propel.Modules.Notification.Notifiers;
 using Propel.Modules.Patient.Commands;
+using Propel.Modules.Patient.Services;
+using Propel.Modules.Queue.Commands;
+using Propel.Modules.Risk.Commands;
+using Propel.Modules.Risk.Interfaces;
+using Propel.Modules.Risk.Services;
+using MediatR;
+using System.Threading.Channels;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -102,16 +136,26 @@ builder.Services.AddControllers(options =>
     apiBehaviorOptions.SuppressModelStateInvalidFilter = true;
 });
 
-// ── MediatR (all 7 module assemblies + gateway) ───────────────────────────────
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
-    typeof(PingAuthCommand).Assembly,
-    typeof(PingPatientCommand).Assembly,
-    typeof(PingAppointmentCommand).Assembly,
-    typeof(PingClinicalCommand).Assembly,
-    typeof(PingAICommand).Assembly,
-    typeof(PingNotificationCommand).Assembly,
-    typeof(PingAdminCommand).Assembly
-));
+// ── MediatR (all 8 module assemblies + gateway) ───────────────────────────────
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblies(
+        typeof(PingAuthCommand).Assembly,
+        typeof(PingPatientCommand).Assembly,
+        typeof(PingAppointmentCommand).Assembly,
+        typeof(PingClinicalCommand).Assembly,
+        typeof(PingAICommand).Assembly,
+        typeof(PingNotificationCommand).Assembly,
+        typeof(PingAdminCommand).Assembly,
+        typeof(PingQueueCommand).Assembly,    // Propel.Modules.Queue — US_027
+        typeof(PingRiskCommand).Assembly,     // Propel.Modules.Risk — us_031 (NoShow Risk Engine)
+        typeof(PingCalendarCommand).Assembly, // Propel.Modules.Calendar — EP-007/us_035 (Google Calendar sync)
+        typeof(Program).Assembly      // Propel.Api.Gateway — BookingConfirmedEventHandler (US_021, TASK_002), BookingConfirmedRiskHandler (us_031)
+    );
+    
+    // Register ValidationBehavior to run FluentValidation on all commands before handlers
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
 
 // ── FluentValidation (all 7 module assemblies) ────────────────────────────────
 // DisableDataAnnotationsValidation = true: prevents DataAnnotations from running
@@ -125,7 +169,11 @@ builder.Services.AddValidatorsFromAssemblies([
     typeof(PingClinicalCommand).Assembly,
     typeof(PingAICommand).Assembly,
     typeof(PingNotificationCommand).Assembly,
-    typeof(PingAdminCommand).Assembly
+    typeof(PingAdminCommand).Assembly,
+    typeof(PingQueueCommand).Assembly,   // Propel.Modules.Queue — US_027
+    typeof(PingRiskCommand).Assembly,    // Propel.Modules.Risk — us_031
+    typeof(PingCalendarCommand).Assembly, // Propel.Modules.Calendar — EP-007/us_035
+    typeof(Program).Assembly             // Propel.Api.Gateway — US_038 (UploadClinicalDocuments), US_039 (UploadStaffClinicalNote)
 ]);
 
 // ── Entity Framework Core 9 + PostgreSQL ─────────────────────────────────────
@@ -179,23 +227,45 @@ builder.Services.AddSingleton(dataSource);
 builder.Services.AddSingleton<IEncryptionService, PgcryptoEncryptionService>();
 
 // ── Redis (StackExchange.Redis) — graceful degradation per NFR-018 / AC4 ─────
-// abortConnect=false: the app starts even when Redis is unreachable.
-// All Redis read/write paths must catch RedisConnectionException and append
-// X-Degraded: redis to the response (see controllers/endpoints using IDatabase).
-// REDIS_URL env var (Railway/Upstash standard) takes precedence over appsettings.
-var redisUseLocal = configuration.GetValue<bool>("Redis:UseLocal");
-var rawRedisConn = redisUseLocal
-    ? (configuration["Redis:LocalConnectionString"] ?? "redis:6379")
-    : (configuration["REDIS_URL"] ?? configuration["Redis:ConnectionString"] ?? "redis:6379");
+// DEVELOPMENT MODE: Redis is DISABLED. Using in-memory session storage.
+// PRODUCTION MODE: Redis is REQUIRED for session management.
+if (builder.Environment.IsDevelopment())
+{
+    Log.Warning("DEVELOPMENT MODE: Redis is disabled. Using IN-MEMORY session storage. Sessions will be lost on restart!");
+    
+    // Register a dummy IConnectionMultiplexer to satisfy DI dependencies
+    builder.Services.AddSingleton<IConnectionMultiplexer>(_ => 
+        throw new InvalidOperationException("Redis is disabled in development. Use in-memory session service."));
+}
+else
+{
+    // Production: Redis is required
+    var rawRedisConn = configuration["REDIS_URL"] 
+        ?? configuration["Redis:ConnectionString"] 
+        ?? throw new InvalidOperationException("REDIS_URL is required in production.");
 
-var redisOptions = ConfigurationOptions.Parse(rawRedisConn);
-redisOptions.AbortOnConnectFail = false;
-redisOptions.ConnectRetry = 3;
-redisOptions.ReconnectRetryPolicy = new LinearRetry(2_000);
+    var redisOptions = ConfigurationOptions.Parse(rawRedisConn);
+    redisOptions.AbortOnConnectFail = false;
+    redisOptions.ConnectRetry = 3;
+    redisOptions.ReconnectRetryPolicy = new LinearRetry(2_000);
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(
-
-    ConnectionMultiplexer.Connect(redisOptions));
+    try
+    {
+        var redisMultiplexer = ConnectionMultiplexer.Connect(redisOptions);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(redisMultiplexer);
+        
+        // Test connection
+        var testDb = redisMultiplexer.GetDatabase();
+        testDb.Ping();
+        
+        Log.Information("Redis connected successfully at {Endpoint}", rawRedisConn);
+    }
+    catch (Exception ex)
+    {
+        throw new InvalidOperationException(
+            "Redis connection is required in production. Please ensure Redis is available.", ex);
+    }
+}
 
 // ── ASP.NET Core Data Protection — AES-256 key ring for PHI encryption (NFR-004, NFR-013) ───
 // Key lifetime: 90-day rotation. All historical keys are retained so previously
@@ -206,18 +276,25 @@ var dpBuilder = builder.Services
     .SetApplicationName("propeliq-platform")
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
-if (!builder.Environment.IsDevelopment())
-{
-    // Production: persist keys to Upstash Redis (IConnectionMultiplexer already created above)
-    var redisMultiplexer = ConnectionMultiplexer.Connect(redisOptions);
-    dpBuilder.PersistKeysToStackExchangeRedis(redisMultiplexer, "DataProtection-Keys");
-}
-else
+if (builder.Environment.IsDevelopment())
 {
     // Local dev: persist keys to a configurable file system path (never ephemeral in-memory)
     var keyPath = configuration["DataProtection:KeyPath"]
         ?? Path.Combine(builder.Environment.ContentRootPath, ".data-protection-keys");
     dpBuilder.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+    Log.Information("Data Protection: Persisting keys to {KeyPath}", keyPath);
+}
+else
+{
+    // Production: persist keys to Upstash Redis
+    var rawRedisConn = configuration["REDIS_URL"] 
+        ?? configuration["Redis:ConnectionString"] 
+        ?? throw new InvalidOperationException("REDIS_URL is required for Data Protection in production.");
+    
+    var redisOptions = ConfigurationOptions.Parse(rawRedisConn);
+    var redisMultiplexer = ConnectionMultiplexer.Connect(redisOptions);
+    dpBuilder.PersistKeysToStackExchangeRedis(redisMultiplexer, "DataProtection-Keys");
+    Log.Information("Data Protection: Persisting keys to Redis");
 }
 
 // ── Argon2id password hasher (NFR-008, DRY) — replaces direct Argon2 calls in handlers ──
@@ -225,6 +302,16 @@ builder.Services.AddSingleton<IPasswordHasher, Argon2PasswordHasher>();
 
 // ── PHI encryption service (NFR-004, NFR-013) — AES-256 via Data Protection key ring ──
 builder.Services.AddSingleton<IPhiEncryptionService, AesGcmPhiEncryptionService>();
+
+// ── Clinical document encryption service (US_038, US_039, NFR-004, FR-043) ────
+// Uses a dedicated Data Protection purpose string "ClinicalDocuments.v1" isolated from PHI keys.
+builder.Services.AddSingleton<IFileEncryptionService, DataProtectionFileEncryptionService>();
+
+// ── Clinical document storage service (US_038, US_039) ───────────────────────
+// DocumentStorage:StoragePath configured in appsettings.json; defaults to ./document-storage.
+builder.Services.Configure<DocumentStorageSettings>(
+    builder.Configuration.GetSection("DocumentStorage"));
+builder.Services.AddSingleton<IDocumentStorageService, LocalDocumentStorageService>();
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
 // Jwt:SecretKey is set via env var JWT__SecretKey (Railway). Already validated above.
@@ -359,14 +446,19 @@ var allowedOrigins = configuration["CORS:AllowedOrigins"]
         "CORS:AllowedOrigins environment variable is required. " +
         "Set CORS__AllowedOrigins to the Netlify frontend URL (e.g., https://propeliq.netlify.app).");
 
+// Split comma-separated origins to support multiple origins in development/production
+var originsArray = allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NetlifyPolicy", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
+        policy.WithOrigins(originsArray)
               .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-              .WithHeaders("Authorization", "Content-Type")
-              .AllowCredentials();
+              .WithHeaders("Authorization", "Content-Type", "X-Correlation-Id")
+              .WithExposedHeaders("X-Correlation-Id", "Retry-After", "X-Degraded")
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
     });
 });
 
@@ -381,26 +473,343 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IEmailVerificationTokenRepository, EmailVerificationTokenRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
+// ── US_047 — Audit log read repository (task_002) ─────────────────────────────
+// EfAuditLogReadRepository exposes only read methods; no write surface (AD-7, FR-059).
+builder.Services.AddScoped<IAuditLogReadRepository, EfAuditLogReadRepository>();
+
+// ── US_016 — Patient dashboard aggregation repository (TASK_002) ──────────────
+builder.Services.AddScoped<IPatientDashboardRepository, PatientDashboardRepository>();
+
+// ── US_017 — Intake edit repository (TASK_002) ────────────────────────────────
+builder.Services.AddScoped<IIntakeRepository, IntakeRepository>();
+
+// ── US_018 — Slot availability cache and repository (TASK_002) ────────────────
+// SlotConfiguration POCO bound from appsettings.json "SlotConfiguration" section.
+builder.Services.Configure<SlotConfiguration>(configuration.GetSection("SlotConfiguration"));
+// Appointment slot repository: EF Core fallback for slot availability queries.
+builder.Services.AddScoped<IAppointmentSlotRepository, AppointmentSlotRepository>();
+// ISlotCacheService: NullSlotCacheService in development (Redis disabled), RedisSlotCacheService in production.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<ISlotCacheService, NullSlotCacheService>();
+    Log.Information("SlotCacheService: Using NULL (no-op) cache in development mode.");
+}
+else
+{
+    builder.Services.AddScoped<ISlotCacheService, RedisSlotCacheService>();
+    Log.Information("SlotCacheService: Using Redis cache in production mode.");
+}
+
 // ── US_013 — Audit logging service (task_001): retry-once wrapper + Critical alert ──
 // AuditLogService is scoped so it shares the DI scope with request handlers.
 // SessionExpirySubscriberService creates its own scope via IServiceScopeFactory.
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddHttpContextAccessor();
 
+// ── US_019 — Appointment booking repositories and services (task_002) ─────────
+// AppointmentBookingRepository: EF Core writes for Appointment, InsuranceValidation, WaitlistEntry.
+builder.Services.AddScoped<IAppointmentBookingRepository, AppointmentBookingRepository>();
+// InsuranceSoftCheckService: inline insurance soft-check against DummyInsurers seed table.
+builder.Services.AddScoped<IInsuranceSoftCheckService, InsuranceSoftCheckService>();
+
+// ── US_023 — Waitlist enrollment repository (task_002) ────────────────────────
+// WaitlistRepository: EF Core read/update for WaitlistEntry (GetMyWaitlist, CancelPreference).
+builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
+
+// ── US_026 — Staff walk-in booking repository (task_002) ──────────────────────
+// StaffWalkInRepository: patient search + atomic walk-in booking (Patient? + Appointment + QueueEntry).
+builder.Services.AddScoped<IStaffWalkInRepository, StaffWalkInRepository>();
+
+// ── US_027 — Queue repository (same-day queue management) ────────────────────
+builder.Services.AddScoped<IQueueRepository, QueueRepository>();
+
+// ── US_022 — Insurance pre-check endpoint (task_002) ──────────────────────────
+// DummyInsurersRepository: thin EF Core read-only query for the DummyInsurers seed table.
+builder.Services.AddScoped<IDummyInsurersRepository, DummyInsurersRepository>();
+// InsuranceSoftCheckClassifier: pure classification service (no DB dependency) — extracts
+// Incomplete detection and guidance text constants for testability (NFR-013).
+builder.Services.AddScoped<InsuranceSoftCheckClassifier>();
+
+// ── US_020 — Appointment cancellation background task queue (task_002) ────────
+// BackgroundTaskQueue: singleton channel-backed queue for fire-and-forget work items.
+builder.Services.AddSingleton<Propel.Modules.Appointment.Infrastructure.IBackgroundTaskQueue, BackgroundTaskQueue>();
+// QueuedHostedService: long-running hosted service that drains the task queue.
+builder.Services.AddHostedService<QueuedHostedService>();
+// RevokeCalendarSyncBackgroundTask: enqueues CalendarSync revocation after cancellation (AC-2, NFR-018).
+builder.Services.AddScoped<Propel.Modules.Appointment.Infrastructure.ICalendarSyncRevocationService, RevokeCalendarSyncBackgroundTask>();
+
 // ── US_013 — Session expiry background service (task_001) ─────────────────────
-builder.Services.AddHostedService<SessionExpirySubscriberService>();
+// Only register in production where Redis is available
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHostedService<SessionExpirySubscriberService>();
+    Log.Information("SessionExpirySubscriberService: ENABLED (production mode)");
+}
+else
+{
+    Log.Warning("SessionExpirySubscriberService: DISABLED (development mode - Redis not available)");
+}
 
 // ── US_011 — Auth services and refresh-token repository (task_002) ────────────
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IRedisSessionService, RedisSessionService>();
+
+// Session service: In-memory for development, Redis for production
+if (builder.Environment.IsDevelopment())
+{
+    // Development: Always use in-memory session service (Redis disabled)
+    builder.Services.AddScoped<IRedisSessionService, InMemoryRedisSessionService>();
+    Log.Information("Session service: Using IN-MEMORY storage (development mode)");
+}
+else
+{
+    // Production: Always use Redis session service (required)
+    builder.Services.AddScoped<IRedisSessionService, RedisSessionService>();
+    Log.Information("Session service: Using REDIS storage (production mode)");
+}
 
 // ── US_012 — Admin account management repositories (task_002) ─────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICredentialSetupTokenRepository, CredentialSetupTokenRepository>();
 
+// ── US_045 — Admin user CRUD API (task_002) ────────────────────────────────────
+// ICredentialEmailService: SendGrid implementation returning bool (graceful degradation, NFR-018).
+builder.Services.AddTransient<ICredentialEmailService, SendGridCredentialEmailService>();
+// ISessionInvalidationService: delegates to IRedisSessionService.DeleteAllUserSessionsAsync (AD-9).
+builder.Services.AddScoped<ISessionInvalidationService, RedisSessionInvalidationService>();
+Log.Information("Admin user CRUD services registered (US_045, task_002).");
+
+// ── US_046 — Re-auth token store for Admin elevation and destructive actions (task_002) ────
+// Development: in-memory store (Redis disabled); Production: Redis-backed single-use store.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<IReAuthTokenStore, InMemoryReAuthTokenStore>();
+    Log.Information("ReAuthTokenStore: Using IN-MEMORY store (development mode).");
+}
+else
+{
+    builder.Services.AddSingleton<IReAuthTokenStore, RedisReAuthTokenStore>();
+    Log.Information("ReAuthTokenStore: Using REDIS store (production mode).");
+}
+Log.Information("Admin re-auth role assignment services registered (US_046, task_002).");
+
 // ── Email service — SendGrid (us_010 task_002, NFR-018) ──────────────────────
 builder.Services.AddTransient<IEmailService, SendGridEmailService>();
+
+// ── US_025 — Slot-swap dual-channel notification services (task_001) ──────────
+// ISmsService: Twilio SDK wrapper for SMS dispatch (NFR-018 graceful degradation).
+builder.Services.AddTransient<ISmsService, TwilioSmsService>();
+// INotificationRepository: INSERT-only EF Core repository for Notification records (AC-2).
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+// ── US_021 — PDF confirmation service (task_001) ──────────────────────────────
+// IPdfConfirmationService: scoped QuestPDF in-memory PDF generation.
+builder.Services.AddScoped<IPdfConfirmationService, QuestPdfConfirmationService>();
+
+// ── US_021 — Booking confirmation notification pipeline (task_002) ─────────────
+// Channel<ConfirmationRetryRequest>: in-process unbounded queue for retry orchestration.
+// Registered as Singleton so both BookingConfirmedEventHandler and
+// PdfConfirmationRetryService share the same channel instance.
+builder.Services.AddSingleton(Channel.CreateUnbounded<ConfirmationRetryRequest>(
+    new UnboundedChannelOptions { SingleReader = true }));
+
+// PdfConfirmationRetryService: long-running BackgroundService draining the retry channel.
+builder.Services.AddHostedService<PdfConfirmationRetryService>();
+
+// ── US_025 — SMS retry background job (task_002, AC-3) ───────────────────────
+// SmsRetryRepository: EF Core query repository for retry-eligible SMS Notification records.
+// Registered as Scoped so it is resolved per poll cycle via IServiceScopeFactory inside
+// SmsRetryBackgroundService (avoids captive-dependency issue in .NET hosted services).
+builder.Services.AddScoped<SmsRetryRepository>();
+// SmsRetryBackgroundService: polls every 2 min for failed SlotSwapNotification SMS records
+// with retryCount = 0 and sentAt <= UtcNow - 5 min, then dispatches NotificationRetryCommand.
+builder.Services.AddHostedService<SmsRetryBackgroundService>();
+
+// ── US_033 — Reminder scheduler background service (task_001) ─────────────────
+// ISystemSettingsRepository: reads configurable reminder intervals from system_settings table.
+builder.Services.AddScoped<ISystemSettingsRepository, SystemSettingsRepository>();
+// IAppointmentReminderRepository: queries Booked/Cancelled appointments for reminder evaluation.
+// IgnoreQueryFilters() is used internally to bypass the Cancelled soft-delete filter (AC-4).
+builder.Services.AddScoped<IAppointmentReminderRepository, AppointmentReminderRepository>();
+
+// ── US_033 — Notification dispatch layer (task_002) ───────────────────────────
+// IEmailNotifier: SendGrid implementation that composes and delivers reminder emails (AC-2).
+builder.Services.AddTransient<IEmailNotifier, SendGridEmailNotifier>();
+// ISmsNotifier: Twilio implementation that composes and delivers reminder SMS (AC-2, Edge Case 1).
+builder.Services.AddTransient<ISmsNotifier, TwilioSmsNotifier>();
+// INotificationDispatcher: orchestrates per-channel dispatch, outcome persistence, and audit logging.
+// Scoped lifetime so it shares the IServiceScope created per tick by ReminderSchedulerService.
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatchService>();
+Log.Information("NotificationDispatchService registered (US_033, task_002).");
+
+// ReminderSchedulerService: 5-minute PeriodicTimer loop that creates Pending Notification records
+// for each unprocessed reminder window (48h, 24h, 2h) and suppresses reminders for Cancelled
+// appointments. Resumes overdue Pending jobs on startup (at-least-once delivery, Edge Case 2).
+builder.Services.AddHostedService<ReminderSchedulerService>();
+Log.Information("ReminderSchedulerService registered (US_033, task_001).");
+
+// ── EP-005/US_028 — AI Intake session store + service (task_002 + task_003) ───
+// IntakeSessionStore: singleton ConcurrentDictionary<Guid, IntakeSession> with a background
+// timer that evicts sessions idle for more than 60 minutes (prevents memory leak, US_028).
+builder.Services.AddSingleton<Propel.Modules.AI.Services.IntakeSessionStore>();
+
+// ── Bind AiSettings from "Ai" section (AIR-O01, AIR-O02, AIR-O03) ────────────
+// API keys are NEVER stored in appsettings — read from env vars only (OWASP A02).
+builder.Services.Configure<AiSettings>(configuration.GetSection("Ai"));
+var aiSettings = configuration.GetSection("Ai").Get<AiSettings>() ?? new AiSettings();
+
+// ── Register Semantic Kernel chat completion service ──────────────────────────
+// Dev/staging: direct OpenAI endpoint. Production: Azure OpenAI (HIPAA BAA path).
+if (aiSettings.UseAzureOpenAI)
+{
+    var azureEndpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
+        ?? throw new InvalidOperationException(
+            "AZURE_OPENAI_ENDPOINT environment variable is required when Ai:UseAzureOpenAI = true.");
+    var azureApiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY")
+        ?? throw new InvalidOperationException(
+            "AZURE_OPENAI_API_KEY environment variable is required when Ai:UseAzureOpenAI = true.");
+
+    builder.Services.AddAzureOpenAIChatCompletion(
+        deploymentName : aiSettings.ModelDeploymentName,
+        endpoint       : azureEndpoint,
+        apiKey         : azureApiKey);
+
+    Log.Information("AI: Azure OpenAI chat completion registered (deployment={Deployment})", aiSettings.ModelDeploymentName);
+}
+else
+{
+    var openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+        ?? throw new InvalidOperationException(
+            "OPENAI_API_KEY environment variable is required when Ai:UseAzureOpenAI = false.");
+
+    builder.Services.AddOpenAIChatCompletion(
+        modelId : aiSettings.ModelDeploymentName,
+        apiKey  : openAiApiKey);
+
+    Log.Information("AI: OpenAI chat completion registered (model={Model})", aiSettings.ModelDeploymentName);
+}
+
+// ── Polly circuit breaker pipeline (AIR-O02) ─────────────────────────────────
+// Opens after CircuitBreakerFailureThreshold (3) consecutive failures within
+// CircuitBreakerWindowSeconds (300 s = 5 min). Break duration: 60 s.
+// Registered as singleton — the same circuit state is shared across all scoped requests.
+var aiCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio       = 1.0,
+        MinimumThroughput  = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration   = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration      = TimeSpan.FromSeconds(60),
+        ShouldHandle       = new PredicateBuilder().Handle<Exception>(),
+        OnOpened           = _ => { Log.Warning("AiCircuitBreaker_Opened"); return ValueTask.CompletedTask; },
+        OnClosed           = _ => { Log.Information("AiCircuitBreaker_Closed"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddSingleton(aiCircuitBreaker);
+
+// ── Polly circuit breaker for risk augmenter (us_031, task_003, AIR-O02) ─────
+// Separate keyed pipeline — prevents US_028 intake circuit from tripping the risk augmenter circuit.
+// 3 consecutive failures / 5-min window → BrokenCircuitException → AiNoShowRiskUnavailableException.
+var riskAugmenterCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio      = 1.0,
+        MinimumThroughput = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration  = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration     = TimeSpan.FromSeconds(60),
+        ShouldHandle      = new PredicateBuilder().Handle<Exception>(),
+        OnOpened          = _ => { Log.Warning("AiCircuitBreaker_Opened_RiskAugmenter"); return ValueTask.CompletedTask; },
+        OnClosed          = _ => { Log.Information("AiCircuitBreaker_Closed_RiskAugmenter"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddKeyedSingleton<ResiliencePipeline>("risk-augmenter", riskAugmenterCircuitBreaker);
+
+// ── AI intake helpers and concrete service (task_003) ────────────────────────
+builder.Services.AddSingleton<IntakePromptBuilder>();
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
+    Propel.Modules.AI.Services.SemanticKernelAiIntakeService>();
+
+// ── us_031 — No-Show Risk Engine (task_002 + task_003) ────────────────────────
+// INoShowRiskCalculator: scoped rule-based engine with AI augmentation hook.
+builder.Services.AddScoped<INoShowRiskCalculator, RuleBasedNoShowRiskCalculator>();
+// IAiNoShowRiskAugmenter: concrete SK implementation (task_003 — replaces NullAiNoShowRiskAugmenter stub).
+builder.Services.AddSingleton<Propel.Modules.Risk.Services.RiskAssessmentPromptBuilder>();
+builder.Services.AddScoped<IAiNoShowRiskAugmenter,
+    Propel.Modules.Risk.Services.SemanticKernelNoShowRiskAugmenter>();
+// INoShowRiskRepository: EF Core repository for risk data queries and UPSERT.
+builder.Services.AddScoped<INoShowRiskRepository, Propel.Api.Gateway.Infrastructure.Repositories.NoShowRiskRepository>();
+// NoShowRiskCalculationBackgroundService: 1-hour periodic batch job.
+builder.Services.AddHostedService<Propel.Modules.Risk.BackgroundServices.NoShowRiskCalculationBackgroundService>();
+Log.Information("NoShowRiskCalculationBackgroundService registered (us_031, task_002).");
+
+// ── EP-007/us_035 — Google Calendar OAuth 2.0 sync (task_002) ─────────────────
+// GoogleCalendarSettings: non-secret OAuth settings bound from appsettings.json (OWASP A02).
+// GOOGLE_CLIENT_SECRET is read exclusively from Environment.GetEnvironmentVariable at runtime.
+builder.Services.Configure<GoogleCalendarSettings>(configuration.GetSection("GoogleCalendar"));
+
+// IGoogleCalendarService: wraps Google.Apis.Calendar.v3; handles event create/update, token refresh.
+builder.Services.AddScoped<IGoogleCalendarService, GoogleCalendarService>();
+
+// IcsGenerationService: Ical.Net wrapper; RFC 5545 ICS file generation (AC-4 fallback).
+builder.Services.AddScoped<IcsGenerationService>();
+
+// ICalendarSyncRepository and IPatientOAuthTokenRepository: EF Core repositories for upsert/read.
+builder.Services.AddScoped<ICalendarSyncRepository, Propel.Api.Gateway.Infrastructure.Repositories.CalendarSyncRepository>();
+builder.Services.AddScoped<IPatientOAuthTokenRepository, Propel.Api.Gateway.Infrastructure.Repositories.PatientOAuthTokenRepository>();
+
+// IOAuthStateService: PKCE state store — InMemory in development, Redis in production (OWASP A07).
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<IOAuthStateService, InMemoryOAuthStateService>();
+    Log.Information("OAuthStateService: Using IN-MEMORY store (development mode).");
+}
+else
+{
+    builder.Services.AddScoped<IOAuthStateService, RedisOAuthStateService>();
+    Log.Information("OAuthStateService: Using Redis store (production mode).");
+}
+
+// AddHttpClient: required by GoogleCalendarService for token refresh and by HandleGoogleCallbackCommandHandler.
+builder.Services.AddHttpClient();
+
+// ── EP-007/us_037 — Calendar Propagation Service (task_001) ───────────────────
+// IOAuthTokenService: get + silent-refresh OAuth tokens for Google/Outlook (EC-1, OWASP A02).
+builder.Services.AddScoped<IOAuthTokenService, OAuthTokenService>();
+// IGoogleCalendarAdapter: Google Calendar API v3 PATCH/DELETE adapter (AC-1, AC-2).
+builder.Services.AddScoped<IGoogleCalendarAdapter, GoogleCalendarAdapter>();
+// IOutlookCalendarAdapter: Microsoft Graph API v1.0 PATCH/DELETE adapter (AC-1, AC-2).
+builder.Services.AddScoped<IOutlookCalendarAdapter, OutlookCalendarAdapter>();
+// ICalendarPropagationService: orchestrates provider routing, token refresh, and status updates (us_037).
+builder.Services.AddScoped<Propel.Modules.Appointment.Infrastructure.ICalendarPropagationService, CalendarPropagationService>();
+Log.Information("CalendarPropagationService registered (EP-007, us_037, task_001).");
+
+// CalendarSyncRetryBackgroundService: 5-min PeriodicTimer; retries Failed CalendarSync records (AC-4).
+builder.Services.AddHostedService<CalendarSyncRetryBackgroundService>();
+Log.Information("CalendarSyncRetryBackgroundService registered (EP-007, us_035, task_002).");
+
+// CalendarSyncRetryProcessor: 5-min PeriodicTimer; retries Failed CalendarSync records for both
+// Google and Outlook via ICalendarPropagationService with SemaphoreSlim(5) rate limiting (US_037, AC-3, EC-2).
+builder.Services.AddHostedService<CalendarSyncRetryProcessor>();
+Log.Information("CalendarSyncRetryProcessor registered (EP-007, us_037, task_002).");
+
+// ── EP-007/us_036 — Outlook Calendar OAuth 2.0 sync (task_002) ────────────────
+// OutlookCalendarOptions: non-secret settings bound from appsettings.json (OWASP A02).
+// OUTLOOK_CLIENT_SECRET is sourced exclusively from Key Vault / environment variables.
+builder.Services.Configure<OutlookCalendarOptions>(configuration.GetSection("OutlookCalendar"));
+
+// IIcsGeneratorService: RFC 5545-compliant ICS generator shared with us_035 Google flow.
+builder.Services.AddScoped<IIcsGeneratorService, IcsGeneratorService>();
+
+// Channel<OutlookRetryRequest>: in-process unbounded channel for Outlook retry orchestration.
+// Singleton so both HandleOutlookCallbackCommandHandler and OutlookCalendarRetryService
+// share the same channel instance.
+builder.Services.AddSingleton(System.Threading.Channels.Channel.CreateUnbounded<OutlookRetryRequest>(
+    new System.Threading.Channels.UnboundedChannelOptions { SingleReader = true }));
+
+// OutlookCalendarRetryService: BackgroundService consuming Channel<OutlookRetryRequest>;
+// waits 10 minutes then retries once; LogWarning on second failure; never throws (AG-6, AC-4).
+builder.Services.AddHostedService<OutlookCalendarRetryService>();
+Log.Information("OutlookCalendarRetryService registered (EP-007, us_036, task_002).");
 
 // ═══════════════════════════════════════════════════════════════════════════════
 var app = builder.Build();

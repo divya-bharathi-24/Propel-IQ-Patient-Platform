@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Propel.Api.Gateway.Data;
 using Propel.Domain.Entities;
+using Propel.Domain.Enums;
 using Propel.Domain.Interfaces;
 
 namespace Propel.Api.Gateway.Infrastructure.Repositories;
@@ -51,6 +52,23 @@ public sealed class UserRepository : IUserRepository
         CancellationToken cancellationToken = default)
     {
         user.CredentialEmailStatus = status;
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<List<User>> GetManagedUsersAsync(CancellationToken cancellationToken = default)
+        => _context.Users
+            .Where(u => u.Role == UserRole.Staff || u.Role == UserRole.Admin)
+            .OrderBy(u => u.Name)
+            .ToListAsync(cancellationToken);
+
+    public async Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeactivateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        user.Status = PatientStatus.Deactivated;
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

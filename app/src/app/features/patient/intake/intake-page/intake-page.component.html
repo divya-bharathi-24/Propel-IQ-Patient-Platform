@@ -1,0 +1,115 @@
+<main class="intake-page" role="main" aria-label="Patient intake">
+
+  <!-- ── Autosave status live region (AC-4, accessibility) ─────────────── -->
+  <span
+    class="autosave-status"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    @switch (store.autosaveStatus()) {
+      @case ('Saving') {
+        <mat-progress-spinner
+          diameter="14"
+          mode="indeterminate"
+          aria-label="Saving your progress"
+        />
+        <span>Saving&hellip;</span>
+      }
+      @case ('Saved') {
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        <span>Saved</span>
+      }
+      @case ('Error') {
+        <mat-icon aria-hidden="true" class="status-error">warning</mat-icon>
+        <span>Save failed &mdash; data kept locally</span>
+      }
+      @default {
+        <!-- Idle: render nothing visible but keep live region in DOM -->
+      }
+    }
+  </span>
+
+  <!-- ── Draft restored live region (AC-3) ─────────────────────────────── -->
+  @if (store.hasDraft()) {
+    <div role="status" class="sr-only" aria-live="polite">
+      Resuming your saved intake
+    </div>
+  }
+
+  <!-- ── Mode toggle toolbar ────────────────────────────────────────────── -->
+  <div class="mode-toolbar" role="group" aria-label="Intake mode selection">
+
+    @if (store.mode() !== 'AI') {
+      <button
+        mat-raised-button
+        color="primary"
+        class="mode-btn"
+        [disabled]="store.autosaveStatus() === 'Saving'"
+        (click)="switchToAi()"
+        aria-label="Switch to AI-assisted intake mode"
+      >
+        <mat-icon aria-hidden="true">smart_toy</mat-icon>
+        Switch to AI Mode
+      </button>
+    }
+
+    @if (store.mode() !== 'Manual') {
+      <button
+        mat-raised-button
+        color="accent"
+        class="mode-btn"
+        [disabled]="store.autosaveStatus() === 'Saving'"
+        (click)="switchToManual()"
+        aria-label="Switch to manual intake form"
+      >
+        <mat-icon aria-hidden="true">edit_note</mat-icon>
+        Switch to Manual Form
+      </button>
+    }
+
+  </div>
+
+  <!-- ── Active intake surface ──────────────────────────────────────────── -->
+  <div class="intake-surface">
+
+    @if (store.mode() === 'AI') {
+      <app-ai-intake-chat [resumeQuestion]="resumeQuestion()" />
+    }
+
+    @if (store.mode() === 'Manual') {
+      <app-manual-intake-form />
+    }
+
+  </div>
+
+  <!-- ── LocalStorage conflict resolution modal ─────────────────────────── -->
+  @if (showConflictModal()) {
+    <div
+      class="conflict-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="conflict-title"
+    >
+      <div class="conflict-modal">
+        <h2 id="conflict-title">Draft Conflict Detected</h2>
+        <p>
+          A local offline draft and a server draft were found.
+          Which version would you like to keep?
+        </p>
+        <div class="conflict-actions">
+          <button mat-raised-button color="primary" (click)="onConflictResolved('server')">
+            Keep Server Version
+          </button>
+          <button mat-raised-button color="accent" (click)="onConflictResolved('local')">
+            Keep Local Version
+          </button>
+          <button mat-button (click)="onConflictResolved('merge')">
+            Decide Later
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</main>

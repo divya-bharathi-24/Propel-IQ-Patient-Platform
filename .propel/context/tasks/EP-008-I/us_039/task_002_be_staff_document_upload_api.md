@@ -15,58 +15,59 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | ASP.NET Core Web API | .net 10 |
-| Mediator | MediatR | 12.x |
-| Validation | FluentValidation | 11.x |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer        | Technology            | Version |
+| ------------ | --------------------- | ------- |
+| Backend      | ASP.NET Core Web API  | .net 10 |
+| Mediator     | MediatR               | 12.x    |
+| Validation   | FluentValidation      | 11.x    |
+| ORM          | Entity Framework Core | 9.x     |
+| Database     | PostgreSQL            | 16+     |
+| AI/ML        | N/A                   | N/A     |
+| Vector Store | N/A                   | N/A     |
+| AI Gateway   | N/A                   | N/A     |
+| Mobile       | N/A                   | N/A     |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
 Implement the `StaffDocumentController` and supporting CQRS handlers for staff post-visit clinical note management. Three endpoints form the surface:
 
 **`POST /api/staff/documents/upload`** — `[Authorize(Roles="Staff,Admin")]` — `multipart/form-data`. Processes the staff note upload via `UploadStaffClinicalNoteCommand` (MediatR):
+
 1. Resolves `staffId` from JWT `NameIdentifier` claim (OWASP A01 — never from form body).
 2. Validates `patientId` exists in the `Patients` table (404 if not found).
 3. FluentValidation: `file` is required, MIME type `application/pdf`, size ≤ 26,214,400 bytes (25 MB); `encounterReference` max 100 chars if provided.
@@ -79,12 +80,14 @@ Implement the `StaffDocumentController` and supporting CQRS handlers for staff p
 10. Returns `201 Created` with `UploadNoteResponseDto { id, encounterWarning, warningMessage }`. If document storage unavailable → `503 Service Unavailable` (edge case — storage down); no partial record created.
 
 **`GET /api/staff/patients/{patientId}/documents`** — `[Authorize(Roles="Staff,Admin")]`. Loads document history via `GetPatientDocumentsQuery` (MediatR):
+
 - `AsNoTracking()` query of `ClinicalDocuments` filtered by `patientId`, `deletedAt == null` (excludes soft-deleted).
 - Joins `Staff` table to resolve `uploadedByName` for `sourceType = StaffUpload` rows.
 - Returns `DocumentHistoryItemDto[]` ordered by `uploadedAt DESC`.
 - `isDeletable` = `sourceType == StaffUpload && uploadedAt >= UtcNow.AddHours(-24) && deletedAt == null`.
 
 **`DELETE /api/staff/documents/{id}`** — `[Authorize(Roles="Staff,Admin")]`. Soft-deletes via `SoftDeleteClinicalDocumentCommand` (MediatR):
+
 - Resolves `staffId` from JWT.
 - Loads `ClinicalDocument` where `id = request.Id` (not AsNoTracking — requires update).
 - Guard: `sourceType` must be `StaffUpload` (staff cannot soft-delete patient self-uploads).
@@ -105,15 +108,15 @@ Implement the `StaffDocumentController` and supporting CQRS handlers for staff p
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `StaffDocumentController` | NEW | `Server/Controllers/StaffDocumentController.cs` |
-| `UploadStaffClinicalNoteCommand` + `Handler` | NEW | `Server/Features/Documents/UploadStaffClinicalNote/` |
-| `GetPatientDocumentsQuery` + `Handler` | NEW | `Server/Features/Documents/GetPatientDocuments/` |
-| `SoftDeleteClinicalDocumentCommand` + `Handler` | NEW | `Server/Features/Documents/SoftDeleteClinicalDocument/` |
-| `ClinicalDocumentUploadedNotification` | NEW | `Server/Features/Documents/Notifications/ClinicalDocumentUploadedNotification.cs` |
-| `DocumentHistoryItemDto` | NEW | `Server/Features/Documents/Dtos/DocumentHistoryItemDto.cs` |
-| `UploadNoteResponseDto` | NEW | `Server/Features/Documents/Dtos/UploadNoteResponseDto.cs` |
+| Component                                       | Status | Location                                                                          |
+| ----------------------------------------------- | ------ | --------------------------------------------------------------------------------- |
+| `StaffDocumentController`                       | NEW    | `Server/Controllers/StaffDocumentController.cs`                                   |
+| `UploadStaffClinicalNoteCommand` + `Handler`    | NEW    | `Server/Features/Documents/UploadStaffClinicalNote/`                              |
+| `GetPatientDocumentsQuery` + `Handler`          | NEW    | `Server/Features/Documents/GetPatientDocuments/`                                  |
+| `SoftDeleteClinicalDocumentCommand` + `Handler` | NEW    | `Server/Features/Documents/SoftDeleteClinicalDocument/`                           |
+| `ClinicalDocumentUploadedNotification`          | NEW    | `Server/Features/Documents/Notifications/ClinicalDocumentUploadedNotification.cs` |
+| `DocumentHistoryItemDto`                        | NEW    | `Server/Features/Documents/Dtos/DocumentHistoryItemDto.cs`                        |
+| `UploadNoteResponseDto`                         | NEW    | `Server/Features/Documents/Dtos/UploadNoteResponseDto.cs`                         |
 
 ## Implementation Plan
 
@@ -342,20 +345,20 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/Features/Documents/Dtos/UploadNoteResponseDto.cs` | `record UploadNoteResponseDto(Guid Id, bool EncounterWarning, string? WarningMessage)` |
-| CREATE | `Server/Features/Documents/Dtos/DocumentHistoryItemDto.cs` | `record DocumentHistoryItemDto(...)` with `IsDeletable` computed flag |
-| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommand.cs` | MediatR command with `IFormFile` |
-| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommandValidator.cs` | FluentValidation: PDF MIME, 25 MB size limit, encounter ref max length |
-| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommandHandler.cs` | Encrypt → store → INSERT `ClinicalDocument` → publish notification → audit log; encounter warning on unmatched ref |
-| CREATE | `Server/Features/Documents/GetPatientDocuments/GetPatientDocumentsQuery.cs` | `record GetPatientDocumentsQuery(Guid PatientId) : IRequest<List<DocumentHistoryItemDto>>` |
-| CREATE | `Server/Features/Documents/GetPatientDocuments/GetPatientDocumentsQueryHandler.cs` | `AsNoTracking()` projection with `IsDeletable` 24h window logic (AD-2 CQRS) |
-| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommand.cs` | `record SoftDeleteClinicalDocumentCommand(Guid DocumentId, string Reason)` |
-| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommandValidator.cs` | Reason: `MinimumLength(10).MaximumLength(500)` |
-| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommandHandler.cs` | `sourceType = StaffUpload` guard; 24h upload-time guard; set `DeletedAt` + `DeletionReason`; audit log with before-state |
-| CREATE | `Server/Features/Documents/Notifications/ClinicalDocumentUploadedNotification.cs` | `record ClinicalDocumentUploadedNotification(Guid DocumentId, Guid PatientId) : INotification` |
-| CREATE | `Server/Controllers/StaffDocumentController.cs` | 3 endpoints: `POST /upload`, `GET /{patientId}/documents`, `DELETE /{id}`; `[RequestSizeLimit(27_262_976)]` on upload |
+| Action | File Path                                                                                            | Description                                                                                                              |
+| ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CREATE | `Server/Features/Documents/Dtos/UploadNoteResponseDto.cs`                                            | `record UploadNoteResponseDto(Guid Id, bool EncounterWarning, string? WarningMessage)`                                   |
+| CREATE | `Server/Features/Documents/Dtos/DocumentHistoryItemDto.cs`                                           | `record DocumentHistoryItemDto(...)` with `IsDeletable` computed flag                                                    |
+| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommand.cs`                | MediatR command with `IFormFile`                                                                                         |
+| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommandValidator.cs`       | FluentValidation: PDF MIME, 25 MB size limit, encounter ref max length                                                   |
+| CREATE | `Server/Features/Documents/UploadStaffClinicalNote/UploadStaffClinicalNoteCommandHandler.cs`         | Encrypt → store → INSERT `ClinicalDocument` → publish notification → audit log; encounter warning on unmatched ref       |
+| CREATE | `Server/Features/Documents/GetPatientDocuments/GetPatientDocumentsQuery.cs`                          | `record GetPatientDocumentsQuery(Guid PatientId) : IRequest<List<DocumentHistoryItemDto>>`                               |
+| CREATE | `Server/Features/Documents/GetPatientDocuments/GetPatientDocumentsQueryHandler.cs`                   | `AsNoTracking()` projection with `IsDeletable` 24h window logic (AD-2 CQRS)                                              |
+| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommand.cs`          | `record SoftDeleteClinicalDocumentCommand(Guid DocumentId, string Reason)`                                               |
+| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommandValidator.cs` | Reason: `MinimumLength(10).MaximumLength(500)`                                                                           |
+| CREATE | `Server/Features/Documents/SoftDeleteClinicalDocument/SoftDeleteClinicalDocumentCommandHandler.cs`   | `sourceType = StaffUpload` guard; 24h upload-time guard; set `DeletedAt` + `DeletionReason`; audit log with before-state |
+| CREATE | `Server/Features/Documents/Notifications/ClinicalDocumentUploadedNotification.cs`                    | `record ClinicalDocumentUploadedNotification(Guid DocumentId, Guid PatientId) : INotification`                           |
+| CREATE | `Server/Controllers/StaffDocumentController.cs`                                                      | 3 endpoints: `POST /upload`, `GET /{patientId}/documents`, `DELETE /{id}`; `[RequestSizeLimit(27_262_976)]` on upload    |
 
 ## External References
 
@@ -388,10 +391,10 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] `[Authorize(Roles = "Staff,Admin")]` at controller class level; `staffId` from JWT `NameIdentifier` only (OWASP A01); `[RequestSizeLimit(27_262_976)]` on upload endpoint; Patient-role receives 403 before handler executes (AC-4)
-- [ ] `UploadStaffClinicalNoteCommandValidator`: reject non-`application/pdf` MIME type; reject `IFormFile.Length > 26_214_400`; `EncounterReference` max 100 chars if provided; 422 `UnprocessableEntity` on validation failure (TR-020)
-- [ ] Encounter reference check: `AnyAsync` lookup against `Appointments` by reference string; if not found set `encounterWarning = true` in response body (202); NEVER reject (edge case — encounter ref not found)
-- [ ] `IFileEncryptionService.EncryptAsync()` + `IDocumentStorageService.StoreAsync()` called before INSERT; if storage throws → propagate 503, no `SaveChangesAsync` called (no partial records — edge case storage unavailable)
-- [ ] INSERT `ClinicalDocument` with `sourceType = StaffUpload`, `uploadedById = staffId`, `encounterReference`; publish `ClinicalDocumentUploadedNotification` after `SaveChangesAsync()` (AC-3, AD-3 async trigger); audit log `StaffClinicalNoteUploaded` (FR-058, AD-7)
-- [ ] `GetPatientDocumentsQueryHandler`: `AsNoTracking()`, filter `deletedAt == null`, `OrderByDescending(uploadedAt)`, project `IsDeletable = sourceType == StaffUpload && uploadedAt >= UtcNow.AddHours(-24)` (AC-2, AD-2)
-- [ ] `SoftDeleteClinicalDocumentCommandHandler`: guard `sourceType == StaffUpload`; guard `uploadedAt >= UtcNow.AddHours(-24)` (24h window); set `deletedAt = UtcNow`, `deletionReason = reason`; audit log `StaffClinicalNoteDeleted` with before-state `{ fileName, patientId, encounterReference }` (FR-058 before-state, edge case wrong patient)
+- [x] `[Authorize(Roles = "Staff,Admin")]` at controller class level; `staffId` from JWT `NameIdentifier` only (OWASP A01); `[RequestSizeLimit(27_262_976)]` on upload endpoint; Patient-role receives 403 before handler executes (AC-4)
+- [x] `UploadStaffClinicalNoteCommandValidator`: reject non-`application/pdf` MIME type; reject `IFormFile.Length > 26_214_400`; `EncounterReference` max 100 chars if provided; 422 `UnprocessableEntity` on validation failure (TR-020)
+- [x] Encounter reference check: `AnyAsync` lookup against `Appointments` by reference string; if not found set `encounterWarning = true` in response body (202); NEVER reject (edge case — encounter ref not found)
+- [x] `IFileEncryptionService.EncryptAsync()` + `IDocumentStorageService.StoreAsync()` called before INSERT; if storage throws → propagate 503, no `SaveChangesAsync` called (no partial records — edge case storage unavailable)
+- [x] INSERT `ClinicalDocument` with `sourceType = StaffUpload`, `uploadedById = staffId`, `encounterReference`; publish `ClinicalDocumentUploadedNotification` after `SaveChangesAsync()` (AC-3, AD-3 async trigger); audit log `StaffClinicalNoteUploaded` (FR-058, AD-7)
+- [x] `GetPatientDocumentsQueryHandler`: `AsNoTracking()`, filter `deletedAt == null`, `OrderByDescending(uploadedAt)`, project `IsDeletable = sourceType == StaffUpload && uploadedAt >= UtcNow.AddHours(-24)` (AC-2, AD-2)
+- [x] `SoftDeleteClinicalDocumentCommandHandler`: guard `sourceType == StaffUpload`; guard `uploadedAt >= UtcNow.AddHours(-24)` (24h window); set `deletedAt = UtcNow`, `deletionReason = reason`; audit log `StaffClinicalNoteDeleted` with before-state `{ fileName, patientId, encounterReference }` (FR-058 before-state, edge case wrong patient)

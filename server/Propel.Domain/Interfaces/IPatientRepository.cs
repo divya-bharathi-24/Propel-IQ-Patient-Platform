@@ -34,4 +34,20 @@ public interface IPatientRepository
     /// (e.g. <c>UsedAt</c>) in a single <c>SaveChangesAsync</c> call.
     /// </summary>
     Task MarkEmailVerifiedAsync(Patient patient, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Persists mutations applied to a tracked <see cref="Patient"/> entity (US_015, AC-2).
+    /// EF Core value converters transparently re-encrypt PHI fields before writing (NFR-004).
+    /// Callers must set only non-locked fields; locked fields are the caller's responsibility to leave unchanged.
+    /// </summary>
+    Task UpdateAsync(Patient patient, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the patient's contact details and communication preferences required for
+    /// notification dispatch (US_025, AC-1, AC-4).
+    /// Returns a tuple of (Email, Name, Phone, CommunicationPreferencesJson) or <c>null</c>
+    /// when the patient is not found.
+    /// </summary>
+    Task<(string Email, string Name, string Phone, string? CommunicationPreferencesJson)?>
+        GetCommunicationPreferencesAsync(Guid patientId, CancellationToken cancellationToken = default);
 }

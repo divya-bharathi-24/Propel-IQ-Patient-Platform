@@ -1,0 +1,165 @@
+<div class="table-header" aria-live="polite" aria-atomic="true">
+  <span class="count-badge" role="status">
+    Showing {{ events.length }} of {{ totalCount }} events
+  </span>
+</div>
+
+<div class="table-container" role="region" aria-label="Audit events">
+  <table
+    mat-table
+    [dataSource]="events"
+    class="audit-table"
+    aria-label="Audit event log"
+  >
+    <!-- User ID Column -->
+    <ng-container matColumnDef="userId">
+      <th mat-header-cell *matHeaderCellDef scope="col">User ID</th>
+      <td mat-cell *matCellDef="let event">
+        <span class="mono">{{ event.userId }}</span>
+      </td>
+    </ng-container>
+
+    <!-- User Role Column -->
+    <ng-container matColumnDef="userRole">
+      <th mat-header-cell *matHeaderCellDef scope="col">Role</th>
+      <td mat-cell *matCellDef="let event">
+        <span class="role-badge role-badge--{{ event.userRole | lowercase }}">
+          {{ event.userRole }}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Entity Type Column -->
+    <ng-container matColumnDef="entityType">
+      <th mat-header-cell *matHeaderCellDef scope="col">Entity Type</th>
+      <td mat-cell *matCellDef="let event">{{ event.entityType }}</td>
+    </ng-container>
+
+    <!-- Entity ID Column -->
+    <ng-container matColumnDef="entityId">
+      <th mat-header-cell *matHeaderCellDef scope="col">Entity ID</th>
+      <td mat-cell *matCellDef="let event">
+        <span class="mono">{{ event.entityId }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Action Type Column -->
+    <ng-container matColumnDef="actionType">
+      <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
+      <td mat-cell *matCellDef="let event">
+        <span
+          class="action-badge action-badge--{{ event.actionType | lowercase }}"
+        >
+          {{ event.actionType }}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- IP Address Column -->
+    <ng-container matColumnDef="ipAddress">
+      <th mat-header-cell *matHeaderCellDef scope="col">IP Address</th>
+      <td mat-cell *matCellDef="let event">
+        <span class="mono">{{ event.ipAddress }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Timestamp Column -->
+    <ng-container matColumnDef="timestamp">
+      <th mat-header-cell *matHeaderCellDef scope="col">Timestamp (UTC)</th>
+      <td mat-cell *matCellDef="let event">
+        {{ event.timestamp | date: "yyyy-MM-dd HH:mm:ss" : "UTC" }}
+      </td>
+    </ng-container>
+
+    <!-- Expand Toggle Column -->
+    <ng-container matColumnDef="expand">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        scope="col"
+        aria-label="Expand row"
+      ></th>
+      <td mat-cell *matCellDef="let event">
+        @if (event.details !== null) {
+          <button
+            mat-icon-button
+            type="button"
+            (click)="toggleExpand(event)"
+            [attr.aria-expanded]="isExpanded(event)"
+            [attr.aria-label]="
+              isExpanded(event)
+                ? 'Collapse details for event ' + event.id
+                : 'Expand details for event ' + event.id
+            "
+            [matTooltip]="
+              isExpanded(event) ? 'Collapse' : 'Show change details'
+            "
+          >
+            <mat-icon aria-hidden="true">
+              {{ isExpanded(event) ? "expand_less" : "expand_more" }}
+            </mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <!-- Expansion Detail Row -->
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let event"
+        [attr.colspan]="displayedColumns.length"
+      >
+        @if (isExpanded(event) && event.details !== null) {
+          <div
+            class="expansion-panel"
+            role="region"
+            [attr.aria-label]="'Change details for event ' + event.id"
+          >
+            <app-diff-view [details]="event.details" />
+          </div>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let event; columns: displayedColumns"
+      class="event-row"
+      [class.event-row--expanded]="isExpanded(event)"
+      [class.event-row--expandable]="event.details !== null"
+    ></tr>
+    <tr
+      mat-row
+      *matRowDef="let event; columns: ['expandedDetail']"
+      class="expansion-row"
+      [class.expansion-row--visible]="isExpanded(event)"
+    ></tr>
+  </table>
+
+  <!-- Empty state -->
+  @if (!loading && events.length === 0) {
+    <div class="empty-state" role="status" aria-live="polite">
+      <mat-icon aria-hidden="true">manage_search</mat-icon>
+      <p>No audit events found matching the current filters.</p>
+    </div>
+  }
+</div>
+
+<!-- Load More -->
+<div class="load-more-row">
+  @if (loading) {
+    <mat-spinner diameter="32" aria-label="Loading audit events…" />
+  }
+  @if (!loading && nextCursor !== null) {
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="loadMore()"
+      aria-label="Load next 50 audit events"
+    >
+      Load More
+    </button>
+  }
+</div>

@@ -48,6 +48,14 @@ public sealed class InsuranceValidationConfiguration : IEntityTypeConfiguration<
                .HasForeignKey(iv => iv.PatientId)
                .OnDelete(DeleteBehavior.Restrict);
 
+        // FK: insurance_validations → appointments (Cascade — orphan validations cleaned up with appointment)
+        // IsRequired(false) — AppointmentId is nullable; validation can exist before appointment is committed
+        builder.HasOne(iv => iv.Appointment)
+               .WithMany()
+               .HasForeignKey(iv => iv.AppointmentId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .IsRequired(false);
+
         // Index: lookup insurance validations by patient
         builder.HasIndex(iv => iv.PatientId)
                .HasDatabaseName("ix_insurance_validations_patient_id");
@@ -55,5 +63,10 @@ public sealed class InsuranceValidationConfiguration : IEntityTypeConfiguration<
         // Index: filter validations by outcome
         builder.HasIndex(iv => iv.ValidationResult)
                .HasDatabaseName("ix_insurance_validations_result");
+
+        // Composite index: patient dashboard query (AC-2) — validated_at DESC for latest-first ordering
+        builder.HasIndex(iv => new { iv.PatientId, iv.ValidatedAt })
+               .HasDatabaseName("ix_insurance_validations_patient_id_validated_at")
+               .IsDescending(false, true);
     }
 }

@@ -69,7 +69,8 @@
               "buildTarget": "propel-iq-patient-platform:build:production"
             },
             "development": {
-              "buildTarget": "propel-iq-patient-platform:build:development"
+              "buildTarget": "propel-iq-patient-platform:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development",

@@ -10,7 +10,7 @@
 ## Design References (Frontend Tasks Only)
 
 | Reference Type         | Value |
-|------------------------|-------|
+| ---------------------- | ----- |
 | **UI Impact**          | No    |
 | **Figma URL**          | N/A   |
 | **Wireframe Status**   | N/A   |
@@ -22,38 +22,38 @@
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                  | Version |
-|------------|-----------------------------|---------|
-| Backend    | ASP.NET Core Web API        | .net 10  |
-| Messaging  | MediatR                     | 12.x    |
-| Validation | FluentValidation            | 11.x    |
-| ORM        | Entity Framework Core       | 9.x     |
-| Database   | PostgreSQL                  | 16+     |
-| Auth       | JWT + RBAC                  | —       |
-| Logging    | Serilog                     | 4.x     |
-| AI/ML      | N/A                         | N/A     |
+| Layer      | Technology            | Version |
+| ---------- | --------------------- | ------- |
+| Backend    | ASP.NET Core Web API  | .net 10 |
+| Messaging  | MediatR               | 12.x    |
+| Validation | FluentValidation      | 11.x    |
+| ORM        | Entity Framework Core | 9.x     |
+| Database   | PostgreSQL            | 16+     |
+| Auth       | JWT + RBAC            | —       |
+| Logging    | Serilog               | 4.x     |
+| AI/ML      | N/A                   | N/A     |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-|----------------------|-------|
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A   |
-| **AI Pattern**       | N/A   |
-| **Prompt Template**  | N/A   |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type        | Value |
+| --------------------- | ----- |
+| **AI Impact**         | No    |
+| **AIR Requirements**  | N/A   |
+| **AI Pattern**        | N/A   |
+| **Prompt Template**   | N/A   |
+| **Guardrails Config** | N/A   |
+| **Model Provider**    | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-|---------------------|-------|
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -65,15 +65,15 @@ Implement the backend REST API endpoints that allow Staff and Admin users to ret
 
 ## Impacted Components
 
-| Component | Project | Action |
-|-----------|---------|--------|
-| `GetReminderSettingsQuery` / Handler | `PropelIQ.Notification` | CREATE |
-| `UpdateReminderIntervalsCommand` / Handler | `PropelIQ.Notification` | CREATE |
-| `ReminderSettingsController` | `PropelIQ.Api` | CREATE |
-| `UpdateReminderIntervalsValidator` | `PropelIQ.Notification` | CREATE |
-| `ISystemSettingsRepository` | `PropelIQ.Shared` | CREATE |
-| `SystemSettingsRepository` | `PropelIQ.Infrastructure` | CREATE |
-| `INotificationRepository` | `PropelIQ.Notification` | MODIFY (add `UpdateScheduledAtBatchAsync`) |
+| Component                                  | Project                   | Action                                     |
+| ------------------------------------------ | ------------------------- | ------------------------------------------ |
+| `GetReminderSettingsQuery` / Handler       | `PropelIQ.Notification`   | CREATE                                     |
+| `UpdateReminderIntervalsCommand` / Handler | `PropelIQ.Notification`   | CREATE                                     |
+| `ReminderSettingsController`               | `PropelIQ.Api`            | CREATE                                     |
+| `UpdateReminderIntervalsValidator`         | `PropelIQ.Notification`   | CREATE                                     |
+| `ISystemSettingsRepository`                | `PropelIQ.Shared`         | CREATE                                     |
+| `SystemSettingsRepository`                 | `PropelIQ.Infrastructure` | CREATE                                     |
+| `INotificationRepository`                  | `PropelIQ.Notification`   | MODIFY (add `UpdateScheduledAtBatchAsync`) |
 
 ## Implementation Plan
 
@@ -160,16 +160,16 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/PropelIQ.Notification/Queries/GetReminderSettingsQuery.cs` | MediatR query + handler |
-| CREATE | `Server/PropelIQ.Notification/Commands/UpdateReminderIntervalsCommand.cs` | MediatR command + handler |
-| CREATE | `Server/PropelIQ.Notification/Validators/UpdateReminderIntervalsValidator.cs` | FluentValidation rules |
-| CREATE | `Server/PropelIQ.Shared/Settings/ISystemSettingsRepository.cs` | Interface for SystemSettings CRUD |
-| CREATE | `Server/PropelIQ.Infrastructure/Repositories/SystemSettingsRepository.cs` | EF Core implementation |
-| CREATE | `Server/PropelIQ.Api/Controllers/ReminderSettingsController.cs` | REST endpoints GET + PUT |
-| CREATE | `Server/PropelIQ.Notification/DTOs/ReminderSettingsDto.cs` | Response DTO |
-| MODIFY | `Server/PropelIQ.Notification/Repositories/INotificationRepository.cs` | Add `GetPendingForFutureAppointmentsAsync`, `DeleteAsync` |
+| Action | File Path                                                                     | Description                                               |
+| ------ | ----------------------------------------------------------------------------- | --------------------------------------------------------- |
+| CREATE | `Server/PropelIQ.Notification/Queries/GetReminderSettingsQuery.cs`            | MediatR query + handler                                   |
+| CREATE | `Server/PropelIQ.Notification/Commands/UpdateReminderIntervalsCommand.cs`     | MediatR command + handler                                 |
+| CREATE | `Server/PropelIQ.Notification/Validators/UpdateReminderIntervalsValidator.cs` | FluentValidation rules                                    |
+| CREATE | `Server/PropelIQ.Shared/Settings/ISystemSettingsRepository.cs`                | Interface for SystemSettings CRUD                         |
+| CREATE | `Server/PropelIQ.Infrastructure/Repositories/SystemSettingsRepository.cs`     | EF Core implementation                                    |
+| CREATE | `Server/PropelIQ.Api/Controllers/ReminderSettingsController.cs`               | REST endpoints GET + PUT                                  |
+| CREATE | `Server/PropelIQ.Notification/DTOs/ReminderSettingsDto.cs`                    | Response DTO                                              |
+| MODIFY | `Server/PropelIQ.Notification/Repositories/INotificationRepository.cs`        | Add `GetPendingForFutureAppointmentsAsync`, `DeleteAsync` |
 
 ## External References
 
@@ -203,11 +203,11 @@ dotnet run --project PropelIQ.Api
 
 ## Implementation Checklist
 
-- [ ] Create `ISystemSettingsRepository` with `GetReminderIntervalsAsync` and `SetReminderIntervalsAsync` methods
-- [ ] Implement `SystemSettingsRepository` using EF Core against `SystemSettings` table (key-value pattern)
-- [ ] Create `GetReminderSettingsQuery` MediatR query and handler returning `ReminderSettingsDto`
-- [ ] Create `UpdateReminderIntervalsCommand` MediatR command and handler with full recalculation logic
-- [ ] Create `UpdateReminderIntervalsValidator` — validate positive integers, no duplicates, max 10, ≤ 168h
-- [ ] Create `ReminderSettingsController` with `GET /api/settings/reminders` and `PUT /api/settings/reminders`
-- [ ] Apply `[Authorize(Roles = "Staff,Admin")]` to controller — Patient role returns 403 (NFR-006)
-- [ ] Write AuditLog entry with before/after interval values on successful update (NFR-009)
+- [x] Create `ISystemSettingsRepository` with `GetReminderIntervalsAsync` and `SetReminderIntervalsAsync` methods
+- [x] Implement `SystemSettingsRepository` using EF Core against `SystemSettings` table (key-value pattern)
+- [x] Create `GetReminderSettingsQuery` MediatR query and handler returning `ReminderSettingsDto`
+- [x] Create `UpdateReminderIntervalsCommand` MediatR command and handler with full recalculation logic
+- [x] Create `UpdateReminderIntervalsValidator` — validate positive integers, no duplicates, max 10, ≤ 168h
+- [x] Create `ReminderSettingsController` with `GET /api/settings/reminders` and `PUT /api/settings/reminders`
+- [x] Apply `[Authorize(Roles = "Staff,Admin")]` to controller — Patient role returns 403 (NFR-006)
+- [x] Write AuditLog entry with before/after interval values on successful update (NFR-009)

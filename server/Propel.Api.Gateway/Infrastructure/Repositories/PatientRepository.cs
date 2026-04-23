@@ -45,4 +45,30 @@ public sealed class PatientRepository : IPatientRepository
         // including any EmailVerificationToken.UsedAt mutations made in the same scope.
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task UpdateAsync(Patient patient, CancellationToken cancellationToken = default)
+    {
+        // The patient entity is already tracked by the scoped DbContext (loaded via GetByIdAsync).
+        // SaveChangesAsync detects modified properties and issues the UPDATE SQL;
+        // EF Core value converters transparently re-encrypt PHI fields (NFR-004, NFR-013).
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<(string Email, string Name, string Phone, string? CommunicationPreferencesJson)?>
+        GetCommunicationPreferencesAsync(Guid patientId, CancellationToken cancellationToken = default)
+    {
+        // Project only the columns needed for notification dispatch to avoid loading PHI blobs
+        // unnecessarily (OWASP A03 — minimal data exposure).
+        // Note: Name and Phone are stored as AES-256 ciphertext; decryption is done automatically
+        // by the EF Core value converters registered in AppDbContext.OnModelCreating (NFR-004).
+        return _context.Patients
+            .Where(p => p.Id == patientId)
+            .Select(p => new ValueTuple<string, string, string, string?>(
+                p.Email,
+                p.Name,
+                p.Phone,
+                p.CommunicationPreferencesJson))
+            .Cast<(string, string, string, string?)?>()
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

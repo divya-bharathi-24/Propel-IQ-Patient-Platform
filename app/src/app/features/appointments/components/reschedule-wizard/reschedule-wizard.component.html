@@ -1,0 +1,119 @@
+<section class="reschedule-wizard" aria-label="Reschedule appointment">
+  <mat-stepper #stepper linear aria-label="Reschedule steps">
+    <!-- Step 1: Slot picker -->
+    <mat-step label="Choose a new slot">
+      @if (store.conflictMessage()) {
+        <mat-card class="conflict-banner" role="alert" aria-live="assertive">
+          <mat-card-content>{{ store.conflictMessage() }}</mat-card-content>
+        </mat-card>
+      }
+
+      @if (specialtyId) {
+        <app-slot-picker
+          [specialtyId]="specialtyId"
+          (slotSelected)="onSlotSelected($event)"
+        />
+      } @else {
+        <p class="reschedule-wizard__no-specialty" role="status">
+          Unable to determine specialty. Please go back and try again.
+        </p>
+      }
+
+      <div class="reschedule-wizard__actions">
+        <button
+          mat-stroked-button
+          (click)="onCancel()"
+          aria-label="Cancel reschedule and return to appointments"
+        >
+          Back to Appointments
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Confirm new slot -->
+    <mat-step label="Confirm reschedule">
+      <div class="reschedule-wizard__summary" aria-label="Reschedule summary">
+        @if (originalAppointment(); as original) {
+          <mat-card class="reschedule-wizard__card">
+            <mat-card-header>
+              <mat-card-title>Current Appointment</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>
+                <strong>Date:</strong> {{ original.date | date: "longDate" }}
+              </p>
+              <p>
+                <strong>Time:</strong>
+                {{ original.timeStart | date: "shortTime" }} –
+                {{ original.timeEnd | date: "shortTime" }}
+              </p>
+              <p><strong>Specialty:</strong> {{ original.specialtyName }}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        @if (selectedSlot(); as slot) {
+          <mat-card
+            class="reschedule-wizard__card reschedule-wizard__card--new"
+          >
+            <mat-card-header>
+              <mat-card-title>New Slot</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Date:</strong> {{ slot.date | date: "longDate" }}</p>
+              <p>
+                <strong>Time:</strong>
+                {{ slot.timeSlotStart | date: "shortTime" }} –
+                {{ slot.timeSlotEnd | date: "shortTime" }}
+              </p>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        @if (store.actionState() === "error" && store.errorMessage()) {
+          <p
+            class="reschedule-wizard__error"
+            role="alert"
+            aria-live="assertive"
+          >
+            {{ store.errorMessage() }}
+          </p>
+        }
+      </div>
+
+      <div class="reschedule-wizard__actions">
+        <button
+          mat-stroked-button
+          matStepperPrevious
+          [disabled]="store.actionState() === 'rescheduling'"
+          aria-label="Go back to slot selection"
+        >
+          Back
+        </button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="onConfirmReschedule()"
+          [disabled]="store.actionState() === 'rescheduling'"
+          aria-label="Confirm reschedule and book the new slot"
+        >
+          @if (store.actionState() === "rescheduling") {
+            <mat-spinner diameter="20" aria-label="Rescheduling…" />
+          } @else {
+            Confirm Reschedule
+          }
+        </button>
+
+        <button
+          mat-button
+          (click)="onCancel()"
+          [disabled]="store.actionState() === 'rescheduling'"
+          aria-label="Cancel reschedule and return to appointments"
+        >
+          Cancel
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</section>

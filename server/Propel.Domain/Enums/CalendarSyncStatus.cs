@@ -8,5 +8,7 @@ public enum CalendarSyncStatus
 {
     Synced,
     Failed,
-    Pending
+    Pending,
+    Revoked,
+    PermanentFailed
 }

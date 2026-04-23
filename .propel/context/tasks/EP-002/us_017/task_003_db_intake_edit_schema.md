@@ -13,50 +13,50 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | N/A | N/A |
-| Backend | ASP.NET Core Web API | .net 10 |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| Library | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer        | Technology                            | Version |
+| ------------ | ------------------------------------- | ------- |
+| Frontend     | N/A                                   | N/A     |
+| Backend      | ASP.NET Core Web API                  | .net 10 |
+| ORM          | Entity Framework Core                 | 9.x     |
+| Database     | PostgreSQL                            | 16+     |
+| Library      | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x     |
+| AI/ML        | N/A                                   | N/A     |
+| Vector Store | N/A                                   | N/A     |
+| AI Gateway   | N/A                                   | N/A     |
+| Mobile       | N/A                                   | N/A     |
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -74,15 +74,16 @@ No new tables are created. The `IntakeRecord` table already exists (delivered by
 
 ## Impacted Components
 
-| Component | Action | Project |
-|-----------|--------|---------|
-| `IntakeRecord` entity class | MODIFY | `Server/Domain/Entities/IntakeRecord.cs` |
-| `IntakeRecordConfiguration` (EF Core fluent config) | MODIFY | `Server/Infrastructure/Persistence/Configurations/IntakeRecordConfiguration.cs` |
-| EF Core migration (`AddIntakeEditDraftAndConcurrency`) | CREATE | `Server/Infrastructure/Persistence/Migrations/` |
+| Component                                              | Action | Project                                                                         |
+| ------------------------------------------------------ | ------ | ------------------------------------------------------------------------------- |
+| `IntakeRecord` entity class                            | MODIFY | `Server/Domain/Entities/IntakeRecord.cs`                                        |
+| `IntakeRecordConfiguration` (EF Core fluent config)    | MODIFY | `Server/Infrastructure/Persistence/Configurations/IntakeRecordConfiguration.cs` |
+| EF Core migration (`AddIntakeEditDraftAndConcurrency`) | CREATE | `Server/Infrastructure/Persistence/Migrations/`                                 |
 
 ## Implementation Plan
 
 1. **Extend `IntakeRecord` Entity** — Add three new properties to the `IntakeRecord` C# entity class:
+
    ```csharp
    // Partial draft storage — nullable JSONB
    public JsonDocument? DraftData { get; set; }
@@ -93,9 +94,11 @@ No new tables are created. The `IntakeRecord` table already exists (delivered by
    // Optimistic concurrency token (PostgreSQL xmin)
    public uint RowVersion { get; set; }
    ```
+
    Use `System.Text.Json.JsonDocument` for the JSONB property to remain consistent with other JSONB columns (`Demographics`, `MedicalHistory`, `Symptoms`, `Medications`) already present on the entity.
 
 2. **Update EF Core Fluent Configuration** — In `IntakeRecordConfiguration.cs` add:
+
    ```csharp
    builder.Property(x => x.DraftData)
        .HasColumnType("jsonb")
@@ -111,17 +114,21 @@ No new tables are created. The `IntakeRecord` table already exists (delivered by
        .HasColumnName("xmin")
        .HasColumnType("xid");
    ```
+
    The `xmin` approach leverages PostgreSQL's built-in system column, eliminating the need for application-managed version increment logic. EF Core's `DbUpdateConcurrencyException` is thrown automatically on stale-version conflicts.
 
 3. **Generate EF Core Migration** — Run:
+
    ```bash
    dotnet ef migrations add AddIntakeEditDraftAndConcurrency \
        --project Server/Infrastructure \
        --startup-project Server/Api
    ```
+
    The generated migration `Up()` method adds `draftData jsonb NULL` and `lastModifiedAt timestamptz NULL` columns to `"IntakeRecords"`. The `xmin` column is a system column requiring no `ALTER TABLE` statement — only the EF Core model mapping change.
 
 4. **Migration Rollback (`Down()`)** — Ensure the generated `Down()` method drops the two added columns:
+
    ```csharp
    migrationBuilder.DropColumn(table: "IntakeRecords", name: "draftData");
    migrationBuilder.DropColumn(table: "IntakeRecords", name: "lastModifiedAt");
@@ -129,6 +136,7 @@ No new tables are created. The `IntakeRecord` table already exists (delivered by
    ```
 
 5. **Index Verification** — Confirm that an index on `(patientId, appointmentId)` already exists on `IntakeRecords` (should have been created in EP-DATA). If absent, add via migration:
+
    ```csharp
    migrationBuilder.CreateIndex(
        name: "IX_IntakeRecords_PatientId_AppointmentId",
@@ -136,6 +144,7 @@ No new tables are created. The `IntakeRecord` table already exists (delivered by
        columns: new[] { "PatientId", "AppointmentId" },
        unique: true);
    ```
+
    A unique composite index prevents duplicate `IntakeRecord` rows for the same `(patientId, appointmentId)` pair at the database level, directly enforcing FR-010 / FR-019 no-duplicate guarantee even under concurrent write scenarios.
 
 6. **Apply Migration** — Apply to the development database:
@@ -160,10 +169,10 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| MODIFY | `Server/Domain/Entities/IntakeRecord.cs` | Add `DraftData` (`JsonDocument?`), `LastModifiedAt` (`DateTime?`), `RowVersion` (`uint`) properties |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/IntakeRecordConfiguration.cs` | Map `draftData` as nullable JSONB, `lastModifiedAt` as `timestamptz`, `xmin` as row-version concurrency token |
+| Action | File Path                                                                                      | Description                                                                                                                                 |
+| ------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| MODIFY | `Server/Domain/Entities/IntakeRecord.cs`                                                       | Add `DraftData` (`JsonDocument?`), `LastModifiedAt` (`DateTime?`), `RowVersion` (`uint`) properties                                         |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/IntakeRecordConfiguration.cs`                | Map `draftData` as nullable JSONB, `lastModifiedAt` as `timestamptz`, `xmin` as row-version concurrency token                               |
 | CREATE | `Server/Infrastructure/Persistence/Migrations/<timestamp>_AddIntakeEditDraftAndConcurrency.cs` | EF Core migration — adds `draftData jsonb NULL` and `lastModifiedAt timestamptz NULL`; ensures unique index on `(PatientId, AppointmentId)` |
 
 ## External References
@@ -195,11 +204,11 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Add `DraftData`, `LastModifiedAt`, and `RowVersion` properties to `IntakeRecord` entity
-- [ ] Map `draftData` as nullable JSONB in `IntakeRecordConfiguration`
-- [ ] Map `lastModifiedAt` as nullable `timestamptz` in `IntakeRecordConfiguration`
-- [ ] Map `xmin` as `IsRowVersion()` concurrency token in `IntakeRecordConfiguration`
-- [ ] Generate EF Core migration `AddIntakeEditDraftAndConcurrency`
-- [ ] Verify or add unique composite index `IX_IntakeRecords_PatientId_AppointmentId` in migration
-- [ ] Write migration `Down()` rollback — drop `draftData` and `lastModifiedAt` columns
+- [x] Add `DraftData`, `LastModifiedAt`, and `RowVersion` properties to `IntakeRecord` entity
+- [x] Map `draftData` as nullable JSONB in `IntakeRecordConfiguration`
+- [x] Map `lastModifiedAt` as nullable `timestamptz` in `IntakeRecordConfiguration`
+- [x] Map `xmin` as `IsRowVersion()` concurrency token in `IntakeRecordConfiguration`
+- [x] Generate EF Core migration `AddIntakeEditDraftAndConcurrency`
+- [x] Verify or add unique composite index `IX_IntakeRecords_PatientId_AppointmentId` in migration
+- [x] Write migration `Down()` rollback — drop `draftData` and `lastModifiedAt` columns
 - [ ] Apply migration to local development database and confirm schema via psql inspection

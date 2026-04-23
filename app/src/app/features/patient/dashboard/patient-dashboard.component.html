@@ -1,0 +1,250 @@
+<main class="dashboard-page" aria-labelledby="dashboard-heading">
+  <header class="dashboard-header">
+    <h1 id="dashboard-heading" class="dashboard-title">My Dashboard</h1>
+  </header>
+
+  <!-- Error banner -->
+  @if (loadState() === "error") {
+    <div class="error-banner" role="alert" aria-live="assertive">
+      <span>Unable to load dashboard data. Please try again.</span>
+      <button
+        type="button"
+        class="retry-button"
+        (click)="loadDashboard()"
+        aria-label="Retry loading dashboard"
+      >
+        Retry
+      </button>
+    </div>
+  }
+
+  <div class="dashboard-grid">
+    <!-- ── Upcoming Appointments ── -->
+    <section class="dashboard-section" aria-label="Upcoming Appointments">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Upcoming Appointments</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Skeleton loader -->
+          @if (loadState() === "loading" || loadState() === "idle") {
+            <ul class="skeleton-list" aria-hidden="true">
+              @for (item of [1, 2, 3]; track item) {
+                <li class="skeleton-row">
+                  <span class="skeleton skeleton-text"></span>
+                  <span class="skeleton skeleton-badge"></span>
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Loaded: appointments exist -->
+          @if (
+            loadState() === "success" &&
+            (dashboard()?.upcomingAppointments?.length ?? 0) > 0
+          ) {
+            <ul class="item-list">
+              @for (appt of dashboard()!.upcomingAppointments; track appt.id) {
+                <li class="appointment-row">
+                  <div class="appointment-info">
+                    <span class="appointment-specialty">{{
+                      appt.specialty
+                    }}</span>
+                    <span class="appointment-datetime">
+                      {{ appt.date | date: "mediumDate" }} at
+                      {{ appt.timeSlotStart }}
+                    </span>
+                  </div>
+                  <div class="appointment-badges">
+                    <app-appointment-status-badge [status]="appt.status" />
+                    @if (appointmentInsuranceResult(appt); as insResult) {
+                      <app-insurance-status-badge [result]="insResult" />
+                    }
+                  </div>
+                  <!-- Outlook Calendar sync per appointment card (EP-007 / US_036) -->
+                  <app-outlook-calendar-sync [appointmentId]="appt.id" />
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Empty state -->
+          @if (
+            loadState() === "success" &&
+            (dashboard()?.upcomingAppointments?.length ?? 0) === 0
+          ) {
+            <div class="empty-state" role="status">
+              <p class="empty-message">You have no upcoming appointments.</p>
+              <a
+                mat-stroked-button
+                routerLink="/appointments/book"
+                aria-label="Book a new appointment"
+              >
+                Book Appointment
+              </a>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- ── Pending Intake ── -->
+    <section class="dashboard-section" aria-label="Pending Intake">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Pending Intake</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Skeleton loader -->
+          @if (loadState() === "loading" || loadState() === "idle") {
+            <ul class="skeleton-list" aria-hidden="true">
+              @for (item of [1, 2]; track item) {
+                <li class="skeleton-row">
+                  <span class="skeleton skeleton-text"></span>
+                  <span class="skeleton skeleton-btn"></span>
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Loaded: pending items exist -->
+          @if (loadState() === "success" && pendingIntakeItems().length > 0) {
+            <ul class="item-list">
+              @for (appt of pendingIntakeItems(); track appt.id) {
+                <li class="intake-row">
+                  <div class="appointment-info">
+                    <span class="appointment-specialty">{{
+                      appt.specialty
+                    }}</span>
+                    <span class="appointment-datetime">
+                      {{ appt.date | date: "mediumDate" }}
+                    </span>
+                  </div>
+                  <a
+                    mat-stroked-button
+                    color="primary"
+                    [routerLink]="['/intake', appt.id]"
+                    [attr.aria-label]="
+                      'Complete intake form for ' +
+                      appt.specialty +
+                      ' on ' +
+                      (appt.date | date: 'mediumDate')
+                    "
+                  >
+                    Complete Intake
+                  </a>
+                  @if (appt.hasSubmittedIntake) {
+                    <a
+                      mat-stroked-button
+                      [routerLink]="['/intake/edit', appt.id]"
+                      [attr.aria-label]="
+                        'Edit intake form for ' +
+                        appt.specialty +
+                        ' on ' +
+                        (appt.date | date: 'mediumDate')
+                      "
+                    >
+                      Edit Intake
+                    </a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Empty state -->
+          @if (loadState() === "success" && pendingIntakeItems().length === 0) {
+            <div class="empty-state" role="status">
+              <p class="empty-message">No pending intake items.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- ── Document Upload History ── -->
+    <section class="dashboard-section" aria-label="Document Upload History">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Document Upload History</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Skeleton loader -->
+          @if (loadState() === "loading" || loadState() === "idle") {
+            <ul class="skeleton-list" aria-hidden="true">
+              @for (item of [1, 2, 3]; track item) {
+                <li class="skeleton-row">
+                  <span class="skeleton skeleton-text"></span>
+                  <span class="skeleton skeleton-badge"></span>
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Loaded: documents exist -->
+          @if (
+            loadState() === "success" &&
+            (dashboard()?.documents?.length ?? 0) > 0
+          ) {
+            <ul class="item-list document-list">
+              @for (doc of dashboard()!.documents; track doc.id) {
+                <li class="document-row">
+                  <div class="document-info">
+                    <span class="document-name">{{ doc.fileName }}</span>
+                    <span class="document-date">
+                      Uploaded {{ doc.uploadedAt | date: "medium" }}
+                    </span>
+                  </div>
+                  <app-document-status-chip
+                    [processingStatus]="doc.processingStatus"
+                    (retryClicked)="onRetryUpload(doc.id)"
+                  />
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Empty state -->
+          @if (
+            loadState() === "success" &&
+            (dashboard()?.documents?.length ?? 0) === 0
+          ) {
+            <div class="empty-state" role="status">
+              <p class="empty-message">No documents uploaded yet.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- ── 360° View Status ── -->
+    <section class="dashboard-section" aria-label="360° View Status">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>360° View Status</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Skeleton loader -->
+          @if (loadState() === "loading" || loadState() === "idle") {
+            <div class="skeleton-row" aria-hidden="true">
+              <span class="skeleton skeleton-badge-lg"></span>
+            </div>
+          }
+
+          <!-- Loaded -->
+          @if (loadState() === "success" && dashboard() !== null) {
+            <div class="view-readiness-container">
+              <app-view-readiness-indicator
+                [verified]="dashboard()!.viewVerified"
+              />
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+</main>

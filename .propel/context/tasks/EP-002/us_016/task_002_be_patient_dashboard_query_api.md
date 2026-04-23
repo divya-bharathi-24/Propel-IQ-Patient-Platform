@@ -288,10 +288,10 @@ dotnet test --project Server.Tests/Server.Tests.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `PatientController` with `[Authorize(Roles = "Patient")]` and `GET /api/patient/dashboard`; extract `patientId` from JWT claims only
-- [ ] Create `GetPatientDashboardQuery` record with `PatientId` property
-- [ ] Implement `GetPatientDashboardQueryHandler`: upcoming appointments projection with correlated `hasPendingIntake` sub-query
-- [ ] Implement documents query: descending order by `uploadedAt`, include all `processingStatus` values including `Failed`
-- [ ] Implement 360° view status query: `patients.view_verified_at IS NOT NULL`
-- [ ] Create `PatientDashboardResponse`, `UpcomingAppointmentDto`, `DocumentHistoryDto` immutable record DTOs
-- [ ] Confirm `DateOnly`/`TimeOnly` JSON serializer options in `Program.cs`; add if missing
+- [x] Create `PatientController` with `[Authorize(Roles = "Patient")]` and `GET /api/patient/dashboard`; extract `patientId` from JWT claims only
+- [x] Create `GetPatientDashboardQuery` record with `PatientId` property
+- [x] Implement `GetPatientDashboardQueryHandler`: upcoming appointments projection with correlated `hasPendingIntake` sub-query
+- [x] Implement documents query: descending order by `uploadedAt`, include all `processingStatus` values including `Failed`
+- [x] Implement 360° view status query: `patients.view_verified_at IS NOT NULL`
+- [x] Create `PatientDashboardResponse`, `UpcomingAppointmentDto`, `DocumentHistoryDto` immutable record DTOs
+- [x] Confirm `DateOnly`/`TimeOnly` JSON serializer options in `Program.cs`; add if missing

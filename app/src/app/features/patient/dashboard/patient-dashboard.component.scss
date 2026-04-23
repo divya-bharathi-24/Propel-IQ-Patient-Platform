@@ -1,0 +1,263 @@
+.dashboard-page {
+  padding: 24px 16px;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Error banner */
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  background-color: #fce4ec;
+  border-left: 4px solid #b71c1c;
+  border-radius: 4px;
+  color: #b71c1c;
+  font-size: 0.875rem;
+}
+
+.retry-button {
+  background: none;
+  border: 1px solid #b71c1c;
+  border-radius: 4px;
+  padding: 4px 12px;
+  color: #b71c1c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(183, 28, 28, 0.08);
+  }
+}
+
+/* Responsive grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+
+  /* 768px: two columns */
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* 1440px: two columns remain but with more padding */
+  @media (min-width: 1440px) {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+}
+
+.dashboard-section {
+  mat-card {
+    height: 100%;
+  }
+
+  mat-card-content {
+    padding-top: 8px;
+  }
+}
+
+/* Item lists */
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Appointment rows */
+.appointment-row,
+.intake-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.appointment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Wraps appointment status badge + insurance status badge side by side (AC-4) */
+.appointment-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.appointment-specialty {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appointment-datetime {
+  font-size: 0.8125rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* Document rows */
+.document-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.document-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.document-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.document-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-date {
+  font-size: 0.8125rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* 360° View */
+.view-readiness-container {
+  padding: 16px 0;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 0;
+  text-align: center;
+}
+
+.empty-message {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* Skeleton loaders */
+.skeleton-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.skeleton {
+  display: block;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 18px;
+  flex: 1;
+}
+
+.skeleton-badge {
+  height: 22px;
+  width: 80px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.skeleton-btn {
+  height: 32px;
+  width: 120px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.skeleton-badge-lg {
+  height: 36px;
+  width: 200px;
+  border-radius: 16px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Mobile (375px) */
+@media (max-width: 600px) {
+  .dashboard-page {
+    padding: 16px 12px;
+  }
+
+  .appointment-row,
+  .intake-row,
+  .document-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .error-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

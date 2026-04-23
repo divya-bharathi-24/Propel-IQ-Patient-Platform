@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "dgSpecHash": "CoTMwT60w9U=",
+  "success": true,
+  "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Queue\\Propel.Modules.Queue.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\fluentvalidation\\11.12.0\\fluentvalidation.11.12.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr\\12.5.0\\mediatr.12.5.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.7\\microsoft.extensions.logging.abstractions.10.0.7.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Queue\\Propel.Modules.Queue.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Queue\\Propel.Modules.Queue.csproj",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}

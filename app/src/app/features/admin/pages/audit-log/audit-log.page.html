@@ -1,0 +1,29 @@
+<main class="audit-log-container" role="main" aria-labelledby="audit-log-title">
+  <header class="page-header">
+    <h1 id="audit-log-title">Audit Log</h1>
+    <p class="page-subtitle">
+      Read-only record of all user actions on patient data (HIPAA-compliant).
+    </p>
+  </header>
+
+  <!-- Filter Panel (AC-2) -->
+  <app-audit-filter-panel
+    (filtersApplied)="onFiltersApplied($event)"
+    (filtersCleared)="onFiltersCleared()"
+  />
+
+  <!-- Error State -->
+  @if (store.errorMessage()) {
+  <div class="error-message" role="alert" aria-live="assertive">
+    {{ store.errorMessage() }}
+  </div>
+  }
+
+  <!-- Event Table (AC-1, AC-3) -->
+  <app-audit-event-table
+    [events]="store.events()"
+    [loading]="store.loading()"
+    [nextCursor]="store.nextCursor()"
+    [totalCount]="store.totalCount()"
+  />
+</main>

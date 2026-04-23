@@ -1,0 +1,114 @@
+<section class="preview-panel" aria-label="Live intake form preview">
+  <h2 class="preview-panel__title">Form Preview</h2>
+
+  @if (extractedFields.length === 0) {
+    <p class="preview-panel__empty" role="status">
+      Extracted fields will appear here as you answer questions.
+    </p>
+  }
+
+  @for (section of sections; track section) {
+    @let sectionFields = getFieldsForSection(section);
+    @if (sectionFields.length > 0) {
+      <div class="preview-section">
+        <h3 class="preview-section__heading">{{ section }}</h3>
+        <ul class="preview-section__list" role="list">
+          @for (field of sectionFields; track field.fieldName) {
+            <li class="preview-field" role="listitem">
+              <span class="preview-field__label">{{
+                formatFieldLabel(field.fieldName)
+              }}</span>
+
+              @if (editMode) {
+                <mat-form-field
+                  appearance="outline"
+                  class="preview-field__input"
+                >
+                  <input
+                    matInput
+                    [value]="getEditedValue(field.fieldName, field.value)"
+                    (input)="
+                      updateFieldValue(
+                        field.fieldName,
+                        $any($event.target).value
+                      )
+                    "
+                    [attr.aria-label]="formatFieldLabel(field.fieldName)"
+                  />
+                </mat-form-field>
+              } @else {
+                <span class="preview-field__value">{{
+                  field.value || "—"
+                }}</span>
+              }
+
+              @if (isLowConfidence(field)) {
+                <mat-icon
+                  color="warn"
+                  class="preview-field__warning-icon"
+                  aria-label="Low confidence – awaiting clarification"
+                  [matTooltip]="
+                    'AI confidence: ' +
+                    confidencePercent(field) +
+                    '% — awaiting clarification'
+                  "
+                  matTooltipPosition="above"
+                >
+                  warning
+                </mat-icon>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+
+  <!-- Fields that don't map to a known section -->
+  @let otherFields = getUnclassifiedFields();
+  @if (otherFields.length > 0) {
+    <div class="preview-section">
+      <h3 class="preview-section__heading">Other</h3>
+      <ul class="preview-section__list" role="list">
+        @for (field of otherFields; track field.fieldName) {
+          <li class="preview-field" role="listitem">
+            <span class="preview-field__label">{{
+              formatFieldLabel(field.fieldName)
+            }}</span>
+
+            @if (editMode) {
+              <mat-form-field appearance="outline" class="preview-field__input">
+                <input
+                  matInput
+                  [value]="getEditedValue(field.fieldName, field.value)"
+                  (input)="
+                    updateFieldValue(field.fieldName, $any($event.target).value)
+                  "
+                  [attr.aria-label]="formatFieldLabel(field.fieldName)"
+                />
+              </mat-form-field>
+            } @else {
+              <span class="preview-field__value">{{ field.value || "—" }}</span>
+            }
+
+            @if (isLowConfidence(field)) {
+              <mat-icon
+                color="warn"
+                class="preview-field__warning-icon"
+                aria-label="Low confidence – awaiting clarification"
+                [matTooltip]="
+                  'AI confidence: ' +
+                  confidencePercent(field) +
+                  '% — awaiting clarification'
+                "
+                matTooltipPosition="above"
+              >
+                warning
+              </mat-icon>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</section>

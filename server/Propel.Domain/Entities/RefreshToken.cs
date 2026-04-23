@@ -5,13 +5,18 @@ namespace Propel.Domain.Entities;
 /// Only the SHA-256 hash of the raw token is stored — never the raw value (OWASP A02, NFR-008).
 /// Token families enable reuse-detection: when a revoked token is presented, the entire
 /// family is invalidated and a security alert is written to the audit log.
+/// Supports both Patient and User (Staff/Admin) authentication via nullable PatientId/UserId.
+/// Exactly one of PatientId or UserId must be non-null (enforced via DB CHECK constraint).
 /// </summary>
 public sealed class RefreshToken
 {
     public Guid Id { get; set; }
 
-    /// <summary>FK to the patient who owns this token. Raw FK — no navigation property.</summary>
-    public Guid UserId { get; set; }
+    /// <summary>FK to the patient who owns this token (nullable — set for patient logins). Raw FK — no navigation property.</summary>
+    public Guid? PatientId { get; set; }
+
+    /// <summary>FK to the staff/admin user who owns this token (nullable — set for staff/admin logins). Raw FK — no navigation property.</summary>
+    public Guid? UserId { get; set; }
 
     /// <summary>
     /// SHA-256 hex digest of the raw refresh token.

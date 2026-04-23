@@ -30,15 +30,15 @@
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                               | Version |
-| ---------- | ---------------------------------------- | ------- |
-| Database   | PostgreSQL                               | 16+     |
-| ORM        | Entity Framework Core                    | 9.x     |
-| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL    | 9.x     |
-| DB Hosting | Neon PostgreSQL (free tier)              | —       |
-| Testing    | xUnit                                    | 2.x     |
-| AI/ML      | N/A                                      | N/A     |
-| Mobile     | N/A                                      | N/A     |
+| Layer      | Technology                            | Version |
+| ---------- | ------------------------------------- | ------- |
+| Database   | PostgreSQL                            | 16+     |
+| ORM        | Entity Framework Core                 | 9.x     |
+| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier)           | —       |
+| Testing    | xUnit                                 | 2.x     |
+| AI/ML      | N/A                                   | N/A     |
+| Mobile     | N/A                                   | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -92,20 +92,21 @@ All new columns are additive / nullable where appropriate — zero-downtime migr
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `PatientOAuthToken` EF Core entity | `Server/Infrastructure/Persistence/Entities/PatientOAuthToken.cs` |
-| CREATE | `PatientOAuthTokenConfiguration` EF Core fluent config | `Server/Infrastructure/Persistence/Configurations/PatientOAuthTokenConfiguration.cs` |
-| MODIFY | `CalendarSync` EF Core entity | Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int` |
-| MODIFY | `CalendarSyncConfiguration` EF Core fluent config | Map new columns; add `PermanentFailed` to `syncStatus` valid values |
-| CREATE | EF Core migration: `AddCalendarSyncOAuthSchema` | `Server/Infrastructure/Migrations/` |
-| CREATE | Migration Designer snapshot | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.Designer.cs` |
+| Status | Component / Module                                     | Project                                                                               |
+| ------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| CREATE | `PatientOAuthToken` EF Core entity                     | `Server/Infrastructure/Persistence/Entities/PatientOAuthToken.cs`                     |
+| CREATE | `PatientOAuthTokenConfiguration` EF Core fluent config | `Server/Infrastructure/Persistence/Configurations/PatientOAuthTokenConfiguration.cs`  |
+| MODIFY | `CalendarSync` EF Core entity                          | Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int`            |
+| MODIFY | `CalendarSyncConfiguration` EF Core fluent config      | Map new columns; add `PermanentFailed` to `syncStatus` valid values                   |
+| CREATE | EF Core migration: `AddCalendarSyncOAuthSchema`        | `Server/Infrastructure/Migrations/`                                                   |
+| CREATE | Migration Designer snapshot                            | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.Designer.cs` |
 
 ---
 
 ## Implementation Plan
 
 1. **`PatientOAuthToken` entity**:
+
    ```csharp
    public class PatientOAuthToken
    {
@@ -124,6 +125,7 @@ All new columns are additive / nullable where appropriate — zero-downtime migr
    ```
 
 2. **`PatientOAuthTokenConfiguration`** (EF Core fluent config):
+
    ```csharp
    builder.ToTable("patient_oauth_tokens");
    builder.HasKey(t => t.Id);
@@ -135,17 +137,21 @@ All new columns are additive / nullable where appropriate — zero-downtime migr
    builder.HasIndex(t => new { t.PatientId, t.Provider }).IsUnique();
    builder.HasOne(t => t.Patient).WithMany().HasForeignKey(t => t.PatientId).OnDelete(DeleteBehavior.Cascade);
    ```
+
    - `OnDelete(Cascade)`: when a Patient is deactivated/deleted, OAuth tokens are removed automatically (HIPAA — no orphaned PHI-adjacent tokens)
 
 3. **Extend `CalendarSync` entity**:
+
    ```csharp
    public string? EventLink { get; set; }          // Google Calendar event URL (AC-2)
    public DateTime? RetryScheduledAt { get; set; } // When retry service should reattempt (AC-4)
    public int RetryCount { get; set; } = 0;        // Retry attempts; PermanentFailed after 3
    ```
+
    - `syncStatus` VARCHAR values extended to include `'PermanentFailed'` (document in migration comment; validated at application layer)
 
 4. **Update `CalendarSyncConfiguration`**:
+
    ```csharp
    builder.Property(c => c.EventLink).HasMaxLength(2048).IsRequired(false);
    builder.Property(c => c.RetryScheduledAt).IsRequired(false);
@@ -154,6 +160,7 @@ All new columns are additive / nullable where appropriate — zero-downtime migr
 
 5. **EF Core migration `AddCalendarSyncOAuthSchema`**:
    - `Up()`:
+
      ```sql
      CREATE TABLE patient_oauth_tokens (
          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -172,6 +179,7 @@ All new columns are additive / nullable where appropriate — zero-downtime migr
      ALTER TABLE calendar_syncs ADD COLUMN retry_scheduled_at TIMESTAMPTZ NULL;
      ALTER TABLE calendar_syncs ADD COLUMN retry_count SMALLINT NOT NULL DEFAULT 0;
      ```
+
    - `Down()`:
      ```sql
      ALTER TABLE calendar_syncs DROP COLUMN retry_count;
@@ -200,14 +208,14 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Infrastructure/Persistence/Entities/PatientOAuthToken.cs` | Entity: patientId, provider, encryptedAccessToken, encryptedRefreshToken, expiresAt, timestamps |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/PatientOAuthTokenConfiguration.cs` | Unique index (patientId, provider); Cascade delete; max lengths |
-| MODIFY | `Server/Infrastructure/Persistence/Entities/CalendarSync.cs` | Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int` |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/CalendarSyncConfiguration.cs` | Map new columns; max length 2048 on `EventLink`; default 0 on `RetryCount` |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.cs` | `Up()`: CREATE `patient_oauth_tokens`, ADD 3 columns to `calendar_syncs`; `Down()`: reversal |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.Designer.cs` | EF Core migration snapshot |
+| Action | File Path                                                                             | Description                                                                                     |
+| ------ | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Infrastructure/Persistence/Entities/PatientOAuthToken.cs`                     | Entity: patientId, provider, encryptedAccessToken, encryptedRefreshToken, expiresAt, timestamps |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/PatientOAuthTokenConfiguration.cs`  | Unique index (patientId, provider); Cascade delete; max lengths                                 |
+| MODIFY | `Server/Infrastructure/Persistence/Entities/CalendarSync.cs`                          | Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int`                      |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/CalendarSyncConfiguration.cs`       | Map new columns; max length 2048 on `EventLink`; default 0 on `RetryCount`                      |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.cs`          | `Up()`: CREATE `patient_oauth_tokens`, ADD 3 columns to `calendar_syncs`; `Down()`: reversal    |
+| CREATE | `Server/Infrastructure/Migrations/<timestamp>_AddCalendarSyncOAuthSchema.Designer.cs` | EF Core migration snapshot                                                                      |
 
 ---
 
@@ -256,9 +264,9 @@ dotnet ef database update <PreviousMigrationName> --project Server/Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create `PatientOAuthToken` entity: `Id`, `PatientId`, `Provider`, `EncryptedAccessToken` (TEXT — Data Protection ciphertext), `EncryptedRefreshToken` (TEXT), `ExpiresAt`, `CreatedAt`, `UpdatedAt`
-- [ ] Create `PatientOAuthTokenConfiguration`: unique index on `(PatientId, Provider)`; `OnDelete(Cascade)`; `TEXT` columns with no max length (Data Protection output is variable-length)
-- [ ] Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int = 0` to `CalendarSync` entity and `CalendarSyncConfiguration`
-- [ ] Write migration `AddCalendarSyncOAuthSchema` `Up()`: `CREATE TABLE patient_oauth_tokens` + unique index; `ALTER TABLE calendar_syncs ADD COLUMN` (event_link, retry_scheduled_at, retry_count)
-- [ ] Generate SQL migration script and review before applying to Neon; confirm `pgcrypto` extension active for `gen_random_uuid()`
-- [ ] Verify `Down()` cleanly drops new columns and `patient_oauth_tokens` table without affecting existing `calendar_syncs` rows
+- [x] Create `PatientOAuthToken` entity: `Id`, `PatientId`, `Provider`, `EncryptedAccessToken` (TEXT — Data Protection ciphertext), `EncryptedRefreshToken` (TEXT), `ExpiresAt`, `CreatedAt`, `UpdatedAt`
+- [x] Create `PatientOAuthTokenConfiguration`: unique index on `(PatientId, Provider)`; `OnDelete(Restrict)` per DR-009; `VARCHAR(4000)` columns for Base64 Data Protection ciphertext
+- [x] Add `EventLink: string?`, `RetryScheduledAt: DateTime?`, `RetryCount: int = 0` to `CalendarSync` entity and `CalendarSyncConfiguration`
+- [x] Write migration `AddCalendarSyncOAuthSchema` `Up()`: `CREATE TABLE patient_oauth_tokens` + unique index; `ALTER TABLE calendar_syncs ADD COLUMN` (event_link, retry_scheduled_at, retry_count)
+- [x] Generate SQL migration script and review before applying to Neon; confirm `pgcrypto` extension active for `gen_random_uuid()`
+- [x] Verify `Down()` cleanly drops new columns and `patient_oauth_tokens` table without affecting existing `calendar_syncs` rows

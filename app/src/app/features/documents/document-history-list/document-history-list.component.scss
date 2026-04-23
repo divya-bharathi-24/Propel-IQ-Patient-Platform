@@ -1,0 +1,291 @@
+:host {
+  display: block;
+}
+
+.history-panel {
+  padding: 1.5rem;
+  background: var(--surface-color, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.panel-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+  color: var(--text-primary, #1a1a1a);
+}
+
+/* ── State messages ── */
+.state-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+  padding: 0.75rem 0;
+}
+
+.error-message {
+  color: var(--error-color, #dc2626);
+}
+
+.empty-message {
+  color: var(--text-secondary, #9ca3af);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ── Document list ── */
+.document-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.document-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-alt, #f9fafb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  position: relative;
+}
+
+/* ── Primary info ── */
+.doc-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.doc-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 20rem;
+}
+
+.doc-size {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* ── Source badges ── */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.badge--staff {
+  background: var(--warning-bg, #fffbeb);
+  color: var(--warning-text, #92400e);
+  border: 1px solid var(--warning-border, #f59e0b);
+}
+
+.badge--patient {
+  background: var(--info-bg, #eff6ff);
+  color: var(--info-text, #1e40af);
+  border: 1px solid var(--info-border, #93c5fd);
+}
+
+/* ── Meta fields ── */
+.doc-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6b7280);
+  flex-shrink: 0;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: var(--text-primary, #374151);
+  margin-right: 0.25rem;
+}
+
+/* ── Processing status chips ── */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.chip--pending {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.chip--processing {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.chip--completed {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.chip--failed {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* ── Delete button ── */
+.delete-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--error-color, #dc2626);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--error-color, #dc2626);
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--error-color, #dc2626);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring, #2563eb);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Inline confirmation panel ── */
+.delete-confirm-panel {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-color, #fff);
+  border: 1px solid var(--error-color, #dc2626);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.confirm-message {
+  font-size: 0.875rem;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.required-star {
+  color: var(--error-color, #dc2626);
+  margin-left: 0.125rem;
+}
+
+.reason-textarea {
+  resize: vertical;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text-primary, #1a1a1a);
+  background: var(--input-bg, #fff);
+  transition: border-color 0.15s ease;
+
+  &:focus {
+    outline: 2px solid var(--focus-ring, #2563eb);
+    outline-offset: 2px;
+    border-color: var(--focus-ring, #2563eb);
+  }
+}
+
+.field-error {
+  font-size: 0.8125rem;
+  color: var(--error-color, #dc2626);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text-primary, #374151);
+
+  &:hover {
+    background: var(--surface-alt, #f9fafb);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring, #2563eb);
+    outline-offset: 2px;
+  }
+}
+
+.confirm-delete-btn {
+  padding: 0.5rem 1rem;
+  background: var(--error-color, #dc2626);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #b91c1c;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring, #2563eb);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .history-panel {
+    padding: 1rem;
+  }
+
+  .document-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .delete-btn {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}

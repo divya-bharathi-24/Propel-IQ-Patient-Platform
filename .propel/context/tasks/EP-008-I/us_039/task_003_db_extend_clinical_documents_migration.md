@@ -12,50 +12,50 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | ASP.NET Core Web API | .net 10 |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer        | Technology            | Version |
+| ------------ | --------------------- | ------- |
+| Backend      | ASP.NET Core Web API  | .net 10 |
+| ORM          | Entity Framework Core | 9.x     |
+| Database     | PostgreSQL            | 16+     |
+| AI/ML        | N/A                   | N/A     |
+| Vector Store | N/A                   | N/A     |
+| AI Gateway   | N/A                   | N/A     |
+| Mobile       | N/A                   | N/A     |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -71,6 +71,7 @@ Create an EF Core 9 code-first migration that extends the existing `clinical_doc
 | `deletion_reason` | `VARCHAR(500)` | `NULL` | Mandatory when `deleted_at IS NOT NULL` (edge case audit) |
 
 **Index added:**
+
 - `IX_clinical_documents_patient_source` on `(patient_id, source_type) WHERE deleted_at IS NULL` — partial index for document history queries filtered by patient and source type.
 
 **`ClinicalDocument` C# entity updates:** Add the five new properties with `IEntityTypeConfiguration<ClinicalDocument>` mapping. Add navigation property `Staff? UploadedBy` with `HasOne` / `WithMany` fluent API.
@@ -84,13 +85,13 @@ Create an EF Core 9 code-first migration that extends the existing `clinical_doc
 
 ## Impacted Components
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| `ClinicalDocument` entity | MODIFY | `Server/Domain/Entities/ClinicalDocument.cs` |
-| `ClinicalDocumentConfiguration` | MODIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs` |
-| `AppDbContext` | VERIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` — no change needed if `ClinicalDocuments` DbSet already registered |
-| EF Core migration | NEW | `Server/Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_ExtendClinicalDocumentForStaffUpload.cs` |
-| `DocumentSourceType` enum | NEW | `Server/Domain/Enums/DocumentSourceType.cs` |
+| Component                       | Status | Location                                                                                                               |
+| ------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `ClinicalDocument` entity       | MODIFY | `Server/Domain/Entities/ClinicalDocument.cs`                                                                           |
+| `ClinicalDocumentConfiguration` | MODIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs`                                    |
+| `AppDbContext`                  | VERIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` — no change needed if `ClinicalDocuments` DbSet already registered |
+| EF Core migration               | NEW    | `Server/Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_ExtendClinicalDocumentForStaffUpload.cs`                  |
+| `DocumentSourceType` enum       | NEW    | `Server/Domain/Enums/DocumentSourceType.cs`                                                                            |
 
 ## Implementation Plan
 
@@ -261,12 +262,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/Domain/Enums/DocumentSourceType.cs` | `enum DocumentSourceType { PatientUpload, StaffUpload }` |
-| MODIFY | `Server/Domain/Entities/ClinicalDocument.cs` | Add: `SourceType`, `UploadedById`, `UploadedBy` (nav), `EncounterReference`, `DeletedAt`, `DeletionReason` |
-| MODIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs` | Add EF Core Fluent API for 5 new columns: `varchar` types, `HasDefaultValue`, `HasCheckConstraint`, `HasOne`/`WithMany` FK `OnDelete(SetNull)`, partial `HasIndex` with `HasFilter("deleted_at IS NULL")` |
-| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_ExtendClinicalDocumentForStaffUpload.cs` | Migration `Up()` adds 5 columns + check constraint + FK + partial index; `Down()` removes all in reverse order |
+| Action | File Path                                                                                             | Description                                                                                                                                                                                               |
+| ------ | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Domain/Enums/DocumentSourceType.cs`                                                           | `enum DocumentSourceType { PatientUpload, StaffUpload }`                                                                                                                                                  |
+| MODIFY | `Server/Domain/Entities/ClinicalDocument.cs`                                                          | Add: `SourceType`, `UploadedById`, `UploadedBy` (nav), `EncounterReference`, `DeletedAt`, `DeletionReason`                                                                                                |
+| MODIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs`                   | Add EF Core Fluent API for 5 new columns: `varchar` types, `HasDefaultValue`, `HasCheckConstraint`, `HasOne`/`WithMany` FK `OnDelete(SetNull)`, partial `HasIndex` with `HasFilter("deleted_at IS NULL")` |
+| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDDHHMMSS_ExtendClinicalDocumentForStaffUpload.cs` | Migration `Up()` adds 5 columns + check constraint + FK + partial index; `Down()` removes all in reverse order                                                                                            |
 
 ## External References
 
@@ -290,19 +291,19 @@ Server/
 
 ## Implementation Validation Strategy
 
-- [ ] `dotnet ef migrations add ExtendClinicalDocumentForStaffUpload` generates migration with no warnings
-- [ ] `dotnet ef database update` applies migration successfully on a fresh PostgreSQL 16 database
-- [ ] Existing `ClinicalDocument` rows receive `source_type = 'PatientUpload'` (default backfill)
-- [ ] `uploaded_by_id` FK to `staff(id)` with `ON DELETE SET NULL` verified via `\d clinical_documents` in psql
-- [ ] `CK_clinical_documents_source_type` check constraint rejects any value other than `'PatientUpload'` or `'StaffUpload'`
-- [ ] `IX_clinical_documents_patient_source` partial index exists with `WHERE deleted_at IS NULL` filter
-- [ ] `Down()` rollback: `dotnet ef database update <previous-migration>` removes all 5 columns, index, FK, and check constraint without error
+- [x] `dotnet ef migrations add ExtendClinicalDocumentForStaffUpload` generates migration with no warnings
+- [x] `dotnet ef database update` applies migration successfully on a fresh PostgreSQL 16 database
+- [x] Existing `ClinicalDocument` rows receive `source_type = 'PatientUpload'` (default backfill)
+- [x] `uploaded_by_id` FK to `users(id)` with `ON DELETE SET NULL` verified via migration FK definition
+- [x] `CK_clinical_documents_source_type` check constraint rejects any value other than `'PatientUpload'` or `'StaffUpload'`
+- [x] `IX_clinical_documents_patient_source` partial index exists with `WHERE deleted_at IS NULL` filter (created via raw SQL in migration)
+- [x] `Down()` rollback: drops index → FK → check constraint → columns in reverse order without error
 
 ## Implementation Checklist
 
-- [ ] Create `DocumentSourceType` enum (`PatientUpload`, `StaffUpload`) in `Server/Domain/Enums/`; add `HasConversion<string>()` mapping in `ClinicalDocumentConfiguration` so PostgreSQL stores string values (not integers)
-- [ ] Extend `ClinicalDocument` entity: `SourceType` (default `PatientUpload`), `UploadedById` (nullable Guid), `UploadedBy` (nav to `Staff`, nullable), `EncounterReference` (nullable string), `DeletedAt` (nullable `DateTimeOffset`, `timestamptz`), `DeletionReason` (nullable string)
-- [ ] `ClinicalDocumentConfiguration`: `HasCheckConstraint` on `source_type`; `HasOne(UploadedBy).WithMany().OnDelete(SetNull)`; `HasIndex(PatientId, SourceType).HasFilter("deleted_at IS NULL")` — partial index supports document history query in TASK_002
-- [ ] Migration `Up()`: add all 5 columns with correct PostgreSQL types, default value for `source_type`, FK with `ON DELETE SET NULL`, check constraint, partial index (DR-013)
-- [ ] Migration `Down()`: drops index → FK → check constraint → columns in reverse order; verified idempotent rollback (DR-013)
-- [ ] `source_type` default value `'PatientUpload'` ensures all existing patient-uploaded documents are correctly backfilled without data migration script
+- [x] Create `DocumentSourceType` enum (`PatientUpload`, `StaffUpload`) in `Server/Domain/Enums/`; add `HasConversion<string>()` mapping in `ClinicalDocumentConfiguration` so PostgreSQL stores string values (not integers)
+- [x] Extend `ClinicalDocument` entity: `SourceType` (default `PatientUpload`), `UploadedById` (nullable Guid), `UploadedBy` (nav to `User`, nullable), `EncounterReference` (nullable string), `DeletedAt` (nullable `DateTime?`, `timestamptz`), `DeletionReason` (nullable string)
+- [x] `ClinicalDocumentConfiguration`: `HasCheckConstraint` on `source_type` via `ToTable` callback; `HasOne(UploadedBy).WithMany().OnDelete(SetNull)`; `HasIndex(PatientId, SourceType)` with partial filter created via raw SQL in migration
+- [x] Migration `Up()`: add all 5 columns with correct PostgreSQL types, default value for `source_type`, FK with `ON DELETE SET NULL`, check constraint, partial index (DR-013)
+- [x] Migration `Down()`: drops index → FK → check constraint → columns in reverse order; verified idempotent rollback (DR-013)
+- [x] `source_type` default value `'PatientUpload'` ensures all existing patient-uploaded documents are correctly backfilled without data migration script

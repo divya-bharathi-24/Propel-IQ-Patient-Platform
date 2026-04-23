@@ -1,0 +1,108 @@
+<section class="patient-search" aria-label="Search for existing patient">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Search by name or date of birth</mat-label>
+    <input
+      matInput
+      id="patient-search-input"
+      [formControl]="searchControl"
+      type="search"
+      autocomplete="off"
+      aria-describedby="patient-search-hint"
+      placeholder="e.g. Jane Doe or 1990-05-15"
+    />
+    <mat-icon matSuffix aria-hidden="true">search</mat-icon>
+    <mat-hint id="patient-search-hint"
+      >Enter at least 2 characters to search</mat-hint
+    >
+  </mat-form-field>
+
+  <!-- Searching spinner -->
+  @if (store.actionState() === "searching") {
+    <div class="search-status" role="status" aria-live="polite">
+      <mat-spinner
+        diameter="24"
+        aria-label="Searching for patients…"
+      ></mat-spinner>
+      <span class="sr-only">Searching…</span>
+    </div>
+  }
+
+  <!-- Search results -->
+  @if (
+    hasSearched() &&
+    store.actionState() !== "searching" &&
+    store.searchResults().length > 0
+  ) {
+    <mat-selection-list
+      [multiple]="false"
+      aria-label="Patient search results"
+      aria-live="polite"
+    >
+      @for (patient of store.searchResults(); track patient.patientId) {
+        <mat-list-option
+          (click)="onPatientSelect(patient)"
+          (keydown.enter)="onPatientSelect(patient)"
+          [attr.aria-label]="'Select patient ' + patient.name"
+        >
+          <span matListItemTitle>{{ patient.name }}</span>
+          <span matListItemLine>
+            @if (patient.dateOfBirth) {
+              DOB: {{ patient.dateOfBirth }} &bull;
+            }
+            {{ patient.email }}
+          </span>
+        </mat-list-option>
+      }
+    </mat-selection-list>
+  }
+
+  <!-- No results state -->
+  @if (
+    hasSearched() &&
+    store.actionState() !== "searching" &&
+    store.searchResults().length === 0
+  ) {
+    <div class="no-results" role="status" aria-live="polite">
+      <mat-icon aria-hidden="true">person_off</mat-icon>
+      <p>
+        No patients found. You can create a new patient record or continue
+        anonymously.
+      </p>
+
+      <div class="no-results-actions">
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="onCreateNew()"
+          aria-label="Create a new patient record"
+        >
+          <mat-icon aria-hidden="true">person_add</mat-icon>
+          Create New Patient
+        </button>
+
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="onAnonymous()"
+          aria-label="Continue as anonymous walk-in visit"
+        >
+          <mat-icon aria-hidden="true">hail</mat-icon>
+          Continue as Anonymous
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Search error -->
+  @if (store.actionState() === "error" && store.errorMessage()) {
+    <div
+      class="search-error"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      {{ store.errorMessage() }}
+    </div>
+  }
+</section>

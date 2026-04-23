@@ -1,0 +1,259 @@
+<main class="upload-page" aria-labelledby="upload-page-heading">
+  <header class="upload-header">
+    <h1 id="upload-page-heading" class="upload-title">Upload Documents</h1>
+    <p class="upload-subtitle">
+      Upload PDF files (max 20 files, 25 MB each) to your medical record.
+    </p>
+  </header>
+
+  <!-- ── Storage Unavailable Banner ───────────────────────────────────────── -->
+  @if (store.storageUnavailable()) {
+    <div class="banner banner--error" role="alert" aria-live="assertive">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <span>Service temporarily unavailable. Please try again shortly.</span>
+    </div>
+  }
+
+  <!-- ── Upload Card ───────────────────────────────────────────────────────── -->
+  <mat-card class="upload-card">
+    <mat-card-header>
+      <mat-card-title>Select Files</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Drop Zone -->
+      <div
+        class="drop-zone"
+        [class.drop-zone--active]="isDragOver"
+        role="button"
+        tabindex="0"
+        aria-label="Upload PDF files. Click or drag and drop."
+        (click)="openFilePicker()"
+        (keydown.enter)="openFilePicker()"
+        (keydown.space)="openFilePicker()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <mat-icon class="drop-zone__icon" aria-hidden="true"
+          >upload_file</mat-icon
+        >
+        <p class="drop-zone__label">
+          Drag &amp; drop PDF files here, or click to browse
+        </p>
+        <p class="drop-zone__hint">
+          PDF only · max 25 MB per file · max 20 files
+        </p>
+      </div>
+
+      <!-- Hidden file input — keyboard/click accessible via drop zone -->
+      <input
+        #fileInput
+        type="file"
+        accept=".pdf,application/pdf"
+        multiple
+        class="visually-hidden"
+        aria-hidden="true"
+        tabindex="-1"
+        (change)="onFileInputChange($event)"
+      />
+
+      <!-- Global batch-limit error -->
+      @if (store.globalError()) {
+        <p class="global-error" role="alert">{{ store.globalError() }}</p>
+      }
+
+      <!-- ── Selected File List ────────────────────────────────────────────── -->
+      @if (store.selectedFiles().length > 0) {
+        <ul class="file-list" aria-label="Selected files">
+          @for (file of store.selectedFiles(); track file.name) {
+            <li
+              class="file-row"
+              [class.file-row--error]="store.validationErrors()[file.name]"
+            >
+              <mat-icon class="file-row__icon" aria-hidden="true">
+                @if (store.validationErrors()[file.name]) {
+                  error
+                } @else {
+                  picture_as_pdf
+                }
+              </mat-icon>
+
+              <div class="file-row__info">
+                <span class="file-row__name" [title]="file.name">{{
+                  file.name
+                }}</span>
+                <span class="file-row__size">{{
+                  formatFileSize(file.size)
+                }}</span>
+              </div>
+
+              @if (store.validationErrors()[file.name]) {
+                <span class="file-row__error" role="alert">
+                  {{ store.validationErrors()[file.name] }}
+                </span>
+              }
+            </li>
+          }
+        </ul>
+
+        <!-- Upload progress bar -->
+        @if (store.isUploading()) {
+          <mat-progress-bar
+            mode="determinate"
+            [value]="store.uploadProgress()"
+            aria-label="Upload progress"
+          ></mat-progress-bar>
+          <p class="progress-label" aria-live="polite">
+            Uploading… {{ store.uploadProgress() }}%
+          </p>
+        }
+
+        <!-- Action buttons -->
+        <div class="action-row">
+          <button
+            mat-flat-button
+            color="primary"
+            class="upload-btn"
+            [disabled]="!canUpload"
+            aria-label="Upload selected PDF files"
+            (click)="upload()"
+          >
+            @if (store.isUploading()) {
+              <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
+              <span>Uploading…</span>
+            } @else {
+              <mat-icon aria-hidden="true">cloud_upload</mat-icon>
+              <span>Upload</span>
+            }
+          </button>
+
+          <button
+            mat-stroked-button
+            type="button"
+            aria-label="Clear selected files"
+            (click)="reset()"
+          >
+            Clear
+          </button>
+        </div>
+      }
+
+      <!-- ── Upload Result Summary (per-file) ─────────────────────────────── -->
+      @if (store.uploadResult() && store.uploadResult()!.length > 0) {
+        <section class="result-summary" aria-labelledby="result-heading">
+          <h2 id="result-heading" class="result-heading">Upload Results</h2>
+          <ul class="result-list" aria-label="Upload result per file">
+            @for (result of store.uploadResult()!; track result.fileName) {
+              <li
+                class="result-row"
+                [class.result-row--success]="result.success"
+                [class.result-row--fail]="!result.success"
+              >
+                <mat-icon aria-hidden="true">
+                  {{ result.success ? "check_circle" : "cancel" }}
+                </mat-icon>
+                <span class="result-row__name">{{ result.fileName }}</span>
+
+                @if (!result.success) {
+                  <span class="result-row__error">{{
+                    result.errorMessage
+                  }}</span>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    type="button"
+                    [attr.aria-label]="'Retry upload for ' + result.fileName"
+                    [matTooltip]="'Retry ' + result.fileName"
+                    (click)="retryFile(result.fileName)"
+                  >
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ── Upload History ───────────────────────────────────────────────────── -->
+  <mat-card class="history-card">
+    <mat-card-header>
+      <mat-card-title>Upload History</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading indicator -->
+      @if (store.loadingHistory()) {
+        <mat-progress-bar
+          mode="indeterminate"
+          aria-label="Loading upload history"
+        ></mat-progress-bar>
+      }
+
+      <!-- Empty state -->
+      @else if (store.uploadHistory().length === 0) {
+        <p class="empty-state">No documents uploaded yet.</p>
+      }
+
+      <!-- History table -->
+      @else {
+        <table
+          mat-table
+          [dataSource]="store.uploadHistory()"
+          class="history-table"
+          aria-label="Document upload history"
+        >
+          <!-- File Name Column -->
+          <ng-container matColumnDef="fileName">
+            <th mat-header-cell *matHeaderCellDef scope="col">File Name</th>
+            <td mat-cell *matCellDef="let doc" class="cell-filename">
+              <mat-icon class="cell-icon" aria-hidden="true"
+                >picture_as_pdf</mat-icon
+              >
+              {{ doc.fileName }}
+            </td>
+          </ng-container>
+
+          <!-- Upload Date Column -->
+          <ng-container matColumnDef="uploadedAt">
+            <th mat-header-cell *matHeaderCellDef scope="col">Upload Date</th>
+            <td mat-cell *matCellDef="let doc">
+              {{ doc.uploadedAt | date: "dd MMM yyyy, HH:mm" }}
+            </td>
+          </ng-container>
+
+          <!-- File Size Column -->
+          <ng-container matColumnDef="fileSize">
+            <th mat-header-cell *matHeaderCellDef scope="col">Size</th>
+            <td mat-cell *matCellDef="let doc">
+              {{ formatFileSize(doc.fileSize) }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="processingStatus">
+            <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
+            <td mat-cell *matCellDef="let doc">
+              <span
+                class="status-chip"
+                [class.chip--pending]="doc.processingStatus === 'Pending'"
+                [class.chip--processing]="doc.processingStatus === 'Processing'"
+                [class.chip--completed]="doc.processingStatus === 'Completed'"
+                [class.chip--failed]="doc.processingStatus === 'Failed'"
+                [attr.aria-label]="'Processing status: ' + doc.processingStatus"
+              >
+                {{ doc.processingStatus }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: historyColumns"></tr>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+</main>

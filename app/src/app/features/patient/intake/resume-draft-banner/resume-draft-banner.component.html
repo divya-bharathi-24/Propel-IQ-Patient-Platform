@@ -1,0 +1,27 @@
+<div class="resume-banner" role="alert" aria-live="polite">
+  <div class="resume-banner__message">
+    <strong>You have an incomplete form.</strong>
+    Resume your draft or start fresh?
+  </div>
+  <div class="resume-banner__actions">
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      class="resume-banner__btn"
+      (click)="onResume()"
+      aria-label="Resume your in-progress intake draft"
+    >
+      Resume Draft
+    </button>
+    <button
+      type="button"
+      mat-stroked-button
+      class="resume-banner__btn"
+      (click)="onStartFresh()"
+      aria-label="Discard draft and start a new intake form"
+    >
+      Start Fresh
+    </button>
+  </div>
+</div>

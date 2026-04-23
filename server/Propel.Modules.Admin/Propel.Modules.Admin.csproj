@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Propel.Domain\Propel.Domain.csproj" />
     <ProjectReference Include="..\Propel.Modules.Notification\Propel.Modules.Notification.csproj" />
+    <ProjectReference Include="..\Propel.Modules.Patient\Propel.Modules.Patient.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,5 +16,8 @@ public sealed record RefreshTokenCommand(
 public sealed record RefreshTokenResult(
     string AccessToken,
     string RefreshToken,
-    int ExpiresIn
+    int ExpiresIn,
+    string UserId,
+    string Role,
+    string DeviceId
 );

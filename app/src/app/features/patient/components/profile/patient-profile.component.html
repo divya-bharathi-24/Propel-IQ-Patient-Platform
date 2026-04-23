@@ -1,0 +1,263 @@
+<main class="profile-page" aria-labelledby="profile-heading">
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <mat-card-title id="profile-heading">My Profile</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading spinner -->
+      @if (isLoading()) {
+        <div
+          class="loading-container"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading profile"
+        >
+          <mat-spinner diameter="48"></mat-spinner>
+        </div>
+      }
+
+      <!-- Profile display (view mode) -->
+      @if (!isLoading() && profile() && !isEditMode()) {
+        <!-- Locked fields section -->
+        <section aria-labelledby="personal-info-heading">
+          <h2 id="personal-info-heading" class="section-heading">
+            Personal Information
+          </h2>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Legal Name</mat-label>
+            <input
+              matInput
+              [value]="profile()!.name"
+              readonly
+              aria-readonly="true"
+              autocomplete="name"
+            />
+            <mat-hint>Contact staff to update this field</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date of Birth</mat-label>
+            <input
+              matInput
+              [value]="profile()!.dateOfBirth"
+              readonly
+              aria-readonly="true"
+              autocomplete="bday"
+            />
+            <mat-hint>Contact staff to update this field</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Biological Sex</mat-label>
+            <input
+              matInput
+              [value]="profile()!.biologicalSex"
+              readonly
+              aria-readonly="true"
+            />
+            <mat-hint>Contact staff to update this field</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              [value]="profile()!.email"
+              readonly
+              aria-readonly="true"
+              autocomplete="email"
+            />
+            <mat-hint>Contact staff to update this field</mat-hint>
+          </mat-form-field>
+        </section>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <!-- Editable fields section -->
+        <section aria-labelledby="contact-info-heading">
+          <h2 id="contact-info-heading" class="section-heading">
+            Contact Information
+          </h2>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Phone</mat-label>
+            <input
+              matInput
+              [value]="profile()!.phone"
+              readonly
+              aria-readonly="true"
+              autocomplete="tel"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Street Address</mat-label>
+            <input
+              matInput
+              [value]="profile()!.address.street"
+              readonly
+              aria-readonly="true"
+              autocomplete="street-address"
+            />
+          </mat-form-field>
+
+          <div class="address-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>City</mat-label>
+              <input
+                matInput
+                [value]="profile()!.address.city"
+                readonly
+                aria-readonly="true"
+                autocomplete="address-level2"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>State</mat-label>
+              <input
+                matInput
+                [value]="profile()!.address.state"
+                readonly
+                aria-readonly="true"
+                autocomplete="address-level1"
+              />
+            </mat-form-field>
+          </div>
+
+          <div class="address-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Postal Code</mat-label>
+              <input
+                matInput
+                [value]="profile()!.address.postalCode"
+                readonly
+                aria-readonly="true"
+                autocomplete="postal-code"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Country</mat-label>
+              <input
+                matInput
+                [value]="profile()!.address.country"
+                readonly
+                aria-readonly="true"
+                autocomplete="country-name"
+              />
+            </mat-form-field>
+          </div>
+        </section>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <!-- Insurance section -->
+        <section aria-labelledby="insurance-heading">
+          <h2 id="insurance-heading" class="section-heading">Insurance</h2>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Insurer Name</mat-label>
+            <input
+              matInput
+              [value]="profile()!.insurance.insurerName"
+              readonly
+              aria-readonly="true"
+            />
+          </mat-form-field>
+
+          <div class="address-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Member ID</mat-label>
+              <input
+                matInput
+                [value]="profile()!.insurance.memberId"
+                readonly
+                aria-readonly="true"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Group Number</mat-label>
+              <input
+                matInput
+                [value]="profile()!.insurance.groupNumber"
+                readonly
+                aria-readonly="true"
+              />
+            </mat-form-field>
+          </div>
+        </section>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <!-- Emergency contact section -->
+        <section aria-labelledby="emergency-contact-heading">
+          <h2 id="emergency-contact-heading" class="section-heading">
+            Emergency Contact
+          </h2>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input
+              matInput
+              [value]="profile()!.emergencyContact.name"
+              readonly
+              aria-readonly="true"
+              autocomplete="name"
+            />
+          </mat-form-field>
+
+          <div class="address-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Phone</mat-label>
+              <input
+                matInput
+                [value]="profile()!.emergencyContact.phone"
+                readonly
+                aria-readonly="true"
+                autocomplete="tel"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Relationship</mat-label>
+              <input
+                matInput
+                [value]="profile()!.emergencyContact.relationship"
+                readonly
+                aria-readonly="true"
+              />
+            </mat-form-field>
+          </div>
+        </section>
+
+        <!-- Edit action -->
+        <div class="action-row">
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            (click)="onEditClicked()"
+            aria-label="Edit your profile information"
+          >
+            Edit Profile
+          </button>
+        </div>
+      }
+
+      <!-- Edit form (edit mode) -->
+      @if (!isLoading() && profile() && isEditMode()) {
+        <app-patient-profile-edit-form
+          [initialValue]="editInitialValue"
+          [eTag]="eTag()"
+          (saved)="onEditSaved($event)"
+          (cancelled)="onEditCancelled()"
+        >
+        </app-patient-profile-edit-form>
+      }
+    </mat-card-content>
+  </mat-card>
+</main>

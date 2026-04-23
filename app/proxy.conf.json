@@ -1,0 +1,23 @@
+{
+  "/api": {
+    "target": "https://localhost:5001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/health": {
+    "target": "https://localhost:5001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/healthz": {
+    "target": "https://localhost:5001",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/swagger": {
+    "target": "https://localhost:5001",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

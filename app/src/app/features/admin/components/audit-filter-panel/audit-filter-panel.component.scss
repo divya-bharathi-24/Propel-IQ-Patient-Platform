@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+.audit-filter-panel {
+  background: var(--mat-sys-surface-container-low, #f9f9fb);
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+
+  &--active {
+    border-color: var(--mat-sys-primary, #1976d2);
+  }
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+
+  mat-form-field {
+    flex: 1 1 180px;
+    min-width: 160px;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+.active-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mat-sys-primary, #1976d2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-right: auto;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}

@@ -35,4 +35,20 @@ public interface IUserRepository
     /// Called after a SendGrid dispatch attempt to record delivery state.
     /// </summary>
     Task UpdateCredentialEmailStatusAsync(User user, string status, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns all users with role <c>Staff</c> or <c>Admin</c> ordered by name ascending.
+    /// Excludes <c>Patient</c>-role accounts (US_045, AC-1).
+    /// </summary>
+    Task<List<User>> GetManagedUsersAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Persists a name and/or role change on an existing user record (US_045, AC-2 PATCH).
+    /// </summary>
+    Task UpdateAsync(User user, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Soft-deletes the user by setting <c>Status = Deactivated</c> (US_045, AC-3 DELETE, DR-010).
+    /// </summary>
+    Task DeactivateAsync(User user, CancellationToken cancellationToken = default);
 }

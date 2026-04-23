@@ -31,6 +31,7 @@ export class AuthService {
     refreshToken: null,
     userId: null,
     role: null,
+    deviceId: null,
     expiresAt: null,
   });
 
@@ -49,6 +50,9 @@ export class AuthService {
 
   /** Role claim from the current JWT (e.g. 'Admin', 'Staff', 'Patient'). */
   readonly currentRole = computed(() => this._authState().role);
+
+  /** The authenticated user's ID from the current JWT. */
+  readonly currentUserId = computed(() => this._authState().userId);
 
   /**
    * True when the access token is within the proactive-refresh window
@@ -92,9 +96,12 @@ export class AuthService {
    */
   refresh(): Observable<TokenResponse> {
     const currentRefresh = this._authState().refreshToken;
+    const currentDeviceId = this._authState().deviceId;
+
     return this.http
       .post<TokenResponse>(`${this.apiBase}/refresh`, {
         refreshToken: currentRefresh,
+        deviceId: currentDeviceId,
       })
       .pipe(
         tap((res) => this._storeTokens(res)),
@@ -109,15 +116,15 @@ export class AuthService {
    * backend (fire-and-forget), and navigates to /auth/login.
    */
   logout(reason?: 'idle_timeout' | 'session_expired'): void {
-    const { refreshToken } = this._authState();
+    const { refreshToken, deviceId } = this._authState();
 
     this._clearState();
     this._sessionTimerStopFn?.();
 
     // Fire-and-forget — errors are intentionally suppressed
-    if (refreshToken) {
+    if (refreshToken && deviceId) {
       this.http
-        .post(`${this.apiBase}/logout`, { refreshToken })
+        .post(`${this.apiBase}/logout`, { refreshToken, deviceId })
         .pipe(catchError(() => []))
         .subscribe();
     }
@@ -129,12 +136,29 @@ export class AuthService {
   // ── Private helpers ───────────────────────────────────────────────────────
 
   private _storeTokens(res: TokenResponse): void {
+    console.log('[AuthService] Storing tokens:', {
+      hasAccessToken: !!res.accessToken,
+      hasRefreshToken: !!res.refreshToken,
+      userId: res.userId,
+      role: res.role,
+      deviceId: res.deviceId,
+      expiresIn: res.expiresIn,
+    });
+
     this._authState.set({
       accessToken: res.accessToken,
       refreshToken: res.refreshToken,
       userId: res.userId,
       role: res.role,
+      deviceId: res.deviceId,
       expiresAt: Date.now() + res.expiresIn * 1_000,
+    });
+
+    console.log('[AuthService] Token state after storage:', {
+      hasAccessToken: !!this._authState().accessToken,
+      isAuthenticated: this.isAuthenticated(),
+      deviceId: this._authState().deviceId,
+      expiresAt: new Date(this._authState().expiresAt || 0).toISOString(),
     });
   }
 
@@ -144,6 +168,7 @@ export class AuthService {
       refreshToken: null,
       userId: null,
       role: null,
+      deviceId: null,
       expiresAt: null,
     });
   }

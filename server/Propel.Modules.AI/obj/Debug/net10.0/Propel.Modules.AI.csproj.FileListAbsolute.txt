@@ -11,3 +11,8 @@ D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\obj\Debug\net10
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\obj\Debug\net10.0\refint\Propel.Modules.AI.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\obj\Debug\net10.0\Propel.Modules.AI.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\obj\Debug\net10.0\ref\Propel.Modules.AI.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\bin\Debug\net10.0\Propel.Domain.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\bin\Debug\net10.0\Propel.Domain.pdb
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\obj\Debug\net10.0\Propel.M.068F6E12.Up2Date
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\bin\Debug\net10.0\Prompts\intake-system-v1.txt
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.AI\bin\Debug\net10.0\Prompts\intake-context-resume.txt

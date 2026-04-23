@@ -1,0 +1,162 @@
+<!-- Filter toolbar -->
+<mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Search users</mat-label>
+  <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+  <input
+    matInput
+    type="search"
+    [ngModel]="filterValue()"
+    (ngModelChange)="applyFilter($event)"
+    placeholder="Name, email, or role…"
+    aria-label="Filter user accounts by name, email, or role"
+  />
+</mat-form-field>
+
+<section aria-label="Staff and Admin accounts table">
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    matSortActive="name"
+    matSortDirection="asc"
+    class="full-width-table"
+    aria-describedby="user-table-description"
+  >
+    <caption id="user-table-description" class="sr-only">
+      Sortable and filterable list of staff and admin user accounts.
+    </caption>
+
+    <!-- Name column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">
+        Name
+      </th>
+      <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+    </ng-container>
+
+    <!-- Email column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">
+        Email
+      </th>
+      <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+    </ng-container>
+
+    <!-- Role column -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">
+        Role
+      </th>
+      <td mat-cell *matCellDef="let user">
+        <mat-select
+          [value]="user.role"
+          [disabled]="isSelf(user.id) || user.status === 'Deactivated'"
+          [attr.aria-label]="'Role for ' + user.name"
+          (selectionChange)="onChangeRole(user, $event.value)"
+        >
+          <mat-option value="Staff">Staff</mat-option>
+          <mat-option value="Admin">Admin</mat-option>
+        </mat-select>
+      </td>
+    </ng-container>
+
+    <!-- Status column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
+      <td mat-cell *matCellDef="let user">
+        <app-user-status-badge [status]="user.status" />
+      </td>
+    </ng-container>
+
+    <!-- Last Login column -->
+    <ng-container matColumnDef="lastLoginAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">
+        Last Login
+      </th>
+      <td mat-cell *matCellDef="let user">
+        {{ formatDate(user.lastLoginAt) }}
+      </td>
+    </ng-container>
+
+    <!-- Actions column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+      <td mat-cell *matCellDef="let user" class="actions-cell">
+        <!-- Edit -->
+        <button
+          mat-icon-button
+          type="button"
+          (click)="onEdit(user)"
+          [attr.aria-label]="'Edit account for ' + user.name"
+          matTooltip="Edit account"
+        >
+          <mat-icon aria-hidden="true">edit</mat-icon>
+        </button>
+
+        <!-- Deactivate -->
+        <button
+          mat-icon-button
+          type="button"
+          color="warn"
+          (click)="onDeactivate(user)"
+          [disabled]="isSelf(user.id) || user.status === 'Deactivated'"
+          [attr.aria-label]="
+            isSelf(user.id)
+              ? 'Cannot deactivate your own account'
+              : 'Deactivate account for ' + user.name
+          "
+          [matTooltip]="
+            isSelf(user.id)
+              ? 'Cannot deactivate your own account'
+              : user.status === 'Deactivated'
+                ? 'Account already deactivated'
+                : 'Deactivate account'
+          "
+        >
+          <mat-icon aria-hidden="true">block</mat-icon>
+        </button>
+
+        <!-- Resend credentials (shown only when email delivery failed) -->
+        @if (user.credentialEmailStatus === "Failed") {
+          <button
+            mat-icon-button
+            type="button"
+            color="accent"
+            (click)="onResendEmail(user)"
+            [attr.aria-label]="'Resend credential email for ' + user.name"
+            matTooltip="Resend credential setup email"
+          >
+            <mat-icon aria-hidden="true">mail</mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      [attr.aria-label]="row.name + ', ' + row.role + ', ' + row.status"
+    ></tr>
+
+    <!-- Empty state -->
+    <tr class="mat-row" *matNoDataRow>
+      <td
+        class="mat-cell no-data-cell"
+        [attr.colspan]="displayedColumns.length"
+      >
+        @if (filterValue()) {
+          No users match "{{ filterValue() }}".
+        } @else {
+          No user accounts found.
+        }
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[10, 25, 50]"
+    showFirstLastButtons
+    aria-label="Select page of users"
+  ></mat-paginator>
+</section>

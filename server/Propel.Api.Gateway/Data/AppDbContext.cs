@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Propel.Domain.Entities;
 using Propel.Domain.Enums;
 using Propel.Domain.Interfaces;
+using System.Text.Json;
 
 namespace Propel.Api.Gateway.Data;
 
@@ -43,17 +44,29 @@ public sealed class AppDbContext : DbContext
     public DbSet<NoShowRisk> NoShowRisks => Set<NoShowRisk>();
     public DbSet<QueueEntry> QueueEntries => Set<QueueEntry>();
 
+    // ── US_032 risk flag interventions (task_002) ─────────────────────────────
+    public DbSet<RiskIntervention> RiskInterventions => Set<RiskIntervention>();
+
     // ── US_008 audit / notification / insurance / calendar entities (task_002) ──
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<InsuranceValidation> InsuranceValidations => Set<InsuranceValidation>();
     public DbSet<CalendarSync> CalendarSyncs => Set<CalendarSync>();
 
+    // ── US_019 booking — insurance soft-check seed table (task_003) ───────────
+    public DbSet<DummyInsurer> DummyInsurers => Set<DummyInsurer>();
+
     // ── US_011 authentication — refresh tokens (task_002) ────────────────────
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     // ── US_012 admin account management — credential setup tokens (task_002) ──
     public DbSet<CredentialSetupToken> CredentialSetupTokens => Set<CredentialSetupToken>();
+
+    // ── US_033 reminder scheduler — configurable system settings (task_005) ───
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+
+    // ── EP-007/us_035 — Google Calendar OAuth token storage (task_002) ────────
+    public DbSet<PatientOAuthToken> PatientOAuthTokens => Set<PatientOAuthToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -88,6 +101,15 @@ public sealed class AppDbContext : DbContext
                 .HasConversion(
                     v => _phiEncryption.Encrypt(v.ToString("yyyy-MM-dd")),
                     v => DateOnly.Parse(_phiEncryption.Decrypt(v)));
+
+            // Address: PHI — AES-256 encrypted JSON stored in text column (US_015, NFR-004).
+            // No EF Core value converter — handlers call IPhiEncryptionService directly.
+
+            // EmergencyContact: PHI — AES-256 encrypted JSON stored in text column (US_015, NFR-004).
+            // No EF Core value converter — handlers call IPhiEncryptionService directly.
+
+            // CommunicationPreferences: non-PHI — plain JSON stored in jsonb column (US_015).
+            // No EF Core value converter — handlers call JsonSerializer directly.
         });
     }
 

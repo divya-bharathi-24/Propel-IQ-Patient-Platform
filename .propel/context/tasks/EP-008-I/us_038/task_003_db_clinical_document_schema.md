@@ -29,15 +29,15 @@
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                               | Version |
-| ---------- | ---------------------------------------- | ------- |
-| Database   | PostgreSQL                               | 16+     |
-| ORM        | Entity Framework Core                    | 9.x     |
-| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL    | 9.x     |
-| DB Hosting | Neon PostgreSQL (free tier)              | —       |
-| Testing    | xUnit                                    | 2.x     |
-| AI/ML      | N/A                                      | N/A     |
-| Mobile     | N/A                                      | N/A     |
+| Layer      | Technology                            | Version |
+| ---------- | ------------------------------------- | ------- |
+| Database   | PostgreSQL                            | 16+     |
+| ORM        | Entity Framework Core                 | 9.x     |
+| EF Driver  | Npgsql.EntityFrameworkCore.PostgreSQL | 9.x     |
+| DB Hosting | Neon PostgreSQL (free tier)           | —       |
+| Testing    | xUnit                                 | 2.x     |
+| AI/ML      | N/A                                   | N/A     |
+| Mobile     | N/A                                   | N/A     |
 
 ---
 
@@ -69,9 +69,10 @@
 
 Establish the EF Core entity, fluent configuration, and database migration for the `ClinicalDocument` aggregate required by US_038's upload pipeline.
 
-**DR-005** (design.md): *"System MUST store uploaded clinical documents as encrypted binary objects with metadata (file name, upload date, processing status, patient reference)."*
+**DR-005** (design.md): _"System MUST store uploaded clinical documents as encrypted binary objects with metadata (file name, upload date, processing status, patient reference)."_
 
 **Columns required by US_038 (from design.md `ClinicalDocument` entity definition):**
+
 - `id UUID PK`
 - `patient_id UUID FK → patients(id)`
 - `file_name VARCHAR(255) NOT NULL`
@@ -95,18 +96,19 @@ Establish the EF Core entity, fluent configuration, and database migration for t
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE/VERIFY | `ClinicalDocument` EF Core entity | `Server/Infrastructure/Persistence/Entities/ClinicalDocument.cs` |
-| CREATE/VERIFY | `ClinicalDocumentConfiguration` EF Core fluent config | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs` |
-| CREATE | EF Core migration `CreateClinicalDocumentsTable` (if US_007 not yet scaffolded) | `Server/Infrastructure/Migrations/` |
-| MODIFY | `AppDbContext` | Add `DbSet<ClinicalDocument> ClinicalDocuments` if missing |
+| Status        | Component / Module                                                              | Project                                                                             |
+| ------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| CREATE/VERIFY | `ClinicalDocument` EF Core entity                                               | `Server/Infrastructure/Persistence/Entities/ClinicalDocument.cs`                    |
+| CREATE/VERIFY | `ClinicalDocumentConfiguration` EF Core fluent config                           | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs` |
+| CREATE        | EF Core migration `CreateClinicalDocumentsTable` (if US_007 not yet scaffolded) | `Server/Infrastructure/Migrations/`                                                 |
+| MODIFY        | `AppDbContext`                                                                  | Add `DbSet<ClinicalDocument> ClinicalDocuments` if missing                          |
 
 ---
 
 ## Implementation Plan
 
 1. **`ClinicalDocument` EF Core entity**:
+
    ```csharp
    public class ClinicalDocument
    {
@@ -133,6 +135,7 @@ Establish the EF Core entity, fluent configuration, and database migration for t
    ```
 
 2. **`ClinicalDocumentConfiguration`** (EF Core fluent config):
+
    ```csharp
    builder.ToTable("clinical_documents");
    builder.HasKey(d => d.Id);
@@ -162,6 +165,7 @@ Establish the EF Core entity, fluent configuration, and database migration for t
 
 3. **EF Core migration `CreateClinicalDocumentsTable`** (if US_007 not yet present):
    - **`Up()`**:
+
      ```sql
      CREATE TABLE clinical_documents (
          id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -181,6 +185,7 @@ Establish the EF Core entity, fluent configuration, and database migration for t
          ON clinical_documents (processing_status)
          WHERE processing_status IN ('Pending', 'Processing');
      ```
+
    - **`Down()`**:
      ```sql
      DROP INDEX IF EXISTS idx_clinical_documents_processing_status_active;
@@ -193,6 +198,7 @@ Establish the EF Core entity, fluent configuration, and database migration for t
      ```
 
 4. **`AppDbContext`** update:
+
    ```csharp
    public DbSet<ClinicalDocument> ClinicalDocuments => Set<ClinicalDocument>();
 
@@ -220,13 +226,13 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE/VERIFY | `Server/Infrastructure/Persistence/Entities/ClinicalDocument.cs` | Entity: 8 columns; `ProcessingStatus` constants class |
-| CREATE/VERIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs` | Fluent config: max lengths, FK RESTRICT, 2 indexes |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateClinicalDocumentsTable.cs` | Full table creation if US_007 not yet scaffolded |
-| CREATE | `Server/Infrastructure/Migrations/<timestamp>_CreateClinicalDocumentsTable.Designer.cs` | EF Core snapshot |
-| MODIFY | `Server/Infrastructure/Persistence/AppDbContext.cs` | Add `DbSet<ClinicalDocument>` + `ApplyConfiguration` call |
+| Action        | File Path                                                                               | Description                                               |
+| ------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| CREATE/VERIFY | `Server/Infrastructure/Persistence/Entities/ClinicalDocument.cs`                        | Entity: 8 columns; `ProcessingStatus` constants class     |
+| CREATE/VERIFY | `Server/Infrastructure/Persistence/Configurations/ClinicalDocumentConfiguration.cs`     | Fluent config: max lengths, FK RESTRICT, 2 indexes        |
+| CREATE        | `Server/Infrastructure/Migrations/<timestamp>_CreateClinicalDocumentsTable.cs`          | Full table creation if US_007 not yet scaffolded          |
+| CREATE        | `Server/Infrastructure/Migrations/<timestamp>_CreateClinicalDocumentsTable.Designer.cs` | EF Core snapshot                                          |
+| MODIFY        | `Server/Infrastructure/Persistence/AppDbContext.cs`                                     | Add `DbSet<ClinicalDocument>` + `ApplyConfiguration` call |
 
 ---
 
@@ -279,9 +285,9 @@ dotnet ef database update <PreviousMigrationName> --project Server/Server.csproj
 
 ## Implementation Checklist
 
-- [ ] Create/verify `ClinicalDocument` entity: `Id UUID PK`, `PatientId UUID FK`, `FileName VARCHAR(255)`, `FileSize BIGINT`, `StoragePath TEXT` (relative path — NOT binary content), `MimeType VARCHAR(100) DEFAULT 'application/pdf'`, `ProcessingStatus VARCHAR(20) DEFAULT 'Pending'`, `UploadedAt TIMESTAMPTZ DEFAULT NOW()`; add `ProcessingStatus` constants class
-- [ ] Create `ClinicalDocumentConfiguration`: `OnDelete(DeleteBehavior.Restrict)` on `PatientId` FK (preserve documents on patient deactivation, HIPAA DR-010); max lengths on `FileName`, `MimeType`, `ProcessingStatus`
-- [ ] Add `idx_clinical_documents_patient_uploaded` composite index on `(patient_id, uploaded_at DESC)` for efficient upload-history dashboard queries (AC-3)
-- [ ] Add `idx_clinical_documents_processing_status_active` partial index on `processing_status WHERE IN ('Pending', 'Processing')` for AI background service polling
-- [ ] Write migration `CreateClinicalDocumentsTable` `Up()` + `Down()` (if US_007 table absent); confirm `pgcrypto` extension active for `gen_random_uuid()`; generate SQL script before applying to Neon
-- [ ] Add `DbSet<ClinicalDocument> ClinicalDocuments` to `AppDbContext` and register `ClinicalDocumentConfiguration` in `OnModelCreating`
+- [x] Create/verify `ClinicalDocument` entity: `Id UUID PK`, `PatientId UUID FK`, `FileName VARCHAR(255)`, `FileSize BIGINT`, `StoragePath TEXT` (relative path — NOT binary content), `MimeType VARCHAR(100) DEFAULT 'application/pdf'`, `ProcessingStatus VARCHAR(20) DEFAULT 'Pending'`, `UploadedAt TIMESTAMPTZ DEFAULT NOW()`; add `ProcessingStatus` constants class
+- [x] Create `ClinicalDocumentConfiguration`: `OnDelete(DeleteBehavior.Restrict)` on `PatientId` FK (preserve documents on patient deactivation, HIPAA DR-010); max lengths on `FileName`, `MimeType`, `ProcessingStatus`
+- [x] Add `idx_clinical_documents_patient_uploaded` composite index on `(patient_id, uploaded_at DESC)` for efficient upload-history dashboard queries (AC-3)
+- [x] Add `idx_clinical_documents_processing_status_active` partial index on `processing_status WHERE IN ('Pending', 'Processing')` for AI background service polling
+- [x] Write migration `CreateClinicalDocumentsTable` `Up()` + `Down()` (if US_007 table absent); confirm `pgcrypto` extension active for `gen_random_uuid()`; generate SQL script before applying to Neon
+- [x] Add `DbSet<ClinicalDocument> ClinicalDocuments` to `AppDbContext` and register `ClinicalDocumentConfiguration` in `OnModelCreating`

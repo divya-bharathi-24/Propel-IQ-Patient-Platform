@@ -59,8 +59,33 @@ public sealed class IntakeRecordConfiguration : IEntityTypeConfiguration<IntakeR
                .HasForeignKey(i => i.AppointmentId)
                .OnDelete(DeleteBehavior.Restrict);
 
+        // US_017 — draftData: nullable jsonb column for autosave partial snapshots (AC-3, AC-4)
+        builder.Property(i => i.DraftData)
+               .HasColumnName("draft_data")
+               .HasColumnType("jsonb")
+               .IsRequired(false);
+
+        // US_017 — lastModifiedAt: updated on every draft or full save
+        builder.Property(i => i.LastModifiedAt)
+               .HasColumnName("last_modified_at")
+               .HasColumnType("timestamp with time zone")
+               .IsRequired(false);
+
+        // US_017 — optimistic concurrency token via PostgreSQL xmin system column (AC-2).
+        // xmin is a uint maintained automatically by PostgreSQL on every row write.
+        // No migration required — xmin exists on all PostgreSQL tables.
+        builder.Property(i => i.RowVersion)
+               .HasColumnName("xmin")
+               .HasColumnType("xid")
+               .IsRowVersion();
+
         // Index for patient-scoped intake lookups
         builder.HasIndex(i => i.PatientId)
                .HasDatabaseName("ix_intake_records_patient_id");
+
+        // Composite unique index — enforces the "no duplicate (patientId, appointmentId)" constraint (DR-004)
+        builder.HasIndex(i => new { i.PatientId, i.AppointmentId })
+               .IsUnique()
+               .HasDatabaseName("uq_intake_records_patient_appointment");
     }
 }

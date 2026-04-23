@@ -1,0 +1,104 @@
+<section
+  class="audit-filter-panel"
+  [class.audit-filter-panel--active]="hasActiveFilters"
+  aria-label="Audit log filter controls"
+>
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" novalidate>
+    <div class="filter-row">
+      <!-- Date From -->
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>From date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerFrom"
+          formControlName="dateFrom"
+          placeholder="MM/DD/YYYY"
+          aria-label="Filter from date"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerFrom" />
+        <mat-datepicker #pickerFrom />
+      </mat-form-field>
+
+      <!-- Date To -->
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>To date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerTo"
+          formControlName="dateTo"
+          placeholder="MM/DD/YYYY"
+          aria-label="Filter to date"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerTo" />
+        <mat-datepicker #pickerTo />
+      </mat-form-field>
+
+      <!-- User ID free-text -->
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>User ID</mat-label>
+        <mat-icon matPrefix aria-hidden="true">person_search</mat-icon>
+        <input
+          matInput
+          formControlName="userId"
+          placeholder="e.g. usr_abc123"
+          aria-label="Filter by user ID"
+          autocomplete="off"
+        />
+      </mat-form-field>
+
+      <!-- Action Type select -->
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Action type</mat-label>
+        <mat-select
+          formControlName="actionType"
+          aria-label="Filter by action type"
+        >
+          <mat-option [value]="null">All</mat-option>
+          @for (opt of actionTypeOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Entity Type select -->
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Entity type</mat-label>
+        <mat-select
+          formControlName="entityType"
+          aria-label="Filter by entity type"
+        >
+          <mat-option [value]="null">All</mat-option>
+          @for (opt of entityTypeOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-actions">
+      @if (hasActiveFilters) {
+        <span class="active-indicator" role="status" aria-live="polite">
+          <mat-icon aria-hidden="true">filter_alt</mat-icon>
+          Filters active
+        </span>
+      }
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="clearFilters()"
+        [disabled]="!hasActiveFilters"
+        aria-label="Clear all filters"
+      >
+        Clear
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        aria-label="Apply filters"
+      >
+        Apply
+      </button>
+    </div>
+  </form>
+</section>

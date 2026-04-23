@@ -17,16 +17,16 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type       | Value                                                                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **UI Impact**        | Yes                                                                                                                                              |
-| **Figma URL**        | N/A                                                                                                                                              |
-| **Wireframe Status** | PENDING                                                                                                                                          |
-| **Wireframe Type**   | N/A                                                                                                                                              |
+| Reference Type         | Value                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **UI Impact**          | Yes                                                                                                                           |
+| **Figma URL**          | N/A                                                                                                                           |
+| **Wireframe Status**   | PENDING                                                                                                                       |
+| **Wireframe Type**     | N/A                                                                                                                           |
 | **Wireframe Path/URL** | TODO: Upload to `.propel/context/wireframes/Hi-Fi/wireframe-SCR-XXX-patient-profile.[html\|png\|jpg]` or provide external URL |
-| **Screen Spec**      | N/A (figma_spec.md not yet generated)                                                                                                            |
-| **UXR Requirements** | N/A (figma_spec.md not yet generated)                                                                                                            |
-| **Design Tokens**    | N/A (designsystem.md not yet generated)                                                                                                          |
+| **Screen Spec**        | N/A (figma_spec.md not yet generated)                                                                                         |
+| **UXR Requirements**   | N/A (figma_spec.md not yet generated)                                                                                         |
+| **Design Tokens**      | N/A (designsystem.md not yet generated)                                                                                       |
 
 > **Wireframe Status:** PENDING — implement layout following Angular Material and WCAG 2.2 AA guidelines until wireframes are available. Run `/analyze-ux` once wireframe is provided.
 
@@ -94,13 +94,13 @@ Session-expiry resilience: unsubmitted form state is auto-saved to `sessionStora
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `PatientProfileComponent` | Angular Frontend (`app/features/patient/`) |
-| CREATE | `PatientProfileEditFormComponent` | Angular Frontend (`app/features/patient/`) |
-| CREATE | `PatientService` | Angular Frontend (`app/features/patient/services/`) |
-| CREATE | `PatientProfileDraftService` | Angular Frontend (`app/features/patient/services/`) — manages sessionStorage draft |
-| MODIFY | `AppRoutingModule` | Add `/profile` route guarded by `AuthGuard` (Patient role) |
+| Status | Component / Module                | Project                                                                            |
+| ------ | --------------------------------- | ---------------------------------------------------------------------------------- |
+| CREATE | `PatientProfileComponent`         | Angular Frontend (`app/features/patient/`)                                         |
+| CREATE | `PatientProfileEditFormComponent` | Angular Frontend (`app/features/patient/`)                                         |
+| CREATE | `PatientService`                  | Angular Frontend (`app/features/patient/services/`)                                |
+| CREATE | `PatientProfileDraftService`      | Angular Frontend (`app/features/patient/services/`) — manages sessionStorage draft |
+| MODIFY | `AppRoutingModule`                | Add `/profile` route guarded by `AuthGuard` (Patient role)                         |
 
 ---
 
@@ -160,19 +160,19 @@ Propel-IQ-Patient-Platform/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `app/features/patient/patient.module.ts` | Lazy-loaded Patient feature module |
-| CREATE | `app/features/patient/patient-routing.module.ts` | Patient routes: `/profile` |
-| CREATE | `app/features/patient/components/profile/patient-profile.component.ts` | View-mode profile page: reads and displays all demographic fields |
-| CREATE | `app/features/patient/components/profile/patient-profile.component.html` | Template: locked + editable field display, edit button |
-| CREATE | `app/features/patient/components/profile-edit/patient-profile-edit-form.component.ts` | Edit mode form component with draft persistence |
+| Action | File Path                                                                               | Description                                                             |
+| ------ | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| CREATE | `app/features/patient/patient.module.ts`                                                | Lazy-loaded Patient feature module                                      |
+| CREATE | `app/features/patient/patient-routing.module.ts`                                        | Patient routes: `/profile`                                              |
+| CREATE | `app/features/patient/components/profile/patient-profile.component.ts`                  | View-mode profile page: reads and displays all demographic fields       |
+| CREATE | `app/features/patient/components/profile/patient-profile.component.html`                | Template: locked + editable field display, edit button                  |
+| CREATE | `app/features/patient/components/profile-edit/patient-profile-edit-form.component.ts`   | Edit mode form component with draft persistence                         |
 | CREATE | `app/features/patient/components/profile-edit/patient-profile-edit-form.component.html` | Template: phone, address, emergency contact, communication prefs fields |
-| CREATE | `app/features/patient/services/patient.service.ts` | `getProfile()`, `updateProfile()` with ETag header |
-| CREATE | `app/features/patient/services/patient-profile-draft.service.ts` | sessionStorage draft save/load/clear |
-| CREATE | `app/features/patient/validators/e164-phone.validator.ts` | Custom validator for E.164 phone format |
-| CREATE | `app/features/patient/models/patient-profile.models.ts` | Interfaces: `PatientProfileDto`, `UpdatePatientProfileDto` |
-| MODIFY | `app/app-routing.module.ts` | Add lazy-loaded `/profile` route with `AuthGuard` |
+| CREATE | `app/features/patient/services/patient.service.ts`                                      | `getProfile()`, `updateProfile()` with ETag header                      |
+| CREATE | `app/features/patient/services/patient-profile-draft.service.ts`                        | sessionStorage draft save/load/clear                                    |
+| CREATE | `app/features/patient/validators/e164-phone.validator.ts`                               | Custom validator for E.164 phone format                                 |
+| CREATE | `app/features/patient/models/patient-profile.models.ts`                                 | Interfaces: `PatientProfileDto`, `UpdatePatientProfileDto`              |
+| MODIFY | `app/app-routing.module.ts`                                                             | Add lazy-loaded `/profile` route with `AuthGuard`                       |
 
 ---
 
@@ -230,14 +230,14 @@ npx playwright test
 
 ## Implementation Checklist
 
-- [ ] Create `PatientService` with `getProfile()` (stores ETag) and `updateProfile()` (sends `If-Match` header)
-- [ ] Create `PatientProfileDraftService` with `saveDraft()`, `loadDraft()`, `clearDraft()` backed by `sessionStorage`
-- [ ] Build `PatientProfileComponent`: display all fields, locked fields disabled with "Contact staff" hint, "Edit profile" button
-- [ ] Build `PatientProfileEditFormComponent` with nested `FormGroup`s for address, emergency contact, communication prefs
-- [ ] Implement `E164PhoneValidator` and apply to both `phone` and `emergencyContact.phone` fields
-- [ ] Wire `valueChanges` (debounced 500ms) to `PatientProfileDraftService.saveDraft()` in edit form
-- [ ] On component init: load draft from `PatientProfileDraftService`; pre-populate form and show "unsaved changes" banner if draft found
-- [ ] Handle 409 response: show stale-data warning; refresh profile via `getProfile()`; clear draft
-- [ ] Apply `AuthGuard` to `/profile` route in lazy-loaded `PatientModule`
+- [x] Create `PatientService` with `getProfile()` (stores ETag) and `updateProfile()` (sends `If-Match` header)
+- [x] Create `PatientProfileDraftService` with `saveDraft()`, `loadDraft()`, `clearDraft()` backed by `sessionStorage`
+- [x] Build `PatientProfileComponent`: display all fields, locked fields disabled with "Contact staff" hint, "Edit profile" button
+- [x] Build `PatientProfileEditFormComponent` with nested `FormGroup`s for address, emergency contact, communication prefs
+- [x] Implement `E164PhoneValidator` and apply to both `phone` and `emergencyContact.phone` fields
+- [x] Wire `valueChanges` (debounced 500ms) to `PatientProfileDraftService.saveDraft()` in edit form
+- [x] On component init: load draft from `PatientProfileDraftService`; pre-populate form and show "unsaved changes" banner if draft found
+- [x] Handle 409 response: show stale-data warning; refresh profile via `getProfile()`; clear draft
+- [x] Apply `AuthGuard` to `/profile` route in lazy-loaded `PatientModule`
 - [ ] **[UI Tasks - MANDATORY]** Reference wireframe from Design References table during implementation (when AVAILABLE)
 - [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking task complete (when AVAILABLE)

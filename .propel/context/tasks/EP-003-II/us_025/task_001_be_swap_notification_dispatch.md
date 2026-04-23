@@ -14,53 +14,53 @@
 
 ## Design References (Frontend Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **UI Impact** | No |
-| **Figma URL** | N/A |
-| **Wireframe Status** | N/A |
-| **Wireframe Type** | N/A |
-| **Wireframe Path/URL** | N/A |
-| **Screen Spec** | N/A |
-| **UXR Requirements** | N/A |
-| **Design Tokens** | N/A |
+| Reference Type         | Value |
+| ---------------------- | ----- |
+| **UI Impact**          | No    |
+| **Figma URL**          | N/A   |
+| **Wireframe Status**   | N/A   |
+| **Wireframe Type**     | N/A   |
+| **Wireframe Path/URL** | N/A   |
+| **Screen Spec**        | N/A   |
+| **UXR Requirements**   | N/A   |
+| **Design Tokens**      | N/A   |
 
 ## Applicable Technology Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Frontend | N/A | N/A |
-| Backend | ASP.NET Core Web API | .net 10 |
-| Backend Messaging | MediatR | 12.x |
-| ORM | Entity Framework Core | 9.x |
-| Database | PostgreSQL | 16+ |
-| Email Service | SendGrid (free tier) | — |
-| SMS Service | Twilio (free tier) | — |
-| Library | Serilog | 4.x |
-| AI/ML | N/A | N/A |
-| Vector Store | N/A | N/A |
-| AI Gateway | N/A | N/A |
-| Mobile | N/A | N/A |
+| Layer             | Technology            | Version |
+| ----------------- | --------------------- | ------- |
+| Frontend          | N/A                   | N/A     |
+| Backend           | ASP.NET Core Web API  | .net 10 |
+| Backend Messaging | MediatR               | 12.x    |
+| ORM               | Entity Framework Core | 9.x     |
+| Database          | PostgreSQL            | 16+     |
+| Email Service     | SendGrid (free tier)  | —       |
+| SMS Service       | Twilio (free tier)    | —       |
+| Library           | Serilog               | 4.x     |
+| AI/ML             | N/A                   | N/A     |
+| Vector Store      | N/A                   | N/A     |
+| AI Gateway        | N/A                   | N/A     |
+| Mobile            | N/A                   | N/A     |
 
 ## AI References (AI Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **AI Impact** | No |
-| **AIR Requirements** | N/A |
-| **AI Pattern** | N/A |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config** | N/A |
-| **Model Provider** | N/A |
+| Reference Type           | Value |
+| ------------------------ | ----- |
+| **AI Impact**            | No    |
+| **AIR Requirements**     | N/A   |
+| **AI Pattern**           | N/A   |
+| **Prompt Template Path** | N/A   |
+| **Guardrails Config**    | N/A   |
+| **Model Provider**       | N/A   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type | Value |
-|----------------|-------|
-| **Mobile Impact** | No |
-| **Platform Target** | N/A |
-| **Min OS Version** | N/A |
-| **Mobile Framework** | N/A |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -86,20 +86,21 @@ The `appointmentId` (new appointment after swap) + `templateType = "SlotSwapNoti
 
 ## Impacted Components
 
-| Component | Action | Project |
-|-----------|--------|---------|
-| `SwapNotificationService` | CREATE | `Server/Notification/Services/` |
-| `SlotSwapCompletedNotification` (MediatR INotification) | CREATE | `Server/Appointment/Events/` |
-| `SwapNotificationHandler` (INotificationHandler) | CREATE | `Server/Notification/Handlers/` |
-| `SendGridEmailService` | CREATE | `Server/Notification/Infrastructure/` |
-| `TwilioSmsService` | CREATE | `Server/Notification/Infrastructure/` |
-| `NotificationRepository` | CREATE | `Server/Notification/Repositories/` |
-| `SlotSwapCommandHandler` (US_024) | MODIFY | `Server/Appointment/Commands/` — publish `SlotSwapCompletedNotification` after transaction commit |
-| `PatientRepository` | MODIFY | `Server/Patient/Repositories/` — expose `GetCommunicationPreferencesAsync(patientId)` |
+| Component                                               | Action | Project                                                                                           |
+| ------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| `SwapNotificationService`                               | CREATE | `Server/Notification/Services/`                                                                   |
+| `SlotSwapCompletedNotification` (MediatR INotification) | CREATE | `Server/Appointment/Events/`                                                                      |
+| `SwapNotificationHandler` (INotificationHandler)        | CREATE | `Server/Notification/Handlers/`                                                                   |
+| `SendGridEmailService`                                  | CREATE | `Server/Notification/Infrastructure/`                                                             |
+| `TwilioSmsService`                                      | CREATE | `Server/Notification/Infrastructure/`                                                             |
+| `NotificationRepository`                                | CREATE | `Server/Notification/Repositories/`                                                               |
+| `SlotSwapCommandHandler` (US_024)                       | MODIFY | `Server/Appointment/Commands/` — publish `SlotSwapCompletedNotification` after transaction commit |
+| `PatientRepository`                                     | MODIFY | `Server/Patient/Repositories/` — expose `GetCommunicationPreferencesAsync(patientId)`             |
 
 ## Implementation Plan
 
 1. **`SlotSwapCompletedNotification`** — Define MediatR `INotification` record:
+
    ```csharp
    public record SlotSwapCompletedNotification(
        Guid PatientId,
@@ -110,6 +111,7 @@ The `appointmentId` (new appointment after swap) + `templateType = "SlotSwapNoti
        string BookingReference
    ) : INotification;
    ```
+
    Publish from `SlotSwapCommandHandler` with `await _mediator.Publish(notification, cancellationToken)` **after** the EF Core transaction commit. This ensures the notification only fires on a confirmed swap (AD-3 event-driven pattern).
 
 2. **Communication Preference Check** — In `SwapNotificationHandler.Handle()`, call `PatientRepository.GetCommunicationPreferencesAsync(PatientId)`. Check `preferences.SmsOptIn` and `preferences.PhoneVerified`. If either is false → set `skipSms = true`, log reason. The phone/opt-in check uses data already on the `Patient` entity; no new columns required.
@@ -119,11 +121,12 @@ The `appointmentId` (new appointment after swap) + `templateType = "SlotSwapNoti
    - `Subject`: "Your appointment has been updated — {BookingReference}"
    - `PlainTextContent` + `HtmlContent`: new appointment date, time, specialty, reference number
    - `From`: configured system sender address (`IConfiguration["SendGrid:SenderEmail"]`)
-   Call `ISendGridClient.SendEmailAsync()`. Catch `Exception`; map to `EmailDeliveryResult { Success: bool, DeliveryTimestamp: DateTime }`.
+     Call `ISendGridClient.SendEmailAsync()`. Catch `Exception`; map to `EmailDeliveryResult { Success: bool, DeliveryTimestamp: DateTime }`.
 
 4. **SMS Dispatch (`TwilioSmsService`)** — Build SMS body (≤ 160 chars): `"Your appt on {date} at {time} ({specialty}) is confirmed. Ref: {reference}. [Platform Name]"`. Call `MessageResource.CreateAsync()` via `ITwilioRestClient`. Catch `TwilioException`; map to `SmsDeliveryResult { Success: bool, DeliveryTimestamp: DateTime }`.
 
 5. **`NotificationRepository` — INSERT Records** — For each channel dispatched (email, and SMS if not skipped):
+
    ```csharp
    await _db.Notifications.AddAsync(new Notification {
        PatientId = notification.PatientId,
@@ -136,6 +139,7 @@ The `appointmentId` (new appointment after swap) + `templateType = "SlotSwapNoti
        LastRetryAt = null
    });
    ```
+
    For skipped SMS: insert `Notification { channel: SMS, status: Skipped (map to Failed), templateType: "SlotSwapSmsSkipped" }`.
 
 6. **Dual-Failure Dashboard Alert** — If both email and SMS result in `Failed`: update `Patient` record with a `pendingAlerts` JSONB field entry `{ alertType: "SwapNotificationFailure", appointmentId, createdAt }`. The patient dashboard query (US_016 task) must be updated to surface this alert.
@@ -170,16 +174,16 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
+| Action | File Path                                                    | Description                                                                                                          |
+| ------ | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
 | CREATE | `Server/Appointment/Events/SlotSwapCompletedNotification.cs` | MediatR `INotification` record carrying swap payload (patientId, newAppointmentId, date, time, specialty, reference) |
-| CREATE | `Server/Notification/Handlers/SwapNotificationHandler.cs` | MediatR `INotificationHandler` — orchestrates pref check → email → SMS → dual-fail flag → audit |
-| CREATE | `Server/Notification/Services/SwapNotificationService.cs` | Business logic layer — preference check, dispatch result evaluation, dual-fail detection |
-| CREATE | `Server/Notification/Infrastructure/SendGridEmailService.cs` | Wraps `ISendGridClient.SendEmailAsync()` with error handling; returns `EmailDeliveryResult` |
-| CREATE | `Server/Notification/Infrastructure/TwilioSmsService.cs` | Wraps `MessageResource.CreateAsync()` with error handling; returns `SmsDeliveryResult` |
-| CREATE | `Server/Notification/Repositories/NotificationRepository.cs` | EF Core repository — `InsertAsync(Notification)`, `UpdateStatusAsync(id, status, sentAt)` |
-| MODIFY | `Server/Appointment/Commands/SlotSwapCommandHandler.cs` | Publish `SlotSwapCompletedNotification` via `_mediator.Publish()` after EF Core transaction commit |
-| MODIFY | `Server/Patient/Repositories/PatientRepository.cs` | Add `GetCommunicationPreferencesAsync(patientId)` returning SMS opt-in and phone verified flags |
+| CREATE | `Server/Notification/Handlers/SwapNotificationHandler.cs`    | MediatR `INotificationHandler` — orchestrates pref check → email → SMS → dual-fail flag → audit                      |
+| CREATE | `Server/Notification/Services/SwapNotificationService.cs`    | Business logic layer — preference check, dispatch result evaluation, dual-fail detection                             |
+| CREATE | `Server/Notification/Infrastructure/SendGridEmailService.cs` | Wraps `ISendGridClient.SendEmailAsync()` with error handling; returns `EmailDeliveryResult`                          |
+| CREATE | `Server/Notification/Infrastructure/TwilioSmsService.cs`     | Wraps `MessageResource.CreateAsync()` with error handling; returns `SmsDeliveryResult`                               |
+| CREATE | `Server/Notification/Repositories/NotificationRepository.cs` | EF Core repository — `InsertAsync(Notification)`, `UpdateStatusAsync(id, status, sentAt)`                            |
+| MODIFY | `Server/Appointment/Commands/SlotSwapCommandHandler.cs`      | Publish `SlotSwapCompletedNotification` via `_mediator.Publish()` after EF Core transaction commit                   |
+| MODIFY | `Server/Patient/Repositories/PatientRepository.cs`           | Add `GetCommunicationPreferencesAsync(patientId)` returning SMS opt-in and phone verified flags                      |
 
 ## External References
 
@@ -210,11 +214,11 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `SlotSwapCompletedNotification` MediatR `INotification` record with all swap payload fields
-- [ ] Modify `SlotSwapCommandHandler` to publish `SlotSwapCompletedNotification` after transaction commit
-- [ ] Implement `SwapNotificationHandler` orchestrating: pref check → email dispatch → SMS dispatch → dual-fail flag → audit log
-- [ ] Implement `SendGridEmailService` wrapping `ISendGridClient.SendEmailAsync()` with try/catch and `EmailDeliveryResult`
-- [ ] Implement `TwilioSmsService` wrapping `MessageResource.CreateAsync()` with try/catch and `SmsDeliveryResult`
-- [ ] Implement `NotificationRepository` with `InsertAsync()` for per-channel `Notification` entity inserts
-- [ ] Add communication preference check and SMS-skip logic (no verified phone / opt-out) with skip Notification record insert
-- [ ] Implement dual-failure detection and `Patient.pendingAlerts` JSONB update for dashboard alert (edge case)
+- [x] Create `SlotSwapCompletedNotification` MediatR `INotification` record with all swap payload fields
+- [x] Modify `SlotSwapCommandHandler` to publish `SlotSwapCompletedNotification` after transaction commit
+- [x] Implement `SwapNotificationHandler` orchestrating: pref check → email dispatch → SMS dispatch → dual-fail flag → audit log
+- [x] Implement `SendGridEmailService` wrapping `ISendGridClient.SendEmailAsync()` with try/catch and `EmailDeliveryResult`
+- [x] Implement `TwilioSmsService` wrapping `MessageResource.CreateAsync()` with try/catch and `SmsDeliveryResult`
+- [x] Implement `NotificationRepository` with `InsertAsync()` for per-channel `Notification` entity inserts
+- [x] Add communication preference check and SMS-skip logic (no verified phone / opt-out) with skip Notification record insert
+- [x] Implement dual-failure detection and `Patient.pendingAlerts` JSONB update for dashboard alert (edge case)

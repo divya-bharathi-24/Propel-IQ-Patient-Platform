@@ -1,0 +1,60 @@
+{
+  "version": 2,
+  "dgSpecHash": "2N0cJ/rvHLw=",
+  "success": true,
+  "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Risk\\Propel.Modules.Risk.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\azure.ai.openai\\2.9.0-beta.1\\azure.ai.openai.2.9.0-beta.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\azure.core\\1.51.1\\azure.core.1.51.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\fluentvalidation\\11.12.0\\fluentvalidation.11.12.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr\\12.5.0\\mediatr.12.5.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\10.0.2\\microsoft.bcl.asyncinterfaces.10.0.2.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.bcl.hashcode\\1.1.1\\microsoft.bcl.hashcode.1.1.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.ai\\10.4.0\\microsoft.extensions.ai.10.4.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.ai.abstractions\\10.4.0\\microsoft.extensions.ai.abstractions.10.4.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.ai.openai\\10.4.0\\microsoft.extensions.ai.openai.10.4.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.7\\microsoft.extensions.logging.abstractions.10.0.7.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.options\\10.0.7\\microsoft.extensions.options.10.0.7.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.extensions.vectordata.abstractions\\10.1.0\\microsoft.extensions.vectordata.abstractions.10.1.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel\\1.74.0\\microsoft.semantickernel.1.74.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel.abstractions\\1.74.0\\microsoft.semantickernel.abstractions.1.74.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel.connectors.azureopenai\\1.74.0\\microsoft.semantickernel.connectors.azureopenai.1.74.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel.connectors.openai\\1.74.0\\microsoft.semantickernel.connectors.openai.1.74.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel.core\\1.74.0\\microsoft.semantickernel.core.1.74.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\openai\\2.9.1\\openai.2.9.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\polly\\8.6.6\\polly.8.6.6.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\polly.core\\8.6.6\\polly.core.8.6.6.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\polly.extensions\\8.6.6\\polly.extensions.8.6.6.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\serilog\\4.3.1\\serilog.4.3.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.clientmodel\\1.9.0\\system.clientmodel.1.9.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.memory.data\\10.0.1\\system.memory.data.10.0.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.numerics.tensors\\10.0.4\\system.numerics.tensors.10.0.4.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Risk\\Propel.Modules.Risk.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Risk\\Propel.Modules.Risk.csproj",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Options will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Risk\\Propel.Modules.Risk.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Risk\\Propel.Modules.Risk.csproj",
+      "libraryId": "Microsoft.Extensions.Options",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
