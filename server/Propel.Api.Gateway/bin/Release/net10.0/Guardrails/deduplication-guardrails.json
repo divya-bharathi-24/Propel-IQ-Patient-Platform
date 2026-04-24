@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeduplicationGuardrails",
+  "description": "Content-filter configuration for the AI de-duplication pipeline (EP-008-I/us_041, task_003). Enforces AIR-S04 harmful-content guardrails on GPT-4o responses before canonical selection.",
+  "version": "1.0.0",
+
+  "responseSchema": {
+    "required": ["confirmations"],
+    "properties": {
+      "confirmations": {
+        "type": "array",
+        "minItems": 0,
+        "items": {
+          "type": "object",
+          "required": ["id1", "id2", "isDuplicate"],
+          "properties": {
+            "id1": { "type": "string", "format": "uuid" },
+            "id2": { "type": "string", "format": "uuid" },
+            "isDuplicate": { "type": "boolean" },
+            "reasoning": { "type": "string", "maxLength": 120 }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+
+  "contentSafety": {
+    "description": "AIR-S04: Deny-list patterns applied to GPT-4o 'reasoning' fields. Match → reject entire response and log guardrail event.",
+    "denyPatterns": [
+      "you should take",
+      "i recommend",
+      "i suggest",
+      "increase dosage",
+      "decrease dosage",
+      "stop taking",
+      "discontinue",
+      "consult a doctor",
+      "seek emergency",
+      "call 911",
+      "this is not medical advice",
+      "as an ai",
+      "based on my training"
+    ]
+  },
+
+  "piiSafetyRules": {
+    "description": "AIR-S01: Patterns that indicate PII was emitted in the response. Match → reject and audit.",
+    "forbiddenPatterns": [
+      "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "\\b\\d{9}\\b",
+      "\\b[A-Z]{1,3}\\d{6,9}\\b"
+    ]
+  },
+
+  "operationalLimits": {
+    "maxTokensPerRequest": 8000,
+    "tokenBudgetSoftLimit": 7800,
+    "circuitBreakerEnabled": true,
+    "circuitBreakerMinFailures": 3,
+    "circuitBreakerWindowSeconds": 300,
+    "circuitBreakerBreakSeconds": 60,
+    "fallbackMode": "FallbackManual"
+  },
+
+  "auditRetentionYears": 7
+}

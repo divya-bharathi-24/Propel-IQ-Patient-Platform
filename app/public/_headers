@@ -38,3 +38,25 @@
     by this SPA to reduce the attack surface.
   */
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+# ── Cache-Control (NFR-012 / TR-014) ──────────────────────────────────────────
+# Static assets use content-hashed filenames (Angular CLI outputHashing: "all"),
+# so they are safe to cache immutably for one year in CDN and browser caches.
+# This dramatically reduces repeat-visit LCP.
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# index.html must never be cached — it is the entry point that references
+# the current hashed asset filenames. A stale index.html would load old bundles.
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate

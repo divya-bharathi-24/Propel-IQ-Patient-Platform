@@ -1,7 +1,6 @@
 using Npgsql;
-// TODO: Uncomment when pgvector is installed and AI features are ready
-// using Pgvector.EntityFrameworkCore;
-// using Pgvector.Npgsql;
+using Pgvector.EntityFrameworkCore;
+using Pgvector.Npgsql;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,22 +20,27 @@ using Polly;
 using Polly.CircuitBreaker;
 using Propel.Api.Gateway.Data;
 using Propel.Api.Gateway.Endpoints;
+using Propel.Api.Gateway.HealthChecks;
 using Propel.Api.Gateway.Infrastructure.BackgroundServices;
 using Propel.Api.Gateway.Infrastructure.Behaviors;
 using Propel.Api.Gateway.Infrastructure.Cache;
 using Propel.Api.Gateway.Infrastructure.Email;
 using Propel.Api.Gateway.Infrastructure.Filters;
+using Propel.Api.Gateway.Infrastructure.HealthChecks;
 using Propel.Api.Gateway.Infrastructure.Models;
 using Propel.Api.Gateway.Infrastructure.Documents;
-using Propel.Api.Gateway.Infrastructure.Pdf;
-using Propel.Api.Gateway.Infrastructure.Repositories;
+using Propel.Api.Gateway.Infrastructure.Notifications;
+using Propel.Api.Gateway.Infrastructure.Pdf;using Propel.Api.Gateway.Infrastructure.Repositories;
 using Propel.Api.Gateway.Infrastructure.Persistence.AuditLog;
 using Propel.Api.Gateway.Infrastructure.Security;
 using Propel.Api.Gateway.Infrastructure.Session;
 using Propel.Api.Gateway.Infrastructure.ReAuth;
 using Propel.Api.Gateway.Infrastructure.Sms;
+using Propel.Api.Gateway.Infrastructure;
 using Propel.Api.Gateway.Middleware;
 using Propel.Api.Gateway.Security;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Propel.Domain.Interfaces;
 using Propel.Modules.Auth.Audit;
 using Propel.Modules.Auth.Services;
@@ -49,6 +53,7 @@ using Propel.Modules.Admin.Queries;
 using Propel.Modules.AI.Commands;
 using Propel.Modules.AI.Interfaces;
 using Propel.Modules.AI.Options;
+using Propel.Modules.AI.Registration;
 using Propel.Modules.AI.Services;
 using Propel.Modules.Appointment.Commands;
 using Propel.Modules.Appointment.Configuration;
@@ -76,15 +81,28 @@ using System.Threading.Channels;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// ── Kestrel TLS 1.2+ enforcement (NFR-005, AG-2, AC-4) ───────────────────────
-// Restricts Kestrel to TLS 1.2 and TLS 1.3 for direct HTTPS scenarios (local dev).
+// ── Kestrel TLS 1.2+ enforcement + connection/body limits (NFR-005, NFR-010, NFR-019, EP-011/us_053/task_002) ─
+// TLS: Restricts Kestrel to TLS 1.2 and TLS 1.3 for direct HTTPS scenarios (local dev).
 // On Railway, TLS is terminated at the platform ingress; this setting adds defence-in-depth.
+// Connection limits: sized for 100 concurrent users with 2× headroom (AC-2, NFR-010).
+// MaxRequestBodySize: 1 MB global default; per-action [RequestSizeLimit] overrides for upload endpoints.
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureHttpsDefaults(httpsOptions =>
     {
         httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
     });
+
+    // Global request body cap — upload endpoints override this with [RequestSizeLimit] (NFR-019).
+    options.Limits.MaxRequestBodySize = 1_048_576; // 1 MB default for non-upload endpoints
+
+    // Connection limits for 100 concurrent users: 2× headroom (NFR-010, AC-2).
+    options.Limits.MaxConcurrentConnections = 200;
+    options.Limits.MaxConcurrentUpgradedConnections = 50; // WebSocket budget
+
+    // Keep-alive and header timeouts: balanced for long-lived upload streams (NFR-019).
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(30);
 });
 
 // ── Serilog structured logging (NFR-013) ─────────────────────────────────────
@@ -152,10 +170,14 @@ builder.Services.AddMediatR(cfg =>
         typeof(PingCalendarCommand).Assembly, // Propel.Modules.Calendar — EP-007/us_035 (Google Calendar sync)
         typeof(Program).Assembly      // Propel.Api.Gateway — BookingConfirmedEventHandler (US_021, TASK_002), BookingConfirmedRiskHandler (us_031)
     );
-    
-    // Register ValidationBehavior to run FluentValidation on all commands before handlers
-    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
+
+// ── EP-011/us_051/task_002 — MediatR pipeline behaviors (ordered: Log → Validate → Perf) ──
+// Registered as open-generic transients so a new instance is created per request type.
+// Pipeline execution order matches registration order (first registered = outermost).
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
 
 // ── FluentValidation (all 7 module assemblies) ────────────────────────────────
 // DisableDataAnnotationsValidation = true: prevents DataAnnotations from running
@@ -182,11 +204,20 @@ var connectionString = configuration["DATABASE_URL"]
     ?? configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("DATABASE_URL is required.");
 
-// TODO: Uncomment when pgvector is installed and AI features are ready
+// ── Npgsql connection pool tuning for 100 concurrent users (NFR-010, AC-2, EP-011/us_053/task_002) ──
+// Little's Law: L = λW → at 100 RPS with 50ms avg query time ≈ 5 concurrent connections.
+// Pool of 50 provides 10× headroom; Minimum Pool Size=5 pre-warms connections on startup.
+// Append pool parameters only if DATABASE_URL does not already contain them.
+if (!connectionString.Contains("Maximum Pool Size", StringComparison.OrdinalIgnoreCase))
+{
+    var poolParams = ";Maximum Pool Size=50;Minimum Pool Size=5;Connection Idle Lifetime=300;Connection Pruning Interval=60";
+    connectionString = connectionString.TrimEnd(';') + poolParams;
+}
+
 // UseVector() registers the pgvector type handler so the Npgsql driver can
-// serialize/deserialize float[] ↔ vector columns at runtime (task_002, AC-2).
+// serialize/deserialize float[] ↔ vector columns at runtime (US_040, task_002, AC-1).
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-// dataSourceBuilder.UseVector();  // COMMENTED OUT - AI features disabled temporarily
+dataSourceBuilder.UseVector();
 var dataSource = dataSourceBuilder.Build();
 
 // IDbContextFactory<AppDbContext> — used by AuditLogRepository to create isolated DbContext
@@ -197,9 +228,8 @@ var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContextFactory<AppDbContext>(
     (serviceProvider, opt) =>
     {
-        // TODO: Uncomment when pgvector is installed and AI features are ready
-        // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) columns (task_003, AC-2).
-        opt.UseNpgsql(dataSource /*, o => o.UseVector() */)  // COMMENTED OUT - AI features disabled temporarily
+        // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) columns (US_040, task_002, AC-1).
+        opt.UseNpgsql(dataSource, o => o.UseVector())
            .UseSnakeCaseNamingConvention()
            .UseApplicationServiceProvider(serviceProvider)
            .ConfigureWarnings(warnings =>
@@ -313,6 +343,12 @@ builder.Services.Configure<DocumentStorageSettings>(
     builder.Configuration.GetSection("DocumentStorage"));
 builder.Services.AddSingleton<IDocumentStorageService, LocalDocumentStorageService>();
 
+// ── PDF streaming storage service (EP-011/us_053/task_002, NFR-019) ──────────
+// PdfStreamingStorageService streams large uploads in 4 MB chunks without buffering the
+// full file in memory. Used by Staff AI-document upload flows where per-file encryption
+// is deferred to the OS / Azure Blob Storage server-side encryption (Phase 1/Phase 2).
+builder.Services.AddScoped<IPdfStreamingStorageService, PdfStreamingStorageService>();
+
 // ── JWT Authentication ────────────────────────────────────────────────────────
 // Jwt:SecretKey is set via env var JWT__SecretKey (Railway). Already validated above.
 var jwtSecret = configuration["Jwt:SecretKey"]
@@ -335,11 +371,46 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ── ASP.NET Core Health Checks — maps /health liveness probe (Railway health-gate + AC-2) ───
+// ── ASP.NET Core Health Checks — all 7 external dependencies (EP-011/us_052, AC-1, NFR-003) ──
 // No authentication required; /health is a liveness probe, not a data endpoint.
+// Each check has a 5-second individual timeout so a single slow dependency cannot block
+// the full health response. PostgreSQL failure → HTTP 503; all other failures → Degraded (HTTP 200).
 // PgcryptoHealthCheck verifies the pgcrypto extension is active before traffic is accepted (task_002, AC-4).
 builder.Services.AddHealthChecks()
-    .AddCheck<PgcryptoHealthCheck>("pgcrypto");
+    .AddCheck<PgcryptoHealthCheck>("pgcrypto",
+        tags: ["db", "critical"],
+        timeout: TimeSpan.FromSeconds(5))
+    // PostgreSQL — critical: failure returns HTTP 503 and sets Redis db_down flag (AC-1 edge-case).
+    .AddCheck<PostgreSqlHealthCheck>("postgresql",
+        tags: ["db", "critical"],
+        timeout: TimeSpan.FromSeconds(5))
+    // Redis — Degraded (not Unhealthy) on failure: failureStatus overrides exception-path status
+    // when Redis is intentionally disabled in development or unreachable in production (NFR-018).
+    .AddCheck<RedisHealthCheck>("redis",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["cache"],
+        timeout: TimeSpan.FromSeconds(5))
+    // Email, SMS, AI, and calendar providers — Degraded on failure; non-critical to core workflows (AG-6).
+    .AddCheck<SendGridHealthCheck>("sendgrid",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["email", "degradable"],
+        timeout: TimeSpan.FromSeconds(5))
+    .AddCheck<TwilioHealthCheck>("twilio",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["sms", "degradable"],
+        timeout: TimeSpan.FromSeconds(5))
+    .AddCheck<OpenAiHealthCheck>("openai",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["ai", "degradable"],
+        timeout: TimeSpan.FromSeconds(5))
+    .AddCheck<GoogleCalendarHealthCheck>("google-calendar",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["calendar", "degradable"],
+        timeout: TimeSpan.FromSeconds(5))
+    .AddCheck<MicrosoftGraphHealthCheck>("microsoft-graph",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["calendar", "degradable"],
+        timeout: TimeSpan.FromSeconds(5));
 
 // ── Rate Limiting — named policies defined in RateLimitingPolicies (NFR-017, AC-1) ──────────
 builder.Services.AddRateLimiter(rateLimiterOptions =>
@@ -464,9 +535,14 @@ builder.Services.AddCors(options =>
 
 // ── Middleware singletons ─────────────────────────────────────────────────────
 builder.Services.AddTransient<CorrelationIdMiddleware>();
+builder.Services.AddTransient<RequestLoggingMiddleware>();
 builder.Services.AddTransient<RbacMiddleware>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddTransient<SessionAliveMiddleware>();
+
+// ── EP-011/us_051/task_001 — Correlation ID accessor (ICorrelationIdAccessor) ─
+// Scoped so it shares the DI scope with MediatR pipeline behaviors (task_002).
+builder.Services.AddScoped<ICorrelationIdAccessor, HttpContextCorrelationIdAccessor>();
 
 // ── Registration / Verification repositories (us_010 task_002) ───────────────
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -648,6 +724,17 @@ Log.Information("NotificationDispatchService registered (US_033, task_002).");
 builder.Services.AddHostedService<ReminderSchedulerService>();
 Log.Information("ReminderSchedulerService registered (US_033, task_001).");
 
+// ── EP-011/US_052 — Booking notification fire-and-try dispatch + retry (task_002) ──
+// INotificationDispatchService: fire-and-try service called by booking/reminder command handlers.
+// Persists a Pending Notification BEFORE delivery attempt; on failure returns Queued instead of
+// throwing, so the booking workflow is never blocked (NFR-018, AC-2).
+builder.Services.AddScoped<INotificationDispatchService, BookingNotificationDispatchService>();
+// NotificationRetryBackgroundService: 60-second loop that retries Pending booking-confirmation
+// notifications with exponential backoff (4^retryCount minutes, max 3 attempts).
+// After 3 failed attempts, sets Status = Failed and emits a Serilog Warning (US_052, AC-2).
+builder.Services.AddHostedService<NotificationRetryBackgroundService>();
+Log.Information("NotificationRetryBackgroundService registered (US_052, task_002).");
+
 // ── EP-005/US_028 — AI Intake session store + service (task_002 + task_003) ───
 // IntakeSessionStore: singleton ConcurrentDictionary<Guid, IntakeSession> with a background
 // timer that evicts sessions idle for more than 60 minutes (prevents memory leak, US_028).
@@ -729,6 +816,245 @@ builder.Services.AddSingleton<IntakePromptBuilder>();
 builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
     Propel.Modules.AI.Services.SemanticKernelAiIntakeService>();
 
+// ── US_040 — AI RAG vector store: pgvector chunk storage and retrieval (task_002) ──────────
+// IDocumentChunkEmbeddingRepository: EF Core + raw SQL pgvector <=> cosine similarity search.
+// ACL filter (AIR-S02), threshold filtering (AIR-R02), and re-ranking (AIR-R03) applied per retrieval.
+builder.Services.AddScoped<IDocumentChunkEmbeddingRepository, DocumentChunkEmbeddingRepository>();
+// IVectorStoreService: orchestrates StoreChunksAsync (task_001→task_002 handoff) and
+// RetrieveRelevantChunksAsync (task_002→task_003 handoff) with full AIR pipeline enforcement.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IVectorStoreService,
+    Propel.Modules.AI.Services.VectorStoreService>();
+Log.Information("VectorStoreService registered (US_040, task_002).");
+
+// ── US_040 — AI RAG extraction orchestrator (task_003) ─────────────────────────────────────
+// Polly circuit breaker for the extraction pipeline — isolated from the intake and risk circuits.
+// Opens after 3 consecutive failures within 5 minutes; resets after a 60-second break (AIR-O02).
+var extractionCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio      = 1.0,
+        MinimumThroughput = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration  = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration     = TimeSpan.FromSeconds(60),
+        ShouldHandle      = new PredicateBuilder().Handle<Exception>(),
+        OnOpened          = _ => { Log.Warning("AiCircuitBreaker_Opened_Extraction"); return ValueTask.CompletedTask; },
+        OnClosed          = _ => { Log.Information("AiCircuitBreaker_Closed_Extraction"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddKeyedSingleton<ResiliencePipeline>("extraction", extractionCircuitBreaker);
+
+// ExtractionGuardrailFilter: singleton schema + content safety validator (AIR-Q03, AIR-S04).
+builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.ExtractionGuardrailFilter>();
+
+// IExtractedDataRepository: EF Core INSERT-only repository for AI-extracted fields (AC-3, AIR-001).
+builder.Services.AddScoped<IExtractedDataRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.ExtractedDataRepository>();
+
+// ── EP-008-I/us_041 — 360-degree aggregation API repositories (task_002) ──────
+// IDataConflictRepository: parameterised LINQ query for unresolved Critical conflicts (AC-4).
+builder.Services.AddScoped<IDataConflictRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.DataConflictRepository>();
+// IPatientProfileVerificationRepository: upsert verification record per patient (AC-3).
+builder.Services.AddScoped<IPatientProfileVerificationRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.PatientProfileVerificationRepository>();
+Log.Information("360-view aggregation repositories registered (EP-008-I/us_041, task_002).");
+
+// IExtractionOrchestrator: full RAG + GPT-4o extraction pass per document (US_040, AC-2, AC-3, AIR-O01, AIR-O02).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IExtractionOrchestrator,
+    Propel.Modules.AI.Services.ExtractionOrchestrator>();
+Log.Information("ExtractionOrchestrator registered (US_040, task_003).");
+
+// ── EP-008-I/us_041 — AI semantic de-duplication service (task_003) ───────────
+// Isolated Polly circuit breaker: 3 consecutive GPT-4o failures / 5-min window → FallbackManual
+// path (AIR-O02). Keyed separately from extraction and intake circuits to prevent cross-tripping.
+var deduplicationCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio      = 1.0,
+        MinimumThroughput = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration  = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration     = TimeSpan.FromSeconds(60),
+        ShouldHandle      = new PredicateBuilder().Handle<Exception>(),
+        OnOpened          = _ => { Log.Warning("AiCircuitBreaker_Opened_Deduplication"); return ValueTask.CompletedTask; },
+        OnClosed          = _ => { Log.Information("AiCircuitBreaker_Closed_Deduplication"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddKeyedSingleton<ResiliencePipeline>("deduplication", deduplicationCircuitBreaker);
+
+// IPatientDeduplicationService: pgvector cosine similarity + GPT-4o confirmation + canonical
+// selection per patient. Scoped lifetime shares DbContext with request-level repositories.
+// AIR-S01 (PII redaction), AIR-S03 (audit log), AIR-O01 (token budget), AIR-O02 (circuit breaker).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IPatientDeduplicationService,
+    Propel.Modules.AI.Services.PatientDeduplicationService>();
+Log.Information("PatientDeduplicationService registered (EP-008-I/us_041, task_003).");
+
+// ── EP-008-II/us_042 — AI Medical Coding Suggestion Pipeline (task_001) ───────
+// Isolated Polly circuit breaker: 3 consecutive GPT-4o failures / 5-min window → open for 60s.
+// Keyed "medical-coding" to prevent cross-tripping with extraction, intake, and deduplication circuits.
+var medicalCodingCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio      = 1.0,
+        MinimumThroughput = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration  = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration     = TimeSpan.FromSeconds(60),
+        ShouldHandle      = new PredicateBuilder().Handle<Exception>(),
+        OnOpened          = _ => { Log.Warning("AiCircuitBreaker_Opened_MedicalCoding"); return ValueTask.CompletedTask; },
+        OnClosed          = _ => { Log.Information("AiCircuitBreaker_Closed_MedicalCoding"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddKeyedSingleton<ResiliencePipeline>("medical-coding", medicalCodingCircuitBreaker);
+
+// MedicalCodingPlugin: Semantic Kernel plugin with [KernelFunction] ICD-10 and CPT tool methods.
+// Singleton because it holds no mutable state — only reads prompt files from disk (AIR-O03).
+builder.Services.AddSingleton<Propel.Modules.AI.Services.MedicalCodingPlugin>();
+
+// MedicalCodeSchemaValidator: singleton schema + anti-hallucination validator (AIR-Q03, AC-3).
+builder.Services.AddSingleton<Propel.Modules.AI.Validators.MedicalCodeSchemaValidator>();
+
+// ICodeReferenceLibrary: singleton in-memory ICD-10/CPT reference validator shared between the
+// AI anti-hallucination pipeline and the Staff code-confirmation API (EP-008-II/us_043, task_002, AC-4).
+builder.Services.AddSingleton<Propel.Domain.Interfaces.ICodeReferenceLibrary,
+    Propel.Modules.AI.Services.CodeReferenceLibrary>();
+
+// IMedicalCodeRepository: EF Core scoped repository for accept/reject upserts and manual inserts
+// in the Staff confirmation workflow (EP-008-II/us_043, task_002, AC-2, AC-3, AC-4).
+builder.Services.AddScoped<Propel.Domain.Interfaces.IMedicalCodeRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.MedicalCodeRepository>();
+
+// IMedicalCodingOrchestrator: sequential ICD-10 → CPT pipeline with circuit breaker, schema validation,
+// low-confidence flagging, and audit logging. Scoped to share DbContext with request repositories.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IMedicalCodingOrchestrator,
+    Propel.Modules.AI.Services.MedicalCodingOrchestrator>();
+Log.Information("MedicalCodingOrchestrator registered (EP-008-II/us_042, task_001).");
+
+// ── EP-008-II/us_044 — AI Conflict Detection Pipeline (task_001) ──────────────
+// Isolated Polly circuit breaker: 3 consecutive GPT-4o failures / 5-min window → open for 60s.
+// Keyed "conflict-detection" to prevent cross-tripping with extraction, deduplication, and medical-coding circuits.
+var conflictDetectionCircuitBreaker = new ResiliencePipelineBuilder()
+    .AddCircuitBreaker(new CircuitBreakerStrategyOptions
+    {
+        FailureRatio      = 1.0,
+        MinimumThroughput = aiSettings.CircuitBreakerFailureThreshold,
+        SamplingDuration  = TimeSpan.FromSeconds(aiSettings.CircuitBreakerWindowSeconds),
+        BreakDuration     = TimeSpan.FromSeconds(60),
+        ShouldHandle      = new PredicateBuilder().Handle<Exception>(),
+        OnOpened          = _ => { Log.Warning("AiCircuitBreaker_Opened_ConflictDetection"); return ValueTask.CompletedTask; },
+        OnClosed          = _ => { Log.Information("AiCircuitBreaker_Closed_ConflictDetection"); return ValueTask.CompletedTask; }
+    })
+    .Build();
+builder.Services.AddKeyedSingleton<ResiliencePipeline>("conflict-detection", conflictDetectionCircuitBreaker);
+
+// ConflictDetectionPlugin: Semantic Kernel plugin with [KernelFunction] DetectConflictsAsync method.
+// Singleton because it holds no mutable state — only reads prompt files from disk (AIR-O03).
+builder.Services.AddSingleton<Propel.Modules.AI.Services.ConflictDetectionPlugin>();
+
+// ConflictDetectionSchemaValidator: singleton schema validator for AI output (AIR-Q03).
+builder.Services.AddSingleton<Propel.Modules.AI.Validators.ConflictDetectionSchemaValidator>();
+
+// IConflictDetectionOrchestrator: RAG conflict detection pipeline with circuit breaker,
+// schema validation, severity classification, and idempotent persistence (EP-008-II/us_044, task_001).
+// Scoped to share DbContext with request-level repositories.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IConflictDetectionOrchestrator,
+    Propel.Modules.AI.Services.ConflictDetectionOrchestrator>();
+Log.Information("ConflictDetectionOrchestrator registered (EP-008-II/us_044, task_001).");
+
+// ── EP-010/us_048 — AI Quality Monitoring & Guardrails (task_001 / task_002) ──────────────
+// IAiMetricsWriter: EF Core INSERT-only implementation (task_002 — EfAiMetricsWriter).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiMetricsWriter,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiMetricsWriter>();
+
+// IAiMetricsReadRepository: EF Core rolling-window read implementation (task_002 — EfAiMetricsReadRepository).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiMetricsReadRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiMetricsReadRepository>();
+
+// AgreementRateEvaluator: computes rolling AI-Human Agreement Rate; warns + flags Redis if < 98% (AIR-Q01).
+// Redis is injected as null in development mode (graceful degradation, NFR-018).
+builder.Services.AddScoped<Propel.Modules.AI.Metrics.AgreementRateEvaluator>(sp =>
+{
+    var metricsRepo = sp.GetRequiredService<Propel.Modules.AI.Interfaces.IAiMetricsReadRepository>();
+    IConnectionMultiplexer? redis = null;
+    if (!builder.Environment.IsDevelopment())
+    {
+        try { redis = sp.GetRequiredService<IConnectionMultiplexer>(); }
+        catch { /* Redis unavailable — degrade gracefully */ }
+    }
+    return new Propel.Modules.AI.Metrics.AgreementRateEvaluator(metricsRepo, redis);
+});
+
+// HallucinationRateEvaluator: computes rolling hallucination rate; raises Fatal alert + Redis flag if > 2% (AIR-Q04).
+builder.Services.AddScoped<Propel.Modules.AI.Metrics.HallucinationRateEvaluator>(sp =>
+{
+    var metricsRepo = sp.GetRequiredService<Propel.Modules.AI.Interfaces.IAiMetricsReadRepository>();
+    IConnectionMultiplexer? redis = null;
+    if (!builder.Environment.IsDevelopment())
+    {
+        try { redis = sp.GetRequiredService<IConnectionMultiplexer>(); }
+        catch { /* Redis unavailable — degrade gracefully */ }
+    }
+    return new Propel.Modules.AI.Metrics.HallucinationRateEvaluator(metricsRepo, redis);
+});
+
+// IAiAgreementEventEmitter: maps staff decisions to agreement events; triggers AgreementRateEvaluator (AIR-Q01).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiAgreementEventEmitter,
+    Propel.Modules.AI.Services.AiAgreementEventEmitter>();
+
+// AiOutputSchemaValidator: SK IFunctionInvocationFilter — validates JSON output schema; rejects invalid outputs (AIR-Q03).
+builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.AiOutputSchemaValidator>();
+Log.Information("AI quality monitoring services registered (EP-010/us_048, task_001).");
+
+// ── EP-010/us_049 — AI Safety Guardrails & Immutable Prompt Audit Logging (task_001) ─────────────
+// IContentSafetyEvaluator: Phase 1 keyword blocklist from AiSafety:BlockedKeywords (AIR-S04, AC-3).
+builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.IContentSafetyEvaluator,
+    Propel.Modules.AI.Guardrails.KeywordContentSafetyEvaluator>();
+
+// PiiRedactionFilter: SK IPromptRenderFilter — replaces 6 PII categories before OpenAI transmission (AIR-S01, AC-1).
+// Registered as singleton — stateless; uses compiled Regex patterns.
+builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.PiiRedactionFilter>();
+
+// ContentSafetyFilter: SK IFunctionInvocationFilter — keyword blocklist + IContentSafetyEvaluator post-response (AIR-S04, AC-3).
+builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.ContentSafetyFilter>();
+
+// AiPromptAuditHook: SK IFunctionInvocationFilter (last) — try/finally capture; IAiPromptAuditWriter (AIR-S03, AC-4).
+// Registered as scoped because IAiPromptAuditWriter (task_002 EfAiPromptAuditWriter) is scoped.
+builder.Services.AddScoped<Propel.Modules.AI.Guardrails.AiPromptAuditHook>();
+
+// RagAclFilter: chunk-level ACL predicate injected directly into RAG orchestrators (AIR-S02, AC-2).
+builder.Services.AddScoped<Propel.Modules.AI.Guardrails.RagAclFilter>();
+
+// IAiPromptAuditWriter: EfAiPromptAuditWriter — INSERT-only EF Core; swallows exceptions (AIR-S03, AC-4, task_002).
+// Replaces NullAiPromptAuditWriter stub registered by task_001.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiPromptAuditWriter,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiPromptAuditWriter>();
+
+// IAiPromptAuditReadRepository: EfAiPromptAuditReadRepository — keyset-paginated read for Admin query (AC-4, task_002).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiPromptAuditReadRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiPromptAuditReadRepository>();
+Log.Information("AI safety guardrails registered (EP-010/us_049, task_001+task_002): PiiRedaction, ContentSafety, AuditHook, RagAcl, EfAuditWriter, AuditReadRepo.");
+
+// ── EP-010/us_050 — AI Operational Resilience: Circuit Breaker, Token Budget & Model Swap ─────
+builder.Services.AddAiOperationalResilience(configuration);
+
+// IAiOperationalMetricsWriter: EF Core INSERT-only; swallows exceptions (fire-and-forget contract, NFR-018).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiOperationalMetricsWriter,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiOperationalMetricsWriter>();
+
+// IAiOperationalMetricsReadRepository: keyset-style rolling-window reads for operational dashboard (AIR-O04, AC-4).
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiOperationalMetricsReadRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.EfAiOperationalMetricsReadRepository>();
+
+Log.Information("AI operational metrics services registered (EP-010/us_050, task_002): EfOperationalMetricsWriter, EfOperationalMetricsReadRepo.");
+
+
+// IClinicalDocumentRepository: EF Core repository for Pending document polling and status transitions.
+builder.Services.AddScoped<IClinicalDocumentRepository,
+    Propel.Api.Gateway.Infrastructure.Repositories.ClinicalDocumentRepository>();
+// ExtractionPipelineWorker: 30-second PeriodicTimer worker orchestrating the full extraction
+// pipeline (ChunkAsync → GenerateAsync → StoreChunksAsync → ExtractAsync) with SemaphoreSlim(3)
+// concurrency control and idempotency locking via ProcessingStatus = Processing (AC-1, AC-4, EC-1, EC-2).
+builder.Services.AddHostedService<Propel.Modules.Clinical.Workers.ExtractionPipelineWorker>();
+Log.Information("ExtractionPipelineWorker registered (US_040, task_004).");
+
 // ── us_031 — No-Show Risk Engine (task_002 + task_003) ────────────────────────
 // INoShowRiskCalculator: scoped rule-based engine with AI augmentation hook.
 builder.Services.AddScoped<INoShowRiskCalculator, RuleBasedNoShowRiskCalculator>();
@@ -800,6 +1126,14 @@ builder.Services.Configure<OutlookCalendarOptions>(configuration.GetSection("Out
 // IIcsGeneratorService: RFC 5545-compliant ICS generator shared with us_035 Google flow.
 builder.Services.AddScoped<IIcsGeneratorService, IcsGeneratorService>();
 
+// ── EP-011/us_052 — Calendar Sync Degradation Handlers (task_003) ─────────────
+// ICalendarSyncService (keyed): booking-time sync with graceful degradation (NFR-018, AC-4).
+// GoogleCalendarSyncService persists CalendarSync.syncStatus=Failed on API exception;
+// MicrosoftGraphCalendarSyncService follows the same pattern for Outlook.
+builder.Services.AddKeyedScoped<ICalendarSyncService, GoogleCalendarSyncService>("Google");
+builder.Services.AddKeyedScoped<ICalendarSyncService, MicrosoftGraphCalendarSyncService>("Outlook");
+Log.Information("ICalendarSyncService registered (EP-011, us_052, task_003): Google + Outlook keyed implementations.");
+
 // Channel<OutlookRetryRequest>: in-process unbounded channel for Outlook retry orchestration.
 // Singleton so both HandleOutlookCallbackCommandHandler and OutlookCalendarRetryService
 // share the same channel instance.
@@ -816,10 +1150,13 @@ var app = builder.Build();
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ── Middleware pipeline order (AC3) ──────────────────────────────────────────
-// 1. Correlation ID must be first to propagate to all downstream middleware/handlers
+// 1. Correlation ID must be first to propagate to all downstream middleware/handlers (AC-2, TR-018)
 app.UseMiddleware<CorrelationIdMiddleware>();
 
-// 2. Global exception handler — must be early to catch all downstream exceptions (NFR-014)
+// 2. Request logging — must follow CorrelationIdMiddleware so CorrelationId is in HttpContext.Items (AC-1)
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+// 3. Global exception handler — must be early to catch all downstream exceptions (NFR-014)
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
@@ -854,9 +1191,35 @@ app.UseSwaggerUI(c =>
 
 app.MapControllers().RequireRateLimiting("global");
 
-// ── /health — ASP.NET Core Health Checks liveness probe (Railway health-gate / AC-2) ────────
-// Returns HTTP 200 {"status":"Healthy"} — no auth required (liveness probe only).
-app.MapHealthChecks("/health");
+// ── /health — full platform health report: all 8 checks (EP-011/us_052, AC-1, NFR-003) ────────
+// Degraded maps to HTTP 200 — partial availability is not fatal (NFR-018, AG-6).
+// Unhealthy (PostgreSQL only) maps to HTTP 503 — signals load balancers and uptime monitors.
+// No authentication required; structured JSON via HealthCheckResponseWriter (no credentials exposed).
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthCheckResponseWriter.WriteResponse,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy]   = StatusCodes.Status200OK,
+        [HealthStatus.Degraded]  = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+    }
+});
+
+// ── /health/live — liveness probe: DB only (container orchestrators / Railway health-gate) ──
+// Includes only checks tagged "critical" (postgresql + pgcrypto).
+// Returns 200 when DB is reachable, 503 when DB is unreachable (AC-1 edge-case).
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate      = check => check.Tags.Contains("critical"),
+    ResponseWriter = HealthCheckResponseWriter.WriteResponse,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy]   = StatusCodes.Status200OK,
+        [HealthStatus.Degraded]  = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+    }
+});
 
 // ── /healthz — detailed health check: DB + Redis status (Docker Compose / internal monitoring) ─
 HealthCheckEndpoint.MapHealthCheck(app);

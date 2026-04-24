@@ -5,7 +5,9 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { StaffNoteUploadComponent } from './note-upload/staff-note-upload.component';
 import { DocumentHistoryListComponent } from '../../documents/document-history-list/document-history-list.component';
 
@@ -30,7 +32,13 @@ import { DocumentHistoryListComponent } from '../../documents/document-history-l
   selector: 'app-staff-patient-record',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StaffNoteUploadComponent, DocumentHistoryListComponent],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatIconModule,
+    StaffNoteUploadComponent,
+    DocumentHistoryListComponent,
+  ],
   templateUrl: './staff-patient-record.component.html',
   styleUrl: './staff-patient-record.component.scss',
 })

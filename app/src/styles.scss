@@ -7,3 +7,16 @@
 html, body { height: 100%; margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Conflict severity utility classes — applied by ConflictHighlightDirective (US_044 AC-2) */
+.conflict-critical {
+  border: 2px solid #D32F2F;
+  background-color: #FFEBEE;
+  border-radius: 4px;
+}
+
+.conflict-warning {
+  border: 2px solid #F57C00;
+  background-color: #FFF3E0;
+  border-radius: 4px;
+}

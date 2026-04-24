@@ -14,7 +14,7 @@
 ## Design References (Frontend Tasks Only)
 
 | Reference Type         | Value |
-|------------------------|-------|
+| ---------------------- | ----- |
 | **UI Impact**          | No    |
 | **Figma URL**          | N/A   |
 | **Wireframe Status**   | N/A   |
@@ -26,38 +26,38 @@
 
 ## Applicable Technology Stack
 
-| Layer      | Technology           | Version    |
-|------------|----------------------|------------|
-| Backend    | ASP.NET Core Web API | .net 10     |
-| Messaging  | MediatR              | 12.x       |
-| ORM        | Entity Framework Core| 9.x        |
-| Database   | PostgreSQL           | 16+        |
-| Email      | SendGrid             | SDK Latest |
-| Logging    | Serilog              | 4.x        |
-| AI/ML      | N/A (orchestration only — AI in task_003) | N/A |
-| Mobile     | N/A                  | N/A        |
+| Layer     | Technology                                | Version    |
+| --------- | ----------------------------------------- | ---------- |
+| Backend   | ASP.NET Core Web API                      | .net 10    |
+| Messaging | MediatR                                   | 12.x       |
+| ORM       | Entity Framework Core                     | 9.x        |
+| Database  | PostgreSQL                                | 16+        |
+| Email     | SendGrid                                  | SDK Latest |
+| Logging   | Serilog                                   | 4.x        |
+| AI/ML     | N/A (orchestration only — AI in task_003) | N/A        |
+| Mobile    | N/A                                       | N/A        |
 
 **Note**: All code and libraries MUST be compatible with versions above.
 
 ## AI References (AI Tasks Only)
 
-| Reference Type       | Value |
-|----------------------|-------|
-| **AI Impact**        | No    |
-| **AIR Requirements** | N/A (this task coordinates — AI logic is in task_003) |
-| **AI Pattern**       | N/A   |
-| **Prompt Template Path** | N/A |
-| **Guardrails Config**| N/A   |
-| **Model Provider**   | N/A   |
+| Reference Type           | Value                                                 |
+| ------------------------ | ----------------------------------------------------- |
+| **AI Impact**            | No                                                    |
+| **AIR Requirements**     | N/A (this task coordinates — AI logic is in task_003) |
+| **AI Pattern**           | N/A                                                   |
+| **Prompt Template Path** | N/A                                                   |
+| **Guardrails Config**    | N/A                                                   |
+| **Model Provider**       | N/A                                                   |
 
 ## Mobile References (Mobile Tasks Only)
 
-| Reference Type      | Value |
-|---------------------|-------|
-| **Mobile Impact**   | No    |
-| **Platform Target** | N/A   |
-| **Min OS Version**  | N/A   |
-| **Mobile Framework**| N/A   |
+| Reference Type       | Value |
+| -------------------- | ----- |
+| **Mobile Impact**    | No    |
+| **Platform Target**  | N/A   |
+| **Min OS Version**   | N/A   |
+| **Mobile Framework** | N/A   |
 
 ## Task Overview
 
@@ -72,12 +72,12 @@ Implement the `ExtractionPipelineWorker : BackgroundService` that polls for `Cli
 
 ## Impacted Components
 
-| Component | Project | Action |
-|-----------|---------|--------|
-| `ExtractionPipelineWorker` | `PropelIQ.Clinical` | CREATE |
-| `IClinicalDocumentRepository` | `PropelIQ.Clinical` | MODIFY (add `GetPendingAsync`, `UpdateStatusAsync`) |
-| `IEmailNotifier` | `PropelIQ.Notification` | CONSUME (from US_033 task_002) |
-| `Program.cs` / DI | `PropelIQ.Api` | MODIFY (register BackgroundService) |
+| Component                     | Project                 | Action                                              |
+| ----------------------------- | ----------------------- | --------------------------------------------------- |
+| `ExtractionPipelineWorker`    | `PropelIQ.Clinical`     | CREATE                                              |
+| `IClinicalDocumentRepository` | `PropelIQ.Clinical`     | MODIFY (add `GetPendingAsync`, `UpdateStatusAsync`) |
+| `IEmailNotifier`              | `PropelIQ.Notification` | CONSUME (from US_033 task_002)                      |
+| `Program.cs` / DI             | `PropelIQ.Api`          | MODIFY (register BackgroundService)                 |
 
 ## Implementation Plan
 
@@ -90,9 +90,9 @@ Implement the `ExtractionPipelineWorker : BackgroundService` that polls for `Cli
    c. Call `IEmbeddingGenerationService.GenerateAsync(chunks, ct)` — on failure: set `processingStatus = Failed`, log error, continue.
    d. Call `IVectorStoreService.StoreChunksAsync(chunksWithEmbeddings, ct)`.
    e. Call `IExtractionOrchestrator.ExtractAsync(documentId, ct)`:
-      - If `CircuitBreakerOpen` (EC-2): revert status to `Pending`, log info, do NOT send failure email, continue (will retry next cycle).
-      - If `ExtractionSchemaValidationException`: set `processingStatus = Failed`, send failure email.
-      - If success: set `processingStatus = Completed`.
+   - If `CircuitBreakerOpen` (EC-2): revert status to `Pending`, log info, do NOT send failure email, continue (will retry next cycle).
+   - If `ExtractionSchemaValidationException`: set `processingStatus = Failed`, send failure email.
+   - If success: set `processingStatus = Completed`.
 5. **Send completion email** — on `Completed`: call `IEmailNotifier.SendAsync(patient.Email, ExtractionCompletePayload { patientName, documentName })` (AC-4). Fire-and-forget; email failure does not block status update.
 6. **Concurrency control** — use `SemaphoreSlim(3)` to limit to 3 concurrent document processing tasks per worker tick (respects OpenAI rate limits and memory pressure from PDF processing).
 7. **Structured logging** — log per document: documentId, processingStatus transition, step completed, error (if any) with correlation ID. Log worker tick start/end with pendingCount (Serilog, TR-018).
@@ -190,11 +190,11 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-|--------|-----------|-------------|
-| CREATE | `Server/PropelIQ.Clinical/Workers/ExtractionPipelineWorker.cs` | BackgroundService orchestrating full pipeline |
+| Action | File Path                                                              | Description                                                                                    |
+| ------ | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| CREATE | `Server/PropelIQ.Clinical/Workers/ExtractionPipelineWorker.cs`         | BackgroundService orchestrating full pipeline                                                  |
 | MODIFY | `Server/PropelIQ.Clinical/Repositories/IClinicalDocumentRepository.cs` | Add `GetPendingAsync(int batchSize)` and `UpdateStatusAsync(Guid id, ProcessingStatus status)` |
-| MODIFY | `Server/PropelIQ.Api/Program.cs` | Register `services.AddHostedService<ExtractionPipelineWorker>()` |
+| MODIFY | `Server/PropelIQ.Api/Program.cs`                                       | Register `services.AddHostedService<ExtractionPipelineWorker>()`                               |
 
 ## External References
 
@@ -229,11 +229,11 @@ dotnet run --project PropelIQ.Api
 
 ## Implementation Checklist
 
-- [ ] Implement `ExtractionPipelineWorker : BackgroundService` with `PeriodicTimer(30s)` poll and `GetPendingAsync(batchSize: 5)`
-- [ ] Set `processingStatus = Processing` atomically before pipeline start (idempotency lock — prevents duplicate processing)
-- [ ] Execute pipeline steps: ChunkAsync → GenerateAsync → StoreChunksAsync → ExtractAsync in sequence
-- [ ] Handle `DocumentExtractionException`: set `Failed`, send failure email (EC-1)
-- [ ] Handle `CircuitBreakerOpen` result: revert to `Pending`, no failure email (EC-2)
-- [ ] Send completion email via `IEmailNotifier` (fire-and-forget; email failure non-blocking) (AC-4)
-- [ ] Apply `SemaphoreSlim(3)` for concurrent document limit per tick
-- [ ] Register `services.AddHostedService<ExtractionPipelineWorker>()` in `Program.cs`
+- [x] Implement `ExtractionPipelineWorker : BackgroundService` with `PeriodicTimer(30s)` poll and `GetPendingAsync(batchSize: 5)`
+- [x] Set `processingStatus = Processing` atomically before pipeline start (idempotency lock — prevents duplicate processing)
+- [x] Execute pipeline steps: ChunkAsync → GenerateAsync → StoreChunksAsync → ExtractAsync in sequence
+- [x] Handle `DocumentExtractionException`: set `Failed`, send failure email (EC-1)
+- [x] Handle `CircuitBreakerOpen` result: revert to `Pending`, no failure email (EC-2)
+- [x] Send completion email via `IEmailNotifier` (fire-and-forget; email failure non-blocking) (AC-4)
+- [x] Apply `SemaphoreSlim(3)` for concurrent document limit per tick
+- [x] Register `services.AddHostedService<ExtractionPipelineWorker>()` in `Program.cs`

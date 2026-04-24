@@ -2,8 +2,10 @@ using System.Text.Json;
 using FluentValidation;
 using Propel.Api.Gateway.Infrastructure.Models;
 using Propel.Modules.Admin.Exceptions;
+using Propel.Modules.AI.Exceptions;
 using Propel.Modules.Appointment.Exceptions;
 using Propel.Modules.Auth.Exceptions;
+using Propel.Modules.Clinical.Exceptions;
 using Propel.Modules.Notification.Exceptions;
 using Propel.Modules.Patient.Exceptions;
 
@@ -93,6 +95,62 @@ public sealed class ExceptionHandlingMiddleware : IMiddleware
             };
 
             await context.Response.WriteAsJsonAsync(cancelledProblem,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            return;
+        }
+
+        // Unresolved Critical conflicts block profile verification: 409 with conflict details (AC-4)
+        if (exception is UnresolvedConflictsException conflictsEx)
+        {
+            _logger.LogWarning(
+                "UnresolvedConflictsException on {Method} {Path} — {Count} Critical conflict(s) [CorrelationId: {CorrelationId}]",
+                context.Request.Method, context.Request.Path, conflictsEx.Conflicts.Count, correlationId);
+
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            context.Response.ContentType = "application/problem+json";
+
+            var unresolvedConflictProblem = new
+            {
+                type = "https://httpstatuses.com/409",
+                title = "Conflict",
+                status = StatusCodes.Status409Conflict,
+                detail = conflictsEx.Message,
+                unresolvedConflicts = conflictsEx.Conflicts.Select(c => new
+                {
+                    c.Id,
+                    c.FieldName,
+                    c.Value1,
+                    c.Value2,
+                    Severity = c.Severity.ToString(),
+                    ResolutionStatus = c.ResolutionStatus.ToString()
+                }),
+                correlationId
+            };
+
+            await context.Response.WriteAsJsonAsync(unresolvedConflictProblem,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            return;
+        }
+
+        // Medical coding service unavailable (circuit breaker open — EC-2): 503 with manual-entry fallback message (EP-008-II/us_042, task_002).
+        if (exception is MedicalCodingUnavailableException medicalCodingEx)
+        {
+            _logger.LogError(
+                medicalCodingEx,
+                "MedicalCodingUnavailableException on {Method} {Path} — circuit breaker open [CorrelationId: {CorrelationId}]",
+                context.Request.Method, context.Request.Path, correlationId);
+
+            context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            context.Response.ContentType = "application/problem+json";
+
+            var medicalCodingProblem = new
+            {
+                error = "Medical coding service temporarily unavailable. Please retry or enter codes manually.",
+                statusCode = StatusCodes.Status503ServiceUnavailable,
+                correlationId
+            };
+
+            await context.Response.WriteAsJsonAsync(medicalCodingProblem,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             return;
         }

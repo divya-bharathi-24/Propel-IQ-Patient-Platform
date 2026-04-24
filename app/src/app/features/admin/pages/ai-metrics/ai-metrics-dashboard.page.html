@@ -1,0 +1,56 @@
+<main
+  class="ai-metrics-container"
+  role="main"
+  aria-labelledby="ai-metrics-title"
+>
+  <header class="page-header">
+    <div class="page-title-row">
+      <h1 id="ai-metrics-title">AI Operational Metrics</h1>
+      @if (store.isLoading()) {
+      <mat-spinner diameter="24" aria-label="Loading metrics" />
+      }
+    </div>
+    @if (store.lastRefreshed()) {
+    <p class="page-subtitle">
+      Last updated: {{ store.lastRefreshed() | date:'HH:mm:ss' }} —
+      auto-refreshes every 60 seconds
+    </p>
+    }
+  </header>
+
+  <!-- Error state -->
+  @if (store.error()) {
+  <div class="error-message" role="alert" aria-live="assertive">
+    {{ store.error() }}
+  </div>
+  }
+
+  <!-- Deferred panels — loaded when they enter the viewport to keep LCP fast (NFR-012) -->
+  @defer (on viewport) {
+  <!-- Circuit Breaker banner (AC-4 / AIR-O04) -->
+  <app-circuit-breaker-status [metrics]="store.operationalMetrics()" />
+
+  <!-- Metric panels grid -->
+  <div class="metrics-grid">
+    <app-latency-panel [metrics]="store.operationalMetrics()" />
+    <app-token-consumption-panel [metrics]="store.operationalMetrics()" />
+    <app-error-rate-panel [metrics]="store.operationalMetrics()" />
+  </div>
+
+  <!-- Model Version & Config (AC-3 operator UI) -->
+  <app-model-version-panel
+    [metrics]="store.operationalMetrics()"
+    (modelVersionChange)="onModelVersionChange($event)"
+  />
+  } @placeholder {
+  <!-- Fixed height prevents CLS while deferred content is loading (NFR-012 / CLS <0.1) -->
+  <div
+    class="metrics-loading-placeholder"
+    style="height: 400px"
+    aria-busy="true"
+    aria-label="Loading metrics panels"
+  >
+    <mat-spinner diameter="40" />
+  </div>
+  }
+</main>

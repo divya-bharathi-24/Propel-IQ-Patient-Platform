@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-// TODO: Uncomment when pgvector is installed and AI features are ready
-// using Pgvector.EntityFrameworkCore;
-// using Pgvector.Npgsql;
+using Pgvector.EntityFrameworkCore;
+using Pgvector.Npgsql;
 using Propel.Api.Gateway.Data;
 using Propel.Api.Gateway.Security;
 
@@ -56,19 +55,17 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
                 "Host=localhost;Port=5432;Database=propeliq_dev;Username=postgres;Password=dev";
         }
 
-        // TODO: Uncomment when pgvector is installed and AI features are ready
         // UseVector() registers the pgvector type handler on the Npgsql data source so
         // EF Core can resolve float[] ↔ vector(1536) at design time (migration generation).
-        // This mirrors the runtime registration in Program.cs (task_002, AC-2).
+        // This mirrors the runtime registration in Program.cs (task_002, AC-2, US_040 task_005).
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-        // dataSourceBuilder.UseVector();  // COMMENTED OUT - AI features disabled temporarily
+        dataSourceBuilder.UseVector();
         var dataSource = dataSourceBuilder.Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder
-            // TODO: Uncomment when pgvector is installed and AI features are ready
-            // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) (task_003, AC-2).
-            .UseNpgsql(dataSource /*, o => o.UseVector() */)  // COMMENTED OUT - AI features disabled temporarily
+            // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) (task_003, task_005, AC-2).
+            .UseNpgsql(dataSource, o => o.UseVector())
             .UseSnakeCaseNamingConvention();
 
         return new AppDbContext(

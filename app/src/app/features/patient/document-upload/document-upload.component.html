@@ -178,82 +178,96 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- ── Upload History ───────────────────────────────────────────────────── -->
-  <mat-card class="history-card">
-    <mat-card-header>
-      <mat-card-title>Upload History</mat-card-title>
-    </mat-card-header>
+  <!-- ── Upload History — deferred until browser is idle (not on LCP paint path) ── -->
+  @defer (on idle) {
+    <mat-card class="history-card">
+      <mat-card-header>
+        <mat-card-title>Upload History</mat-card-title>
+      </mat-card-header>
 
-    <mat-card-content>
-      <!-- Loading indicator -->
-      @if (store.loadingHistory()) {
-        <mat-progress-bar
-          mode="indeterminate"
-          aria-label="Loading upload history"
-        ></mat-progress-bar>
-      }
+      <mat-card-content>
+        <!-- Loading indicator -->
+        @if (store.loadingHistory()) {
+          <mat-progress-bar
+            mode="indeterminate"
+            aria-label="Loading upload history"
+          ></mat-progress-bar>
+        }
 
-      <!-- Empty state -->
-      @else if (store.uploadHistory().length === 0) {
-        <p class="empty-state">No documents uploaded yet.</p>
-      }
+        <!-- Empty state -->
+        @else if (store.uploadHistory().length === 0) {
+          <p class="empty-state">No documents uploaded yet.</p>
+        }
 
-      <!-- History table -->
-      @else {
-        <table
-          mat-table
-          [dataSource]="store.uploadHistory()"
-          class="history-table"
-          aria-label="Document upload history"
-        >
-          <!-- File Name Column -->
-          <ng-container matColumnDef="fileName">
-            <th mat-header-cell *matHeaderCellDef scope="col">File Name</th>
-            <td mat-cell *matCellDef="let doc" class="cell-filename">
-              <mat-icon class="cell-icon" aria-hidden="true"
-                >picture_as_pdf</mat-icon
-              >
-              {{ doc.fileName }}
-            </td>
-          </ng-container>
+        <!-- History table -->
+        @else {
+          <table
+            mat-table
+            [dataSource]="store.uploadHistory()"
+            class="history-table"
+            aria-label="Document upload history"
+          >
+            <!-- File Name Column -->
+            <ng-container matColumnDef="fileName">
+              <th mat-header-cell *matHeaderCellDef scope="col">File Name</th>
+              <td mat-cell *matCellDef="let doc" class="cell-filename">
+                <mat-icon class="cell-icon" aria-hidden="true"
+                  >picture_as_pdf</mat-icon
+                >
+                {{ doc.fileName }}
+              </td>
+            </ng-container>
 
-          <!-- Upload Date Column -->
-          <ng-container matColumnDef="uploadedAt">
-            <th mat-header-cell *matHeaderCellDef scope="col">Upload Date</th>
-            <td mat-cell *matCellDef="let doc">
-              {{ doc.uploadedAt | date: "dd MMM yyyy, HH:mm" }}
-            </td>
-          </ng-container>
+            <!-- Upload Date Column -->
+            <ng-container matColumnDef="uploadedAt">
+              <th mat-header-cell *matHeaderCellDef scope="col">Upload Date</th>
+              <td mat-cell *matCellDef="let doc">
+                {{ doc.uploadedAt | date: "dd MMM yyyy, HH:mm" }}
+              </td>
+            </ng-container>
 
-          <!-- File Size Column -->
-          <ng-container matColumnDef="fileSize">
-            <th mat-header-cell *matHeaderCellDef scope="col">Size</th>
-            <td mat-cell *matCellDef="let doc">
-              {{ formatFileSize(doc.fileSize) }}
-            </td>
-          </ng-container>
+            <!-- File Size Column -->
+            <ng-container matColumnDef="fileSize">
+              <th mat-header-cell *matHeaderCellDef scope="col">Size</th>
+              <td mat-cell *matCellDef="let doc">
+                {{ formatFileSize(doc.fileSize) }}
+              </td>
+            </ng-container>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="processingStatus">
-            <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
-            <td mat-cell *matCellDef="let doc">
-              <span
-                class="status-chip"
-                [class.chip--pending]="doc.processingStatus === 'Pending'"
-                [class.chip--processing]="doc.processingStatus === 'Processing'"
-                [class.chip--completed]="doc.processingStatus === 'Completed'"
-                [class.chip--failed]="doc.processingStatus === 'Failed'"
-                [attr.aria-label]="'Processing status: ' + doc.processingStatus"
-              >
-                {{ doc.processingStatus }}
-              </span>
-            </td>
-          </ng-container>
+            <!-- Status Column -->
+            <ng-container matColumnDef="processingStatus">
+              <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
+              <td mat-cell *matCellDef="let doc">
+                <span
+                  class="status-chip"
+                  [class.chip--pending]="doc.processingStatus === 'Pending'"
+                  [class.chip--processing]="
+                    doc.processingStatus === 'Processing'
+                  "
+                  [class.chip--completed]="doc.processingStatus === 'Completed'"
+                  [class.chip--failed]="doc.processingStatus === 'Failed'"
+                  [attr.aria-label]="
+                    'Processing status: ' + doc.processingStatus
+                  "
+                >
+                  {{ doc.processingStatus }}
+                </span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: historyColumns"></tr>
-        </table>
-      }
-    </mat-card-content>
-  </mat-card>
+            <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: historyColumns"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  } @placeholder {
+    <!-- Fixed height prevents CLS while the history table is loading (NFR-012 / CLS <0.1) -->
+    <div
+      class="history-placeholder"
+      style="height: 200px"
+      aria-busy="true"
+      aria-label="Loading upload history"
+    ></div>
+  }
 </main>

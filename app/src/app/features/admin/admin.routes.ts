@@ -20,6 +20,15 @@ export const adminRoutes: Routes = [
     title: 'Audit Log — Propel IQ Admin',
   },
   {
+    path: 'ai-metrics',
+    loadComponent: () =>
+      import('./pages/ai-metrics/ai-metrics-dashboard.page').then(
+        (m) => m.AiMetricsDashboardPageComponent,
+      ),
+    canActivate: [adminGuard],
+    title: 'AI Metrics Dashboard — Propel IQ Admin',
+  },
+  {
     path: '',
     redirectTo: 'users',
     pathMatch: 'full',

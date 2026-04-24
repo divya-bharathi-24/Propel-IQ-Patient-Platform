@@ -73,6 +73,44 @@ public sealed class ExtractedDataConfiguration : IEntityTypeConfiguration<Extrac
         // TEMPORARY: Ignore the Embedding property until pgvector is installed
         builder.Ignore(e => e.Embedding);
 
+        // PriorityReview flag — set to true by orchestrator when confidence < 0.80 (AIR-003, task_005).
+        // Default false ensures existing rows without an explicit confidence review are not flagged.
+        builder.Property(e => e.PriorityReview)
+               .IsRequired()
+               .HasDefaultValue(false);
+
+        // ── De-duplication fields (us_041/task_003) ──────────────────────────
+        // IsCanonical: true = highest-confidence representative of its similarity cluster (AC-1).
+        // Default false — set by PatientDeduplicationService after the pipeline completes.
+        builder.Property(e => e.IsCanonical)
+               .IsRequired()
+               .HasDefaultValue(false);
+
+        // CanonicalGroupId: links all members of a similarity cluster to the canonical record.
+        // Nullable — null for Unprocessed records and standalone fields with no similar peers.
+        builder.Property(e => e.CanonicalGroupId)
+               .IsRequired(false);
+
+        // DeduplicationStatus: Unprocessed / Canonical / Duplicate / FallbackManual.
+        // Stored as string for human-readable audit logs; default = Unprocessed.
+        builder.Property(e => e.DeduplicationStatus)
+               .HasConversion<string>()
+               .HasMaxLength(30)
+               .IsRequired()
+               .HasDefaultValue(Propel.Domain.Enums.DeduplicationStatus.Unprocessed);
+
+        // Index on (patient_id, deduplication_status) — enables fast pipeline re-query
+        // of all Unprocessed/FallbackManual fields for a given patient.
+        builder.HasIndex(e => new { e.PatientId, e.DeduplicationStatus })
+               .HasDatabaseName("ix_extracted_data_patient_dedup_status");
+
+        // Partial index: patient-scoped canonical lookup used by the 360-degree aggregation
+        // query (task_002 GetAggregated360ViewAsync). Only indexes rows where IsCanonical = true,
+        // so the planner can quickly find the representative record for each field group (AC-1).
+        builder.HasIndex(e => new { e.PatientId, e.IsCanonical })
+               .HasDatabaseName("ix_extracted_data_patient_id_is_canonical")
+               .HasFilter("is_canonical = true");
+
         // Composite index for document-scoped extraction queries
         builder.HasIndex(e => new { e.DocumentId, e.DataType })
                .HasDatabaseName("ix_extracted_data_document_type");

@@ -39,6 +39,14 @@ public sealed class AiSettings
     public string RiskAssessmentPromptVersion { get; set; } = "v1";
 
     /// <summary>
+    /// Clinical extraction prompt template version (AIR-O03, US_040, task_003).
+    /// Resolved to <c>Prompts/clinical-extraction-{ExtractionPromptVersion}.yaml</c> at runtime;
+    /// falls back to <c>Prompts/clinical-extraction.yaml</c> for the default version.
+    /// Override via env var <c>Ai__ExtractionPromptVersion</c>.
+    /// </summary>
+    public string ExtractionPromptVersion { get; set; } = "v1";
+
+    /// <summary>
     /// Number of consecutive failures before the circuit breaker opens (AIR-O02). Default: 3.
     /// Maps to <c>CircuitBreakerStrategyOptions.MinimumThroughput</c>.
     /// </summary>
@@ -56,4 +64,12 @@ public sealed class AiSettings
     /// OWASP A05: never defaults to Azure in dev to avoid accidental production key usage.
     /// </summary>
     public bool UseAzureOpenAI { get; set; } = false;
+
+    /// <summary>
+    /// De-duplication prompt template version (AIR-O03, EP-008-I/us_041, task_003).
+    /// Resolved to <c>Prompts/deduplication/deduplication-system.txt</c> and
+    /// <c>Prompts/deduplication/deduplication-user.txt</c> at runtime.
+    /// Override via env var <c>Ai__DeduplicationPromptVersion</c> without redeployment.
+    /// </summary>
+    public string DeduplicationPromptVersion { get; set; } = "v1";
 }

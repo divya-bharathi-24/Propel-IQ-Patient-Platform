@@ -264,3 +264,12 @@ D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net1
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Microsoft.Kiota.Serialization.Multipart.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Microsoft.Kiota.Serialization.Text.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Std.UriTemplate.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\clinical-extraction.yaml
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\deduplication\deduplication-system.txt
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\deduplication\deduplication-user.txt
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Guardrails\deduplication-guardrails.json
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\medical-coding\cpt-suggestion.yaml
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\medical-coding\icd10-suggestion.yaml
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Prompts\conflict-detection\detect-conflicts.yaml
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Google.Protobuf.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Api.Gateway\bin\Debug\net10.0\Microsoft.ML.Tokenizers.dll

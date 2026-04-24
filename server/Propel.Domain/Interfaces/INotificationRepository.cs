@@ -119,4 +119,21 @@ public interface INotificationRepository
     Task<Notification?> GetLatestManualReminderAsync(
         Guid appointmentId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns all <see cref="Notification"/> records eligible for retry by
+    /// <c>NotificationRetryBackgroundService</c> (US_052, AC-2):
+    /// <list type="bullet">
+    ///   <item><c>Status == Pending</c></item>
+    ///   <item><c>RetryCount &lt; <paramref name="maxRetries"/></c></item>
+    ///   <item><c>ScheduledAt IS NULL</c> — distinguishes fire-and-try booking/confirmation
+    ///         notifications from scheduler-managed reminder records.</item>
+    /// </list>
+    /// The caller is responsible for applying the per-record exponential backoff filter
+    /// (<c>4^retryCount</c> minutes since <c>LastRetryAt</c>) in-memory after fetching.
+    /// All queries are parameterised LINQ — no raw SQL interpolation (OWASP A03).
+    /// </summary>
+    Task<IReadOnlyList<Notification>> GetRetryEligibleBookingNotificationsAsync(
+        int maxRetries,
+        CancellationToken cancellationToken = default);
 }

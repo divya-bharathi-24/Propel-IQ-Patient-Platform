@@ -28,12 +28,12 @@
 
 ## Applicable Technology Stack
 
-| Layer    | Technology                            | Version |
-| -------- | ------------------------------------- | ------- |
-| Backend  | ASP.NET Core Web API / .NET           | 9       |
-| Health   | Microsoft.Extensions.Diagnostics.HealthChecks | 9.x |
-| Cache    | Upstash Redis (StackExchange.Redis)   | Serverless |
-| Logging  | Serilog                               | 4.x     |
+| Layer   | Technology                                    | Version    |
+| ------- | --------------------------------------------- | ---------- |
+| Backend | ASP.NET Core Web API / .NET                   | 9          |
+| Health  | Microsoft.Extensions.Diagnostics.HealthChecks | 9.x        |
+| Cache   | Upstash Redis (StackExchange.Redis)           | Serverless |
+| Logging | Serilog                                       | 4.x        |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -83,17 +83,17 @@ A `DatabaseUnavailableHealthCheck` also writes a Redis flag `platform:health:db_
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `PostgreSqlHealthCheck` (new) | Infrastructure | CREATE — pings `ApplicationDbContext` via `_context.Database.CanConnectAsync()`; sets Redis `platform:health:db_down` flag on failure |
-| `RedisHealthCheck` (new) | Infrastructure | CREATE — `IDatabase.PingAsync()` with 5-second timeout |
-| `SendGridHealthCheck` (new) | Infrastructure | CREATE — HTTP HEAD to `https://api.sendgrid.com/v3/scopes` with API key; no email sent |
-| `TwilioHealthCheck` (new) | Infrastructure | CREATE — HTTP HEAD to `https://api.twilio.com/2010-04-01/Accounts/{AccountSid}` with Basic auth; no SMS sent |
-| `OpenAiHealthCheck` (new) | Infrastructure | CREATE — HTTP GET to `https://api.openai.com/v1/models` (lightweight list endpoint) with Bearer token; checks HTTP 200 |
+| Component                         | Module         | Action                                                                                                                                                                                        |
+| --------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PostgreSqlHealthCheck` (new)     | Infrastructure | CREATE — pings `ApplicationDbContext` via `_context.Database.CanConnectAsync()`; sets Redis `platform:health:db_down` flag on failure                                                         |
+| `RedisHealthCheck` (new)          | Infrastructure | CREATE — `IDatabase.PingAsync()` with 5-second timeout                                                                                                                                        |
+| `SendGridHealthCheck` (new)       | Infrastructure | CREATE — HTTP HEAD to `https://api.sendgrid.com/v3/scopes` with API key; no email sent                                                                                                        |
+| `TwilioHealthCheck` (new)         | Infrastructure | CREATE — HTTP HEAD to `https://api.twilio.com/2010-04-01/Accounts/{AccountSid}` with Basic auth; no SMS sent                                                                                  |
+| `OpenAiHealthCheck` (new)         | Infrastructure | CREATE — HTTP GET to `https://api.openai.com/v1/models` (lightweight list endpoint) with Bearer token; checks HTTP 200                                                                        |
 | `GoogleCalendarHealthCheck` (new) | Infrastructure | CREATE — HTTP HEAD to `https://www.googleapis.com/calendar/v3/users/me/calendarList`; OAuth token from config; returns `Degraded` (not `Unhealthy`) if unavailable — calendar is non-critical |
-| `MicrosoftGraphHealthCheck` (new) | Infrastructure | CREATE — HTTP GET `https://graph.microsoft.com/v1.0/$metadata`; returns `Degraded` if unavailable |
-| `HealthCheckResponseWriter` (new) | API | CREATE — custom `Func<HttpContext, HealthReport, Task>` that serialises `HealthReport` to structured JSON |
-| `Program.cs` (existing) | API | MODIFY — register all 7 health checks; map `/health` with custom writer; map `/health/live` (liveness probe — DB only) |
+| `MicrosoftGraphHealthCheck` (new) | Infrastructure | CREATE — HTTP GET `https://graph.microsoft.com/v1.0/$metadata`; returns `Degraded` if unavailable                                                                                             |
+| `HealthCheckResponseWriter` (new) | API            | CREATE — custom `Func<HttpContext, HealthReport, Task>` that serialises `HealthReport` to structured JSON                                                                                     |
+| `Program.cs` (existing)           | API            | MODIFY — register all 7 health checks; map `/health` with custom writer; map `/health/live` (liveness probe — DB only)                                                                        |
 
 ---
 
@@ -271,17 +271,17 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Infrastructure/HealthChecks/PostgreSqlHealthCheck.cs` | `IHealthCheck`: `CanConnectAsync`; sets Redis `platform:health:db_down` on failure; `Log.Critical` |
-| CREATE | `Server/Infrastructure/HealthChecks/RedisHealthCheck.cs` | `IHealthCheck`: `IDatabase.PingAsync()` with 5-second timeout |
-| CREATE | `Server/Infrastructure/HealthChecks/SendGridHealthCheck.cs` | `IHealthCheck`: HTTP HEAD to SendGrid scopes endpoint; API key from `IOptions` |
-| CREATE | `Server/Infrastructure/HealthChecks/TwilioHealthCheck.cs` | `IHealthCheck`: HTTP HEAD to Twilio Accounts endpoint; Basic auth from `IOptions` |
-| CREATE | `Server/Infrastructure/HealthChecks/OpenAiHealthCheck.cs` | `IHealthCheck`: HTTP GET to OpenAI models list; Bearer token from `IOptions` |
-| CREATE | `Server/Infrastructure/HealthChecks/GoogleCalendarHealthCheck.cs` | `IHealthCheck`: HTTP HEAD to Google Calendar API; `Degraded` (not `Unhealthy`) on failure |
-| CREATE | `Server/Infrastructure/HealthChecks/MicrosoftGraphHealthCheck.cs` | `IHealthCheck`: HTTP GET to Graph `$metadata`; `Degraded` on failure |
-| CREATE | `Server/API/HealthChecks/HealthCheckResponseWriter.cs` | Custom writer: structured JSON with no credentials/internals in output |
-| MODIFY | `Server/API/Program.cs` | Register all 7 checks; map `/health` + `/health/live`; configure `ResultStatusCodes` |
+| Action | File Path                                                         | Description                                                                                        |
+| ------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Infrastructure/HealthChecks/PostgreSqlHealthCheck.cs`     | `IHealthCheck`: `CanConnectAsync`; sets Redis `platform:health:db_down` on failure; `Log.Critical` |
+| CREATE | `Server/Infrastructure/HealthChecks/RedisHealthCheck.cs`          | `IHealthCheck`: `IDatabase.PingAsync()` with 5-second timeout                                      |
+| CREATE | `Server/Infrastructure/HealthChecks/SendGridHealthCheck.cs`       | `IHealthCheck`: HTTP HEAD to SendGrid scopes endpoint; API key from `IOptions`                     |
+| CREATE | `Server/Infrastructure/HealthChecks/TwilioHealthCheck.cs`         | `IHealthCheck`: HTTP HEAD to Twilio Accounts endpoint; Basic auth from `IOptions`                  |
+| CREATE | `Server/Infrastructure/HealthChecks/OpenAiHealthCheck.cs`         | `IHealthCheck`: HTTP GET to OpenAI models list; Bearer token from `IOptions`                       |
+| CREATE | `Server/Infrastructure/HealthChecks/GoogleCalendarHealthCheck.cs` | `IHealthCheck`: HTTP HEAD to Google Calendar API; `Degraded` (not `Unhealthy`) on failure          |
+| CREATE | `Server/Infrastructure/HealthChecks/MicrosoftGraphHealthCheck.cs` | `IHealthCheck`: HTTP GET to Graph `$metadata`; `Degraded` on failure                               |
+| CREATE | `Server/API/HealthChecks/HealthCheckResponseWriter.cs`            | Custom writer: structured JSON with no credentials/internals in output                             |
+| MODIFY | `Server/API/Program.cs`                                           | Register all 7 checks; map `/health` + `/health/live`; configure `ResultStatusCodes`               |
 
 ---
 
@@ -313,8 +313,8 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `PostgreSqlHealthCheck`: `CanConnectAsync()`; set Redis `platform:health:db_down` (60-second TTL) + `Log.Critical` on failure
-- [ ] Create `RedisHealthCheck`: `IDatabase.PingAsync()` with 5-second timeout; `Degraded` on timeout/exception
-- [ ] Create HTTP-based checks for SendGrid, Twilio, OpenAI, Google Calendar, Microsoft Graph: `IHttpClientFactory`; credentials from `IOptions`; all return `Degraded` on failure; response JSON exposes no credential data
-- [ ] Create `HealthCheckResponseWriter`: structured JSON output; no `ExceptionMessage`, no `Data` dictionary in output
-- [ ] Modify `Program.cs`: register all 7 checks with correct `failureStatus` (only PostgreSQL = `Unhealthy`); map `/health` + `/health/live`; configure `ResultStatusCodes` (Degraded → 200, Unhealthy → 503)
+- [x] Create `PostgreSqlHealthCheck`: `CanConnectAsync()`; set Redis `platform:health:db_down` (60-second TTL) + `Log.Fatal` on failure
+- [x] Create `RedisHealthCheck`: `IDatabase.PingAsync()` with 5-second timeout; `Degraded` on timeout/exception
+- [x] Create HTTP-based checks for SendGrid, Twilio, OpenAI, Google Calendar, Microsoft Graph: `IHttpClientFactory`; credentials from `IOptions`; all return `Degraded` on failure; response JSON exposes no credential data
+- [x] Create `HealthCheckResponseWriter`: structured JSON output; no `ExceptionMessage`, no `Data` dictionary in output
+- [x] Modify `Program.cs`: register all 7 checks with correct `failureStatus` (only PostgreSQL = `Unhealthy`); map `/health` + `/health/live`; configure `ResultStatusCodes` (Degraded → 200, Unhealthy → 503)

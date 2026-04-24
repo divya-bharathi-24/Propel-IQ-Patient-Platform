@@ -7,4 +7,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- MediatR: required for ICommand / IQuery CQRS marker interfaces (EP-011/us_051/task_002, TR-019) -->
+    <PackageReference Include="MediatR" Version="12.*" />
+  </ItemGroup>
+
 </Project>

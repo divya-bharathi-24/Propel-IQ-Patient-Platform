@@ -217,12 +217,12 @@ app/
 
 ## Implementation Checklist
 
-- [ ] Create `ClinicalConflictStore`: `conflicts`, `unresolvedCriticalCount` computed, `resolveConflict` method
-- [ ] Create `ConflictService`: `getConflicts` and `resolveConflict` HTTP methods
-- [ ] Create `ConflictHighlightDirective`: severity input → CSS class on host element
-- [ ] Create `ConflictResolutionFormComponent`: radio group (value1/value2/custom) + conditional custom input + submit
-- [ ] Create `ConflictCardComponent`: severity badge, side-by-side values, embeds resolution form
-- [ ] Create `UnresolvedCriticalBlockerModalComponent`: MatDialog listing unresolved Critical conflicts
-- [ ] Extend `Patient360ViewPageComponent`: populate conflict store, apply directive, render cards, gate Verify button
-- [ ] Add `canVerify` computed signal to `clinical-360.store.ts`
-- [ ] Add `.conflict-critical` and `.conflict-warning` CSS classes to `clinical.styles.scss`
+- [x] Create `ClinicalConflictStore`: `conflicts`, `unresolvedCriticalCount` computed, `resolveConflict` method
+- [x] Create `ConflictService`: `getConflicts` and `resolveConflict` HTTP methods
+- [x] Create `ConflictHighlightDirective`: severity input → CSS class on host element
+- [x] Create `ConflictResolutionFormComponent`: radio group (value1/value2/custom) + conditional custom input + submit
+- [x] Create `ConflictCardComponent`: severity badge, side-by-side values, embeds resolution form
+- [x] Create `UnresolvedCriticalBlockerModalComponent`: MatDialog listing unresolved Critical conflicts
+- [x] Extend `Patient360ViewPageComponent`: populate conflict store, apply directive, render cards, gate Verify button
+- [x] Add `canVerify` computed signal to `clinical-360.store.ts`
+- [x] Add `.conflict-critical` and `.conflict-warning` CSS classes to `clinical.styles.scss`

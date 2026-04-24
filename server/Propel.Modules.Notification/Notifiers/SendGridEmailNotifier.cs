@@ -111,4 +111,128 @@ public sealed class SendGridEmailNotifier : IEmailNotifier
             return new NotifierResult(IsSuccess: false, ErrorMessage: ex.Message);
         }
     }
+
+    /// <inheritdoc/>
+    public async Task<NotifierResult> SendExtractionCompleteAsync(
+        string toEmail,
+        string patientName,
+        string documentName,
+        CancellationToken cancellationToken = default)
+    {
+        string? apiKey = _configuration["SendGrid:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            _logger.LogWarning(
+                "SendGrid:ApiKey is not configured. Extraction-complete email was not sent.");
+            return new NotifierResult(IsSuccess: false, ErrorMessage: "SendGrid:ApiKey not configured.");
+        }
+
+        string fromEmail = _configuration["SendGrid:FromEmail"] ?? "noreply@propeliq.app";
+        string fromName  = _configuration["SendGrid:FromName"]  ?? "PropelIQ";
+
+        // HtmlEncode all patient-supplied values written into HTML to prevent XSS (OWASP A03).
+        string encodedName = System.Net.WebUtility.HtmlEncode(patientName);
+        string encodedDoc  = System.Net.WebUtility.HtmlEncode(documentName);
+
+        string subject  = "Your clinical document has been processed";
+        string htmlBody =
+            $"<p>Hi {encodedName},</p>" +
+            $"<p>Your document <strong>{encodedDoc}</strong> has been successfully processed " +
+            "and your clinical data has been extracted.</p>" +
+            "<p>You can review the extracted information in your patient portal.</p>" +
+            "<p>PropelIQ Team</p>";
+        string textBody =
+            $"Hi {patientName},\n\n" +
+            $"Your document \"{documentName}\" has been successfully processed " +
+            "and your clinical data has been extracted.\n\n" +
+            "You can review the extracted information in your patient portal.\n\n" +
+            "PropelIQ Team";
+
+        return await SendEmailAsync(apiKey, fromEmail, fromName, toEmail, patientName, subject, textBody, htmlBody, "extraction-complete", cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<NotifierResult> SendExtractionFailureAsync(
+        string toEmail,
+        string patientName,
+        string documentName,
+        CancellationToken cancellationToken = default)
+    {
+        string? apiKey = _configuration["SendGrid:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            _logger.LogWarning(
+                "SendGrid:ApiKey is not configured. Extraction-failure email was not sent.");
+            return new NotifierResult(IsSuccess: false, ErrorMessage: "SendGrid:ApiKey not configured.");
+        }
+
+        string fromEmail = _configuration["SendGrid:FromEmail"] ?? "noreply@propeliq.app";
+        string fromName  = _configuration["SendGrid:FromName"]  ?? "PropelIQ";
+
+        // HtmlEncode all patient-supplied values written into HTML to prevent XSS (OWASP A03).
+        string encodedName = System.Net.WebUtility.HtmlEncode(patientName);
+        string encodedDoc  = System.Net.WebUtility.HtmlEncode(documentName);
+
+        string subject  = "Action required: Please re-upload your clinical document";
+        string htmlBody =
+            $"<p>Hi {encodedName},</p>" +
+            $"<p>We were unable to extract data from your document <strong>{encodedDoc}</strong> " +
+            "because it does not contain a text layer (image-only or scanned PDF).</p>" +
+            "<p>Please re-upload a text-based PDF so our system can process it.</p>" +
+            "<p>If you need assistance, please contact our support team.</p>" +
+            "<p>PropelIQ Team</p>";
+        string textBody =
+            $"Hi {patientName},\n\n" +
+            $"We were unable to extract data from your document \"{documentName}\" " +
+            "because it does not contain a text layer (image-only or scanned PDF).\n\n" +
+            "Please re-upload a text-based PDF so our system can process it.\n\n" +
+            "If you need assistance, please contact our support team.\n\n" +
+            "PropelIQ Team";
+
+        return await SendEmailAsync(apiKey, fromEmail, fromName, toEmail, patientName, subject, textBody, htmlBody, "extraction-failure", cancellationToken);
+    }
+
+    private async Task<NotifierResult> SendEmailAsync(
+        string apiKey,
+        string fromEmail,
+        string fromName,
+        string toEmail,
+        string toName,
+        string subject,
+        string textBody,
+        string htmlBody,
+        string context,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var client   = new SendGridClient(apiKey);
+            var from     = new EmailAddress(fromEmail, fromName);
+            var to       = new EmailAddress(toEmail, toName);
+            var msg      = MailHelper.CreateSingleEmail(from, to, subject, textBody, htmlBody);
+
+            var response = await client.SendEmailAsync(msg, cancellationToken);
+
+            if ((int)response.StatusCode >= 400)
+            {
+                string body = await response.Body.ReadAsStringAsync(cancellationToken);
+                _logger.LogError(
+                    "SendGrid returned {StatusCode} for {Context} email. Response: {Body}",
+                    (int)response.StatusCode, context, body);
+                return new NotifierResult(
+                    IsSuccess: false,
+                    ErrorMessage: $"SendGrid status {(int)response.StatusCode}");
+            }
+
+            _logger.LogInformation(
+                "Email sent via SendGrid for context={Context} (status {StatusCode}).",
+                context, (int)response.StatusCode);
+            return new NotifierResult(IsSuccess: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error sending {Context} email.", context);
+            return new NotifierResult(IsSuccess: false, ErrorMessage: ex.Message);
+        }
+    }
 }

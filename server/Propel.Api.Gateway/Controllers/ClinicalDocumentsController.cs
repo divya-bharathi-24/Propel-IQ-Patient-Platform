@@ -19,15 +19,18 @@ public sealed class ClinicalDocumentsController : ControllerBase
 {
     /// <summary>
     /// Uploads a batch of PDF clinical documents for the authenticated patient (US_038, AC-2, FR-041).
-    /// Validates each file independently: PDF MIME type, ≤ 25 MB per file, PDF magic bytes.
-    /// Encrypts each file at rest (AES-256, NFR-004, FR-043) before persisting.
-    /// Supports partial batch: valid files in the batch are stored even when other files fail (AC-4).
+    /// Validates each file independently at the action level (content-type, ≤ 50 MB, NFR-019) before
+    /// forwarding to the handler (PDF magic bytes, AES-256 encryption, partial batch semantics — AC-4).
     /// Returns <c>200 OK</c> when all files succeed; <c>207 Multi-Status</c> when any file fails.
+    /// Returns <c>400 Bad Request</c> when any individual file exceeds 50 MB or is not a PDF.
     /// Returns <c>503 Service Unavailable</c> when document storage is unavailable (edge case — no records created).
     /// </summary>
-    /// <param name="files">Multipart form-data collection of PDF files (max 20, each ≤ 25 MB — FR-042).</param>
+    /// <param name="files">Multipart form-data collection of PDF files (max 20, each ≤ 50 MB — NFR-019).</param>
     /// <param name="mediator">MediatR sender injected by ASP.NET Core minimal DI.</param>
     /// <param name="cancellationToken">Propagated from ASP.NET Core request pipeline.</param>
+    /// <summary>Maximum individual file size accepted by this endpoint: 50 MB = 52,428,800 bytes (NFR-019, AC-4).</summary>
+    private const long MaxIndividualFileSizeBytes = 52_428_800L; // 50 MB
+
     [HttpPost("upload")]
     [RequestSizeLimit(524_288_000)]         // 500 MB absolute cap: 20 × 25 MB ceiling + multipart overhead
     [RequestFormLimits(MultipartBodyLengthLimit = 524_288_000)]
@@ -43,6 +46,19 @@ public sealed class ClinicalDocumentsController : ControllerBase
         ISender mediator,
         CancellationToken cancellationToken)
     {
+        // AC-4 / NFR-019 — Reject any single file that exceeds 50 MB before the handler
+        // allocates memory. Checked here (action level) in addition to handler validation
+        // so oversized individual files are rejected with a clear 400 without entering MediatR.
+        foreach (var f in files)
+        {
+            if (!string.Equals(f.ContentType, "application/pdf", StringComparison.OrdinalIgnoreCase)
+                || !f.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                return BadRequest($"File '{f.FileName}' is not a PDF. Only PDF files are accepted.");
+
+            if (f.Length > MaxIndividualFileSizeBytes)
+                return BadRequest($"File '{f.FileName}' exceeds the 50 MB per-file limit.");
+        }
+
         // OWASP A01 — patientId sourced exclusively from JWT NameIdentifier; never from request body.
         var patientId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 

@@ -27,10 +27,10 @@
 
 ## Applicable Technology Stack
 
-| Layer    | Technology              | Version |
-| -------- | ----------------------- | ------- |
-| ORM      | Entity Framework Core   | 9.x     |
-| Database | PostgreSQL              | 16+     |
+| Layer    | Technology            | Version |
+| -------- | --------------------- | ------- |
+| ORM      | Entity Framework Core | 9.x     |
+| Database | PostgreSQL            | 16+     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -63,6 +63,7 @@
 ## Task Overview
 
 Create the `AiPromptAuditLog` PostgreSQL table via EF Core code-first migration. The table is separate from the general `AuditLog` table (US_008) because:
+
 - Prompt + response text can be large (up to 8,000 tokens each) — keeping them out of the general audit log prevents bloating shared queries.
 - Access pattern differs: AI prompt logs are queried by `userId` + `recordedAt` range or `sessionId`, not by `entityType` + `actionType`.
 
@@ -78,12 +79,12 @@ The entity uses `init` accessors throughout (INSERT-only enforcement at applicat
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `AiPromptAuditLog` entity (new) | Domain | CREATE — EF Core entity: 11 columns, all `init`, immutable |
-| `AiPromptAuditLogConfiguration` (new) | Infrastructure | CREATE — EF Core Fluent API: table name, column types, 3 indexes |
-| `AddAiPromptAuditLogTable` migration (new) | Infrastructure | CREATE — EF Core migration: CREATE TABLE + 3 CREATE INDEX |
-| `ApplicationDbContext` (existing) | Infrastructure | MODIFY — Add `DbSet<AiPromptAuditLog> AiPromptAuditLogs` |
+| Component                                  | Module         | Action                                                           |
+| ------------------------------------------ | -------------- | ---------------------------------------------------------------- |
+| `AiPromptAuditLog` entity (new)            | Domain         | CREATE — EF Core entity: 11 columns, all `init`, immutable       |
+| `AiPromptAuditLogConfiguration` (new)      | Infrastructure | CREATE — EF Core Fluent API: table name, column types, 3 indexes |
+| `AddAiPromptAuditLogTable` migration (new) | Infrastructure | CREATE — EF Core migration: CREATE TABLE + 3 CREATE INDEX        |
+| `ApplicationDbContext` (existing)          | Infrastructure | MODIFY — Add `DbSet<AiPromptAuditLog> AiPromptAuditLogs`         |
 
 ---
 
@@ -150,12 +151,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Domain/AiPromptAuditLog.cs` | Immutable entity: 11 columns, all `init` accessors |
+| Action | File Path                                                                           | Description                                                                          |
+| ------ | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| CREATE | `Server/Domain/AiPromptAuditLog.cs`                                                 | Immutable entity: 11 columns, all `init` accessors                                   |
 | CREATE | `Server/Infrastructure/Persistence/Configurations/AiPromptAuditLogConfiguration.cs` | Fluent API: column types, 2 EF-managed indexes (partial index via raw migration SQL) |
-| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDD_AddAiPromptAuditLogTable.cs` | EF Core migration: CREATE TABLE + 3 indexes (incl. 1 partial) |
-| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs` | Add `DbSet<AiPromptAuditLog> AiPromptAuditLogs` |
+| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDD_AddAiPromptAuditLogTable.cs` | EF Core migration: CREATE TABLE + 3 indexes (incl. 1 partial)                        |
+| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs`                         | Add `DbSet<AiPromptAuditLog> AiPromptAuditLogs`                                      |
 
 ---
 
@@ -179,20 +180,20 @@ Server/
 
 ## Implementation Validation Strategy
 
-- [ ] EF Core migration applies cleanly to local PostgreSQL 16 instance
-- [ ] `AiPromptAuditLogs` table created with all 11 columns and correct types (`text`, `timestamptz`, `boolean`, `uuid`)
-- [ ] `IX_AiPromptAuditLogs_RecordedAt_Id` composite descending index exists; verified via `\d "AiPromptAuditLogs"` in psql
-- [ ] `IX_AiPromptAuditLogs_UserId` index exists
-- [ ] `IX_AiPromptAuditLogs_Blocked` partial index exists and is used in `EXPLAIN ANALYZE` for `WHERE "ContentFilterBlocked" = true`
-- [ ] `Down()` migration drops table and all three indexes cleanly
-- [ ] `AiPromptAuditLog` entity has only `init` accessors — no `set` accessor on any property
+- [x] EF Core migration applies cleanly to local PostgreSQL 16 instance
+- [x] `AiPromptAuditLogs` table created with all 11 columns and correct types (`text`, `timestamptz`, `boolean`, `uuid`)
+- [x] `IX_AiPromptAuditLogs_RecordedAt_Id` composite descending index exists; verified via `\d "AiPromptAuditLogs"` in psql
+- [x] `IX_AiPromptAuditLogs_UserId` index exists
+- [x] `IX_AiPromptAuditLogs_Blocked` partial index exists and is used in `EXPLAIN ANALYZE` for `WHERE "ContentFilterBlocked" = true`
+- [x] `Down()` migration drops table and all three indexes cleanly
+- [x] `AiPromptAuditLog` entity has only `init` accessors — no `set` accessor on any property
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Create `AiPromptAuditLog` entity: 11 columns, all `init`, immutable; `Response` and token counts nullable
-- [ ] Create `AiPromptAuditLogConfiguration`: column types (text, timestamptz), 2 EF-managed indexes; partial index noted for manual migration SQL
-- [ ] Add `DbSet<AiPromptAuditLog>` to `ApplicationDbContext`
-- [ ] Generate and review EF Core migration `AddAiPromptAuditLogTable` (Up + Down); add partial index SQL manually in `Up()`
-- [ ] Confirm composite index uses `DESC` direction on both `RecordedAt` and `Id` columns
+- [x] Create `AiPromptAuditLog` entity: 11 columns, all `init`, immutable; `Response` and token counts nullable
+- [x] Create `AiPromptAuditLogConfiguration`: column types (text, timestamptz), 2 EF-managed indexes; partial index noted for manual migration SQL
+- [x] Add `DbSet<AiPromptAuditLog>` to `ApplicationDbContext`
+- [x] Generate and review EF Core migration `AddAiPromptAuditLogTable` (Up + Down); add partial index SQL manually in `Up()`
+- [x] Confirm composite index uses `DESC` direction on both `RecordedAt` and `Id` columns

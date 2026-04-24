@@ -49,6 +49,12 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.*, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -401,6 +407,10 @@
               "target": "Package",
               "version": "[12.*, )"
             },
+            "Microsoft.ML.Tokenizers": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
             "Microsoft.SemanticKernel": {
               "target": "Package",
               "version": "[1.*, )"
@@ -420,6 +430,10 @@
             "Serilog": {
               "target": "Package",
               "version": "[4.*, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.*, )"
             }
           },
           "imports": [

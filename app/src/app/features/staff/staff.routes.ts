@@ -67,6 +67,24 @@ export const staffRoutes: Routes = [
     title: 'Patient Record — Propel IQ',
   },
   {
+    path: 'patients/:patientId/360-view',
+    loadComponent: () =>
+      import('./patients/patient-360-view/patient-360-view.component').then(
+        (m) => m.Patient360ViewComponent,
+      ),
+    canActivate: [authGuard, staffGuard],
+    title: '360° Patient View — Propel IQ',
+  },
+  {
+    path: 'patients/:patientId/medical-codes',
+    loadComponent: () =>
+      import('./patients/medical-code-review/medical-code-review.page').then(
+        (m) => m.MedicalCodeReviewPageComponent,
+      ),
+    canActivate: [authGuard, staffGuard],
+    title: 'Medical Code Review — Propel IQ',
+  },
+  {
     path: '',
     redirectTo: 'walkin',
     pathMatch: 'full',

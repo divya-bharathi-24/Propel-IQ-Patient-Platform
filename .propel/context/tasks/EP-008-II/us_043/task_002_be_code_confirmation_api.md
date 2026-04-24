@@ -31,14 +31,14 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology              | Version |
-| ------------------ | ----------------------- | ------- |
-| Backend            | ASP.NET Core Web API    | .net 10  |
-| Backend Messaging  | MediatR                 | 12.x    |
-| Backend Validation | FluentValidation        | 11.x    |
-| ORM                | Entity Framework Core   | 9.x     |
-| Database           | PostgreSQL              | 16+     |
-| Logging            | Serilog                 | 4.x     |
+| Layer              | Technology            | Version |
+| ------------------ | --------------------- | ------- |
+| Backend            | ASP.NET Core Web API  | .net 10 |
+| Backend Messaging  | MediatR               | 12.x    |
+| Backend Validation | FluentValidation      | 11.x    |
+| ORM                | Entity Framework Core | 9.x     |
+| Database           | PostgreSQL            | 16+     |
+| Logging            | Serilog               | 4.x     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -87,19 +87,19 @@ Implement two ASP.NET Core Web API endpoints that power the Staff medical code r
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `MedicalCodesController` (existing, from US_042) | Clinical Module | MODIFY — Add `POST /validate` and `POST /confirm` action methods |
-| `ValidateMedicalCodeCommand` (new) | Clinical Module | CREATE — MediatR command: `{ Code, CodeType }` |
-| `ValidateMedicalCodeCommandHandler` (new) | Clinical Module | CREATE — Checks code against ICD-10/CPT reference library; returns validation result |
-| `ValidateMedicalCodeCommandValidator` (new) | Clinical Module | CREATE — FluentValidation: `Code` non-empty, `CodeType` in (ICD10, CPT) |
-| `ConfirmMedicalCodesCommand` (new) | Clinical Module | CREATE — MediatR command: `{ PatientId, Accepted[], Rejected[], Manual[] }` |
-| `ConfirmMedicalCodesCommandHandler` (new) | Clinical Module | CREATE — Upserts MedicalCode rows, writes AuditLog per decision |
-| `ConfirmMedicalCodesCommandValidator` (new) | Clinical Module | CREATE — FluentValidation: `PatientId` non-empty; at least one list populated |
-| `CodeValidationResult` (new) | Shared Contracts | CREATE — Response DTO: `{ valid, codeType, normalizedCode, message? }` |
-| `ConfirmCodesResponse` (new) | Shared Contracts | CREATE — Response: `{ acceptedCount, rejectedCount, manualCount, pendingCount }` |
-| `IAuditLogRepository` (existing) | Infrastructure | MODIFY — Used to write per-code audit events (no schema change required) |
-| `ClinicalModuleRegistration` (existing) | DI Bootstrap | MODIFY — Register new commands, handlers, validators |
+| Component                                        | Module           | Action                                                                               |
+| ------------------------------------------------ | ---------------- | ------------------------------------------------------------------------------------ |
+| `MedicalCodesController` (existing, from US_042) | Clinical Module  | MODIFY — Add `POST /validate` and `POST /confirm` action methods                     |
+| `ValidateMedicalCodeCommand` (new)               | Clinical Module  | CREATE — MediatR command: `{ Code, CodeType }`                                       |
+| `ValidateMedicalCodeCommandHandler` (new)        | Clinical Module  | CREATE — Checks code against ICD-10/CPT reference library; returns validation result |
+| `ValidateMedicalCodeCommandValidator` (new)      | Clinical Module  | CREATE — FluentValidation: `Code` non-empty, `CodeType` in (ICD10, CPT)              |
+| `ConfirmMedicalCodesCommand` (new)               | Clinical Module  | CREATE — MediatR command: `{ PatientId, Accepted[], Rejected[], Manual[] }`          |
+| `ConfirmMedicalCodesCommandHandler` (new)        | Clinical Module  | CREATE — Upserts MedicalCode rows, writes AuditLog per decision                      |
+| `ConfirmMedicalCodesCommandValidator` (new)      | Clinical Module  | CREATE — FluentValidation: `PatientId` non-empty; at least one list populated        |
+| `CodeValidationResult` (new)                     | Shared Contracts | CREATE — Response DTO: `{ valid, codeType, normalizedCode, message? }`               |
+| `ConfirmCodesResponse` (new)                     | Shared Contracts | CREATE — Response: `{ acceptedCount, rejectedCount, manualCount, pendingCount }`     |
+| `IAuditLogRepository` (existing)                 | Infrastructure   | MODIFY — Used to write per-code audit events (no schema change required)             |
+| `ClinicalModuleRegistration` (existing)          | DI Bootstrap     | MODIFY — Register new commands, handlers, validators                                 |
 
 ---
 
@@ -154,18 +154,18 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommand.cs` | MediatR command: `Code`, `CodeType` |
-| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommandHandler.cs` | Validates against code reference library; returns `CodeValidationResult` |
-| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommandValidator.cs` | FluentValidation: non-empty code, valid codeType enum |
-| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommand.cs` | MediatR command: `PatientId`, `Accepted[]`, `Rejected[]`, `Manual[]` |
-| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommandHandler.cs` | Upserts MedicalCode rows, writes AuditLog per decision, returns pending count |
-| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommandValidator.cs` | FluentValidation: PatientId non-empty, at least one list populated |
-| CREATE | `Server/Shared/Contracts/CodeValidationResult.cs` | Response DTO: `valid`, `codeType`, `normalizedCode`, `message?` |
-| CREATE | `Server/Shared/Contracts/ConfirmCodesResponse.cs` | Response: `acceptedCount`, `rejectedCount`, `manualCount`, `pendingCount` |
-| MODIFY | `Server/Clinical/Controllers/MedicalCodesController.cs` | Add `POST /validate` and `POST /confirm` action methods |
-| MODIFY | `Server/DI/ClinicalModuleRegistration.cs` | Register new commands, handlers, validators |
+| Action | File Path                                                         | Description                                                                   |
+| ------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommand.cs`          | MediatR command: `Code`, `CodeType`                                           |
+| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommandHandler.cs`   | Validates against code reference library; returns `CodeValidationResult`      |
+| CREATE | `Server/Clinical/Commands/ValidateMedicalCodeCommandValidator.cs` | FluentValidation: non-empty code, valid codeType enum                         |
+| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommand.cs`          | MediatR command: `PatientId`, `Accepted[]`, `Rejected[]`, `Manual[]`          |
+| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommandHandler.cs`   | Upserts MedicalCode rows, writes AuditLog per decision, returns pending count |
+| CREATE | `Server/Clinical/Commands/ConfirmMedicalCodesCommandValidator.cs` | FluentValidation: PatientId non-empty, at least one list populated            |
+| CREATE | `Server/Shared/Contracts/CodeValidationResult.cs`                 | Response DTO: `valid`, `codeType`, `normalizedCode`, `message?`               |
+| CREATE | `Server/Shared/Contracts/ConfirmCodesResponse.cs`                 | Response: `acceptedCount`, `rejectedCount`, `manualCount`, `pendingCount`     |
+| MODIFY | `Server/Clinical/Controllers/MedicalCodesController.cs`           | Add `POST /validate` and `POST /confirm` action methods                       |
+| MODIFY | `Server/DI/ClinicalModuleRegistration.cs`                         | Register new commands, handlers, validators                                   |
 
 ---
 
@@ -206,11 +206,11 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `CodeValidationResult` and `ConfirmCodesResponse` shared contracts
-- [ ] Implement `ValidateMedicalCodeCommand` + handler using `ICodeReferenceLibrary` singleton
-- [ ] Implement `ValidateMedicalCodeCommandValidator` (code non-empty, max 10 chars; codeType enum)
-- [ ] Implement `ConfirmMedicalCodesCommand` + handler (upsert Accepted/Rejected, insert Manual, write AuditLog per decision, return pending count)
-- [ ] Implement `ConfirmMedicalCodesCommandValidator` (PatientId non-empty Guid; at least one list populated)
-- [ ] Add `POST /api/medical-codes/validate` and `POST /api/medical-codes/confirm` action methods to `MedicalCodesController`
-- [ ] Register all new commands, handlers, validators in `ClinicalModuleRegistration`
-- [ ] Verify RBAC: both endpoints return 401/403 for non-Staff callers
+- [x] Create `CodeValidationResult` and `ConfirmCodesResponse` shared contracts
+- [x] Implement `ValidateMedicalCodeCommand` + handler using `ICodeReferenceLibrary` singleton
+- [x] Implement `ValidateMedicalCodeCommandValidator` (code non-empty, max 10 chars; codeType enum)
+- [x] Implement `ConfirmMedicalCodesCommand` + handler (upsert Accepted/Rejected, insert Manual, write AuditLog per decision, return pending count)
+- [x] Implement `ConfirmMedicalCodesCommandValidator` (PatientId non-empty Guid; at least one list populated)
+- [x] Add `POST /api/medical-codes/validate` and `POST /api/medical-codes/confirm` action methods to `MedicalCodesController`
+- [x] Register all new commands, handlers, validators in `ClinicalModuleRegistration`
+- [x] Verify RBAC: both endpoints return 401/403 for non-Staff callers
