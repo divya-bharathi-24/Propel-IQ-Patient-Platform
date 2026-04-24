@@ -25,6 +25,172 @@ namespace Propel.Api.Gateway.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Propel.Domain.Entities.AiOperationalMetric", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MetricType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ModelVersion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("ValueA")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal?>("ValueB")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Metadata")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MetricType", "RecordedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AiOperationalMetrics_MetricType_RecordedAt");
+
+                    b.HasIndex("RecordedAt")
+                        .IsDescending(true)
+                        .HasDatabaseName("IX_AiOperationalMetrics_RecordedAt");
+
+                    b.HasIndex("SessionId")
+                        .HasDatabaseName("IX_AiOperationalMetrics_SessionId")
+                        .HasFilter("\"SessionId\" IS NOT NULL");
+
+                    b.ToTable("AiOperationalMetrics", (string)null);
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.AiPromptAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("CompletionTokenCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("completion_token_count");
+
+                    b.Property<bool>("ContentFilterBlocked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("content_filter_blocked");
+
+                    b.Property<string>("FunctionName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("function_name");
+
+                    b.Property<string>("ModelName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("model_name");
+
+                    b.Property<int?>("PromptTokenCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("prompt_token_count");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<string>("RedactedPrompt")
+                        .HasColumnType("text")
+                        .HasColumnName("redacted_prompt");
+
+                    b.Property<string>("RequestingUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("requesting_user_id");
+
+                    b.Property<string>("ResponseText")
+                        .HasColumnType("text")
+                        .HasColumnName("response_text");
+
+                    b.Property<string>("SessionId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("session_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ai_prompt_audit_logs");
+
+                    b.HasIndex("RecordedAt", "Id")
+                        .IsDescending(true, true)
+                        .HasDatabaseName("ix_ai_prompt_audit_logs_recorded_at_id");
+
+                    b.HasIndex("RequestingUserId")
+                        .HasDatabaseName("ix_ai_prompt_audit_logs_requesting_user_id")
+                        .HasFilter("requesting_user_id IS NOT NULL");
+
+                    b.HasIndex("SessionId")
+                        .HasDatabaseName("ix_ai_prompt_audit_logs_session_id")
+                        .HasFilter("session_id IS NOT NULL");
+
+                    b.ToTable("ai_prompt_audit_logs", (string)null);
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.AiQualityMetric", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("FieldName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("field_name");
+
+                    b.Property<bool?>("IsAgreement")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_agreement");
+
+                    b.Property<bool?>("IsHallucination")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_hallucination");
+
+                    b.Property<bool?>("IsSchemaValid")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_schema_valid");
+
+                    b.Property<string>("MetricType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("metric_type");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("session_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ai_quality_metrics");
+
+                    b.HasIndex("SessionId")
+                        .HasDatabaseName("IX_AiQualityMetrics_SessionId");
+
+                    b.HasIndex("MetricType", "RecordedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AiQualityMetrics_MetricType_RecordedAt");
+
+                    b.ToTable("AiQualityMetrics", (string)null);
+                });
+
             modelBuilder.Entity("Propel.Domain.Entities.Appointment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -86,11 +252,6 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasKey("Id")
                         .HasName("pk_appointments");
 
-                    b.HasIndex("AnonymousVisitId")
-                        .IsUnique()
-                        .HasFilter("anonymous_visit_id IS NOT NULL")
-                        .HasDatabaseName("idx_appointments_anonymous_visit_id");
-
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_appointments_patient_id");
 
@@ -99,11 +260,6 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.HasIndex("Date", "TimeSlotStart", "SpecialtyId")
                         .HasDatabaseName("ix_appointments_slot_lookup");
-
-                    b.HasIndex("SpecialtyId", "Date", "TimeSlotStart")
-                        .IsUnique()
-                        .HasFilter("status NOT IN ('Cancelled')")
-                        .HasDatabaseName("ix_appointments_slot_uniqueness");
 
                     b.ToTable("appointments", (string)null);
                 });
@@ -165,6 +321,9 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasKey("Id")
                         .HasName("pk_audit_logs");
 
+                    b.HasIndex("IpAddress")
+                        .HasDatabaseName("ix_audit_logs_ip_address");
+
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_audit_logs_patient_id");
 
@@ -175,15 +334,12 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_audit_logs_user_id");
 
-                    b.HasIndex("EntityType", "EntityId")
-                        .HasDatabaseName("ix_audit_logs_entity_type_entity_id");
-
                     b.HasIndex("Action", "Timestamp")
                         .IsDescending(false, true)
                         .HasDatabaseName("ix_audit_logs_action_timestamp");
 
-                    b.HasIndex("IpAddress")
-                        .HasDatabaseName("ix_audit_logs_ip_address");
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("ix_audit_logs_entity_type_entity_id");
 
                     b.ToTable("audit_logs", (string)null);
                 });
@@ -198,6 +354,10 @@ namespace Propel.Api.Gateway.Migrations
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("appointment_id");
+
+                    b.Property<Guid?>("AppointmentId1")
+                        .HasColumnType("uuid")
+                        .HasColumnName("appointment_id1");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -219,6 +379,11 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("external_event_id");
 
+                    b.Property<string>("LastOperation")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("last_operation");
+
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid")
                         .HasColumnName("patient_id");
@@ -229,24 +394,17 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("provider");
 
+                    b.Property<DateTime?>("RetryAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("retry_at");
+
                     b.Property<int>("RetryCount")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
                         .HasColumnName("retry_count");
 
                     b.Property<DateTime?>("RetryScheduledAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("retry_scheduled_at");
-
-                    b.Property<DateTime?>("RetryAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("retry_at");
-
-                    b.Property<string>("LastOperation")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("last_operation");
 
                     b.Property<string>("SyncStatus")
                         .IsRequired()
@@ -268,16 +426,20 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("AppointmentId")
                         .HasDatabaseName("ix_calendar_sync_appointment_id");
 
+                    b.HasIndex("AppointmentId1")
+                        .IsUnique()
+                        .HasDatabaseName("ix_calendar_syncs_appointment_id1");
+
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_calendar_syncs_patient_id");
+
+                    b.HasIndex("RetryAt")
+                        .HasDatabaseName("ix_calendar_syncs_retry_at_failed")
+                        .HasFilter("\"sync_status\" = 'Failed'");
 
                     b.HasIndex("Provider", "ExternalEventId")
                         .IsUnique()
                         .HasDatabaseName("ix_calendar_sync_provider_external_id");
-
-                    b.HasIndex("RetryAt")
-                        .HasFilter("\"sync_status\" = 'Failed'")
-                        .HasDatabaseName("ix_calendar_syncs_retry_at_failed");
 
                     b.ToTable("calendar_syncs", (string)null);
                 });
@@ -288,6 +450,20 @@ namespace Propel.Api.Gateway.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("DeletionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("deletion_reason");
+
+                    b.Property<string>("EncounterReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("encounter_reference");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -318,7 +494,6 @@ namespace Propel.Api.Gateway.Migrations
                     b.Property<string>("SourceType")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
                         .HasColumnName("source_type");
 
                     b.Property<string>("StoragePath")
@@ -327,27 +502,13 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("storage_path");
 
-                    b.Property<Guid?>("UploadedById")
-                        .HasColumnType("uuid")
-                        .HasColumnName("uploaded_by_id");
-
                     b.Property<DateTime>("UploadedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("uploaded_at");
 
-                    b.Property<string>("EncounterReference")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("encounter_reference");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("DeletionReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("deletion_reason");
+                    b.Property<Guid?>("UploadedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uploaded_by_id");
 
                     b.HasKey("Id")
                         .HasName("pk_clinical_documents");
@@ -355,20 +516,23 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_clinical_documents_patient_id");
 
+                    b.HasIndex("ProcessingStatus")
+                        .HasDatabaseName("idx_clinical_documents_processing_status_active")
+                        .HasFilter("processing_status IN ('Pending', 'Processing')");
+
+                    b.HasIndex("UploadedById")
+                        .HasDatabaseName("ix_clinical_documents_uploaded_by_id");
+
                     b.HasIndex("PatientId", "SourceType")
                         .HasDatabaseName("ix_clinical_documents_patient_source");
 
                     b.HasIndex("PatientId", "UploadedAt")
                         .HasDatabaseName("idx_clinical_documents_patient_uploaded");
 
-                    b.HasIndex("ProcessingStatus")
-                        .HasFilter("processing_status IN ('Pending', 'Processing')")
-                        .HasDatabaseName("idx_clinical_documents_processing_status_active");
-
-                    b.ToTable("clinical_documents", t =>
-                    {
-                        t.HasCheckConstraint("CK_clinical_documents_source_type", "source_type IN ('PatientUpload', 'StaffUpload')");
-                    });
+                    b.ToTable("clinical_documents", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_clinical_documents_source_type", "source_type IN ('PatientUpload', 'StaffUpload')");
+                        });
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.CredentialSetupToken", b =>
@@ -422,23 +586,36 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateTimeOffset>("DetectedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("detected_at")
+                        .HasDefaultValueSql("now()");
+
                     b.Property<string>("FieldName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("field_name");
 
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid")
                         .HasColumnName("patient_id");
 
+                    b.Property<string>("ResolutionNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("resolution_note");
+
                     b.Property<string>("ResolutionStatus")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasColumnName("resolution_status");
+                        .HasColumnName("resolution_status")
+                        .HasDefaultValueSql("'Unresolved'");
 
-                    b.Property<DateTime?>("ResolvedAt")
+                    b.Property<DateTimeOffset?>("ResolvedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("resolved_at");
 
@@ -450,6 +627,14 @@ namespace Propel.Api.Gateway.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
                         .HasColumnName("resolved_value");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Warning")
+                        .HasColumnName("severity");
 
                     b.Property<Guid>("SourceDocumentId1")
                         .HasColumnType("uuid")
@@ -475,7 +660,11 @@ namespace Propel.Api.Gateway.Migrations
                         .HasName("pk_data_conflicts");
 
                     b.HasIndex("PatientId")
-                        .HasDatabaseName("ix_data_conflicts_patient_id");
+                        .HasDatabaseName("ix_data_conflicts_patient_critical_unresolved")
+                        .HasFilter("severity = 'Critical' AND resolution_status = 'Unresolved'");
+
+                    b.HasIndex("ResolvedBy")
+                        .HasDatabaseName("ix_data_conflicts_resolved_by");
 
                     b.HasIndex("SourceDocumentId1")
                         .HasDatabaseName("ix_data_conflicts_source_document_id1");
@@ -483,7 +672,74 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("SourceDocumentId2")
                         .HasDatabaseName("ix_data_conflicts_source_document_id2");
 
+                    b.HasIndex("PatientId", "ResolutionStatus", "Severity")
+                        .HasDatabaseName("ix_data_conflicts_patient_status_severity");
+
+                    b.HasIndex("PatientId", "FieldName", "SourceDocumentId1", "SourceDocumentId2")
+                        .IsUnique()
+                        .HasDatabaseName("ix_data_conflicts_idempotency")
+                        .HasFilter("\"resolution_status\" = 'Unresolved'");
+
                     b.ToTable("data_conflicts", (string)null);
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.DocumentChunkEmbedding", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ChunkText")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("chunk_text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("document_id");
+
+                    b.Property<Vector>("Embedding")
+                        .IsRequired()
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("embedding");
+
+                    b.Property<int>("EndTokenIndex")
+                        .HasColumnType("integer")
+                        .HasColumnName("end_token_index");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("page_number");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("patient_id");
+
+                    b.Property<int>("StartTokenIndex")
+                        .HasColumnType("integer")
+                        .HasColumnName("start_token_index");
+
+                    b.HasKey("Id")
+                        .HasName("pk_document_chunk_embeddings");
+
+                    b.HasIndex("Embedding")
+                        .HasDatabaseName("ix_document_chunk_embeddings_embedding_hnsw");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
+
+                    b.HasIndex("PatientId")
+                        .HasDatabaseName("ix_document_chunk_embeddings_patient_id");
+
+                    b.HasIndex("DocumentId", "PageNumber")
+                        .HasDatabaseName("ix_document_chunk_embeddings_document_page");
+
+                    b.ToTable("document_chunk_embeddings", (string)null);
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.DummyInsurer", b =>
@@ -602,6 +858,10 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CanonicalGroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("canonical_group_id");
+
                     b.Property<decimal>("Confidence")
                         .HasPrecision(4, 3)
                         .HasColumnType("numeric(4,3)")
@@ -613,13 +873,17 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("data_type");
 
+                    b.Property<string>("DeduplicationStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasDefaultValue("Unprocessed")
+                        .HasColumnName("deduplication_status");
+
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uuid")
                         .HasColumnName("document_id");
-
-                    b.Property<Vector>("Embedding")
-                        .HasColumnType("vector(1536)")
-                        .HasColumnName("embedding");
 
                     b.Property<string>("FieldName")
                         .IsRequired()
@@ -627,9 +891,21 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("field_name");
 
+                    b.Property<bool>("IsCanonical")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_canonical");
+
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid")
                         .HasColumnName("patient_id");
+
+                    b.Property<bool>("PriorityReview")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("priority_review");
 
                     b.Property<int>("SourcePageNumber")
                         .HasColumnType("integer")
@@ -649,17 +925,15 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasKey("Id")
                         .HasName("pk_extracted_data");
 
-                    b.HasIndex("Embedding")
-                        .HasDatabaseName("ix_extracted_data_embedding_hnsw");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
-
-                    b.HasIndex("PatientId")
-                        .HasDatabaseName("ix_extracted_data_patient_id");
-
                     b.HasIndex("DocumentId", "DataType")
                         .HasDatabaseName("ix_extracted_data_document_type");
+
+                    b.HasIndex("PatientId", "DeduplicationStatus")
+                        .HasDatabaseName("ix_extracted_data_patient_dedup_status");
+
+                    b.HasIndex("PatientId", "IsCanonical")
+                        .HasDatabaseName("ix_extracted_data_patient_id_is_canonical")
+                        .HasFilter("is_canonical = true");
 
                     b.ToTable("extracted_data", null, t =>
                         {
@@ -715,6 +989,9 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_insurance_validations");
+
+                    b.HasIndex("AppointmentId")
+                        .HasDatabaseName("ix_insurance_validations_appointment_id");
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_insurance_validations_patient_id");
@@ -813,8 +1090,8 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("code");
 
                     b.Property<string>("CodeType")
@@ -823,22 +1100,39 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(10)")
                         .HasColumnName("code_type");
 
-                    b.Property<decimal>("Confidence")
+                    b.Property<decimal?>("Confidence")
                         .HasPrecision(4, 3)
                         .HasColumnType("numeric(4,3)")
                         .HasColumnName("confidence");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
                         .HasColumnName("description");
+
+                    b.Property<bool>("IsManualEntry")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_manual_entry");
 
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid")
                         .HasColumnName("patient_id");
 
-                    b.Property<Guid>("SourceDocumentId")
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("rejection_reason");
+
+                    b.Property<Guid?>("SourceDocumentId")
                         .HasColumnType("uuid")
                         .HasColumnName("source_document_id");
 
@@ -848,7 +1142,7 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("verification_status");
 
-                    b.Property<DateTime?>("VerifiedAt")
+                    b.Property<DateTimeOffset?>("VerifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("verified_at");
 
@@ -862,12 +1156,18 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("SourceDocumentId")
                         .HasDatabaseName("ix_medical_codes_source_document_id");
 
+                    b.HasIndex("VerifiedBy")
+                        .HasDatabaseName("ix_medical_codes_verified_by");
+
                     b.HasIndex("PatientId", "VerificationStatus")
-                        .HasDatabaseName("ix_medical_codes_patient_pending");
+                        .HasDatabaseName("ix_medical_codes_patient_status");
+
+                    b.HasIndex("PatientId", "CodeType", "VerificationStatus")
+                        .HasDatabaseName("ix_medical_codes_patient_codetype_status");
 
                     b.ToTable("medical_codes", null, t =>
                         {
-                            t.HasCheckConstraint("ck_medical_codes_confidence", "confidence >= 0 AND confidence <= 1");
+                            t.HasCheckConstraint("ck_medical_codes_confidence", "confidence IS NULL OR (confidence >= 0 AND confidence <= 1)");
                         });
                 });
 
@@ -898,6 +1198,7 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.Property<string>("Severity")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasDefaultValue("Medium")
@@ -927,6 +1228,10 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("appointment_id");
 
+                    b.Property<Guid?>("AppointmentId1")
+                        .HasColumnType("uuid")
+                        .HasColumnName("appointment_id1");
+
                     b.Property<string>("Channel")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -942,6 +1247,15 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("error_message");
 
+                    b.Property<string>("ErrorReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("error_reason");
+
+                    b.Property<DateTime?>("LastRetryAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_retry_at");
+
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid")
                         .HasColumnName("patient_id");
@@ -949,6 +1263,10 @@ namespace Propel.Api.Gateway.Migrations
                     b.Property<int>("RetryCount")
                         .HasColumnType("integer")
                         .HasColumnName("retry_count");
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_at");
 
                     b.Property<DateTime?>("SentAt")
                         .HasColumnType("timestamp with time zone")
@@ -960,32 +1278,19 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("status");
 
+                    b.Property<DateTime?>("SuppressedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("suppressed_at");
+
                     b.Property<string>("TemplateType")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)")
                         .HasColumnName("template_type");
 
-                    b.Property<DateTime?>("LastRetryAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_retry_at");
-
-                    b.Property<DateTime?>("ScheduledAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("scheduled_at");
-
-                    b.Property<DateTime?>("SuppressedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("suppressed_at");
-
                     b.Property<Guid?>("TriggeredBy")
                         .HasColumnType("uuid")
                         .HasColumnName("triggered_by");
-
-                    b.Property<string>("ErrorReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("error_reason");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -997,18 +1302,24 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("AppointmentId")
                         .HasDatabaseName("ix_notifications_appointment_id");
 
-                    b.HasIndex("AppointmentId", "SentAt")
-                        .HasDatabaseName("ix_notifications_appointment_id_sent_at")
-                        .IsDescending(false, true);
-
-                    b.HasIndex("AppointmentId", "TemplateType", "ScheduledAt")
-                        .HasDatabaseName("ix_notifications_appt_template_scheduled");
+                    b.HasIndex("AppointmentId1")
+                        .HasDatabaseName("ix_notifications_appointment_id1");
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_notifications_patient_id");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_notifications_status");
+
+                    b.HasIndex("TriggeredBy")
+                        .HasDatabaseName("ix_notifications_triggered_by");
+
+                    b.HasIndex("AppointmentId", "SentAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_notifications_appointment_id_sent_at");
+
+                    b.HasIndex("AppointmentId", "TemplateType", "ScheduledAt")
+                        .HasDatabaseName("ix_notifications_appt_template_scheduled");
 
                     b.ToTable("notifications", (string)null);
                 });
@@ -1033,17 +1344,14 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("communication_preferences_json");
 
-                    b.Property<string>("PendingAlertsJson")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("pending_alerts_json");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<DateOnly>("DateOfBirth")
+                    b.Property<string>("DateOfBirth")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("date_of_birth");
 
@@ -1089,6 +1397,10 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("password_hash");
 
+                    b.Property<string>("PendingAlertsJson")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("pending_alerts_json");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1107,15 +1419,15 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("ViewVerifiedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamptz")
                         .HasColumnName("view_verified_at");
 
                     b.HasKey("Id")
                         .HasName("pk_patients");
 
                     b.HasIndex("Id")
-                        .HasFilter("view_verified_at IS NOT NULL")
-                        .HasDatabaseName("IX_patients_verified");
+                        .HasDatabaseName("IX_patients_verified")
+                        .HasFilter("view_verified_at IS NOT NULL");
 
                     b.ToTable("patients", (string)null);
                 });
@@ -1169,6 +1481,44 @@ namespace Propel.Api.Gateway.Migrations
                         .HasDatabaseName("ix_patient_oauth_tokens_patient_provider");
 
                     b.ToTable("patient_oauth_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.PatientProfileVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("patient_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("VerifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("verified_at");
+
+                    b.Property<Guid>("VerifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("verified_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_patient_profile_verifications");
+
+                    b.HasIndex("PatientId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_patient_profile_verifications_patient_id");
+
+                    b.HasIndex("VerifiedBy")
+                        .HasDatabaseName("ix_patient_profile_verifications_verified_by");
+
+                    b.ToTable("patient_profile_verifications", (string)null);
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.QueueEntry", b =>
@@ -1241,6 +1591,10 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("family_id");
 
+                    b.Property<Guid?>("PatientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("patient_id");
+
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("revoked_at");
@@ -1251,7 +1605,7 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("character varying(512)")
                         .HasColumnName("token_hash");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
@@ -1262,10 +1616,18 @@ namespace Propel.Api.Gateway.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_refresh_tokens_token_hash");
 
-                    b.HasIndex("UserId", "FamilyId")
-                        .HasDatabaseName("ix_refresh_tokens_user_id_family_id");
+                    b.HasIndex("PatientId", "FamilyId")
+                        .HasDatabaseName("ix_refresh_tokens_patient_id_family_id")
+                        .HasFilter("patient_id IS NOT NULL");
 
-                    b.ToTable("refresh_tokens", (string)null);
+                    b.HasIndex("UserId", "FamilyId")
+                        .HasDatabaseName("ix_refresh_tokens_user_id_family_id")
+                        .HasFilter("user_id IS NOT NULL");
+
+                    b.ToTable("refresh_tokens", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_refresh_tokens_patient_or_user", "(patient_id IS NOT NULL AND user_id IS NULL) OR (patient_id IS NULL AND user_id IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.RiskIntervention", b =>
@@ -1305,6 +1667,7 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasDefaultValue("Pending")
@@ -1317,20 +1680,23 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnName("type");
 
                     b.HasKey("Id")
-                        .HasName("PK_risk_interventions");
+                        .HasName("pk_risk_interventions");
 
                     b.HasIndex("AppointmentId")
                         .HasDatabaseName("IX_risk_interventions_pending")
                         .HasFilter("status = 'Pending'");
 
-                    b.HasIndex("NoShowRiskId");
+                    b.HasIndex("NoShowRiskId")
+                        .HasDatabaseName("ix_risk_interventions_no_show_risk_id");
 
-                    b.HasIndex("StaffId");
+                    b.HasIndex("StaffId")
+                        .HasDatabaseName("ix_risk_interventions_staff_id");
 
                     b.ToTable("risk_interventions", null, t =>
                         {
-                            t.HasCheckConstraint("CK_risk_interventions_type", "type IN ('AdditionalReminder', 'CallbackRequest')");
                             t.HasCheckConstraint("CK_risk_interventions_status", "status IN ('Pending', 'Accepted', 'Dismissed', 'AutoCleared')");
+
+                            t.HasCheckConstraint("CK_risk_interventions_type", "type IN ('AdditionalReminder', 'CallbackRequest')");
                         });
                 });
 
@@ -1396,9 +1762,6 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.HasKey("Key")
                         .HasName("pk_system_settings");
-
-                    b.HasIndex("UpdatedByUserId")
-                        .HasDatabaseName("ix_system_settings_updated_by_user_id");
 
                     b.ToTable("system_settings", (string)null);
 
@@ -1555,6 +1918,11 @@ namespace Propel.Api.Gateway.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_calendar_syncs_appointments_appointment_id");
 
+                    b.HasOne("Propel.Domain.Entities.Appointment", null)
+                        .WithOne("CalendarSync")
+                        .HasForeignKey("Propel.Domain.Entities.CalendarSync", "AppointmentId1")
+                        .HasConstraintName("fk_calendar_syncs_appointments_appointment_id1");
+
                     b.HasOne("Propel.Domain.Entities.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -1604,9 +1972,15 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasOne("Propel.Domain.Entities.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_data_conflicts_patients_patient_id");
+
+                    b.HasOne("Propel.Domain.Entities.User", "ResolvedByUser")
+                        .WithMany()
+                        .HasForeignKey("ResolvedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_data_conflicts_users_resolved_by");
 
                     b.HasOne("Propel.Domain.Entities.ClinicalDocument", "SourceDocument1")
                         .WithMany()
@@ -1624,9 +1998,32 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.Navigation("Patient");
 
+                    b.Navigation("ResolvedByUser");
+
                     b.Navigation("SourceDocument1");
 
                     b.Navigation("SourceDocument2");
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.DocumentChunkEmbedding", b =>
+                {
+                    b.HasOne("Propel.Domain.Entities.ClinicalDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_document_chunk_embeddings_clinical_documents_document_id");
+
+                    b.HasOne("Propel.Domain.Entities.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_document_chunk_embeddings_patients_patient_id");
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.EmailVerificationToken", b =>
@@ -1708,20 +2105,27 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasOne("Propel.Domain.Entities.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_medical_codes_patients_patient_id");
 
                     b.HasOne("Propel.Domain.Entities.ClinicalDocument", "SourceDocument")
                         .WithMany()
                         .HasForeignKey("SourceDocumentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_medical_codes_clinical_documents_source_document_id");
+
+                    b.HasOne("Propel.Domain.Entities.User", "VerifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("VerifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_medical_codes_users_verified_by");
 
                     b.Navigation("Patient");
 
                     b.Navigation("SourceDocument");
+
+                    b.Navigation("VerifiedByUser");
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.NoShowRisk", b =>
@@ -1743,6 +2147,11 @@ namespace Propel.Api.Gateway.Migrations
                         .HasForeignKey("AppointmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_notifications_appointments_appointment_id");
+
+                    b.HasOne("Propel.Domain.Entities.Appointment", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("AppointmentId1")
+                        .HasConstraintName("fk_notifications_appointments_appointment_id1");
 
                     b.HasOne("Propel.Domain.Entities.Patient", "Patient")
                         .WithMany()
@@ -1772,6 +2181,27 @@ namespace Propel.Api.Gateway.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("Propel.Domain.Entities.PatientProfileVerification", b =>
+                {
+                    b.HasOne("Propel.Domain.Entities.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_patient_profile_verifications_patients_patient_id");
+
+                    b.HasOne("Propel.Domain.Entities.User", "VerifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("VerifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_patient_profile_verifications_users_verified_by");
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("VerifiedByUser");
+                });
+
             modelBuilder.Entity("Propel.Domain.Entities.QueueEntry", b =>
                 {
                     b.HasOne("Propel.Domain.Entities.Appointment", "Appointment")
@@ -1794,11 +2224,16 @@ namespace Propel.Api.Gateway.Migrations
 
             modelBuilder.Entity("Propel.Domain.Entities.RefreshToken", b =>
                 {
+                    b.HasOne("Propel.Domain.Entities.Patient", null)
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_refresh_tokens_patients_patient_id");
+
                     b.HasOne("Propel.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_refresh_tokens_users_user_id");
                 });
 
@@ -1808,33 +2243,27 @@ namespace Propel.Api.Gateway.Migrations
                         .WithMany()
                         .HasForeignKey("AppointmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_risk_interventions_appointments_appointment_id");
 
                     b.HasOne("Propel.Domain.Entities.NoShowRisk", "NoShowRisk")
                         .WithMany("RiskInterventions")
                         .HasForeignKey("NoShowRiskId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_risk_interventions_no_show_risks_no_show_risk_id");
 
                     b.HasOne("Propel.Domain.Entities.User", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_risk_interventions_users_staff_id");
 
                     b.Navigation("Appointment");
 
                     b.Navigation("NoShowRisk");
 
                     b.Navigation("Staff");
-                });
-
-            modelBuilder.Entity("Propel.Domain.Entities.SystemSetting", b =>
-                {
-                    b.HasOne("Propel.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_system_settings_users_updated_by_user_id");
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.WaitlistEntry", b =>
@@ -1860,21 +2289,25 @@ namespace Propel.Api.Gateway.Migrations
 
             modelBuilder.Entity("Propel.Domain.Entities.Appointment", b =>
                 {
+                    b.Navigation("CalendarSync");
+
                     b.Navigation("NoShowRisk");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("QueueEntry");
 
                     b.Navigation("WaitlistEntry");
                 });
 
-            modelBuilder.Entity("Propel.Domain.Entities.NoShowRisk", b =>
-                {
-                    b.Navigation("RiskInterventions");
-                });
-
             modelBuilder.Entity("Propel.Domain.Entities.ClinicalDocument", b =>
                 {
                     b.Navigation("ExtractedData");
+                });
+
+            modelBuilder.Entity("Propel.Domain.Entities.NoShowRisk", b =>
+                {
+                    b.Navigation("RiskInterventions");
                 });
 
             modelBuilder.Entity("Propel.Domain.Entities.Patient", b =>

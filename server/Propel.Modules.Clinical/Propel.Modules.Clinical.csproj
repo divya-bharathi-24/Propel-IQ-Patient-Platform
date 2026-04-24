@@ -9,6 +9,15 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.*" />
     <PackageReference Include="MediatR" Version="12.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.*" />
+    <PackageReference Include="Serilog" Version="4.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Propel.Domain\Propel.Domain.csproj" />
+    <ProjectReference Include="..\Propel.Modules.AI\Propel.Modules.AI.csproj" />
+    <ProjectReference Include="..\Propel.Modules.Notification\Propel.Modules.Notification.csproj" />
   </ItemGroup>
 
 </Project>

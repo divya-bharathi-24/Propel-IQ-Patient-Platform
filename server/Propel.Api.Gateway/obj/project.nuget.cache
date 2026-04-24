@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "xW09enwC56k=",
+  "dgSpecHash": "xTStoQPlYgA=",
   "success": true,
   "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Api.Gateway\\Propel.Api.Gateway.csproj",
   "expectedPackageFiles": [
@@ -14,6 +14,7 @@
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\google.apis.auth\\1.73.0\\google.apis.auth.1.73.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\google.apis.calendar.v3\\1.73.0.4073\\google.apis.calendar.v3.1.73.0.4073.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\google.apis.core\\1.73.0\\google.apis.core.1.73.0.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\google.protobuf\\3.30.2\\google.protobuf.3.30.2.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\ical.net\\4.3.1\\ical.net.4.3.1.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\isopoh.cryptography.argon2\\2.0.0\\isopoh.cryptography.argon2.2.0.0.nupkg.sha512",
@@ -61,6 +62,7 @@
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.kiota.serialization.json\\1.21.1\\microsoft.kiota.serialization.json.1.21.1.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.kiota.serialization.multipart\\1.21.1\\microsoft.kiota.serialization.multipart.1.21.1.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.kiota.serialization.text\\1.21.1\\microsoft.kiota.serialization.text.1.21.1.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.ml.tokenizers\\2.0.0\\microsoft.ml.tokenizers.2.0.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.openapi\\1.6.14\\microsoft.openapi.1.6.14.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel\\1.74.0\\microsoft.semantickernel.1.74.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\microsoft.semantickernel.abstractions\\1.74.0\\microsoft.semantickernel.abstractions.1.74.0.nupkg.sha512",

@@ -1,0 +1,49 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+# Cancel any in-flight run for the same branch/PR to avoid duplicate work.
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit — Core Web Vitals Gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build Angular app (production)
+        run: npx ng build --configuration production
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli serve
+
+      - name: Run Lighthouse CI
+        # lhci autorun reads ../lighthouserc.json (repo root) via --config flag.
+        # Assertions: LCP ≤2500ms, TBT ≤100ms, CLS ≤0.1, performance score ≥0.80.
+        # Failure here blocks the deployment — the previous Netlify/Vercel
+        # deployment remains live (AC-1 edge case: regression gate).
+        run: lhci autorun --config=../lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

@@ -182,6 +182,9 @@
         }
       },
       "Propel.Domain/1.0.0": {
+        "dependencies": {
+          "MediatR": "12.5.0"
+        },
         "runtime": {
           "Propel.Domain.dll": {
             "assemblyVersion": "1.0.0.0",

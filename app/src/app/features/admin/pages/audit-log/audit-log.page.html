@@ -19,6 +19,9 @@
   </div>
   }
 
+  <!-- Event Table deferred until viewport — keeps audit filter panel eagerly rendered
+       so users can set filters before the heavy table is loaded (NFR-012 / CLS <0.1) -->
+  @defer (on viewport) {
   <!-- Event Table (AC-1, AC-3) -->
   <app-audit-event-table
     [events]="store.events()"
@@ -26,4 +29,15 @@
     [nextCursor]="store.nextCursor()"
     [totalCount]="store.totalCount()"
   />
+  } @placeholder {
+  <!-- Fixed height prevents CLS while the table is being loaded (NFR-012 / CLS <0.1) -->
+  <div
+    class="audit-table-placeholder"
+    style="height: 400px"
+    aria-busy="true"
+    aria-label="Loading audit event table"
+  >
+    <mat-spinner diameter="40" />
+  </div>
+  }
 </main>

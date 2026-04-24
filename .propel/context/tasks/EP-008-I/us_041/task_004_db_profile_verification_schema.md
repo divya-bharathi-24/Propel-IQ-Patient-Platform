@@ -29,14 +29,14 @@
 
 ## Applicable Technology Stack
 
-| Layer              | Technology              | Version |
-| ------------------ | ----------------------- | ------- |
-| Database           | PostgreSQL              | 16+     |
-| ORM                | Entity Framework Core   | 9.x     |
-| Backend            | ASP.NET Core Web API    | .net 10  |
-| Testing — Unit     | xUnit                   | —       |
-| AI/ML              | N/A                     | N/A     |
-| Mobile             | N/A                     | N/A     |
+| Layer          | Technology            | Version |
+| -------------- | --------------------- | ------- |
+| Database       | PostgreSQL            | 16+     |
+| ORM            | Entity Framework Core | 9.x     |
+| Backend        | ASP.NET Core Web API  | .net 10 |
+| Testing — Unit | xUnit                 | —       |
+| AI/ML          | N/A                   | N/A     |
+| Mobile         | N/A                   | N/A     |
 
 > All code and libraries MUST be compatible with versions above.
 
@@ -87,22 +87,23 @@ One EF Core 9 migration covers all changes with a complete rollback-safe `Down()
 
 ## Impacted Components
 
-| Status | Component / Module | Project |
-| ------ | ------------------- | ------- |
-| CREATE | `PatientProfileVerification` domain entity | `Server/src/Domain/Entities/PatientProfileVerification.cs` |
-| CREATE | `PatientProfileVerificationConfiguration` (EF Fluent API) | `Server/src/Infrastructure/Persistence/Configurations/PatientProfileVerificationConfiguration.cs` |
-| CREATE | `IPatientProfileVerificationRepository` | `Server/src/Application/Clinical/Interfaces/IPatientProfileVerificationRepository.cs` |
-| CREATE | `PatientProfileVerificationRepository` | `Server/src/Infrastructure/Persistence/Repositories/PatientProfileVerificationRepository.cs` |
-| CREATE | EF Core migration `Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields` | `Server/src/Infrastructure/Persistence/Migrations/` |
-| MODIFY | `ExtractedData` domain entity | Add `IsCanonical: bool`, `CanonicalGroupId: Guid?`, `DeduplicationStatus` enum |
-| MODIFY | `ExtractedDataConfiguration` (EF Fluent API) | Map new columns; add partial index on `DeduplicationStatus` |
-| MODIFY | `AppDbContext` | Register `DbSet<PatientProfileVerification>` |
+| Status | Component / Module                                                                       | Project                                                                                           |
+| ------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| CREATE | `PatientProfileVerification` domain entity                                               | `Server/src/Domain/Entities/PatientProfileVerification.cs`                                        |
+| CREATE | `PatientProfileVerificationConfiguration` (EF Fluent API)                                | `Server/src/Infrastructure/Persistence/Configurations/PatientProfileVerificationConfiguration.cs` |
+| CREATE | `IPatientProfileVerificationRepository`                                                  | `Server/src/Application/Clinical/Interfaces/IPatientProfileVerificationRepository.cs`             |
+| CREATE | `PatientProfileVerificationRepository`                                                   | `Server/src/Infrastructure/Persistence/Repositories/PatientProfileVerificationRepository.cs`      |
+| CREATE | EF Core migration `Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields` | `Server/src/Infrastructure/Persistence/Migrations/`                                               |
+| MODIFY | `ExtractedData` domain entity                                                            | Add `IsCanonical: bool`, `CanonicalGroupId: Guid?`, `DeduplicationStatus` enum                    |
+| MODIFY | `ExtractedDataConfiguration` (EF Fluent API)                                             | Map new columns; add partial index on `DeduplicationStatus`                                       |
+| MODIFY | `AppDbContext`                                                                           | Register `DbSet<PatientProfileVerification>`                                                      |
 
 ---
 
 ## Implementation Plan
 
 1. **`PatientProfileVerification` entity**:
+
    ```csharp
    public class PatientProfileVerification
    {
@@ -116,6 +117,7 @@ One EF Core 9 migration covers all changes with a complete rollback-safe `Down()
    ```
 
 2. **`PatientProfileVerificationConfiguration`** (Fluent API):
+
    ```csharp
    builder.HasKey(v => v.Id);
    builder.HasIndex(v => v.PatientId).IsUnique();    // one row per patient
@@ -125,6 +127,7 @@ One EF Core 9 migration covers all changes with a complete rollback-safe `Down()
    ```
 
 3. **`IPatientProfileVerificationRepository`**:
+
    ```csharp
    Task<PatientProfileVerification?> GetByPatientIdAsync(Guid patientId, CancellationToken ct = default);
    Task UpsertAsync(PatientProfileVerification verification, CancellationToken ct = default);
@@ -135,12 +138,15 @@ One EF Core 9 migration covers all changes with a complete rollback-safe `Down()
    - `UpsertAsync`: `ExecuteUpdateAsync` or INSERT ON CONFLICT (PostgreSQL upsert pattern via EF Core 9)
 
 5. **`ExtractedData` additions**:
+
    ```csharp
    public bool IsCanonical { get; set; } = true;               // default true until de-dup runs
    public Guid? CanonicalGroupId { get; set; }                  // links duplicate → canonical
    public DeduplicationStatus DeduplicationStatus { get; set; } // Unprocessed/Canonical/Duplicate/FallbackManual
    ```
+
    EF config:
+
    ```csharp
    builder.Property(e => e.DeduplicationStatus)
        .HasConversion<string>()
@@ -154,6 +160,7 @@ One EF Core 9 migration covers all changes with a complete rollback-safe `Down()
    ```
 
 6. **`DataConflicts` — conflict-gate partial index**:
+
    ```csharp
    // Added in migration only (no entity change needed):
    migrationBuilder.CreateIndex(
@@ -193,16 +200,16 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/src/Domain/Entities/PatientProfileVerification.cs` | Entity: `Id`, `PatientId`, `Status`, `VerifiedBy`, `VerifiedAt` |
-| CREATE | `Server/src/Infrastructure/Persistence/Configurations/PatientProfileVerificationConfiguration.cs` | EF Fluent API: unique index on `PatientId`, FK constraints, upsert support |
-| CREATE | `Server/src/Application/Clinical/Interfaces/IPatientProfileVerificationRepository.cs` | Repository interface: `GetByPatientIdAsync`, `UpsertAsync` |
-| CREATE | `Server/src/Infrastructure/Persistence/Repositories/PatientProfileVerificationRepository.cs` | Parameterised LINQ implementation |
-| CREATE | `Server/src/Infrastructure/Persistence/Migrations/<timestamp>_Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields.cs` | Full `Up()` + rollback-safe `Down()` |
-| MODIFY | `Server/src/Domain/Entities/ExtractedData.cs` | Add `IsCanonical`, `CanonicalGroupId`, `DeduplicationStatus` |
-| MODIFY | `Server/src/Infrastructure/Persistence/Configurations/ExtractedDataConfiguration.cs` | Map new fields, partial index `IX_ExtractedData_PatientId_IsCanonical` |
-| MODIFY | `Server/src/Infrastructure/Persistence/AppDbContext.cs` | Register `DbSet<PatientProfileVerification>` |
+| Action | File Path                                                                                                                              | Description                                                                |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| CREATE | `Server/src/Domain/Entities/PatientProfileVerification.cs`                                                                             | Entity: `Id`, `PatientId`, `Status`, `VerifiedBy`, `VerifiedAt`            |
+| CREATE | `Server/src/Infrastructure/Persistence/Configurations/PatientProfileVerificationConfiguration.cs`                                      | EF Fluent API: unique index on `PatientId`, FK constraints, upsert support |
+| CREATE | `Server/src/Application/Clinical/Interfaces/IPatientProfileVerificationRepository.cs`                                                  | Repository interface: `GetByPatientIdAsync`, `UpsertAsync`                 |
+| CREATE | `Server/src/Infrastructure/Persistence/Repositories/PatientProfileVerificationRepository.cs`                                           | Parameterised LINQ implementation                                          |
+| CREATE | `Server/src/Infrastructure/Persistence/Migrations/<timestamp>_Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields.cs` | Full `Up()` + rollback-safe `Down()`                                       |
+| MODIFY | `Server/src/Domain/Entities/ExtractedData.cs`                                                                                          | Add `IsCanonical`, `CanonicalGroupId`, `DeduplicationStatus`               |
+| MODIFY | `Server/src/Infrastructure/Persistence/Configurations/ExtractedDataConfiguration.cs`                                                   | Map new fields, partial index `IX_ExtractedData_PatientId_IsCanonical`     |
+| MODIFY | `Server/src/Infrastructure/Persistence/AppDbContext.cs`                                                                                | Register `DbSet<PatientProfileVerification>`                               |
 
 ---
 
@@ -243,10 +250,10 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `PatientProfileVerification` entity with `VerificationStatus` enum (`Unverified`, `Verified`)
-- [ ] Create `PatientProfileVerificationConfiguration` with unique index on `PatientId` and FK constraints
-- [ ] Register `DbSet<PatientProfileVerification>` in `AppDbContext`
-- [ ] Add `IsCanonical: bool`, `CanonicalGroupId: Guid?`, `DeduplicationStatus` to `ExtractedData` entity; update `ExtractedDataConfiguration` with new field mappings and partial index
-- [ ] Generate and review EF Core migration `Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields`; verify `Up()` adds `DataConflicts` partial index
-- [ ] Create `IPatientProfileVerificationRepository` interface with `GetByPatientIdAsync` and `UpsertAsync`
-- [ ] Implement `PatientProfileVerificationRepository` using parameterised LINQ queries (no raw SQL concatenation)
+- [x] Create `PatientProfileVerification` entity with `VerificationStatus` enum (`Unverified`, `Verified`)
+- [x] Create `PatientProfileVerificationConfiguration` with unique index on `PatientId` and FK constraints
+- [x] Register `DbSet<PatientProfileVerification>` in `AppDbContext`
+- [x] Add `IsCanonical: bool`, `CanonicalGroupId: Guid?`, `DeduplicationStatus` to `ExtractedData` entity; update `ExtractedDataConfiguration` with new field mappings and partial index
+- [x] Generate and review EF Core migration `Add_PatientProfileVerification_And_ExtractedData_DeduplicationFields`; verify `Up()` adds `DataConflicts` partial index
+- [x] Create `IPatientProfileVerificationRepository` interface with `GetByPatientIdAsync` and `UpsertAsync`
+- [x] Implement `PatientProfileVerificationRepository` using parameterised LINQ queries (no raw SQL concatenation)

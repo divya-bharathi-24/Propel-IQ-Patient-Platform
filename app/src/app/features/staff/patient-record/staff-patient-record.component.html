@@ -1,5 +1,18 @@
 <main class="patient-record-page" aria-label="Patient record">
   @if (patientId) {
+    <!-- Review Codes action (US_043) -->
+    <div class="record-actions">
+      <a
+        mat-raised-button
+        color="accent"
+        [routerLink]="['/staff/patients', patientId, 'medical-codes']"
+        aria-label="Review AI-suggested medical codes for this patient"
+      >
+        <mat-icon aria-hidden="true">fact_check</mat-icon>
+        Review Codes
+      </a>
+    </div>
+
     <div class="record-layout">
       <!-- Upload panel -->
       <app-staff-note-upload

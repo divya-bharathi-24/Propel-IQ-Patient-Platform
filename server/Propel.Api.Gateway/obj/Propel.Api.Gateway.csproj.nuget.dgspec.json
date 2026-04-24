@@ -645,6 +645,12 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.*, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -1368,6 +1374,10 @@
               "target": "Package",
               "version": "[12.*, )"
             },
+            "Microsoft.ML.Tokenizers": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
             "Microsoft.SemanticKernel": {
               "target": "Package",
               "version": "[1.*, )"
@@ -1387,6 +1397,10 @@
             "Serilog": {
               "target": "Package",
               "version": "[4.*, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.*, )"
             }
           },
           "imports": [
@@ -3265,7 +3279,17 @@
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Domain\\Propel.Domain.csproj": {
+                "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Domain\\Propel.Domain.csproj"
+              },
+              "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.AI\\Propel.Modules.AI.csproj": {
+                "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.AI\\Propel.Modules.AI.csproj"
+              },
+              "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Notification\\Propel.Modules.Notification.csproj": {
+                "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Notification\\Propel.Modules.Notification.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -3291,6 +3315,18 @@
             "MediatR": {
               "target": "Package",
               "version": "[12.*, )"
+            },
+            "Microsoft.Extensions.Hosting.Abstractions": {
+              "target": "Package",
+              "version": "[10.*, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[10.*, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[4.*, )"
             }
           },
           "imports": [

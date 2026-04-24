@@ -8,6 +8,8 @@
     "dotnet list": true,
     "dotnet tool": true,
     "ForEach-Object": true,
-    "Copy-Item": true
+    "Copy-Item": true,
+    "Set-Content": true,
+    "dotnet add": true
   }
 }

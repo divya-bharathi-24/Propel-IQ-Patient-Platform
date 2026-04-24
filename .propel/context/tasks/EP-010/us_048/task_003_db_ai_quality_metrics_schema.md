@@ -29,10 +29,10 @@
 
 ## Applicable Technology Stack
 
-| Layer    | Technology              | Version |
-| -------- | ----------------------- | ------- |
-| ORM      | Entity Framework Core   | 9.x     |
-| Database | PostgreSQL              | 16+     |
+| Layer    | Technology            | Version |
+| -------- | --------------------- | ------- |
+| ORM      | Entity Framework Core | 9.x     |
+| Database | PostgreSQL            | 16+     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -67,6 +67,7 @@
 Create the `AiQualityMetrics` PostgreSQL table via EF Core code-first migration. The table is a single polymorphic metrics store covering all three metric event types (Agreement, Hallucination, SchemaValidity) to avoid three separate narrow tables at Phase 1 scale. Nullable columns (`FieldName`, `IsAgreement`, `IsHallucination`, `IsSchemaValid`) carry type-specific data; `MetricType` discriminates the row kind.
 
 Two indexes support the rolling-window read patterns required by `EfAiMetricsReadRepository`:
+
 1. Composite index on `(MetricType, RecordedAt DESC)` — primary rolling-window access pattern.
 2. Index on `SessionId` — for per-session metric lookups and future debugging queries.
 
@@ -82,12 +83,12 @@ No foreign key to `Users` is defined (metric events are written by the AI pipeli
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `AiQualityMetric` entity (new) | Domain | CREATE — EF Core entity with all columns |
-| `AiQualityMetricConfiguration` (new) | Infrastructure | CREATE — EF Core Fluent API configuration: table name, required columns, nullable columns, indexes |
-| `AddAiQualityMetricsTable` migration (new) | Infrastructure | CREATE — EF Core migration: CREATE TABLE + 2 CREATE INDEX |
-| `ApplicationDbContext` (existing) | Infrastructure | MODIFY — Add `DbSet<AiQualityMetric> AiQualityMetrics` |
+| Component                                  | Module         | Action                                                                                             |
+| ------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------- |
+| `AiQualityMetric` entity (new)             | Domain         | CREATE — EF Core entity with all columns                                                           |
+| `AiQualityMetricConfiguration` (new)       | Infrastructure | CREATE — EF Core Fluent API configuration: table name, required columns, nullable columns, indexes |
+| `AddAiQualityMetricsTable` migration (new) | Infrastructure | CREATE — EF Core migration: CREATE TABLE + 2 CREATE INDEX                                          |
+| `ApplicationDbContext` (existing)          | Infrastructure | MODIFY — Add `DbSet<AiQualityMetric> AiQualityMetrics`                                             |
 
 ---
 
@@ -145,12 +146,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Domain/AiQualityMetric.cs` | Immutable entity: Id, SessionId, MetricType, FieldName?, IsAgreement?, IsHallucination?, IsSchemaValid?, RecordedAt |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/AiQualityMetricConfiguration.cs` | Fluent API: table name, column constraints, 2 indexes |
-| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDD_AddAiQualityMetricsTable.cs` | EF Core migration: CREATE TABLE + 2 indexes |
-| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs` | Add `DbSet<AiQualityMetric> AiQualityMetrics` |
+| Action | File Path                                                                           | Description                                                                                                         |
+| ------ | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Domain/AiQualityMetric.cs`                                                  | Immutable entity: Id, SessionId, MetricType, FieldName?, IsAgreement?, IsHallucination?, IsSchemaValid?, RecordedAt |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/AiQualityMetricConfiguration.cs`  | Fluent API: table name, column constraints, 2 indexes                                                               |
+| CREATE | `Server/Infrastructure/Persistence/Migrations/YYYYMMDD_AddAiQualityMetricsTable.cs` | EF Core migration: CREATE TABLE + 2 indexes                                                                         |
+| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs`                         | Add `DbSet<AiQualityMetric> AiQualityMetrics`                                                                       |
 
 ---
 
@@ -184,8 +185,8 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `AiQualityMetric` entity: 8 columns, all `init`, immutable; `MetricType` discriminator string
-- [ ] Create `AiQualityMetricConfiguration`: table name, column constraints, 2 named indexes
-- [ ] Add `DbSet<AiQualityMetric>` to `ApplicationDbContext`
-- [ ] Generate and review EF Core migration `AddAiQualityMetricsTable` (Up + Down)
-- [ ] Verify composite index includes `RecordedAt DESC` direction for rolling-window query pattern
+- [x] Create `AiQualityMetric` entity: 8 columns, all `init`, immutable; `MetricType` discriminator string
+- [x] Create `AiQualityMetricConfiguration`: table name, column constraints, 2 named indexes
+- [x] Add `DbSet<AiQualityMetric>` to `ApplicationDbContext`
+- [x] Generate and review EF Core migration `AddAiQualityMetricsTable` (Up + Down)
+- [x] Verify composite index includes `RecordedAt DESC` direction for rolling-window query pattern

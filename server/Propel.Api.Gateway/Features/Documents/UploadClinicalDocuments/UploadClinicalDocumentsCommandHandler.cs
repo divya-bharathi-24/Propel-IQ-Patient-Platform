@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,8 @@ namespace Propel.Api.Gateway.Features.Documents.UploadClinicalDocuments;
 public sealed class UploadClinicalDocumentsCommandHandler
     : IRequestHandler<UploadClinicalDocumentsCommand, UploadBatchResultDto>
 {
-    /// <summary>Maximum accepted file size: 25 MB = 26,214,400 bytes (FR-042).</summary>
-    private const long MaxFileSizeBytes = 26_214_400L;
+    /// <summary>Maximum accepted file size: 50 MB = 52,428,800 bytes (NFR-019, AC-4).</summary>
+    private const long MaxFileSizeBytes = 52_428_800L;
 
     private readonly AppDbContext _db;
     private readonly IFileEncryptionService _encryptionService;
@@ -73,11 +74,13 @@ public sealed class UploadClinicalDocumentsCommandHandler
 
             if (file.Length > MaxFileSizeBytes)
             {
-                results.Add(new UploadFileResultDto(file.FileName, false, "File too large — maximum 25 MB."));
+                results.Add(new UploadFileResultDto(file.FileName, false, "File too large — maximum 50 MB."));
                 continue;
             }
 
             // Step 2 — Read bytes and verify PDF magic bytes (%PDF-) to prevent MIME spoofing (OWASP A05).
+            // Start timing here to include storage I/O in the logged duration (NFR-019, EP-011/us_053/task_002).
+            var uploadStopwatch = Stopwatch.StartNew();
             byte[] fileBytes;
             await using (var stream = file.OpenReadStream())
             {
@@ -116,15 +119,19 @@ public sealed class UploadClinicalDocumentsCommandHandler
 
             _db.ClinicalDocuments.Add(document);
             await _db.SaveChangesAsync(cancellationToken);
+            uploadStopwatch.Stop();
 
             _logger.LogInformation(
-                "PatientUpload_Success: DocumentId={DocumentId} PatientId={PatientId} FileName={FileName} FileSize={FileSize}",
-                document.Id, document.PatientId, document.FileName, document.FileSize);
+                "PatientUpload_Success: DocumentId={DocumentId} PatientId={PatientId} FileName={FileName} FileSize={FileSize} DurationMs={DurationMs}",
+                document.Id, document.PatientId, document.FileName, document.FileSize,
+                uploadStopwatch.ElapsedMilliseconds);
 
-            // Step 6 — Publish notification to trigger async AI extraction pipeline (AC-3, AD-3).
-            await _publisher.Publish(
+            // Step 6 — Fire-and-forget publish so AI extraction does NOT block the HTTP response.
+            // CancellationToken.None prevents the HTTP request cancellation from aborting the
+            // extraction pipeline after the response has been returned (EP-011/us_053/task_002).
+            _ = _publisher.Publish(
                 new ClinicalDocumentUploadedNotification(document.Id, document.PatientId),
-                cancellationToken);
+                CancellationToken.None);
 
             // Step 7 — Write audit log (FR-057, FR-058, AD-7 — isolated context, never rolled back).
             await _auditLogRepo.AppendAsync(new AuditLog

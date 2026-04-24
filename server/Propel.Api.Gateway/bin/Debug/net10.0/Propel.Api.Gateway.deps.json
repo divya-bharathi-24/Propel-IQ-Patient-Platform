@@ -158,6 +158,14 @@
           }
         }
       },
+      "Google.Protobuf/3.30.2": {
+        "runtime": {
+          "lib/net5.0/Google.Protobuf.dll": {
+            "assemblyVersion": "3.30.2.0",
+            "fileVersion": "3.30.2.0"
+          }
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "runtime": {
           "lib/net6.0/Humanizer.dll": {
@@ -837,6 +845,17 @@
           }
         }
       },
+      "Microsoft.ML.Tokenizers/2.0.0": {
+        "dependencies": {
+          "Google.Protobuf": "3.30.2"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.ML.Tokenizers.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "2.0.25.55704"
+          }
+        }
+      },
       "Microsoft.OpenApi/1.6.14": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {
@@ -1467,6 +1486,9 @@
         }
       },
       "Propel.Domain/1.0.0": {
+        "dependencies": {
+          "MediatR": "12.5.0"
+        },
         "runtime": {
           "Propel.Domain.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -1493,12 +1515,14 @@
         "dependencies": {
           "FluentValidation": "11.12.0",
           "MediatR": "12.5.0",
+          "Microsoft.ML.Tokenizers": "2.0.0",
           "Microsoft.SemanticKernel": "1.74.0",
           "Microsoft.SemanticKernel.Connectors.AzureOpenAI": "1.74.0",
           "Polly": "8.6.6",
           "Polly.Extensions": "8.6.6",
           "Propel.Domain": "1.0.0",
-          "Serilog": "4.3.1"
+          "Serilog": "4.3.1",
+          "StackExchange.Redis": "2.12.14"
         },
         "runtime": {
           "Propel.Modules.AI.dll": {
@@ -1559,7 +1583,11 @@
       "Propel.Modules.Clinical/1.0.0": {
         "dependencies": {
           "FluentValidation": "11.12.0",
-          "MediatR": "12.5.0"
+          "MediatR": "12.5.0",
+          "Propel.Domain": "1.0.0",
+          "Propel.Modules.AI": "1.0.0",
+          "Propel.Modules.Notification": "1.0.0",
+          "Serilog": "4.3.1"
         },
         "runtime": {
           "Propel.Modules.Clinical.dll": {
@@ -1707,6 +1735,13 @@
       "sha512": "sha512-vSc7CY4KCP7HE4QTElDx/ExnGLbg9kXb89MS6cdvI+0D4sxvTYb16vGtXmF2jSDMV3iDmykSXdIUPTz8TDS6gg==",
       "path": "google.apis.core/1.73.0",
       "hashPath": "google.apis.core.1.73.0.nupkg.sha512"
+    },
+    "Google.Protobuf/3.30.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Y2aOVLIt75yeeEWigg9V9YnjsEm53sADtLGq0gLhwaXpk3iu8tYSoauolyhenagA2sWno2TQ2WujI0HQd6s1Vw==",
+      "path": "google.protobuf/3.30.2",
+      "hashPath": "google.protobuf.3.30.2.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -2008,6 +2043,13 @@
       "sha512": "sha512-L2G8IAedvUR0cfx7/kUSzK9xOymp7jC11mfYVvUM6RltIYlxZwnfISezo5HwuSu71ESDQ1ddxtKQ6TubVDn8uA==",
       "path": "microsoft.kiota.serialization.text/1.21.1",
       "hashPath": "microsoft.kiota.serialization.text.1.21.1.nupkg.sha512"
+    },
+    "Microsoft.ML.Tokenizers/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+b8lT4cLLO/sBR2hjvE/qG6qrZG15h7/PBvnIrzTh4xDaAxdHUY6449rC+1pHzQUsBiCHZVbj+VMn+xS0sL7TA==",
+      "path": "microsoft.ml.tokenizers/2.0.0",
+      "hashPath": "microsoft.ml.tokenizers.2.0.0.nupkg.sha512"
     },
     "Microsoft.OpenApi/1.6.14": {
       "type": "package",

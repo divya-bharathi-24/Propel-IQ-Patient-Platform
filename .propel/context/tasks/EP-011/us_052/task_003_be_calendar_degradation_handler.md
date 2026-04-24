@@ -29,11 +29,11 @@
 
 ## Applicable Technology Stack
 
-| Layer    | Technology                    | Version |
-| -------- | ----------------------------- | ------- |
-| Backend  | ASP.NET Core Web API / .NET   | 9       |
-| ORM      | Entity Framework Core         | 9.x     |
-| Logging  | Serilog                       | 4.x     |
+| Layer   | Technology                  | Version |
+| ------- | --------------------------- | ------- |
+| Backend | ASP.NET Core Web API / .NET | 9       |
+| ORM     | Entity Framework Core       | 9.x     |
+| Logging | Serilog                     | 4.x     |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -84,16 +84,16 @@ This task does NOT re-implement the circuit breaker (US_050 task_001). It adds o
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `ICalendarSyncService` (new) | Application | CREATE — `SyncAsync(appointmentId, provider)` → `CalendarSyncResult`; never throws |
-| `GoogleCalendarSyncService` (new) | Infrastructure | CREATE — wraps Google Calendar API; on exception → `CalendarSync { syncStatus=Failed }` + return `CalendarSyncResult.Failed` |
-| `MicrosoftGraphCalendarSyncService` (new) | Infrastructure | CREATE — wraps Microsoft Graph calendar API; same pattern |
-| `CalendarSyncResult` (new) | Application | CREATE — discriminated result: `Synced(externalEventId)` / `Failed(reason)` |
-| `IcsFileGenerator` (new) | Application | CREATE — generates RFC 5545 `.ics` file content from `Appointment` entity; used as fallback |
-| `DegradationNotice` DTO (new) | Application | CREATE — `{ feature, message, fallbackAvailable, fallbackType }`; included in API responses when a feature is degraded |
-| `DegradationResponseFactory` (new) | Application | CREATE — maps `ExtractionResult.ManualFallback` + `CalendarSyncResult.Failed` to `DegradationNotice`; used by booking and extraction controllers |
-| `AppointmentsController` (existing) | API | MODIFY — include `DegradationNotice[]` in booking confirmation response when calendar sync fails |
+| Component                                 | Module         | Action                                                                                                                                           |
+| ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ICalendarSyncService` (new)              | Application    | CREATE — `SyncAsync(appointmentId, provider)` → `CalendarSyncResult`; never throws                                                               |
+| `GoogleCalendarSyncService` (new)         | Infrastructure | CREATE — wraps Google Calendar API; on exception → `CalendarSync { syncStatus=Failed }` + return `CalendarSyncResult.Failed`                     |
+| `MicrosoftGraphCalendarSyncService` (new) | Infrastructure | CREATE — wraps Microsoft Graph calendar API; same pattern                                                                                        |
+| `CalendarSyncResult` (new)                | Application    | CREATE — discriminated result: `Synced(externalEventId)` / `Failed(reason)`                                                                      |
+| `IcsFileGenerator` (new)                  | Application    | CREATE — generates RFC 5545 `.ics` file content from `Appointment` entity; used as fallback                                                      |
+| `DegradationNotice` DTO (new)             | Application    | CREATE — `{ feature, message, fallbackAvailable, fallbackType }`; included in API responses when a feature is degraded                           |
+| `DegradationResponseFactory` (new)        | Application    | CREATE — maps `ExtractionResult.ManualFallback` + `CalendarSyncResult.Failed` to `DegradationNotice`; used by booking and extraction controllers |
+| `AppointmentsController` (existing)       | API            | MODIFY — include `DegradationNotice[]` in booking confirmation response when calendar sync fails                                                 |
 
 ---
 
@@ -258,16 +258,16 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Application/Calendar/ICalendarSyncService.cs` | Interface: `SyncAsync()` → `CalendarSyncResult` |
-| CREATE | `Server/Application/Calendar/CalendarSyncResult.cs` | Abstract record: `Synced(externalEventId)` + `Failed(reason)` |
-| CREATE | `Server/Application/Calendar/IcsFileGenerator.cs` | RFC 5545 `.ics` content generator from `Appointment` entity |
-| CREATE | `Server/Application/Degradation/DegradationNotice.cs` | DTO record: `Feature`, `Message`, `FallbackAvailable`, `FallbackType` |
-| CREATE | `Server/Application/Degradation/DegradationResponseFactory.cs` | Static factory: maps `CalendarSyncResult.Failed` and `ExtractionResult.ManualFallback` to `DegradationNotice` |
-| CREATE | `Server/Infrastructure/Calendar/GoogleCalendarSyncService.cs` | `ICalendarSyncService`: wraps Google Calendar API; persists `CalendarSync`; `Failed` on exception |
-| CREATE | `Server/Infrastructure/Calendar/MicrosoftGraphCalendarSyncService.cs` | `ICalendarSyncService`: wraps Microsoft Graph; same pattern as Google |
-| MODIFY | `Server/API/Controllers/AppointmentsController.cs` | Include `DegradationNotices` in booking response; `IcsDownloadAvailable` flag |
+| Action | File Path                                                             | Description                                                                                                   |
+| ------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Application/Calendar/ICalendarSyncService.cs`                 | Interface: `SyncAsync()` → `CalendarSyncResult`                                                               |
+| CREATE | `Server/Application/Calendar/CalendarSyncResult.cs`                   | Abstract record: `Synced(externalEventId)` + `Failed(reason)`                                                 |
+| CREATE | `Server/Application/Calendar/IcsFileGenerator.cs`                     | RFC 5545 `.ics` content generator from `Appointment` entity                                                   |
+| CREATE | `Server/Application/Degradation/DegradationNotice.cs`                 | DTO record: `Feature`, `Message`, `FallbackAvailable`, `FallbackType`                                         |
+| CREATE | `Server/Application/Degradation/DegradationResponseFactory.cs`        | Static factory: maps `CalendarSyncResult.Failed` and `ExtractionResult.ManualFallback` to `DegradationNotice` |
+| CREATE | `Server/Infrastructure/Calendar/GoogleCalendarSyncService.cs`         | `ICalendarSyncService`: wraps Google Calendar API; persists `CalendarSync`; `Failed` on exception             |
+| CREATE | `Server/Infrastructure/Calendar/MicrosoftGraphCalendarSyncService.cs` | `ICalendarSyncService`: wraps Microsoft Graph; same pattern as Google                                         |
+| MODIFY | `Server/API/Controllers/AppointmentsController.cs`                    | Include `DegradationNotices` in booking response; `IcsDownloadAvailable` flag                                 |
 
 ---
 
@@ -299,9 +299,9 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `CalendarSyncResult` abstract record: `Synced(externalEventId)` and `Failed(reason)` subtypes
-- [ ] Create `ICalendarSyncService` interface; create `GoogleCalendarSyncService` + `MicrosoftGraphCalendarSyncService`: persist `CalendarSync` as `Pending` first; update to `Synced`/`Failed` on outcome; catch → `Failed` + Serilog Warning
-- [ ] Create `IcsFileGenerator`: RFC 5545 compliant `VCALENDAR` + `VEVENT`; `DTSTART`/`DTEND` from `Appointment.TimeSlotStart`/`TimeSlotEnd`; `UID` = `{appointment.Id}@propeliq.health`
-- [ ] Create `DegradationNotice` DTO + `DegradationResponseFactory` static class mapping `CalendarSyncResult.Failed` → `DegradationNotice` and `ExtractionResult.ManualFallback` → `DegradationNotice`
-- [ ] Modify `AppointmentsController` booking endpoint: call `ICalendarSyncService.SyncAsync` after booking; build `DegradationNotices` list; include `IcsDownloadAvailable` flag in `BookAppointmentResponse`
-- [ ] Register `GoogleCalendarSyncService` and `MicrosoftGraphCalendarSyncService` as scoped `ICalendarSyncService` in `Program.cs` (keyed or named registration for provider selection)
+- [x] Create `CalendarSyncResult` abstract record: `Synced(externalEventId)` and `Failed(reason)` subtypes
+- [x] Create `ICalendarSyncService` interface; create `GoogleCalendarSyncService` + `MicrosoftGraphCalendarSyncService`: persist `CalendarSync` as `Pending` first; update to `Synced`/`Failed` on outcome; catch → `Failed` + Serilog Warning
+- [x] Create `IcsFileGenerator`: RFC 5545 compliant `VCALENDAR` + `VEVENT`; `DTSTART`/`DTEND` from `Appointment.TimeSlotStart`/`TimeSlotEnd`; `UID` = `{appointment.Id}@propeliq.health` — leverages existing `IcsGenerationService` (RFC 5545 via Ical.Net); ICS download endpoint `GET /api/appointments/{id}/ics` already exists
+- [x] Create `DegradationNotice` DTO + `DegradationResponseFactory` static class mapping `CalendarSyncResult.Failed` → `DegradationNotice` and `ExtractionResult.ManualFallback` → `DegradationNotice`
+- [x] Modify `BookingController` booking endpoint: call `ICalendarSyncService.SyncAsync` after booking; build `DegradationNotices` list; include `IcsDownloadAvailable` flag in `BookAppointmentResponse`
+- [x] Register `GoogleCalendarSyncService` and `MicrosoftGraphCalendarSyncService` as keyed scoped `ICalendarSyncService` in `Program.cs` (keyed: "Google" / "Outlook")

@@ -30,11 +30,11 @@
 
 ## Applicable Technology Stack
 
-| Layer   | Technology              | Version |
-| ------- | ----------------------- | ------- |
-| Database | PostgreSQL             | 16+     |
-| ORM     | Entity Framework Core   | 9.x     |
-| Backend  | ASP.NET Core Web API   | .net 10  |
+| Layer    | Technology            | Version |
+| -------- | --------------------- | ------- |
+| Database | PostgreSQL            | 16+     |
+| ORM      | Entity Framework Core | 9.x     |
+| Backend  | ASP.NET Core Web API  | .net 10 |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -78,12 +78,12 @@ Create the `DataConflict` EF Core 9 entity and its corresponding PostgreSQL tabl
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `DataConflict` (new) | Domain Entities | CREATE — EF Core entity class |
-| `DataConflictConfiguration` (new) | EF Core Fluent Config | CREATE — Table name, PK, FKs, max lengths, enum-to-string, indexes |
-| `ApplicationDbContext` (existing) | Infrastructure | MODIFY — Add `DbSet<DataConflict> DataConflicts` and apply configuration |
-| `AddDataConflictsTable` migration (new) | EF Core Migrations | CREATE — UP: create table + indexes; DOWN: drop indexes then table |
+| Component                               | Module                | Action                                                                   |
+| --------------------------------------- | --------------------- | ------------------------------------------------------------------------ |
+| `DataConflict` (new)                    | Domain Entities       | CREATE — EF Core entity class                                            |
+| `DataConflictConfiguration` (new)       | EF Core Fluent Config | CREATE — Table name, PK, FKs, max lengths, enum-to-string, indexes       |
+| `ApplicationDbContext` (existing)       | Infrastructure        | MODIFY — Add `DbSet<DataConflict> DataConflicts` and apply configuration |
+| `AddDataConflictsTable` migration (new) | EF Core Migrations    | CREATE — UP: create table + indexes; DOWN: drop indexes then table       |
 
 ---
 
@@ -122,9 +122,11 @@ Create the `DataConflict` EF Core 9 entity and its corresponding PostgreSQL tabl
 3. **Register entity in `ApplicationDbContext`** — Add `public DbSet<DataConflict> DataConflicts { get; set; }` and apply `new DataConflictConfiguration()` in `OnModelCreating`.
 
 4. **Generate EF Core migration** — Run:
+
    ```
    dotnet ef migrations add AddDataConflictsTable --project Server --startup-project Server
    ```
+
    Review generated migration SQL against steps 1–2. Verify partial unique index syntax in the generated migration; hand-adjust `migrationBuilder.Sql()` for the partial index if EF Core does not generate it correctly.
 
 5. **Verify rollback** — Confirm `Down()` drops the three indexes before dropping the table; run `dotnet ef migrations script` to inspect generated SQL.
@@ -154,12 +156,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Domain/Entities/DataConflict.cs` | EF Core entity: all DR-008 attributes + Severity, ResolutionNote, DetectedAt |
+| Action | File Path                                                                       | Description                                                                           |
+| ------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| CREATE | `Server/Domain/Entities/DataConflict.cs`                                        | EF Core entity: all DR-008 attributes + Severity, ResolutionNote, DetectedAt          |
 | CREATE | `Server/Infrastructure/Persistence/Configurations/DataConflictConfiguration.cs` | Fluent API: table, PK, FKs (restrict/cascade), max lengths, enum-to-string, 3 indexes |
-| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs` | Add `DbSet<DataConflict> DataConflicts`; apply `DataConflictConfiguration` |
-| CREATE | `Server/Migrations/<timestamp>_AddDataConflictsTable.cs` | EF Core migration UP/DOWN for `DataConflicts` table and all indexes |
+| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs`                     | Add `DbSet<DataConflict> DataConflicts`; apply `DataConflictConfiguration`            |
+| CREATE | `Server/Migrations/<timestamp>_AddDataConflictsTable.cs`                        | EF Core migration UP/DOWN for `DataConflicts` table and all indexes                   |
 
 ---
 
@@ -199,12 +201,12 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `DataConflict` entity with all DR-008 columns plus `Severity`, `ResolutionNote`, `DetectedAt`
-- [ ] Create `DataConflictConfiguration`: table, PK, FKs (cascade/restrict), max lengths, enum-to-string conversions, default values
-- [ ] Add composite query index `(PatientId, ResolutionStatus, Severity)`
-- [ ] Add partial unique index `(PatientId, FieldName, SourceDocumentId1, SourceDocumentId2)` WHERE `ResolutionStatus = 'Unresolved'` using `HasFilter`
-- [ ] Add `PatientId` standard index for all-conflicts retrieval
-- [ ] Add `DbSet<DataConflict> DataConflicts` to `ApplicationDbContext` and apply configuration
-- [ ] Generate `AddDataConflictsTable` migration; review and hand-adjust partial index SQL if needed
-- [ ] Verify migration DOWN script drops indexes then table without errors
+- [x] Create `DataConflict` entity with all DR-008 columns plus `Severity`, `ResolutionNote`, `DetectedAt`
+- [x] Create `DataConflictConfiguration`: table, PK, FKs (cascade/restrict), max lengths, enum-to-string conversions, default values
+- [x] Add composite query index `(PatientId, ResolutionStatus, Severity)`
+- [x] Add partial unique index `(PatientId, FieldName, SourceDocumentId1, SourceDocumentId2)` WHERE `ResolutionStatus = 'Unresolved'` using `HasFilter`
+- [x] Add `PatientId` standard index for all-conflicts retrieval
+- [x] Add `DbSet<DataConflict> DataConflicts` to `ApplicationDbContext` and apply configuration
+- [x] Generate `AddDataConflictsTable` migration; review and hand-adjust partial index SQL if needed
+- [x] Verify migration DOWN script drops indexes then table without errors
 - [ ] Apply migration and confirm schema via `information_schema` and `pg_indexes` queries

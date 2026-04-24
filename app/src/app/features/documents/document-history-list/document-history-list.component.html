@@ -87,7 +87,7 @@
             <button
               type="button"
               class="delete-btn"
-              aria-label="Delete {{ doc.fileName }}"
+              [attr.aria-label]="'Delete ' + doc.fileName"
               (click)="openDeleteConfirmation(doc.id)"
             >
               🗑
@@ -100,7 +100,7 @@
               class="delete-confirm-panel"
               role="dialog"
               aria-modal="true"
-              aria-label="Confirm deletion of {{ doc.fileName }}"
+              [attr.aria-label]="'Confirm deletion of ' + doc.fileName"
             >
               <p class="confirm-message">
                 Please provide a reason for deleting this document.
@@ -117,7 +117,7 @@
                 [value]="deletionReason()"
                 (input)="deletionReason.set($any($event.target).value)"
                 aria-required="true"
-                aria-describedby="deleteError-{{ doc.id }}"
+                [attr.aria-describedby]="'deleteError-' + doc.id"
               ></textarea>
 
               @if (deleteError()) {

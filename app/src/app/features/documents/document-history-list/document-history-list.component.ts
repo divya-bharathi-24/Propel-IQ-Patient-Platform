@@ -10,8 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { catchError, of } from 'rxjs';
-import { StaffDocumentService } from '../staff-document.service';
-import { DocumentHistoryItemDto } from '../staff-document.models';
+import { StaffDocumentService } from '../../staff/patient-record/staff-document.service';
+import { DocumentHistoryItemDto } from '../../staff/patient-record/staff-document.models';
 
 /**
  * DocumentHistoryListComponent — US_039 / TASK_001

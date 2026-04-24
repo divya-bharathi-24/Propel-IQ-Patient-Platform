@@ -235,4 +235,22 @@ public sealed class NotificationRepository : INotificationRepository
             .OrderByDescending(n => n.SentAt)
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<Notification>> GetRetryEligibleBookingNotificationsAsync(
+        int maxRetries,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        // ScheduledAt IS NULL distinguishes fire-and-try booking/confirmation records from
+        // scheduler-managed reminder records (which always have a non-null ScheduledAt).
+        // Parameterised LINQ — no raw SQL interpolation (OWASP A03).
+        return await context.Notifications
+            .AsNoTracking()
+            .Where(n => n.Status       == NotificationStatus.Pending
+                     && n.RetryCount    < maxRetries
+                     && n.ScheduledAt  == null)
+            .ToListAsync(cancellationToken);
+    }
 }

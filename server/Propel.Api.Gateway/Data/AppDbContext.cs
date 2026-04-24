@@ -68,13 +68,27 @@ public sealed class AppDbContext : DbContext
     // ── EP-007/us_035 — Google Calendar OAuth token storage (task_002) ────────
     public DbSet<PatientOAuthToken> PatientOAuthTokens => Set<PatientOAuthToken>();
 
+    // ── US_040 — AI RAG pipeline: pgvector chunk embeddings (task_002) ──────────
+    public DbSet<DocumentChunkEmbedding> DocumentChunkEmbeddings => Set<DocumentChunkEmbedding>();
+
+    // ── EP-008-I/us_041 — 360-degree profile verification (task_002) ─────────
+    public DbSet<PatientProfileVerification> PatientProfileVerifications => Set<PatientProfileVerification>();
+
+    // ── EP-010/us_048 — AI quality metrics (task_003) ─────────────────────────
+    public DbSet<AiQualityMetric> AiQualityMetrics => Set<AiQualityMetric>();
+
+    // ── EP-010/us_049 — AI prompt audit log (task_002) ────────────────────────
+    public DbSet<AiPromptAuditLog> AiPromptAuditLogs => Set<AiPromptAuditLog>();
+
+    // ── EP-010/us_050 — AI operational metrics (task_004) ─────────────────────
+    public DbSet<AiOperationalMetric> AiOperationalMetrics => Set<AiOperationalMetric>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // TODO: Uncomment when pgvector is installed and AI features are ready
-        // Enable pgvector extension — migration will emit CREATE EXTENSION IF NOT EXISTS vector (AC-2)
-        // modelBuilder.HasPostgresExtension("vector");  // COMMENTED OUT - AI features disabled temporarily
+        // Enable pgvector extension — migration will emit CREATE EXTENSION IF NOT EXISTS vector (US_040, AC-1, AD-5)
+        modelBuilder.HasPostgresExtension("vector");
 
         // Auto-discovers all IEntityTypeConfiguration<T> implementations in this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

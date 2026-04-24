@@ -95,3 +95,22 @@ export interface ReAuthModalResult {
   status: ReAuthStatus;
   reAuthToken?: string;
 }
+
+// ---------------------------------------------------------------------------
+// AI Operational Metrics — US_050 / AC-4 (AIR-O04)
+// ---------------------------------------------------------------------------
+
+export interface AiOperationalMetricsSummary {
+  cbOpen: boolean;
+  cbTrips24h: number;
+  p95LatencyMs: number | null;
+  avgPromptTokens: number;
+  avgResponseTokens: number;
+  errorRate: number;
+  currentModelVersion: string;
+  status: string;
+}
+
+export interface UpdateModelVersionRequest {
+  modelVersion: string;
+}

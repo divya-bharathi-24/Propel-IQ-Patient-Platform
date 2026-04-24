@@ -31,11 +31,11 @@
 
 ## Applicable Technology Stack
 
-| Layer  | Technology              | Version |
-| ------ | ----------------------- | ------- |
+| Layer    | Technology            | Version |
+| -------- | --------------------- | ------- |
 | Database | PostgreSQL            | 16+     |
-| ORM    | Entity Framework Core   | 9.x     |
-| Backend | ASP.NET Core Web API   | .net 10  |
+| ORM      | Entity Framework Core | 9.x     |
+| Backend  | ASP.NET Core Web API  | .net 10 |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
 
@@ -79,12 +79,12 @@ Create the `MedicalCode` EF Core entity and its corresponding PostgreSQL table v
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `MedicalCode` (new) | Domain Entities | CREATE — EF Core entity class |
-| `MedicalCodeConfiguration` (new) | EF Core Fluent Config | CREATE — Table name, PK, FKs, indexes, column constraints |
-| `ApplicationDbContext` (existing) | Infrastructure | MODIFY — Add `DbSet<MedicalCode> MedicalCodes` |
-| `AddMedicalCodesTable` migration (new) | EF Core Migrations | CREATE — UP: create table + indexes; DOWN: drop table |
+| Component                              | Module                | Action                                                    |
+| -------------------------------------- | --------------------- | --------------------------------------------------------- |
+| `MedicalCode` (new)                    | Domain Entities       | CREATE — EF Core entity class                             |
+| `MedicalCodeConfiguration` (new)       | EF Core Fluent Config | CREATE — Table name, PK, FKs, indexes, column constraints |
+| `ApplicationDbContext` (existing)      | Infrastructure        | MODIFY — Add `DbSet<MedicalCode> MedicalCodes`            |
+| `AddMedicalCodesTable` migration (new) | EF Core Migrations    | CREATE — UP: create table + indexes; DOWN: drop table     |
 
 ---
 
@@ -119,9 +119,11 @@ Create the `MedicalCode` EF Core entity and its corresponding PostgreSQL table v
 3. **Register entity in `ApplicationDbContext`** — Add `public DbSet<MedicalCode> MedicalCodes { get; set; }` and apply configuration via `modelBuilder.ApplyConfiguration(new MedicalCodeConfiguration())`.
 
 4. **Generate EF Core migration** — Run:
+
    ```
    dotnet ef migrations add AddMedicalCodesTable --project Server --startup-project Server
    ```
+
    Review generated migration for correctness against steps 1–3 before proceeding.
 
 5. **Verify rollback** — Run `dotnet ef migrations script <previous_migration> AddMedicalCodesTable` to confirm DOWN script correctly drops the `MedicalCodes` table and its indexes without affecting other tables.
@@ -154,12 +156,12 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Domain/Entities/MedicalCode.cs` | EF Core entity: all DR-007 attributes + `RejectionReason`, `IsManualEntry`, `CreatedAt` |
-| CREATE | `Server/Infrastructure/Persistence/Configurations/MedicalCodeConfiguration.cs` | Fluent API: table, PK, FKs, max lengths, indexes |
-| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs` | Add `DbSet<MedicalCode> MedicalCodes` and apply configuration |
-| CREATE | `Server/Migrations/<timestamp>_AddMedicalCodesTable.cs` | EF Core migration UP/DOWN for `MedicalCodes` table |
+| Action | File Path                                                                      | Description                                                                             |
+| ------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| CREATE | `Server/Domain/Entities/MedicalCode.cs`                                        | EF Core entity: all DR-007 attributes + `RejectionReason`, `IsManualEntry`, `CreatedAt` |
+| CREATE | `Server/Infrastructure/Persistence/Configurations/MedicalCodeConfiguration.cs` | Fluent API: table, PK, FKs, max lengths, indexes                                        |
+| MODIFY | `Server/Infrastructure/Persistence/ApplicationDbContext.cs`                    | Add `DbSet<MedicalCode> MedicalCodes` and apply configuration                           |
+| CREATE | `Server/Migrations/<timestamp>_AddMedicalCodesTable.cs`                        | EF Core migration UP/DOWN for `MedicalCodes` table                                      |
 
 ---
 
@@ -181,25 +183,25 @@ Server/
 
 ## Implementation Validation Strategy
 
-- [ ] Unit tests pass (xUnit — entity configuration tests)
-- [ ] Migration UP script creates `MedicalCodes` table with all expected columns and correct types
-- [ ] Migration DOWN script drops `MedicalCodes` table cleanly without errors
-- [ ] Composite index `(PatientId, CodeType, VerificationStatus)` exists after migration
-- [ ] Index `(PatientId, VerificationStatus)` exists after migration
-- [ ] FK `PatientId` → `Patients.Id` enforced (cascade delete verified)
-- [ ] FK `SourceDocumentId` → `ClinicalDocuments.Id` nullable; set null on document delete
-- [ ] FK `VerifiedBy` → `Users.Id` nullable; restricted delete
-- [ ] `VerificationStatus` defaults to `'Pending'` on INSERT without explicit value
-- [ ] `IsManualEntry` defaults to `false` on INSERT without explicit value
+- [x] Unit tests pass (xUnit — entity configuration tests)
+- [x] Migration UP script creates `MedicalCodes` table with all expected columns and correct types
+- [x] Migration DOWN script drops `MedicalCodes` table cleanly without errors
+- [x] Composite index `(PatientId, CodeType, VerificationStatus)` exists after migration
+- [x] Index `(PatientId, VerificationStatus)` exists after migration
+- [x] FK `PatientId` → `Patients.Id` enforced (cascade delete verified)
+- [x] FK `SourceDocumentId` → `ClinicalDocuments.Id` nullable; set null on document delete
+- [x] FK `VerifiedBy` → `Users.Id` nullable; restricted delete
+- [x] `VerificationStatus` defaults to `'Pending'` on INSERT without explicit value
+- [x] `IsManualEntry` defaults to `false` on INSERT without explicit value
 - [ ] `dotnet ef database update` succeeds against local Neon PostgreSQL connection string
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Create `MedicalCode` entity class with all DR-007 attributes plus `RejectionReason`, `IsManualEntry`, `CreatedAt`
-- [ ] Create `MedicalCodeConfiguration`: table name, PK, FKs (cascade/set-null/restrict), max lengths, enum-to-string conversions, composite indexes
-- [ ] Add `DbSet<MedicalCode> MedicalCodes` to `ApplicationDbContext` and apply configuration
-- [ ] Generate migration `AddMedicalCodesTable` and review generated SQL for correctness
-- [ ] Verify migration DOWN script drops table and indexes without side effects
+- [x] Create `MedicalCode` entity class with all DR-007 attributes plus `RejectionReason`, `IsManualEntry`, `CreatedAt`
+- [x] Create `MedicalCodeConfiguration`: table name, PK, FKs (cascade/set-null/restrict), max lengths, enum-to-string conversions, composite indexes
+- [x] Add `DbSet<MedicalCode> MedicalCodes` to `ApplicationDbContext` and apply configuration
+- [x] Generate migration `AddMedicalCodesTable` and review generated SQL for correctness
+- [x] Verify migration DOWN script drops table and indexes without side effects
 - [ ] Apply migration to development database and confirm schema via information_schema query

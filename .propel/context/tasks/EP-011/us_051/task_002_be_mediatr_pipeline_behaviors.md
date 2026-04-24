@@ -30,12 +30,12 @@
 
 ## Applicable Technology Stack
 
-| Layer      | Technology                          | Version |
-| ---------- | ----------------------------------- | ------- |
-| Backend    | ASP.NET Core Web API / .NET         | 9       |
-| CQRS       | MediatR                             | 12.x    |
-| Validation | FluentValidation                    | 11.x    |
-| Logging    | Serilog                             | 4.x     |
+| Layer      | Technology                          | Version    |
+| ---------- | ----------------------------------- | ---------- |
+| Backend    | ASP.NET Core Web API / .NET         | 9          |
+| CQRS       | MediatR                             | 12.x       |
+| Validation | FluentValidation                    | 11.x       |
+| Logging    | Serilog                             | 4.x        |
 | Cache      | Upstash Redis (StackExchange.Redis) | Serverless |
 
 **Note:** All code and libraries MUST be compatible with versions listed above.
@@ -90,14 +90,14 @@ All three are registered in `Program.cs` via `services.AddTransient(typeof(IPipe
 
 ## Impacted Components
 
-| Component | Module | Action |
-| --------- | ------ | ------ |
-| `ICommand` / `IQuery<TResult>` marker interfaces (new) | Application | CREATE — empty marker interfaces for CQRS type safety |
-| `LoggingBehavior<TRequest, TResponse>` (new) | Application | CREATE — `IPipelineBehavior`; logs entry/exit; pushes correlation ID to `LogContext` |
-| `ValidationBehavior<TRequest, TResponse>` (new) | Application | CREATE — `IPipelineBehavior`; runs all `IValidator<TRequest>`; throws `ValidationException` on failure |
-| `PerformanceBehavior<TRequest, TResponse>` (new) | Application | CREATE — `IPipelineBehavior`; Redis LPUSH latency sample; p95 computation every 10th write; Serilog Warning + Redis flag on breach |
-| `ExceptionHandlingMiddleware` (new) | API | CREATE — catches `ValidationException` → structured `ProblemDetails` HTTP 400 with per-field errors + correlation ID in log |
-| `Program.cs` (existing) | API | MODIFY — register three behaviors as open-generic `IPipelineBehavior<,>`; register `ExceptionHandlingMiddleware`; register `FluentValidation` validators |
+| Component                                              | Module      | Action                                                                                                                                                   |
+| ------------------------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ICommand` / `IQuery<TResult>` marker interfaces (new) | Application | CREATE — empty marker interfaces for CQRS type safety                                                                                                    |
+| `LoggingBehavior<TRequest, TResponse>` (new)           | Application | CREATE — `IPipelineBehavior`; logs entry/exit; pushes correlation ID to `LogContext`                                                                     |
+| `ValidationBehavior<TRequest, TResponse>` (new)        | Application | CREATE — `IPipelineBehavior`; runs all `IValidator<TRequest>`; throws `ValidationException` on failure                                                   |
+| `PerformanceBehavior<TRequest, TResponse>` (new)       | Application | CREATE — `IPipelineBehavior`; Redis LPUSH latency sample; p95 computation every 10th write; Serilog Warning + Redis flag on breach                       |
+| `ExceptionHandlingMiddleware` (new)                    | API         | CREATE — catches `ValidationException` → structured `ProblemDetails` HTTP 400 with per-field errors + correlation ID in log                              |
+| `Program.cs` (existing)                                | API         | MODIFY — register three behaviors as open-generic `IPipelineBehavior<,>`; register `ExceptionHandlingMiddleware`; register `FluentValidation` validators |
 
 ---
 
@@ -334,14 +334,14 @@ Server/
 
 ## Expected Changes
 
-| Action | File Path | Description |
-| ------ | --------- | ----------- |
-| CREATE | `Server/Application/Common/ICommand.cs` | CQRS marker interfaces: `ICommand`, `ICommand<T>`, `IQuery<T>` |
-| CREATE | `Server/Application/Behaviors/LoggingBehavior.cs` | `IPipelineBehavior`: logs request entry/exit with correlation ID; `LogContext.PushProperty` scope |
-| CREATE | `Server/Application/Behaviors/ValidationBehavior.cs` | `IPipelineBehavior`: aggregates `IValidator<TRequest>` results; throws `ValidationException` on failure |
-| CREATE | `Server/Application/Behaviors/PerformanceBehavior.cs` | `IPipelineBehavior`: Redis LPUSH latency; p95 computation every 10th sample; Serilog Warning + Redis flag on SLA breach |
-| CREATE | `Server/API/Middleware/ExceptionHandlingMiddleware.cs` | `IMiddleware`: catches `ValidationException` → `ValidationProblemDetails` HTTP 400 with correlation ID |
-| MODIFY | `Server/API/Program.cs` | Register all three behaviors as open-generic; register `ExceptionHandlingMiddleware`; `AddValidatorsFromAssemblyContaining`; correct middleware pipeline order |
+| Action | File Path                                              | Description                                                                                                                                                    |
+| ------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CREATE | `Server/Application/Common/ICommand.cs`                | CQRS marker interfaces: `ICommand`, `ICommand<T>`, `IQuery<T>`                                                                                                 |
+| CREATE | `Server/Application/Behaviors/LoggingBehavior.cs`      | `IPipelineBehavior`: logs request entry/exit with correlation ID; `LogContext.PushProperty` scope                                                              |
+| CREATE | `Server/Application/Behaviors/ValidationBehavior.cs`   | `IPipelineBehavior`: aggregates `IValidator<TRequest>` results; throws `ValidationException` on failure                                                        |
+| CREATE | `Server/Application/Behaviors/PerformanceBehavior.cs`  | `IPipelineBehavior`: Redis LPUSH latency; p95 computation every 10th sample; Serilog Warning + Redis flag on SLA breach                                        |
+| CREATE | `Server/API/Middleware/ExceptionHandlingMiddleware.cs` | `IMiddleware`: catches `ValidationException` → `ValidationProblemDetails` HTTP 400 with correlation ID                                                         |
+| MODIFY | `Server/API/Program.cs`                                | Register all three behaviors as open-generic; register `ExceptionHandlingMiddleware`; `AddValidatorsFromAssemblyContaining`; correct middleware pipeline order |
 
 ---
 
@@ -377,10 +377,10 @@ Server/
 
 ## Implementation Checklist
 
-- [ ] Create `ICommand` / `ICommand<T>` / `IQuery<T>` marker interfaces in `Application/Common/`
-- [ ] Create `LoggingBehavior<TRequest, TResponse>`: `LogContext.PushProperty("CorrelationId")` scope wrapping `next()`; log entry + exit with duration using message templates
-- [ ] Create `ValidationBehavior<TRequest, TResponse>`: inject `IEnumerable<IValidator<TRequest>>`; `Task.WhenAll` parallel validation; throw `ValidationException` with all failures if any
-- [ ] Create `PerformanceBehavior<TRequest, TResponse>`: fire-and-forget `RecordLatencyAsync`; Redis LPUSH+LTRIM(500); p95 computation every 10th sample; Serilog Warning + Redis NX flag (10-min TTL) on SLA breach
-- [ ] Create `ExceptionHandlingMiddleware`: catch `ValidationException`; return `ValidationProblemDetails` HTTP 400 with `correlationId` extension field; log with `Log.Warning`
-- [ ] Modify `Program.cs`: register behaviors as open-generic `IPipelineBehavior<,>`; `AddValidatorsFromAssemblyContaining<Program>`; correct middleware order (CorrelationId → RequestLogging → ExceptionHandling → Auth)
+- [x] Create `ICommand` / `ICommand<T>` / `IQuery<T>` marker interfaces in `Application/Common/`
+- [x] Create `LoggingBehavior<TRequest, TResponse>`: `LogContext.PushProperty("CorrelationId")` scope wrapping `next()`; log entry + exit with duration using message templates
+- [x] Create `ValidationBehavior<TRequest, TResponse>`: inject `IEnumerable<IValidator<TRequest>>`; `Task.WhenAll` parallel validation; throw `ValidationException` with all failures if any
+- [x] Create `PerformanceBehavior<TRequest, TResponse>`: fire-and-forget `RecordLatencyAsync`; Redis LPUSH+LTRIM(500); p95 computation every 10th sample; Serilog Warning + Redis NX flag (10-min TTL) on SLA breach
+- [x] Create `ExceptionHandlingMiddleware`: catch `ValidationException`; return `ValidationProblemDetails` HTTP 400 with `correlationId` extension field; log with `Log.Warning`
+- [x] Modify `Program.cs`: register behaviors as open-generic `IPipelineBehavior<,>`; `AddValidatorsFromAssemblyContaining<Program>`; correct middleware order (CorrelationId → RequestLogging → ExceptionHandling → Auth)
 - [ ] Verify controllers inject `ISender` (not `IMediator`) and call `sender.Send(new SomeCommand(...))` — no direct repository injection in any controller
