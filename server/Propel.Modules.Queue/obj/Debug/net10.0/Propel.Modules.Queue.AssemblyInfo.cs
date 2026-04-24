@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Queue")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4bc30b6aa2fdc400ef291b704e79389a499922b3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d44c86b704fc0c3abe410ef28bcc3c249d147595")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Queue")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Queue")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
