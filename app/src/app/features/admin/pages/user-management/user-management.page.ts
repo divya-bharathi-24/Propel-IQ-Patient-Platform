@@ -68,7 +68,7 @@ export class UserManagementPageComponent implements OnInit {
     >(UserFormDialogComponent, {
       width: '480px',
       disableClose: true,
-      data: {},
+      data: undefined,
       ariaLabelledBy: 'user-form-dialog-title',
     });
 

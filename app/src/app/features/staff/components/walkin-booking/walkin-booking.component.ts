@@ -2,6 +2,7 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { PatientSearchResultDto } from '../../models/walkin.models';
 import { WalkInStore } from '../../state/walkin.store';
@@ -18,6 +19,7 @@ type WalkInStep = 'search' | 'create' | 'confirm';
   imports: [
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatSnackBarModule,
     PatientSearchComponent,
     QuickCreatePatientFormComponent,

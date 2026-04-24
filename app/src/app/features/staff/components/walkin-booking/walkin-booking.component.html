@@ -16,19 +16,19 @@
     <ol>
       <li
         [class.active]="currentStep === 'search'"
-        aria-current="{{ currentStep === 'search' ? 'step' : undefined }}"
+        [attr.aria-current]="currentStep === 'search' ? 'step' : undefined"
       >
         1. Search Patient
       </li>
       <li
         [class.active]="currentStep === 'create'"
-        aria-current="{{ currentStep === 'create' ? 'step' : undefined }}"
+        [attr.aria-current]="currentStep === 'create' ? 'step' : undefined"
       >
         2. Create Patient
       </li>
       <li
         [class.active]="currentStep === 'confirm'"
-        aria-current="{{ currentStep === 'confirm' ? 'step' : undefined }}"
+        [attr.aria-current]="currentStep === 'confirm' ? 'step' : undefined"
       >
         3. Confirm
       </li>

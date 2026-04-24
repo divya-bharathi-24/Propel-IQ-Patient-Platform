@@ -27,7 +27,8 @@
   }
 
   <!-- ── Appointment detail ────────────────────────────────────────────── -->
-  @else if (store.selectedAppointment(); as appt) {
+  @else if (store.selectedAppointment()) {
+    @let appt = store.selectedAppointment()!;
     <header class="detail-header">
       <h1 class="detail-title">Appointment Detail</h1>
     </header>
