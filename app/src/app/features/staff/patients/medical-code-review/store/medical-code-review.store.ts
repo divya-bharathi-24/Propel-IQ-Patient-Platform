@@ -33,8 +33,10 @@ export interface MedicalCodeReviewState {
   /**
    * Per-code decision map keyed by `codeId`.
    * Uses a plain object (Record) instead of Map for NgRx Signals compatibility.
+   * Typed as Partial so that indexing a missing key correctly returns
+   * `CodeDecision | undefined`, keeping the `??` fallbacks in templates valid.
    */
-  decisions: Record<string, CodeDecision>;
+  decisions: Partial<Record<string, CodeDecision>>;
   loadingState: LoadingState;
   loadError: string | null;
   submitState: SubmitState;

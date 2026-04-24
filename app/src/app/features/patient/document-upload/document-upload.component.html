@@ -119,13 +119,15 @@
             aria-label="Upload selected PDF files"
             (click)="upload()"
           >
+            @if (!store.isUploading()) {
+              <mat-icon aria-hidden="true">cloud_upload</mat-icon>
+            }
             @if (store.isUploading()) {
               <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
-              <span>Uploading…</span>
-            } @else {
-              <mat-icon aria-hidden="true">cloud_upload</mat-icon>
-              <span>Upload</span>
             }
+            <span>{{
+              store.isUploading() ? "Uploading\u2026" : "Upload"
+            }}</span>
           </button>
 
           <button
