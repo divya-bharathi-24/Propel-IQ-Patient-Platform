@@ -8,8 +8,8 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-    
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here"
       }
     },
     "https": {
@@ -19,8 +19,8 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-       
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here"
       }
     }
   }

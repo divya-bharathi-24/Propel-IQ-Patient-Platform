@@ -71,12 +71,12 @@ namespace Propel.Api.Gateway.Migrations
                 });
 
             // ── 2. Seed default reminder intervals ───────────────────────────────────
-            // Single JSON-array row preferred over three separate rows for simpler
-            // GetReminderIntervalsAsync deserialization (task_005 design note).
-            migrationBuilder.InsertData(
-                table: "system_settings",
-                columns: new[] { "key", "value", "updated_at" },
-                values: new object[] { "reminder_interval_hours", "[48,24,2]", new DateTime(2026, 4, 22, 0, 0, 0, DateTimeKind.Utc) });
+            // Using raw SQL instead of InsertData to avoid entity mapping issues during migration execution.
+            migrationBuilder.Sql(@"
+                INSERT INTO system_settings (key, value, updated_at)
+                VALUES ('reminder_interval_hours', '[48,24,2]', '2026-04-22 00:00:00+00')
+                ON CONFLICT (key) DO NOTHING;
+            ");
 
             // ── 3. Add last_retry_at column to notifications ─────────────────────────
             migrationBuilder.AddColumn<DateTime>(

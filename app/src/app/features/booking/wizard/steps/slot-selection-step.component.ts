@@ -15,12 +15,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ActivatedRoute } from '@angular/router';
+import { MatSelectModule } from '@angular/material/select';
 import { SlotAvailabilityStore } from '../../../appointments/state/slot-availability.store';
-import { SlotDto } from '../../../appointments/models/slot.models';
+import {
+  SlotDto,
+  SpecialtyDto,
+} from '../../../appointments/models/slot.models';
 import { AvailableSlot } from '../../booking.models';
 import { BookingService } from '../../booking.service';
 import { BookingWizardStore } from '../booking-wizard.store';
+import { SpecialtyService } from '../../../appointments/services/specialty.service';
 
 @Component({
   selector: 'app-slot-selection-step',
@@ -34,6 +38,7 @@ import { BookingWizardStore } from '../booking-wizard.store';
     MatInputModule,
     MatNativeDateModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
   ],
   providers: [SlotAvailabilityStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,20 +49,55 @@ import { BookingWizardStore } from '../booking-wizard.store';
     >
       <h2 class="step-heading">Select a Slot</h2>
 
-      <mat-form-field appearance="outline" class="date-field">
-        <mat-label>Select a date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="datepicker"
-          [ngModel]="selectedDate()"
-          (ngModelChange)="onDateChange($event)"
-          [min]="today"
-          aria-label="Appointment date"
-          placeholder="DD/MM/YYYY"
-        />
-        <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
-        <mat-datepicker #datepicker />
-      </mat-form-field>
+      <!-- Specialty selector -->
+      @if (specialtyLoadState() === 'loading') {
+        <div
+          class="loading-container"
+          aria-busy="true"
+          aria-label="Loading specialties"
+        >
+          <mat-spinner diameter="40" />
+        </div>
+      }
+
+      @if (specialtyLoadState() === 'error') {
+        <p class="error-message" role="alert">
+          Unable to load specialties. Please refresh and try again.
+        </p>
+      }
+
+      @if (specialtyLoadState() === 'loaded') {
+        <mat-form-field appearance="outline" class="specialty-field">
+          <mat-label>Select specialty</mat-label>
+          <mat-select
+            [ngModel]="selectedSpecialtyId()"
+            (ngModelChange)="onSpecialtyChange($event)"
+            aria-label="Appointment specialty"
+          >
+            @for (s of specialties(); track s.id) {
+              <mat-option [value]="s.id">{{ s.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <!-- Date picker — shown only once a specialty is selected -->
+      @if (selectedSpecialtyId()) {
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Select a date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="datepicker"
+            [ngModel]="selectedDate()"
+            (ngModelChange)="onDateChange($event)"
+            [min]="today"
+            aria-label="Appointment date"
+            placeholder="DD/MM/YYYY"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+          <mat-datepicker #datepicker />
+        </mat-form-field>
+      }
 
       @if (slotsStore.loadingState() === 'loading') {
         <div
@@ -150,9 +190,10 @@ import { BookingWizardStore } from '../booking-wizard.store';
         margin: 0;
       }
 
+      .specialty-field,
       .date-field {
         width: 100%;
-        max-width: 280px;
+        max-width: 320px;
       }
 
       .slot-grid {
@@ -209,10 +250,16 @@ export class SlotSelectionStepComponent implements OnInit, OnDestroy {
   protected readonly slotsStore = inject(SlotAvailabilityStore);
   protected readonly wizardStore = inject(BookingWizardStore);
   private readonly bookingService = inject(BookingService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly specialtyService = inject(SpecialtyService);
 
   protected readonly today = new Date();
   protected readonly selectedDate = signal<Date | null>(null);
+  protected readonly selectedSpecialtyId = signal<string | null>(null);
+  protected readonly specialties = signal<SpecialtyDto[]>([]);
+  protected readonly specialtyLoadState = signal<
+    'idle' | 'loading' | 'loaded' | 'error'
+  >('idle');
+
   /** ID of the slot currently being held (shows inline spinner). */
   protected readonly holdingSlotId = signal<string | null>(null);
 
@@ -232,19 +279,20 @@ export class SlotSelectionStepComponent implements OnInit, OnDestroy {
     this.slotsStore.slots().filter((s) => !s.isAvailable),
   );
 
-  /** SpecialtyId from query param — falls back to empty string. */
-  private get specialtyId(): string {
-    return this.route.snapshot.queryParamMap.get('specialtyId') ?? '';
-  }
-
   ngOnInit(): void {
-    const today = new Date();
-    this.selectedDate.set(today);
-    this.fetchSlots(today);
+    this.selectedDate.set(new Date());
+    this.loadSpecialties();
   }
 
   ngOnDestroy(): void {
     this.slotsStore.reset();
+  }
+
+  protected onSpecialtyChange(specialtyId: string): void {
+    this.selectedSpecialtyId.set(specialtyId);
+    this.slotsStore.reset();
+    const date = this.selectedDate();
+    if (date) this.fetchSlots(date);
   }
 
   protected onDateChange(date: Date | null): void {
@@ -286,9 +334,22 @@ export class SlotSelectionStepComponent implements OnInit, OnDestroy {
     return `${this.formatTime(start)} – ${this.formatTime(end)}`;
   }
 
+  private loadSpecialties(): void {
+    this.specialtyLoadState.set('loading');
+    this.specialtyService.getSpecialties().subscribe({
+      next: (list) => {
+        this.specialties.set(list);
+        this.specialtyLoadState.set('loaded');
+      },
+      error: () => this.specialtyLoadState.set('error'),
+    });
+  }
+
   private fetchSlots(date: Date): void {
+    const specialtyId = this.selectedSpecialtyId();
+    if (!specialtyId) return;
     this.slotsStore.loadSlots({
-      specialtyId: this.specialtyId,
+      specialtyId,
       date: this.toDateString(date),
     });
   }

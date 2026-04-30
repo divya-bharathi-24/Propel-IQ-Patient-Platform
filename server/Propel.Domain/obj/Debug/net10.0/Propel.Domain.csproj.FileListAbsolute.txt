@@ -1,6 +1,7 @@
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Debug\net10.0\Propel.Domain.deps.json
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Debug\net10.0\Propel.Domain.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\bin\Debug\net10.0\Propel.Domain.pdb
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.csproj.AssemblyReference.cache
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.GeneratedMSBuildEditorConfig.editorconfig
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.AssemblyInfoInputs.cache
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.AssemblyInfo.cs
@@ -10,4 +11,3 @@ D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\P
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\refint\Propel.Domain.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\ref\Propel.Domain.dll
-D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Domain\obj\Debug\net10.0\Propel.Domain.csproj.AssemblyReference.cache

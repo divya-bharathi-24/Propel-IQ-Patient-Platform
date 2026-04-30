@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Pgvector;
 using Propel.Api.Gateway.Data;
 
 #nullable disable
@@ -22,51 +21,59 @@ namespace Propel.Api.Gateway.Migrations
                 .HasAnnotation("ProductVersion", "9.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Propel.Domain.Entities.AiOperationalMetric", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Metadata")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("metadata");
 
                     b.Property<int>("MetricType")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("SessionId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer")
+                        .HasColumnName("metric_type");
 
                     b.Property<string>("ModelVersion")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<decimal?>("ValueA")
-                        .HasColumnType("numeric(18,4)");
-
-                    b.Property<decimal?>("ValueB")
-                        .HasColumnType("numeric(18,4)");
-
-                    b.Property<string>("Metadata")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("model_version");
 
                     b.Property<DateTimeOffset>("RecordedAt")
-                        .HasColumnType("timestamptz");
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("recorded_at");
 
-                    b.HasKey("Id");
+                    b.Property<Guid?>("SessionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("session_id");
 
-                    b.HasIndex("MetricType", "RecordedAt")
-                        .IsDescending(false, true)
-                        .HasDatabaseName("IX_AiOperationalMetrics_MetricType_RecordedAt");
+                    b.Property<decimal?>("ValueA")
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("value_a");
+
+                    b.Property<decimal?>("ValueB")
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("value_b");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ai_operational_metrics");
 
                     b.HasIndex("RecordedAt")
-                        .IsDescending(true)
+                        .IsDescending()
                         .HasDatabaseName("IX_AiOperationalMetrics_RecordedAt");
 
                     b.HasIndex("SessionId")
                         .HasDatabaseName("IX_AiOperationalMetrics_SessionId")
                         .HasFilter("\"SessionId\" IS NOT NULL");
+
+                    b.HasIndex("MetricType", "RecordedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AiOperationalMetrics_MetricType_RecordedAt");
 
                     b.ToTable("AiOperationalMetrics", (string)null);
                 });
@@ -126,10 +133,6 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasKey("Id")
                         .HasName("pk_ai_prompt_audit_logs");
 
-                    b.HasIndex("RecordedAt", "Id")
-                        .IsDescending(true, true)
-                        .HasDatabaseName("ix_ai_prompt_audit_logs_recorded_at_id");
-
                     b.HasIndex("RequestingUserId")
                         .HasDatabaseName("ix_ai_prompt_audit_logs_requesting_user_id")
                         .HasFilter("requesting_user_id IS NOT NULL");
@@ -137,6 +140,10 @@ namespace Propel.Api.Gateway.Migrations
                     b.HasIndex("SessionId")
                         .HasDatabaseName("ix_ai_prompt_audit_logs_session_id")
                         .HasFilter("session_id IS NOT NULL");
+
+                    b.HasIndex("RecordedAt", "Id")
+                        .IsDescending()
+                        .HasDatabaseName("ix_ai_prompt_audit_logs_recorded_at_id");
 
                     b.ToTable("ai_prompt_audit_logs", (string)null);
                 });
@@ -703,9 +710,9 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("document_id");
 
-                    b.Property<Vector>("Embedding")
+                    b.PrimitiveCollection<float[]>("Embedding")
                         .IsRequired()
-                        .HasColumnType("vector(1536)")
+                        .HasColumnType("real[]")
                         .HasColumnName("embedding");
 
                     b.Property<int>("EndTokenIndex")
@@ -726,12 +733,6 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_document_chunk_embeddings");
-
-                    b.HasIndex("Embedding")
-                        .HasDatabaseName("ix_document_chunk_embeddings_embedding_hnsw");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_document_chunk_embeddings_patient_id");

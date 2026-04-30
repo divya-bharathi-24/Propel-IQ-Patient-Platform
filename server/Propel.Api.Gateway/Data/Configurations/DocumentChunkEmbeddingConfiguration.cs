@@ -9,6 +9,7 @@ namespace Propel.Api.Gateway.Data.Configurations;
 /// <summary>
 /// EF Core fluent configuration for the <see cref="DocumentChunkEmbedding"/> entity (US_040, task_002).
 /// Table: <c>document_chunk_embeddings</c>
+/// TEMPORARY: Vector column mapping disabled until pgvector extension is installed.
 /// Key design decisions:
 /// <list type="bullet">
 ///   <item><description><c>embedding</c> is mapped as <c>vector(1536)</c> via a <see cref="ValueConverter{TModel,TProvider}"/>
@@ -45,23 +46,26 @@ public sealed class DocumentChunkEmbeddingConfiguration : IEntityTypeConfigurati
                .HasColumnType("timestamp with time zone")
                .IsRequired();
 
+        // TEMPORARY: Vector column configuration disabled until pgvector is installed
+        // Uncomment these lines after running setup-pgvector.ps1
+        
         // pgvector column — dimension = 1536 (text-embedding-3-small) — AC-1, AIR-R01.
         // ValueConverter translates float[] (domain) ↔ Vector (Npgsql pgvector type) transparently.
-        var embeddingConverter = new ValueConverter<float[], Vector>(
-            v => new Vector(v),
-            v => v.ToArray());
+        // var embeddingConverter = new ValueConverter<float[], Vector>(
+        //     v => new Vector(v),
+        //     v => v.ToArray());
 
-        builder.Property(e => e.Embedding)
-               .HasColumnType("vector(1536)")
-               .HasConversion(embeddingConverter)
-               .IsRequired();
+        // builder.Property(e => e.Embedding)
+        //        .HasColumnType("vector(1536)")
+        //        .HasConversion(embeddingConverter)
+        //        .IsRequired();
 
         // HNSW index for approximate cosine similarity search (AIR-R02, task_005 migration).
         // The index uses vector_cosine_ops to match the <=> cosine distance operator in raw SQL queries.
-        builder.HasIndex(e => e.Embedding)
-               .HasMethod("hnsw")
-               .HasOperators("vector_cosine_ops")
-               .HasDatabaseName("ix_document_chunk_embeddings_embedding_hnsw");
+        // builder.HasIndex(e => e.Embedding)
+        //        .HasMethod("hnsw")
+        //        .HasOperators("vector_cosine_ops")
+        //        .HasDatabaseName("ix_document_chunk_embeddings_embedding_hnsw");
 
         // Composite index: supports page-scoped chunk queries and document-level ACL checks (AIR-S02).
         builder.HasIndex(e => new { e.DocumentId, e.PageNumber })

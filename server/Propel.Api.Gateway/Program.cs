@@ -1,69 +1,58 @@
-using Npgsql;
-using Pgvector.EntityFrameworkCore;
-using Pgvector.Npgsql;
-using System.Security.Authentication;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.DataProtection;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Npgsql;
 using Polly;
 using Polly.CircuitBreaker;
 using Propel.Api.Gateway.Data;
 using Propel.Api.Gateway.Endpoints;
 using Propel.Api.Gateway.HealthChecks;
+using Propel.Api.Gateway.Infrastructure;
 using Propel.Api.Gateway.Infrastructure.BackgroundServices;
 using Propel.Api.Gateway.Infrastructure.Behaviors;
 using Propel.Api.Gateway.Infrastructure.Cache;
+using Propel.Api.Gateway.Infrastructure.Documents;
 using Propel.Api.Gateway.Infrastructure.Email;
 using Propel.Api.Gateway.Infrastructure.Filters;
 using Propel.Api.Gateway.Infrastructure.HealthChecks;
 using Propel.Api.Gateway.Infrastructure.Models;
-using Propel.Api.Gateway.Infrastructure.Documents;
 using Propel.Api.Gateway.Infrastructure.Notifications;
-using Propel.Api.Gateway.Infrastructure.Pdf;using Propel.Api.Gateway.Infrastructure.Repositories;
+using Propel.Api.Gateway.Infrastructure.Pdf;
 using Propel.Api.Gateway.Infrastructure.Persistence.AuditLog;
-using Propel.Api.Gateway.Infrastructure.Security;
-using Propel.Api.Gateway.Infrastructure.Session;
 using Propel.Api.Gateway.Infrastructure.ReAuth;
+using Propel.Api.Gateway.Infrastructure.Repositories;
+using Propel.Api.Gateway.Infrastructure.Security;
+using Propel.Api.Gateway.Infrastructure.Services;
+using Propel.Api.Gateway.Infrastructure.Session;
 using Propel.Api.Gateway.Infrastructure.Sms;
-using Propel.Api.Gateway.Infrastructure;
 using Propel.Api.Gateway.Middleware;
 using Propel.Api.Gateway.Security;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Propel.Domain.Interfaces;
-using Propel.Modules.Auth.Audit;
-using Propel.Modules.Auth.Services;
-using Serilog;
-using StackExchange.Redis;
-
 // ── Module assembly references ────────────────────────────────────────────────
 using Propel.Modules.Admin.Commands;
-using Propel.Modules.Admin.Queries;
 using Propel.Modules.AI.Commands;
-using Propel.Modules.AI.Interfaces;
 using Propel.Modules.AI.Options;
 using Propel.Modules.AI.Registration;
 using Propel.Modules.AI.Services;
 using Propel.Modules.Appointment.Commands;
 using Propel.Modules.Appointment.Configuration;
 using Propel.Modules.Appointment.Infrastructure;
+using Propel.Modules.Auth.Audit;
 using Propel.Modules.Auth.Commands;
+using Propel.Modules.Auth.Services;
 using Propel.Modules.Calendar.BackgroundServices;
 using Propel.Modules.Calendar.Commands;
 using Propel.Modules.Calendar.Interfaces;
 using Propel.Modules.Calendar.Options;
-using Propel.Modules.Calendar.Queries;
 using Propel.Modules.Calendar.Services;
 using Propel.Modules.Clinical.Commands;
 using Propel.Modules.Notification.Commands;
@@ -75,8 +64,12 @@ using Propel.Modules.Queue.Commands;
 using Propel.Modules.Risk.Commands;
 using Propel.Modules.Risk.Interfaces;
 using Propel.Modules.Risk.Services;
-using MediatR;
+using Serilog;
+using StackExchange.Redis;
+using System.Security.Authentication;
+using System.Text;
 using System.Threading.Channels;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -216,8 +209,9 @@ if (!connectionString.Contains("Maximum Pool Size", StringComparison.OrdinalIgno
 
 // UseVector() registers the pgvector type handler so the Npgsql driver can
 // serialize/deserialize float[] ↔ vector columns at runtime (US_040, task_002, AC-1).
+// TEMPORARY: pgvector disabled until extension is installed (uncomment after running docker-compose up)
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-dataSourceBuilder.UseVector();
+// dataSourceBuilder.UseVector();
 var dataSource = dataSourceBuilder.Build();
 
 // IDbContextFactory<AppDbContext> — used by AuditLogRepository to create isolated DbContext
@@ -228,8 +222,9 @@ var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContextFactory<AppDbContext>(
     (serviceProvider, opt) =>
     {
+        // TEMPORARY: pgvector disabled until extension is installed (uncomment after running docker-compose up)
         // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) columns (US_040, task_002, AC-1).
-        opt.UseNpgsql(dataSource, o => o.UseVector())
+        opt.UseNpgsql(dataSource /*, o => o.UseVector()*/)
            .UseSnakeCaseNamingConvention()
            .UseApplicationServiceProvider(serviceProvider)
            .ConfigureWarnings(warnings =>
@@ -682,6 +677,18 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 // IPdfConfirmationService: scoped QuestPDF in-memory PDF generation.
 builder.Services.AddScoped<IPdfConfirmationService, QuestPdfConfirmationService>();
 
+// ── US_020/US_021 — Appointment confirmation email service adapter (task_003) ─
+// IAppointmentConfirmationEmailService: thin adapter combining PDF generation + email dispatch.
+// Used by RescheduleAppointmentCommandHandler which needs the single-method interface.
+builder.Services.AddScoped<IAppointmentConfirmationEmailService>(sp =>
+{
+    var pdfService = sp.GetRequiredService<IPdfConfirmationService>();
+    var emailService = sp.GetRequiredService<IEmailService>();
+    var logger = sp.GetRequiredService<ILogger<AppointmentConfirmationEmailServiceAdapter>>();
+    return new AppointmentConfirmationEmailServiceAdapter(pdfService, emailService, logger);
+});
+Log.Information("AppointmentConfirmationEmailService registered (US_020/US_021, task_003).");
+
 // ── US_021 — Booking confirmation notification pipeline (task_002) ─────────────
 // Channel<ConfirmationRetryRequest>: in-process unbounded queue for retry orchestration.
 // Registered as Singleton so both BookingConfirmedEventHandler and
@@ -817,14 +824,15 @@ builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
     Propel.Modules.AI.Services.SemanticKernelAiIntakeService>();
 
 // ── US_040 — AI RAG vector store: pgvector chunk storage and retrieval (task_002) ──────────
+// TEMPORARY: Vector store disabled until pgvector extension is installed
 // IDocumentChunkEmbeddingRepository: EF Core + raw SQL pgvector <=> cosine similarity search.
 // ACL filter (AIR-S02), threshold filtering (AIR-R02), and re-ranking (AIR-R03) applied per retrieval.
-builder.Services.AddScoped<IDocumentChunkEmbeddingRepository, DocumentChunkEmbeddingRepository>();
+// builder.Services.AddScoped<IDocumentChunkEmbeddingRepository, DocumentChunkEmbeddingRepository>();
 // IVectorStoreService: orchestrates StoreChunksAsync (task_001→task_002 handoff) and
 // RetrieveRelevantChunksAsync (task_002→task_003 handoff) with full AIR pipeline enforcement.
-builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IVectorStoreService,
-    Propel.Modules.AI.Services.VectorStoreService>();
-Log.Information("VectorStoreService registered (US_040, task_002).");
+// builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IVectorStoreService,
+//     Propel.Modules.AI.Services.VectorStoreService>();
+// Log.Information("VectorStoreService registered (US_040, task_002).");
 
 // ── US_040 — AI RAG extraction orchestrator (task_003) ─────────────────────────────────────
 // Polly circuit breaker for the extraction pipeline — isolated from the intake and risk circuits.
@@ -860,9 +868,10 @@ builder.Services.AddScoped<IPatientProfileVerificationRepository,
 Log.Information("360-view aggregation repositories registered (EP-008-I/us_041, task_002).");
 
 // IExtractionOrchestrator: full RAG + GPT-4o extraction pass per document (US_040, AC-2, AC-3, AIR-O01, AIR-O02).
-builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IExtractionOrchestrator,
-    Propel.Modules.AI.Services.ExtractionOrchestrator>();
-Log.Information("ExtractionOrchestrator registered (US_040, task_003).");
+        // TEMPORARY: ExtractionOrchestrator disabled until pgvector extension is installed
+        // builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IExtractionOrchestrator,
+        //     Propel.Modules.AI.Services.ExtractionOrchestrator>();
+        // Log.Information("ExtractionOrchestrator registered (US_040, task_003).");
 
 // ── EP-008-I/us_041 — AI semantic de-duplication service (task_003) ───────────
 // Isolated Polly circuit breaker: 3 consecutive GPT-4o failures / 5-min window → FallbackManual
@@ -1000,7 +1009,8 @@ builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiAgreementEventEmitter
     Propel.Modules.AI.Services.AiAgreementEventEmitter>();
 
 // AiOutputSchemaValidator: SK IFunctionInvocationFilter — validates JSON output schema; rejects invalid outputs (AIR-Q03).
-builder.Services.AddSingleton<Propel.Modules.AI.Guardrails.AiOutputSchemaValidator>();
+// Changed from Singleton to Scoped to fix lifetime mismatch with scoped IAiMetricsWriter (EP-010/us_048).
+builder.Services.AddScoped<Propel.Modules.AI.Guardrails.AiOutputSchemaValidator>();
 Log.Information("AI quality monitoring services registered (EP-010/us_048, task_001).");
 
 // ── EP-010/us_049 — AI Safety Guardrails & Immutable Prompt Audit Logging (task_001) ─────────────
@@ -1045,15 +1055,16 @@ builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiOperationalMetricsRea
 
 Log.Information("AI operational metrics services registered (EP-010/us_050, task_002): EfOperationalMetricsWriter, EfOperationalMetricsReadRepo.");
 
-
 // IClinicalDocumentRepository: EF Core repository for Pending document polling and status transitions.
 builder.Services.AddScoped<IClinicalDocumentRepository,
     Propel.Api.Gateway.Infrastructure.Repositories.ClinicalDocumentRepository>();
+    
+// TEMPORARY: ExtractionPipelineWorker disabled until pgvector extension is installed
 // ExtractionPipelineWorker: 30-second PeriodicTimer worker orchestrating the full extraction
 // pipeline (ChunkAsync → GenerateAsync → StoreChunksAsync → ExtractAsync) with SemaphoreSlim(3)
 // concurrency control and idempotency locking via ProcessingStatus = Processing (AC-1, AC-4, EC-1, EC-2).
-builder.Services.AddHostedService<Propel.Modules.Clinical.Workers.ExtractionPipelineWorker>();
-Log.Information("ExtractionPipelineWorker registered (US_040, task_004).");
+/* builder.Services.AddHostedService<Propel.Modules.Clinical.Workers.ExtractionPipelineWorker>();
+Log.Information("ExtractionPipelineWorker registered (US_040, task_004)."); */
 
 // ── us_031 — No-Show Risk Engine (task_002 + task_003) ────────────────────────
 // INoShowRiskCalculator: scoped rule-based engine with AI augmentation hook.
@@ -1230,7 +1241,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
     Console.WriteLine("[Startup] Migrations applied successfully.");
-    await SeedData.SeedSpecialtiesAsync(db);
+    
+    // Seed all master/reference data (idempotent)
+    await SeedData.SeedAllMasterDataAsync(db);
 }
 
 app.Run();

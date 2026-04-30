@@ -3,8 +3,10 @@ D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\ne
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Admin.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Domain.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Notification.dll
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Patient.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Domain.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Notification.pdb
+D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Patient.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\Propel.Modules.Admin.csproj.AssemblyReference.cache
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\Propel.Modules.Admin.GeneratedMSBuildEditorConfig.editorconfig
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\Propel.Modules.Admin.AssemblyInfoInputs.cache
@@ -16,5 +18,3 @@ D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\ne
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\refint\Propel.Modules.Admin.dll
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\Propel.Modules.Admin.pdb
 D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\obj\Debug\net10.0\ref\Propel.Modules.Admin.dll
-D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Patient.dll
-D:\Propel_IQ\Propel-IQ-Patient-Platform\server\Propel.Modules.Admin\bin\Debug\net10.0\Propel.Modules.Patient.pdb

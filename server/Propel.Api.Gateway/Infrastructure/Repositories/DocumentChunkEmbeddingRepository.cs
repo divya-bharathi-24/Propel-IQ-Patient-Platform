@@ -1,3 +1,7 @@
+// TEMPORARY: DocumentChunkEmbeddingRepository disabled until pgvector extension is installed
+// This file is commented out because it depends on DocumentChunkEmbeddings DbSet which is disabled
+#if false
+
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Pgvector;
@@ -114,3 +118,5 @@ public sealed class DocumentChunkEmbeddingRepository : IDocumentChunkEmbeddingRe
         return results;
     }
 }
+
+#endif

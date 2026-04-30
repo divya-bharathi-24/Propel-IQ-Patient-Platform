@@ -69,7 +69,8 @@ public sealed class AppDbContext : DbContext
     public DbSet<PatientOAuthToken> PatientOAuthTokens => Set<PatientOAuthToken>();
 
     // ── US_040 — AI RAG pipeline: pgvector chunk embeddings (task_002) ──────────
-    public DbSet<DocumentChunkEmbedding> DocumentChunkEmbeddings => Set<DocumentChunkEmbedding>();
+    // TEMPORARY: DocumentChunkEmbeddings table disabled until pgvector extension is installed
+    // public DbSet<DocumentChunkEmbedding> DocumentChunkEmbeddings => Set<DocumentChunkEmbedding>();
 
     // ── EP-008-I/us_041 — 360-degree profile verification (task_002) ─────────
     public DbSet<PatientProfileVerification> PatientProfileVerifications => Set<PatientProfileVerification>();
@@ -87,8 +88,9 @@ public sealed class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // TEMPORARY: pgvector extension disabled until installed (uncomment after running docker-compose up)
         // Enable pgvector extension — migration will emit CREATE EXTENSION IF NOT EXISTS vector (US_040, AC-1, AD-5)
-        modelBuilder.HasPostgresExtension("vector");
+        // modelBuilder.HasPostgresExtension("vector");
 
         // Auto-discovers all IEntityTypeConfiguration<T> implementations in this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
