@@ -110,7 +110,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'auth/register',
+    redirectTo: 'auth/login',
     pathMatch: 'full',
   },
 ];

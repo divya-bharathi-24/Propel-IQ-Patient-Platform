@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { EMPTY, catchError, pipe, switchMap, tap } from 'rxjs';
+import { EMPTY, catchError, filter, pipe, switchMap, tap } from 'rxjs';
 import { SlotDto } from '../models/slot.models';
 import { SlotAvailabilityService } from '../services/slot-availability.service';
 
@@ -31,6 +31,7 @@ export const SlotAvailabilityStore = signalStore(
      */
     loadSlots: rxMethod<{ specialtyId: string; date: string }>(
       pipe(
+        filter(({ specialtyId }) => !!specialtyId),
         tap(() =>
           patchState(store, {
             loadingState: 'loading',

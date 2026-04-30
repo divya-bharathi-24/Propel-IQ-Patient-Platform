@@ -186,7 +186,7 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Graph/5.104.0": {
+      "Microsoft.Graph/5.105.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.Graph.Core": "3.2.5"
@@ -980,10 +980,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Graph/5.104.0": {
-      "sha512": "ey/bka0KsGJD+ciPyU0O0X2u16H+BZZtLKpOlQUvaM0Knf+AHr31zBAP1KIZHaIJ+ysNqR8NL6I5KWUb1atTtw==",
+    "Microsoft.Graph/5.105.0": {
+      "sha512": "DZxSj5D5BBXqEP1fxBmvodsN6g2RmkyyELTKAOynQ01tRc9FFRrqiE4bJqC76p7D/OlPaMdtl2IbzJhlP61iZA==",
       "type": "package",
-      "path": "microsoft.graph/5.104.0",
+      "path": "microsoft.graph/5.105.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -995,7 +995,7 @@
         "lib/netstandard2.0/Microsoft.Graph.xml",
         "lib/netstandard2.1/Microsoft.Graph.dll",
         "lib/netstandard2.1/Microsoft.Graph.xml",
-        "microsoft.graph.5.104.0.nupkg.sha512",
+        "microsoft.graph.5.105.0.nupkg.sha512",
         "microsoft.graph.nuspec"
       ]
     },
@@ -2207,8 +2207,8 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
+      "message": "PackageReference Microsoft.Extensions.Options will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "libraryId": "Microsoft.Extensions.Options",
       "targetGraphs": [
         "net10.0"
       ]
@@ -2217,8 +2217,8 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.Extensions.Options will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "libraryId": "Microsoft.Extensions.Options",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
       "targetGraphs": [
         "net10.0"
       ]

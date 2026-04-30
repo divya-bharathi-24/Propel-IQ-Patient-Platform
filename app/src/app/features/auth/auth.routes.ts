@@ -38,7 +38,7 @@ export const authRoutes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'register',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
 ];

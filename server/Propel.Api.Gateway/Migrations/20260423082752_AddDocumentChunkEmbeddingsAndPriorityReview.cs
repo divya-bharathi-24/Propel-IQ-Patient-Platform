@@ -35,9 +35,11 @@ namespace Propel.Api.Gateway.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // TEMPORARY: pgvector extension disabled until installed
+            // Uncomment this line after running setup-pgvector.ps1
             // 1. Enable pgvector extension — idempotent, safe to call multiple times (TR-008, AD-5).
             //    Must execute BEFORE creating any vector(N) column or HNSW index.
-            migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS vector;");
+            // migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS vector;");
 
             // 2. Add priority_review flag to extracted_data (AIR-003, AC-3, task_005).
             //    Default false — existing rows are not flagged without an explicit confidence check.
@@ -48,6 +50,9 @@ namespace Propel.Api.Gateway.Migrations
                 nullable: false,
                 defaultValue: false);
 
+            // TEMPORARY: document_chunk_embeddings table disabled until pgvector is installed
+            // Uncomment this entire block after running setup-pgvector.ps1
+            /*
             // 3. Create document_chunk_embeddings table (AC-1, AIR-R01, TR-008, AD-5).
             migrationBuilder.CreateTable(
                 name: "document_chunk_embeddings",
@@ -102,15 +107,21 @@ namespace Propel.Api.Gateway.Migrations
                 name: "ix_document_chunk_embeddings_patient_id",
                 table: "document_chunk_embeddings",
                 column: "patient_id");
+            */
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // TEMPORARY: document_chunk_embeddings table rollback disabled until pgvector is installed
+            // Uncomment these lines after running setup-pgvector.ps1
+            // Note: This must stay commented until the Up() migration is uncommented and applied first
+            /*
             // Drop document_chunk_embeddings table — cascades all its indexes and FK constraints.
             // Note: pgvector extension is NOT dropped — it is shared infrastructure (TR-008).
             migrationBuilder.DropTable(
                 name: "document_chunk_embeddings");
+            */
 
             // Drop priority_review column from extracted_data (AIR-003 rollback).
             migrationBuilder.DropColumn(
