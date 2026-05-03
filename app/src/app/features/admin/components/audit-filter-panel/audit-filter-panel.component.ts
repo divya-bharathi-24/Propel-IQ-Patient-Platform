@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -60,7 +60,7 @@ const ENTITY_TYPE_OPTIONS: Array<{ value: AuditEntityType; label: string }> = [
   templateUrl: './audit-filter-panel.component.html',
   styleUrl: './audit-filter-panel.component.scss',
 })
-export class AuditFilterPanelComponent implements OnInit {
+export class AuditFilterPanelComponent {
   private readonly fb = inject(FormBuilder);
 
   readonly filtersApplied = output<AuditLogQueryParams>();
@@ -86,10 +86,6 @@ export class AuditFilterPanelComponent implements OnInit {
       v.actionType ||
       v.entityType
     );
-  }
-
-  ngOnInit(): void {
-    // No-op: form initialized inline above.
   }
 
   applyFilters(): void {

@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -54,16 +53,12 @@ export type ConflictChoice = 'server' | 'local' | 'merge';
     AiIntakeChatComponent,
     ManualIntakeFormComponent,
   ],
-  providers: [
-    IntakeModeStore,
-    IntakeAutosaveService,
-    LocalDraftService,
-  ],
+  providers: [IntakeModeStore, IntakeAutosaveService, LocalDraftService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './intake-page.component.html',
   styleUrl: './intake-page.component.scss',
 })
-export class IntakePageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class IntakePageComponent implements OnInit, OnDestroy {
   @ViewChild(ManualIntakeFormComponent)
   private manualForm?: ManualIntakeFormComponent;
 
@@ -105,11 +100,6 @@ export class IntakePageComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.loadDraftOnInit(id);
-  }
-
-  ngAfterViewInit(): void {
-    // After rendering, wire form value changes into the autosave trigger.
-    // ManualIntakeFormComponent emits on blur; AI fields update draftFields directly.
   }
 
   ngOnDestroy(): void {

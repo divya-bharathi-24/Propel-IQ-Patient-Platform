@@ -22,7 +22,6 @@ import {
 } from './components/unresolved-critical-modal/unresolved-critical-modal.component';
 import {
   ClinicalSectionDto,
-  DataConflictDto,
   DocumentStatusDto,
   SectionType,
 } from '../../../../core/services/patient-360-view.service';
@@ -127,7 +126,9 @@ const SECTION_ORDER: SectionType[] = [
                     mat-stroked-button
                     type="button"
                     (click)="onRetryDocument(view.patientId, doc.documentId)"
-                    [attr.aria-label]="'Retry extraction for ' + doc.documentName"
+                    [attr.aria-label]="
+                      'Retry extraction for ' + doc.documentName
+                    "
                   >
                     <mat-icon aria-hidden="true">refresh</mat-icon>
                     Retry
@@ -169,13 +170,20 @@ const SECTION_ORDER: SectionType[] = [
             <mat-card-header>
               <mat-card-title>
                 <mat-icon aria-hidden="true">block</mat-icon>
-                Verification Blocked — {{ conflictStore.unresolvedCriticalCount() }} Unresolved Critical
-                {{ conflictStore.unresolvedCriticalCount() === 1 ? 'Conflict' : 'Conflicts' }}
+                Verification Blocked —
+                {{ conflictStore.unresolvedCriticalCount() }} Unresolved
+                Critical
+                {{
+                  conflictStore.unresolvedCriticalCount() === 1
+                    ? 'Conflict'
+                    : 'Conflicts'
+                }}
               </mat-card-title>
             </mat-card-header>
             <mat-card-content>
               <p class="conflict-hint">
-                Resolve all Critical conflicts in the sections below before verifying.
+                Resolve all Critical conflicts in the sections below before
+                verifying.
               </p>
             </mat-card-content>
           </mat-card>
@@ -370,7 +378,9 @@ export class Patient360ViewComponent implements OnInit {
   protected onVerifyProfile(patientId: string): void {
     const unresolvedCritical = this.conflictStore
       .conflicts()
-      .filter((c) => c.severity === 'Critical' && c.resolutionStatus === 'Unresolved');
+      .filter(
+        (c) => c.severity === 'Critical' && c.resolutionStatus === 'Unresolved',
+      );
 
     if (unresolvedCritical.length > 0) {
       // AC-4: Block verify and open modal listing unresolved Critical conflicts

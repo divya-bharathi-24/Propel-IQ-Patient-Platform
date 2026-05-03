@@ -4,7 +4,6 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
   Output,
   computed,
   inject,
@@ -121,7 +120,7 @@ export interface PreferredSlotDesignation {
             Select an unavailable slot to join the waitlist:
           </p>
           @for (slot of unavailableSlots(); track slot.timeSlotStart) {
-            <label
+            <div
               class="slot-radio-card"
               [class.slot-radio-card--selected]="
                 selectedSlot()?.timeSlotStart === slot.timeSlotStart
@@ -135,7 +134,7 @@ export interface PreferredSlotDesignation {
               >
                 {{ slotLabel(slot) }}
               </mat-radio-button>
-            </label>
+            </div>
           }
         </div>
       }
@@ -272,7 +271,7 @@ export interface PreferredSlotDesignation {
     `,
   ],
 })
-export class PreferredSlotStepComponent implements OnInit, OnDestroy {
+export class PreferredSlotStepComponent implements OnDestroy {
   /** Specialty for which slots will be fetched. */
   @Input({ required: true }) specialtyId!: string;
 
@@ -309,11 +308,6 @@ export class PreferredSlotStepComponent implements OnInit, OnDestroy {
       this.slotsStore.slots().length > 0 &&
       this.slotsStore.slots().every((s) => s.isAvailable),
   );
-
-  ngOnInit(): void {
-    // Do not pre-load slots on mount — user must first pick a date.
-    // Pre-loading today's slots would confuse the "unavailable slot" UX.
-  }
 
   ngOnDestroy(): void {
     this.slotsStore.reset();

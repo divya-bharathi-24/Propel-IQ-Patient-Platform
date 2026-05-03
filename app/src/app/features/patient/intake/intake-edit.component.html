@@ -454,8 +454,9 @@
     <div
       class="modal-overlay"
       role="presentation"
+      tabindex="0"
       (click)="onConflictCancelled()"
-      (keydown.escape)="onConflictCancelled()"
+      (keydown)="$event.key === 'Escape' && onConflictCancelled()"
     >
       <div class="modal-container" (click)="$event.stopPropagation()">
         <app-intake-conflict-modal

@@ -24,7 +24,7 @@ import { BookingWizardStore } from '../booking-wizard.store';
         aria-label="Intake mode selection"
         class="radio-group"
       >
-        <label
+        <div
           class="radio-card"
           [class.radio-card--selected]="selected() === 'AiAssisted'"
         >
@@ -39,9 +39,9 @@ import { BookingWizardStore } from '../booking-wizard.store';
           <p class="radio-description">
             Our AI guides you through intake questions step-by-step.
           </p>
-        </label>
+        </div>
 
-        <label
+        <div
           class="radio-card"
           [class.radio-card--selected]="selected() === 'Manual'"
         >
@@ -56,7 +56,7 @@ import { BookingWizardStore } from '../booking-wizard.store';
           <p class="radio-description">
             Complete the intake form at your own pace without AI guidance.
           </p>
-        </label>
+        </div>
       </div>
 
       <div class="actions">
