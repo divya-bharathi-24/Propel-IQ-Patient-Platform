@@ -25,6 +25,12 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves a user by email address (case-insensitive). Returns <c>null</c> when not found.
+    /// Used for Staff/Admin login authentication (US_011 extension).
+    /// </summary>
+    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Updates the user's password hash and the credential email status.
     /// Used when credentials are set up via the token-gated endpoint (AC-2).
     /// </summary>

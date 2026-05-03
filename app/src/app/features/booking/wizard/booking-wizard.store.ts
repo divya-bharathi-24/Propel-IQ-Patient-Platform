@@ -27,6 +27,10 @@ export interface BookingWizardState {
   isSubmitting: boolean;
   bookingResult: BookingResult | null;
   errorMessage: string | null;
+  /** Set when the patient clicks "Book This Date" in Step 2 to return to Step 1 with a pre-selected date. */
+  preselectedDate: string | null;
+  /** Set together with preselectedDate so Step 1 can restore the specialty selection. */
+  preselectedSpecialtyId: string | null;
 }
 
 const initialState: BookingWizardState = {
@@ -40,6 +44,8 @@ const initialState: BookingWizardState = {
   isSubmitting: false,
   bookingResult: null,
   errorMessage: null,
+  preselectedDate: null,
+  preselectedSpecialtyId: null,
 };
 
 export const BookingWizardStore = signalStore(
@@ -47,7 +53,30 @@ export const BookingWizardStore = signalStore(
   withMethods((store, bookingService = inject(BookingService)) => ({
     /** Advances from Step 1 after slot hold is placed. Moves to Step 2 (preferred slot). */
     selectSlot(slot: AvailableSlot): void {
-      patchState(store, { selectedSlot: slot, step: 2, errorMessage: null });
+      patchState(store, {
+        selectedSlot: slot,
+        step: 2,
+        errorMessage: null,
+        preselectedDate: null,
+        preselectedSpecialtyId: null,
+      });
+    },
+
+    /**
+     * Returns to Step 1 (slot selection) when the patient clicks "Book This Date"
+     * in Step 2. Stores the date and specialty so Step 1 can restore the selection.
+     */
+    goBackToSlotSelection(date: string): void {
+      const specialtyId = store.selectedSlot()?.specialtyId ?? null;
+      patchState(store, {
+        step: 1,
+        selectedSlot: null,
+        preferredDate: null,
+        preferredTimeSlot: null,
+        errorMessage: null,
+        preselectedDate: date,
+        preselectedSpecialtyId: specialtyId,
+      });
     },
 
     /**
@@ -100,8 +129,10 @@ export const BookingWizardStore = signalStore(
       patchState(store, { isSubmitting: true, errorMessage: null });
 
       const request: CreateBookingRequest = {
-        slotId: slot.slotId,
-        specialtyId: slot.specialtyId,
+        slotSpecialtyId: slot.specialtyId,
+        slotDate: slot.date,
+        slotTimeStart: slot.timeSlotStart,
+        slotTimeEnd: slot.timeSlotEnd,
         intakeMode: mode,
         insuranceName: insurance.insurerName,
         insuranceId: insurance.memberId,
@@ -114,7 +145,7 @@ export const BookingWizardStore = signalStore(
         patchState(store, {
           bookingResult: result ?? null,
           isSubmitting: false,
-          step: 4,
+          step: 5,
         });
       } catch (err: unknown) {
         if (err instanceof HttpErrorResponse && err.status === 409) {

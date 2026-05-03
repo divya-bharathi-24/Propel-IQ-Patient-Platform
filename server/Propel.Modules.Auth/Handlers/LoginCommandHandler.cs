@@ -13,8 +13,8 @@ using Propel.Modules.Auth.Services;
 namespace Propel.Modules.Auth.Handlers;
 
 /// <summary>
-/// Handles patient login (US_011, AC-1):
-/// 1. Look up patient by email (case-insensitive); return generic 401 on mismatch (OWASP A07).
+/// Handles login for both patients and staff/admin users (US_011, AC-1):
+/// 1. Look up user by email (case-insensitive) in both Patient and User tables; return generic 401 on mismatch (OWASP A07).
 /// 2. Write FailedLogin audit BEFORE returning 401 — SHA-256-hashed email in details, never raw
 ///    password (OWASP A09, US_013 AC-2).
 /// 3. Verify Argon2id password hash.
@@ -28,6 +28,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
     private const string PatientRole = "Patient";
 
     private readonly IPatientRepository _patientRepo;
+    private readonly IUserRepository _userRepo;
     private readonly IRefreshTokenRepository _refreshTokenRepo;
     private readonly AuditLogService _auditLog;
     private readonly IJwtService _jwtService;
@@ -36,6 +37,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
 
     public LoginCommandHandler(
         IPatientRepository patientRepo,
+        IUserRepository userRepo,
         IRefreshTokenRepository refreshTokenRepo,
         AuditLogService auditLog,
         IJwtService jwtService,
@@ -43,6 +45,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         ILogger<LoginCommandHandler> logger)
     {
         _patientRepo = patientRepo;
+        _userRepo = userRepo;
         _refreshTokenRepo = refreshTokenRepo;
         _auditLog = auditLog;
         _jwtService = jwtService;
@@ -52,11 +55,35 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
 
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        // AC-1 / OWASP A07: look up patient — do NOT reveal whether email or password failed
+        // AC-1 / OWASP A07: look up user in both Patient and User tables — do NOT reveal whether email or password failed
         var patient = await _patientRepo.GetByEmailAsync(request.Email, cancellationToken);
+        var user = await _userRepo.GetByEmailAsync(request.Email, cancellationToken);
 
-        bool credentialsValid = patient is not null
-            && Argon2.Verify(patient.PasswordHash, request.Password);
+        bool credentialsValid = false;
+        Guid? userId = null;
+        string? role = null;
+
+        // Check patient credentials
+        if (patient is not null && !string.IsNullOrEmpty(patient.PasswordHash))
+        {
+            credentialsValid = Argon2.Verify(patient.PasswordHash, request.Password);
+            if (credentialsValid)
+            {
+                userId = patient.Id;
+                role = PatientRole;
+            }
+        }
+
+        // Check staff/admin credentials if patient check failed
+        if (!credentialsValid && user is not null && !string.IsNullOrEmpty(user.PasswordHash))
+        {
+            credentialsValid = Argon2.Verify(user.PasswordHash, request.Password);
+            if (credentialsValid)
+            {
+                userId = user.Id;
+                role = user.Role.ToString();
+            }
+        }
 
         if (!credentialsValid)
         {
@@ -68,11 +95,11 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
             await _auditLog.AppendAsync(new AuditLog
             {
                 Id         = Guid.NewGuid(),
-                UserId     = patient?.Id,             // null when email is not found
+                UserId     = patient?.Id ?? user?.Id,
                 Action     = AuthAuditActions.FailedLogin,
                 EntityType = "User",
-                EntityId   = patient?.Id ?? Guid.Empty,
-                Role       = patient is not null ? PatientRole : null,
+                EntityId   = patient?.Id ?? user?.Id ?? Guid.Empty,
+                Role       = role,
                 IpAddress  = request.IpAddress,
                 Details    = JsonDocument.Parse($"{{\"emailHash\":\"{emailHash}\"}}"),
                 Timestamp  = DateTime.UtcNow
@@ -86,14 +113,14 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         var jti = Guid.NewGuid();
         string rawRefreshToken = _jwtService.GenerateRefreshToken();
         string tokenHash = _jwtService.HashToken(rawRefreshToken);
-        string accessToken = _jwtService.GenerateAccessToken(patient!.Id, PatientRole, jti, request.DeviceId);
+        string accessToken = _jwtService.GenerateAccessToken(userId!.Value, role!, jti, request.DeviceId);
 
         // Persist refresh token (hashed — never raw)
         var refreshToken = new RefreshToken
         {
             Id        = Guid.NewGuid(),
-            PatientId = patient.Id,
-            UserId    = null,
+            PatientId = patient?.Id,
+            UserId    = user?.Id,
             TokenHash = tokenHash,
             FamilyId  = Guid.NewGuid(), // new family per login session
             DeviceId  = request.DeviceId,
@@ -103,24 +130,24 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
         await _refreshTokenRepo.CreateAsync(refreshToken, cancellationToken);
 
         // Create Redis session (15-min TTL — NFR-007)
-        await _sessionService.SetAsync(patient.Id, request.DeviceId, patient.Id.ToString(), cancellationToken);
+        await _sessionService.SetAsync(userId.Value, request.DeviceId, userId.Value.ToString(), cancellationToken);
 
         // AC-1 (US_013): write Login audit after tokens are issued (FR-006, NFR-013)
         await _auditLog.AppendAsync(new AuditLog
         {
             Id         = Guid.NewGuid(),
-            UserId     = patient.Id,
-            PatientId  = patient.Id,
+            UserId     = userId.Value,
+            PatientId  = patient?.Id,
             Action     = AuthAuditActions.Login,
             EntityType = "User",
-            EntityId   = patient.Id,
-            Role       = PatientRole,
+            EntityId   = userId.Value,
+            Role       = role,
             IpAddress  = request.IpAddress,
             Timestamp  = DateTime.UtcNow
         }, cancellationToken);
 
-        _logger.LogInformation("Patient {PatientId} logged in from device {DeviceId}", patient.Id, request.DeviceId);
+        _logger.LogInformation("User {UserId} with role {Role} logged in from device {DeviceId}", userId.Value, role, request.DeviceId);
 
-        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900, patient.Id.ToString(), PatientRole, request.DeviceId);
+        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900, userId.Value.ToString(), role!, request.DeviceId);
     }
 }

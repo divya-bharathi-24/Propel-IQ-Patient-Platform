@@ -11,7 +11,7 @@ using Propel.Api.Gateway.Infrastructure.Security;
 namespace Propel.Api.Gateway.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/appointments")]
 public sealed class AppointmentController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -26,6 +26,21 @@ public sealed class AppointmentController : ControllerBase
     public async Task<IActionResult> Ping(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new PingAppointmentCommand(), cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Returns all available medical specialties (US_018, AC-1).
+    /// Used by the booking wizard to populate the specialty dropdown before slot selection.
+    /// </summary>
+    [HttpGet("specialties")]
+    [Authorize(Roles = "Patient")]
+    [ProducesResponseType(typeof(IReadOnlyList<SpecialtyDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSpecialties(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetSpecialtiesQuery(), cancellationToken);
         return Ok(result);
     }
 
@@ -56,7 +71,8 @@ public sealed class AppointmentController : ControllerBase
     {
         var query = new GetAvailableSlotsQuery(specialtyId, date);
         var result = await _mediator.Send(query, cancellationToken);
-        return Ok(result);
+        // Return the flat Slots array so the frontend receives SlotDto[] directly.
+        return Ok(result.Slots);
     }
 
     /// <summary>

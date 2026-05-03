@@ -270,10 +270,13 @@ export class InsuranceStepComponent {
       });
   }
 
-  /** Records Incomplete status in place of a check; shows skip confirmation. */
+  /** Records Incomplete status in place of a check and immediately advances to confirmation (AC-4). */
   protected onSkip(): void {
     this.skipped.set(true);
     this.insuranceResult.set(SKIP_RESULT);
+    // Immediately emit so the wizard advances to the confirmation step —
+    // the patient should not need to click "Continue" after skipping.
+    this.insuranceChecked.emit(SKIP_RESULT);
   }
 
   /**

@@ -1606,7 +1606,7 @@
         }
       }
     },
-    "/api/Appointment/ping": {
+    "/api/appointments/ping": {
       "get": {
         "tags": [
           "Appointment"
@@ -1635,7 +1635,85 @@
         }
       }
     },
-    "/api/Appointment/slots": {
+    "/api/appointments/specialties": {
+      "get": {
+        "tags": [
+          "Appointment"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialtyDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialtyDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialtyDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/appointments/slots": {
       "get": {
         "tags": [
           "Appointment"
@@ -1762,7 +1840,7 @@
         }
       }
     },
-    "/api/Appointment/{id}/cancel": {
+    "/api/appointments/{id}/cancel": {
       "post": {
         "tags": [
           "Appointment"
@@ -1884,7 +1962,7 @@
         }
       }
     },
-    "/api/Appointment/{id}/reschedule": {
+    "/api/appointments/{id}/reschedule": {
       "post": {
         "tags": [
           "Appointment"
@@ -5472,20 +5550,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "string",
-                "format": "uuid"
+                "$ref": "#/components/schemas/InitiateOutlookSyncRequest"
               }
             },
             "text/json": {
               "schema": {
-                "type": "string",
-                "format": "uuid"
+                "$ref": "#/components/schemas/InitiateOutlookSyncRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "string",
-                "format": "uuid"
+                "$ref": "#/components/schemas/InitiateOutlookSyncRequest"
               }
             }
           }
@@ -8794,6 +8869,16 @@
         },
         "additionalProperties": false
       },
+      "InitiateOutlookSyncRequest": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "InsurancePreCheckRequestDto": {
         "type": "object",
         "properties": {
@@ -8824,13 +8909,12 @@
       },
       "InsuranceValidationResult": {
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "Verified",
+          "NotRecognized",
+          "Incomplete",
+          "CheckPending"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "IntakeDraftDataDto": {
         "type": "object",
@@ -8900,11 +8984,10 @@
       },
       "IntakeMode": {
         "enum": [
-          0,
-          1
+          "Manual",
+          "AiAssisted"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "IntakeRecordDto": {
         "type": "object",
@@ -9125,11 +9208,10 @@
       },
       "MedicalCodeType": {
         "enum": [
-          0,
-          1
+          "ICD10",
+          "CPT"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "NoShowRiskDto": {
         "type": "object",
@@ -9253,11 +9335,10 @@
       },
       "PatientStatus": {
         "enum": [
-          0,
-          1
+          "Active",
+          "Deactivated"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ProblemDetails": {
         "type": "object",
@@ -9528,14 +9609,22 @@
         "properties": {
           "timeSlotStart": {
             "type": "string",
-            "format": "time"
+            "format": "date-time"
           },
           "timeSlotEnd": {
             "type": "string",
-            "format": "time"
+            "format": "date-time"
           },
           "isAvailable": {
             "type": "boolean"
+          },
+          "specialtyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
           }
         },
         "additionalProperties": false
@@ -9544,6 +9633,20 @@
         "type": "object",
         "properties": {
           "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SpecialtyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
             "type": "string",
             "nullable": true
           }
@@ -9849,12 +9952,11 @@
       },
       "UserRole": {
         "enum": [
-          0,
-          1,
-          2
+          "Patient",
+          "Staff",
+          "Admin"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ValidateMedicalCodeCommand": {
         "type": "object",

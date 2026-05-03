@@ -19,7 +19,11 @@ export class BookingService {
    */
   holdSlot(slot: AvailableSlot): Observable<void> {
     return this.http
-      .post<void>(`${this.apiBase}/hold-slot`, { slotId: slot.slotId })
+      .post<void>(`${this.apiBase}/hold-slot`, {
+        specialtyId: slot.specialtyId,
+        date: slot.date,
+        timeSlotStart: slot.timeSlotStart,
+      })
       .pipe(catchError(this.handleError));
   }
 

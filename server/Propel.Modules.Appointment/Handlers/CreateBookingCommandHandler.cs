@@ -36,7 +36,7 @@ public sealed class CreateBookingCommandHandler
     private readonly IAppointmentBookingRepository _bookingRepo;
     private readonly IInsuranceSoftCheckService _insuranceCheck;
     private readonly ISlotCacheService _slotCache;
-    private readonly IConnectionMultiplexer _redis;
+    private readonly IConnectionMultiplexer? _redis;
     private readonly IAuditLogRepository _auditLogRepo;
     private readonly IPatientRepository _patientRepo;
     private readonly IPublisher _publisher;
@@ -47,12 +47,12 @@ public sealed class CreateBookingCommandHandler
         IAppointmentBookingRepository bookingRepo,
         IInsuranceSoftCheckService insuranceCheck,
         ISlotCacheService slotCache,
-        IConnectionMultiplexer redis,
         IAuditLogRepository auditLogRepo,
         IPatientRepository patientRepo,
         IPublisher publisher,
         IHttpContextAccessor httpContextAccessor,
-        ILogger<CreateBookingCommandHandler> logger)
+        ILogger<CreateBookingCommandHandler> logger,
+        IConnectionMultiplexer? redis = null)
     {
         _bookingRepo = bookingRepo;
         _insuranceCheck = insuranceCheck;
@@ -80,17 +80,25 @@ public sealed class CreateBookingCommandHandler
         // Step 2 — Clear the Redis slot-hold key (best-effort; failure must not block booking).
         var holdKey =
             $"slot_hold:{request.SlotSpecialtyId}:{request.SlotDate:yyyy-MM-dd}:{request.SlotTimeStart:HH\\:mm}:{patientId}";
-        try
+        
+        if (_redis is not null && _redis.IsConnected)
         {
-            var db = _redis.GetDatabase();
-            await db.KeyDeleteAsync(holdKey);
+            try
+            {
+                var db = _redis.GetDatabase();
+                await db.KeyDeleteAsync(holdKey);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "SlotHold_ClearFailed: Could not delete hold key {HoldKey}",
+                    holdKey);
+            }
         }
-        catch (Exception ex)
+        else
         {
-            _logger.LogWarning(
-                ex,
-                "SlotHold_ClearFailed: Could not delete hold key {HoldKey}",
-                holdKey);
+            _logger.LogDebug("SlotHold_ClearSkipped: Redis unavailable (development mode)");
         }
 
         // Step 3 — INSERT Appointment; catch unique constraint violation → SlotConflictException (AC-3).

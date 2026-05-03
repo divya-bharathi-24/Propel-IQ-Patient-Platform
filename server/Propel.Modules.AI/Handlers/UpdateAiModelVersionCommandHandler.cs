@@ -27,16 +27,16 @@ public sealed class UpdateAiModelVersionCommandHandler
 {
     private const string ModelVersionRedisKey = "ai:config:model_version";
 
-    private readonly IConnectionMultiplexer               _redis;
+    private readonly IConnectionMultiplexer?               _redis;
     private readonly IOptionsMonitor<AiResilienceSettings> _options;
     private readonly IAuditLogRepository                   _auditLog;
     private readonly ILogger<UpdateAiModelVersionCommandHandler> _logger;
 
     public UpdateAiModelVersionCommandHandler(
-        IConnectionMultiplexer redis,
         IOptionsMonitor<AiResilienceSettings> options,
         IAuditLogRepository auditLog,
-        ILogger<UpdateAiModelVersionCommandHandler> logger)
+        ILogger<UpdateAiModelVersionCommandHandler> logger,
+        IConnectionMultiplexer? redis = null)
     {
         _redis    = redis;
         _options  = options;
@@ -66,7 +66,17 @@ public sealed class UpdateAiModelVersionCommandHandler
         // ── Read current version for audit log before/after ──────────────────
         string previousVersion = await ReadCurrentVersionAsync(settings);
 
-        // ── Write new version to Redis ─────────────────────────────────────────
+        // ── Write new version to Redis (or fail gracefully in development) ────
+        if (_redis is null || !_redis.IsConnected)
+        {
+            _logger.LogWarning(
+                "UpdateAiModelVersion_RedisUnavailable: Cannot update model version (Redis disabled in development mode).");
+            return new UpdateAiModelVersionResult(
+                Success: false,
+                ActiveModelVersion: previousVersion,
+                ErrorMessage: "Redis is not available (development mode). Model version updates require Redis.");
+        }
+
         try
         {
             var db = _redis.GetDatabase();
@@ -123,6 +133,9 @@ public sealed class UpdateAiModelVersionCommandHandler
 
     private async Task<string> ReadCurrentVersionAsync(AiResilienceSettings settings)
     {
+        if (_redis is null || !_redis.IsConnected)
+            return settings.DefaultModelVersion;
+
         try
         {
             var db  = _redis.GetDatabase();

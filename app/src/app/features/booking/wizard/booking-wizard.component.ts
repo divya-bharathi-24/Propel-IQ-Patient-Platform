@@ -76,6 +76,7 @@ import { InsuranceCheckResult } from '../../../shared/models/insurance.models';
         <app-preferred-slot-step
           [specialtyId]="store.selectedSlot()!.specialtyId"
           (slotDesignated)="onSlotDesignated($event)"
+          (bookThisDate)="onBookThisDate($event)"
         />
       }
       @if (store.step() === 3) {
@@ -194,13 +195,25 @@ export class BookingWizardComponent implements OnDestroy {
   }
 
   /**
+   * Handles the `bookThisDate` output from the preferred slot step.
+   * Returns to Step 1 with the selected date and specialty pre-populated
+   * so the patient can pick an available slot directly.
+   */
+  protected onBookThisDate(date: string): void {
+    this.store.goBackToSlotSelection(date);
+  }
+
+  /**
    * Handles the `insuranceChecked` output from Step 4.
-   * Records the pre-check result on the store then advances to Step 5.
+   * Records the pre-check result on the store, advances to Step 5, then
+   * fires the booking API call. The confirmation step shows "Loading…" while
+   * the call is in-flight and populates once bookingResult is set.
    * Navigation occurs regardless of insurance status (FR-040 — non-blocking).
    */
   protected onInsuranceChecked(result: InsuranceCheckResult | null): void {
     this.store.setInsuranceResult(result);
     this.store.advanceToConfirmation();
+    void this.store.confirmBooking();
   }
 
   ngOnDestroy(): void {

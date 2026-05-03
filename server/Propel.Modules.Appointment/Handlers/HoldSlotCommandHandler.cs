@@ -19,16 +19,16 @@ namespace Propel.Modules.Appointment.Handlers;
 /// </summary>
 public sealed class HoldSlotCommandHandler : IRequestHandler<HoldSlotCommand>
 {
-    private readonly IConnectionMultiplexer _redis;
+    private readonly IConnectionMultiplexer? _redis;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<HoldSlotCommandHandler> _logger;
 
     private static readonly TimeSpan HoldTtl = TimeSpan.FromSeconds(300);
 
     public HoldSlotCommandHandler(
-        IConnectionMultiplexer redis,
         IHttpContextAccessor httpContextAccessor,
-        ILogger<HoldSlotCommandHandler> logger)
+        ILogger<HoldSlotCommandHandler> logger,
+        IConnectionMultiplexer? redis = null)
     {
         _redis = redis;
         _httpContextAccessor = httpContextAccessor;
@@ -44,6 +44,15 @@ public sealed class HoldSlotCommandHandler : IRequestHandler<HoldSlotCommand>
 
         var holdKey =
             $"slot_hold:{request.SpecialtyId}:{request.Date:yyyy-MM-dd}:{request.TimeSlotStart:HH\\:mm}:{patientId}";
+
+        // Development mode: Redis is disabled, log and return
+        if (_redis is null || !_redis.IsConnected)
+        {
+            _logger.LogDebug(
+                "SlotHold_Skipped: Redis unavailable in development mode. Key={HoldKey} PatientId={PatientId}",
+                holdKey, patientId);
+            return;
+        }
 
         try
         {

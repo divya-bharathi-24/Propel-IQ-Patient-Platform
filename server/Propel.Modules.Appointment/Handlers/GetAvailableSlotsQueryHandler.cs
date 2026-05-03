@@ -85,7 +85,10 @@ public sealed class GetAvailableSlotsQueryHandler
             var slotEnd = current.Add(slotDuration);
             // A slot is unavailable if any booked/arrived appointment starts at the same time.
             var isAvailable = !bookedSlots.Any(b => b.TimeSlotStart == current);
-            slots.Add(new SlotDto(current, slotEnd, isAvailable));
+            // Build UTC DateTimeOffset so the frontend receives ISO 8601 datetimes.
+            var slotStartUtc = new DateTimeOffset(request.Date.ToDateTime(current), TimeSpan.Zero);
+            var slotEndUtc = new DateTimeOffset(request.Date.ToDateTime(slotEnd), TimeSpan.Zero);
+            slots.Add(new SlotDto(slotStartUtc, slotEndUtc, isAvailable, request.SpecialtyId, request.Date));
             current = slotEnd;
         }
 

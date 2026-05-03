@@ -97,7 +97,14 @@ export class LoginComponent implements OnInit {
           this.sessionTimer.stop(),
         );
         this.sessionTimer.start(() => this.authService.logout('idle_timeout'));
-        this.router.navigate(['/dashboard']);
+        const role = this.authService.currentRole();
+        if (role === 'Admin') {
+          this.router.navigate(['/admin/users']);
+        } else if (role === 'Staff') {
+          this.router.navigate(['/staff/walkin']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (err: { status: number; message: string }) => {
         this.isSubmitting.set(false);

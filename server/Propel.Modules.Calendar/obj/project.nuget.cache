@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/G/roDk6iGM=",
+  "dgSpecHash": "crPqCYTy8b4=",
   "success": true,
   "projectFilePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
   "expectedPackageFiles": [
@@ -36,28 +36,15 @@
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\nodatime\\3.2.0\\nodatime.3.2.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\pipelines.sockets.unofficial\\2.2.8\\pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
-    "C:\\Users\\JothisNirmal\\.nuget\\packages\\stackexchange.redis\\2.12.14\\stackexchange.redis.2.12.14.nupkg.sha512",
+    "C:\\Users\\JothisNirmal\\.nuget\\packages\\stackexchange.redis\\2.8.58\\stackexchange.redis.2.8.58.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\std.uritemplate\\2.0.8\\std.uritemplate.2.0.8.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.clientmodel\\1.8.0\\system.clientmodel.1.8.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.15.0\\system.identitymodel.tokens.jwt.8.15.0.nupkg.sha512",
-    "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.io.hashing\\10.0.2\\system.io.hashing.10.0.2.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512",
     "C:\\Users\\JothisNirmal\\.nuget\\packages\\system.memory.data\\8.0.1\\system.memory.data.8.0.1.nupkg.sha512"
   ],
   "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
-      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
     {
       "code": "NU1510",
       "level": "Warning",
@@ -66,6 +53,18 @@
       "warningLevel": 1,
       "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
       "libraryId": "Microsoft.Extensions.Options",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Propel_IQ\\Propel-IQ-Patient-Platform\\server\\Propel.Modules.Calendar\\Propel.Modules.Calendar.csproj",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
       "targetGraphs": [
         "net10.0"
       ]

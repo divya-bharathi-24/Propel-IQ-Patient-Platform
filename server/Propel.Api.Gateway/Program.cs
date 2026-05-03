@@ -140,6 +140,13 @@ builder.Services.AddControllers(options =>
     if (invalidModelStateFilter is not null)
         options.Filters.Remove(invalidModelStateFilter);
 })
+.AddJsonOptions(options =>
+{
+    // Configure JSON serialization for enum string conversion
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    // Allow case-insensitive property name matching for better frontend compatibility
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+})
 .ConfigureApiBehaviorOptions(apiBehaviorOptions =>
 {
     // Disable the automatic 400 shortcut so FluentValidation ValidationException flows
@@ -251,16 +258,16 @@ builder.Services.AddSingleton(dataSource);
 // The singleton is injected into PHI-aware repositories (Patient, Clinical).
 builder.Services.AddSingleton<IEncryptionService, PgcryptoEncryptionService>();
 
-// ── Redis (StackExchange.Redis) — graceful degradation per NFR-018 / AC4 ─────
+// ── Redis (StackExchange.Redis) — graceful degradation per NFR-018 / AC4 -----
 // DEVELOPMENT MODE: Redis is DISABLED. Using in-memory session storage.
 // PRODUCTION MODE: Redis is REQUIRED for session management.
 if (builder.Environment.IsDevelopment())
 {
     Log.Warning("DEVELOPMENT MODE: Redis is disabled. Using IN-MEMORY session storage. Sessions will be lost on restart!");
     
-    // Register a dummy IConnectionMultiplexer to satisfy DI dependencies
-    builder.Services.AddSingleton<IConnectionMultiplexer>(_ => 
-        throw new InvalidOperationException("Redis is disabled in development. Use in-memory session service."));
+    // Register null - services that need Redis will check for null and degrade gracefully
+    builder.Services.AddSingleton<IConnectionMultiplexer>(_ => null!);
+    Log.Information("IConnectionMultiplexer: NULL (development mode - graceful degradation enabled)");
 }
 else
 {
@@ -559,6 +566,8 @@ builder.Services.AddScoped<IIntakeRepository, IntakeRepository>();
 builder.Services.Configure<SlotConfiguration>(configuration.GetSection("SlotConfiguration"));
 // Appointment slot repository: EF Core fallback for slot availability queries.
 builder.Services.AddScoped<IAppointmentSlotRepository, AppointmentSlotRepository>();
+// Specialty reference data repository: used by GET /api/appointments/specialties (US_018).
+builder.Services.AddScoped<ISpecialtyRepository, SpecialtyRepository>();
 // ISlotCacheService: NullSlotCacheService in development (Redis disabled), RedisSlotCacheService in production.
 if (builder.Environment.IsDevelopment())
 {
@@ -1131,7 +1140,6 @@ Log.Information("CalendarSyncRetryProcessor registered (EP-007, us_037, task_002
 
 // ── EP-007/us_036 — Outlook Calendar OAuth 2.0 sync (task_002) ────────────────
 // OutlookCalendarOptions: non-secret settings bound from appsettings.json (OWASP A02).
-// OUTLOOK_CLIENT_SECRET is sourced exclusively from Key Vault / environment variables.
 builder.Services.Configure<OutlookCalendarOptions>(configuration.GetSection("OutlookCalendar"));
 
 // IIcsGeneratorService: RFC 5545-compliant ICS generator shared with us_035 Google flow.
@@ -1247,3 +1255,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+

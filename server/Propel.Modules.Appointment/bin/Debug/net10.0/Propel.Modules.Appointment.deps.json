@@ -11,7 +11,7 @@
           "FluentValidation": "11.12.0",
           "MediatR": "12.5.0",
           "Propel.Domain": "1.0.0",
-          "StackExchange.Redis": "2.12.14"
+          "StackExchange.Redis": "2.8.58"
         },
         "runtime": {
           "Propel.Modules.Appointment.dll": {}
@@ -52,23 +52,14 @@
           }
         }
       },
-      "StackExchange.Redis/2.12.14": {
+      "StackExchange.Redis/2.8.58": {
         "dependencies": {
-          "Pipelines.Sockets.Unofficial": "2.2.8",
-          "System.IO.Hashing": "10.0.2"
+          "Pipelines.Sockets.Unofficial": "2.2.8"
         },
         "runtime": {
-          "lib/net10.0/StackExchange.Redis.dll": {
+          "lib/net8.0/StackExchange.Redis.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.12.14.58429"
-          }
-        }
-      },
-      "System.IO.Hashing/10.0.2": {
-        "runtime": {
-          "lib/net10.0/System.IO.Hashing.dll": {
-            "assemblyVersion": "10.0.0.2",
-            "fileVersion": "10.0.225.61305"
+            "fileVersion": "2.8.58.19568"
           }
         }
       },
@@ -119,19 +110,12 @@
       "path": "pipelines.sockets.unofficial/2.2.8",
       "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
     },
-    "StackExchange.Redis/2.12.14": {
+    "StackExchange.Redis/2.8.58": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-QiAQg40OP4Owem6/PjIbjEKq2+uIeQYeZ1TCMUnx/QvKugOPxOfC96wjlnBjWHi4Wq9pv9+fDlXGT06XkRZ6Ig==",
-      "path": "stackexchange.redis/2.12.14",
-      "hashPath": "stackexchange.redis.2.12.14.nupkg.sha512"
-    },
-    "System.IO.Hashing/10.0.2": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-AKJknIFi9O3+rGExxTry188JPvUoZAPcCtS2qdqyFhIzsxQ1Ap94BeGDG0VzVEHakhmRxmJtVih6TsHoghIt/g==",
-      "path": "system.io.hashing/10.0.2",
-      "hashPath": "system.io.hashing.10.0.2.nupkg.sha512"
+      "sha512": "sha512-0XGRE2UoF/n2/qhCpcyBBZovpGhHu4hRtkdsx4fZFu1H5Q/Z8Q+U/z/nWwnosWDRJnEasntNatd9Mf+Isc8plg==",
+      "path": "stackexchange.redis/2.8.58",
+      "hashPath": "stackexchange.redis.2.8.58.nupkg.sha512"
     },
     "Propel.Domain/1.0.0": {
       "type": "project",

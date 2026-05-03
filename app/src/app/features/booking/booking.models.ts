@@ -20,8 +20,10 @@ export interface InsuranceInfo {
 }
 
 export interface CreateBookingRequest {
-  slotId: string;
-  specialtyId: string;
+  slotSpecialtyId: string;
+  slotDate: string; // "YYYY-MM-DD"
+  slotTimeStart: string; // "HH:mm"
+  slotTimeEnd: string; // "HH:mm"
   intakeMode: IntakeMode;
   insuranceName: string | null;
   insuranceId: string | null;

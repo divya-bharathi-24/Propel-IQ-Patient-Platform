@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BookingWizardStore } from '../booking-wizard.store';
 import { CalendarSyncStore } from '../../../../features/patient/calendar/calendar-sync.store';
 import { CalendarSyncButtonComponent } from '../../../../shared/components/calendar-sync-button/calendar-sync-button.component';
@@ -19,6 +20,7 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
   imports: [
     RouterLink,
     MatButtonModule,
+    MatProgressSpinnerModule,
     CalendarSyncButtonComponent,
     CalendarSyncStatusComponent,
     OutlookCalendarSyncComponent,
@@ -77,6 +79,11 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
           <app-outlook-calendar-sync
             [appointmentId]="result()!.appointmentId"
           />
+        </div>
+      } @else if (store.isSubmitting()) {
+        <div class="loading-state" role="status" aria-live="polite">
+          <mat-spinner diameter="40" aria-label="Confirming your booking" />
+          <p class="loading-text">Confirming your booking…</p>
         </div>
       } @else {
         <p class="no-result" role="status">Loading confirmation details…</p>
@@ -166,6 +173,20 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
       .no-result {
         color: #5f6368;
         font-size: 0.875rem;
+      }
+
+      .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+      }
+
+      .loading-text {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin: 0;
       }
     `,
   ],

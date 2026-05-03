@@ -11,7 +11,6 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -151,15 +150,17 @@ export interface PreferredSlotDesignation {
       }
 
       <div class="actions" aria-live="polite">
-        <button
-          mat-flat-button
-          color="primary"
-          [disabled]="!selectedSlot()"
-          (click)="onDesignate()"
-          aria-label="Designate selected slot as preferred and join waitlist"
-        >
-          Designate Preferred Slot
-        </button>
+        @if (!allSlotsAvailable()) {
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="!selectedSlot()"
+            (click)="onDesignate()"
+            aria-label="Designate selected slot as preferred and join waitlist"
+          >
+            Designate Preferred Slot
+          </button>
+        }
 
         <button
           mat-stroked-button
@@ -281,8 +282,14 @@ export class PreferredSlotStepComponent implements OnInit, OnDestroy {
   @Output() slotDesignated =
     new EventEmitter<PreferredSlotDesignation | null>();
 
+  /**
+   * Emits the selected date string ("YYYY-MM-DD") when the patient clicks
+   * "Book This Date" (edge case: all slots available). The wizard handles
+   * navigation back to Step 1 with the date pre-selected.
+   */
+  @Output() bookThisDate = new EventEmitter<string>();
+
   protected readonly slotsStore = inject(SlotAvailabilityStore);
-  private readonly router = inject(Router);
 
   protected readonly today = new Date();
   protected readonly selectedDate = signal<Date | null>(null);
@@ -342,12 +349,9 @@ export class PreferredSlotStepComponent implements OnInit, OnDestroy {
   }
 
   protected onBookThisDate(): void {
-    // Edge case: all slots available — route back to slot picker.
-    // The slot picker step is Step 1 in the wizard; resetting the wizard
-    // navigates there. We pass the pre-selected date via router state.
-    this.router.navigate(['/book'], {
-      state: { preselectedDate: this.toDateString(this.selectedDate()!) },
-    });
+    // Edge case: all slots available — emit the selected date so the wizard
+    // can navigate back to Step 1 with the date pre-selected.
+    this.bookThisDate.emit(this.toDateString(this.selectedDate()!));
   }
 
   protected slotLabel(slot: SlotDto): string {
