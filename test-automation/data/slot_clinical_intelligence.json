@@ -1,0 +1,102 @@
+{
+  "tc_uc004_hp_001": {
+    "swapPatient": "swap-patient@propeliq.dev",
+    "cancelPatient": "cancel-patient@propeliq.dev",
+    "currentSlot": "slot-A",
+    "preferredSlot": "slot-B",
+    "swapTimeoutSeconds": 60
+  },
+  "tc_uc004_ec_001": {
+    "slot": "slot-Z",
+    "cancellingPatient": "patient-d@propeliq.dev",
+    "waitlistedPatients": [
+      { "email": "patient-a@propeliq.dev", "order": 1 },
+      { "email": "patient-b@propeliq.dev", "order": 2 },
+      { "email": "patient-c@propeliq.dev", "order": 3 }
+    ]
+  },
+  "tc_uc004_er_001": {
+    "patient": "swap-er-patient@propeliq.dev",
+    "smsMockStatus": 503,
+    "retryDelayMinutes": 5
+  },
+  "tc_uc005_hp_001": {
+    "staffEmail": "staff@propeliq.dev",
+    "patientName": "John Smith",
+    "patientRef": "john-smith",
+    "slotId": "walkin-001",
+    "slotTime": "14:00"
+  },
+  "tc_uc005_ec_001": {
+    "slotId": "walkin-anon-001",
+    "anonymousIdPattern": "TEMP-[A-Z0-9]{6}"
+  },
+  "tc_uc005_er_001": {
+    "patientRef": "jane-overflow"
+  },
+  "tc_uc006_hp_001": {
+    "staffEmail": "staff@propeliq.dev",
+    "appointmentRef": "appt-queue-001",
+    "patientName": "John Smith",
+    "expectedStatus": "Arrived"
+  },
+  "tc_uc006_ec_001": {
+    "referenceNumber": "REF-20260420-999",
+    "patientRef": "ref-search"
+  },
+  "tc_uc006_er_001": {
+    "appointmentId": "appt-queue-001"
+  },
+  "tc_uc007_hp_001": {
+    "patientEmail": "upload.patient@propeliq.dev",
+    "files": [
+      { "name": "clinical_doc_1.pdf", "sizeMb": 2 },
+      { "name": "clinical_doc_2.pdf", "sizeMb": 5 },
+      { "name": "clinical_doc_3.pdf", "sizeMb": 10 }
+    ],
+    "maxFileSizeMb": 25
+  },
+  "tc_uc007_ec_001": {
+    "files": [
+      { "name": "large_doc_30mb.pdf", "sizeMb": 30, "expectRejected": true },
+      { "name": "clinical_doc_1.pdf", "sizeMb": 2, "expectRejected": false },
+      { "name": "clinical_doc_2.pdf", "sizeMb": 5, "expectRejected": false }
+    ]
+  },
+  "tc_uc007_er_001": {
+    "rejectedFile": "clinical_notes.docx",
+    "supportedFormat": "PDF"
+  },
+  "tc_uc008_hp_001": {
+    "staffEmail": "staff@propeliq.dev",
+    "patientId": "view-patient-id",
+    "conflictField": "medication",
+    "conflictValue1": "Metformin 500mg",
+    "conflictSource1": "Document 1",
+    "conflictValue2": "Metformin 1000mg",
+    "conflictSource2": "Document 2",
+    "authoritativeValue": "Metformin 500mg"
+  },
+  "tc_uc008_ec_001": {
+    "patientId": "noconflict-patient-id"
+  },
+  "tc_uc008_er_001": {
+    "patientId": "corrupt-patient-id",
+    "corruptedDocRef": "corrupted_doc"
+  },
+  "tc_uc009_hp_001": {
+    "staffEmail": "staff@propeliq.dev",
+    "patientId": "code-patient-id",
+    "icd10Code": "I10",
+    "cptCode": "99213"
+  },
+  "tc_uc009_ec_001": {
+    "validManualCode": "E11.9",
+    "validCodeDescription": "Type 2 diabetes mellitus without complications",
+    "invalidCode": "INVALID-999"
+  },
+  "tc_uc009_er_001": {
+    "patientId": "conflict-patient-id",
+    "unresolvedConflicts": 1
+  }
+}
