@@ -15,11 +15,11 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './resume-draft-banner.component.scss',
 })
 export class ResumeDraftBannerComponent {
-  readonly resume = output<void>();
+  readonly resumeDraft = output<void>();
   readonly startFresh = output<void>();
 
   onResume(): void {
-    this.resume.emit();
+    this.resumeDraft.emit();
   }
 
   onStartFresh(): void {

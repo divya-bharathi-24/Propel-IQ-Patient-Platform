@@ -10,7 +10,6 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { EMPTY, catchError, pipe, switchMap, tap } from 'rxjs';
 import {
   CodeDecision,
-  CodeType,
   ConfirmCodesPayload,
   DecisionStatus,
   ManualCodeItem,

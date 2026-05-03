@@ -21,6 +21,8 @@ nul
 */settings.local.json
 .env
 .vs/
+bin/
+obj/
 # .github/*
 # .propel/templates/*
 # .vscode/mcp.json

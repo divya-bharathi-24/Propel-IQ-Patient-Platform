@@ -35,6 +35,10 @@ public sealed class UserRepository : IUserRepository
         => _context.Users
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+        => _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email.ToLowerInvariant(), cancellationToken);
+
     public async Task UpdatePasswordHashAsync(
         User user,
         string passwordHash,

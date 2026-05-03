@@ -7,7 +7,6 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';

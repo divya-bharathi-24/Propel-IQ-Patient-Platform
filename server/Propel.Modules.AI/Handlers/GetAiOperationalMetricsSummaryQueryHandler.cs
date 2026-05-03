@@ -33,15 +33,15 @@ public sealed class GetAiOperationalMetricsSummaryQueryHandler
     private const string ModelVersionRedisKey    = "ai:config:model_version";
 
     private readonly IAiOperationalMetricsReadRepository   _metricsRepo;
-    private readonly IConnectionMultiplexer                _redis;
+    private readonly IConnectionMultiplexer?                _redis;
     private readonly IOptionsMonitor<AiResilienceSettings> _options;
     private readonly ILogger<GetAiOperationalMetricsSummaryQueryHandler> _logger;
 
     public GetAiOperationalMetricsSummaryQueryHandler(
         IAiOperationalMetricsReadRepository metricsRepo,
-        IConnectionMultiplexer redis,
         IOptionsMonitor<AiResilienceSettings> options,
-        ILogger<GetAiOperationalMetricsSummaryQueryHandler> logger)
+        ILogger<GetAiOperationalMetricsSummaryQueryHandler> logger,
+        IConnectionMultiplexer? redis = null)
     {
         _metricsRepo = metricsRepo;
         _redis       = redis;
@@ -142,6 +142,9 @@ public sealed class GetAiOperationalMetricsSummaryQueryHandler
 
     private async Task<bool> CheckRedisKeyExistsAsync(string key, CancellationToken ct)
     {
+        if (_redis is null || !_redis.IsConnected)
+            return false;
+
         try
         {
             var db = _redis.GetDatabase();
@@ -156,6 +159,9 @@ public sealed class GetAiOperationalMetricsSummaryQueryHandler
 
     private async Task<string> ReadRedisStringAsync(string key, string fallback, CancellationToken ct)
     {
+        if (_redis is null || !_redis.IsConnected)
+            return fallback;
+
         try
         {
             var db  = _redis.GetDatabase();

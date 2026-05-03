@@ -12,7 +12,7 @@
   <!-- ── Resume-draft banner ────────────────────────────────────────────── -->
   @if (showResumeDraft()) {
     <app-resume-draft-banner
-      (resume)="onResumeDraft()"
+      (resumeDraft)="onResumeDraft()"
       (startFresh)="onStartFresh()"
     />
   }
@@ -52,13 +52,17 @@
     <!-- Autosave status chip -->
     <div class="save-status" aria-live="polite">
       @if (saveStatus() === "saving") {
-        <span class="save-status__chip save-status__chip--saving">Saving...</span>
+        <span class="save-status__chip save-status__chip--saving"
+          >Saving...</span
+        >
       }
       @if (saveStatus() === "saved") {
         <span class="save-status__chip save-status__chip--saved">Saved</span>
       }
       @if (saveStatus() === "error") {
-        <span class="save-status__chip save-status__chip--error">Save failed</span>
+        <span class="save-status__chip save-status__chip--error"
+          >Save failed</span
+        >
       }
     </div>
 
@@ -92,7 +96,6 @@
       aria-label="Manual intake form"
     >
       <mat-accordion class="intake-accordion" multi>
-
         <!-- ================================================================
              SECTION 1 — Demographics
              ================================================================ -->
@@ -108,56 +111,85 @@
           </mat-expansion-panel-header>
 
           <div formGroupName="demographics" class="section-body">
-
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>First Name <span aria-hidden="true">*</span></mat-label>
+                <mat-label
+                  >First Name <span aria-hidden="true">*</span></mat-label
+                >
                 <input
                   matInput
                   id="firstName"
                   formControlName="firstName"
                   aria-required="true"
-                  [attr.aria-invalid]="hasError('demographics.firstName', 'required') || null"
-                  [attr.aria-describedby]="hasError('demographics.firstName', 'required') ? 'firstName-error' : null"
+                  [attr.aria-invalid]="
+                    hasError('demographics.firstName', 'required') || null
+                  "
+                  [attr.aria-describedby]="
+                    hasError('demographics.firstName', 'required')
+                      ? 'firstName-error'
+                      : null
+                  "
                   (blur)="onFieldBlur()"
                 />
                 @if (hasError("demographics.firstName", "required")) {
-                  <mat-error id="firstName-error">First name is required.</mat-error>
+                  <mat-error id="firstName-error"
+                    >First name is required.</mat-error
+                  >
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Last Name <span aria-hidden="true">*</span></mat-label>
+                <mat-label
+                  >Last Name <span aria-hidden="true">*</span></mat-label
+                >
                 <input
                   matInput
                   id="lastName"
                   formControlName="lastName"
                   aria-required="true"
-                  [attr.aria-invalid]="hasError('demographics.lastName', 'required') || null"
-                  [attr.aria-describedby]="hasError('demographics.lastName', 'required') ? 'lastName-error' : null"
+                  [attr.aria-invalid]="
+                    hasError('demographics.lastName', 'required') || null
+                  "
+                  [attr.aria-describedby]="
+                    hasError('demographics.lastName', 'required')
+                      ? 'lastName-error'
+                      : null
+                  "
                   (blur)="onFieldBlur()"
                 />
                 @if (hasError("demographics.lastName", "required")) {
-                  <mat-error id="lastName-error">Last name is required.</mat-error>
+                  <mat-error id="lastName-error"
+                    >Last name is required.</mat-error
+                  >
                 }
               </mat-form-field>
             </div>
 
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Date of Birth <span aria-hidden="true">*</span></mat-label>
+                <mat-label
+                  >Date of Birth <span aria-hidden="true">*</span></mat-label
+                >
                 <input
                   matInput
                   type="date"
                   id="dateOfBirth"
                   formControlName="dateOfBirth"
                   aria-required="true"
-                  [attr.aria-invalid]="hasError('demographics.dateOfBirth', 'required') || null"
-                  [attr.aria-describedby]="hasError('demographics.dateOfBirth', 'required') ? 'dob-error' : null"
+                  [attr.aria-invalid]="
+                    hasError('demographics.dateOfBirth', 'required') || null
+                  "
+                  [attr.aria-describedby]="
+                    hasError('demographics.dateOfBirth', 'required')
+                      ? 'dob-error'
+                      : null
+                  "
                   (blur)="onFieldBlur()"
                 />
                 @if (hasError("demographics.dateOfBirth", "required")) {
-                  <mat-error id="dob-error">Date of birth is required.</mat-error>
+                  <mat-error id="dob-error"
+                    >Date of birth is required.</mat-error
+                  >
                 }
               </mat-form-field>
 
@@ -167,15 +199,23 @@
                   id="gender"
                   formControlName="gender"
                   aria-required="true"
-                  [attr.aria-invalid]="hasError('demographics.gender', 'required') || null"
-                  [attr.aria-describedby]="hasError('demographics.gender', 'required') ? 'gender-error' : null"
+                  [attr.aria-invalid]="
+                    hasError('demographics.gender', 'required') || null
+                  "
+                  [attr.aria-describedby]="
+                    hasError('demographics.gender', 'required')
+                      ? 'gender-error'
+                      : null
+                  "
                   (blur)="onFieldBlur()"
                 >
                   <mat-option value="Male">Male</mat-option>
                   <mat-option value="Female">Female</mat-option>
                   <mat-option value="NonBinary">Non-binary</mat-option>
                   <mat-option value="Other">Other</mat-option>
-                  <mat-option value="PreferNotToSay">Prefer not to say</mat-option>
+                  <mat-option value="PreferNotToSay"
+                    >Prefer not to say</mat-option
+                  >
                 </mat-select>
                 @if (hasError("demographics.gender", "required")) {
                   <mat-error id="gender-error">Gender is required.</mat-error>
@@ -183,7 +223,10 @@
               </mat-form-field>
             </div>
 
-            <mat-form-field appearance="outline" class="form-field form-field--full">
+            <mat-form-field
+              appearance="outline"
+              class="form-field form-field--full"
+            >
               <mat-label>Phone <span aria-hidden="true">*</span></mat-label>
               <input
                 matInput
@@ -192,29 +235,52 @@
                 formControlName="phone"
                 aria-required="true"
                 placeholder="+1 555 000 0000"
-                [attr.aria-invalid]="hasError('demographics.phone', 'required') || null"
-                [attr.aria-describedby]="hasError('demographics.phone', 'required') ? 'phone-error' : null"
+                [attr.aria-invalid]="
+                  hasError('demographics.phone', 'required') || null
+                "
+                [attr.aria-describedby]="
+                  hasError('demographics.phone', 'required')
+                    ? 'phone-error'
+                    : null
+                "
                 (blur)="onFieldBlur()"
               />
               @if (hasError("demographics.phone", "required")) {
-                <mat-error id="phone-error">Phone number is required.</mat-error>
+                <mat-error id="phone-error"
+                  >Phone number is required.</mat-error
+                >
               }
             </mat-form-field>
 
             <fieldset class="address-fieldset">
               <legend class="address-legend">Address</legend>
-              <mat-form-field appearance="outline" class="form-field form-field--full">
+              <mat-form-field
+                appearance="outline"
+                class="form-field form-field--full"
+              >
                 <mat-label>Street</mat-label>
-                <input matInput formControlName="street" (blur)="onFieldBlur()" />
+                <input
+                  matInput
+                  formControlName="street"
+                  (blur)="onFieldBlur()"
+                />
               </mat-form-field>
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
                   <mat-label>City</mat-label>
-                  <input matInput formControlName="city" (blur)="onFieldBlur()" />
+                  <input
+                    matInput
+                    formControlName="city"
+                    (blur)="onFieldBlur()"
+                  />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="form-field">
                   <mat-label>Postcode</mat-label>
-                  <input matInput formControlName="postalCode" (blur)="onFieldBlur()" />
+                  <input
+                    matInput
+                    formControlName="postalCode"
+                    (blur)="onFieldBlur()"
+                  />
                 </mat-form-field>
               </div>
             </fieldset>
@@ -224,15 +290,23 @@
               <div class="form-row">
                 <mat-form-field appearance="outline" class="form-field">
                   <mat-label>Name</mat-label>
-                  <input matInput formControlName="emergencyContactName" (blur)="onFieldBlur()" />
+                  <input
+                    matInput
+                    formControlName="emergencyContactName"
+                    (blur)="onFieldBlur()"
+                  />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="form-field">
                   <mat-label>Phone</mat-label>
-                  <input matInput type="tel" formControlName="emergencyContactPhone" (blur)="onFieldBlur()" />
+                  <input
+                    matInput
+                    type="tel"
+                    formControlName="emergencyContactPhone"
+                    (blur)="onFieldBlur()"
+                  />
                 </mat-form-field>
               </div>
             </fieldset>
-
           </div>
         </mat-expansion-panel>
 
@@ -251,115 +325,274 @@
           </mat-expansion-panel-header>
 
           <div formGroupName="medicalHistory" class="section-body">
-
             <!-- Past Diagnoses / Conditions -->
             <section class="subsection" aria-labelledby="conditions-heading">
-              <h3 id="conditions-heading" class="subsection-heading">Past Diagnoses / Conditions</h3>
+              <h3 id="conditions-heading" class="subsection-heading">
+                Past Diagnoses / Conditions
+              </h3>
               <div formArrayName="conditions" aria-label="Conditions list">
-                @for (ctrl of conditionsArray.controls; track $index; let i = $index) {
+                @for (
+                  ctrl of conditionsArray.controls;
+                  track $index;
+                  let i = $index
+                ) {
                   <div [formGroupName]="i" class="array-item">
                     <mat-form-field appearance="outline" class="form-field">
-                      <mat-label>Condition <span aria-hidden="true">*</span></mat-label>
+                      <mat-label
+                        >Condition <span aria-hidden="true">*</span></mat-label
+                      >
                       <input
                         matInput
                         [id]="'condition-' + i"
                         formControlName="condition"
                         aria-required="true"
                         [attr.aria-label]="'Condition ' + (i + 1)"
-                        [attr.aria-invalid]="hasArrayError(conditionsArray, i, 'condition', 'required') || null"
+                        [attr.aria-invalid]="
+                          hasArrayError(
+                            conditionsArray,
+                            i,
+                            'condition',
+                            'required'
+                          ) || null
+                        "
                         (blur)="onFieldBlur()"
                       />
-                      @if (hasArrayError(conditionsArray, i, "condition", "required")) {
+                      @if (
+                        hasArrayError(
+                          conditionsArray,
+                          i,
+                          "condition",
+                          "required"
+                        )
+                      ) {
                         <mat-error>Condition name is required.</mat-error>
                       }
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="form-field">
                       <mat-label>Date Diagnosed</mat-label>
-                      <input matInput type="date" formControlName="diagnosedAt" [attr.aria-label]="'Diagnosis date for condition ' + (i + 1)" />
+                      <input
+                        matInput
+                        type="date"
+                        formControlName="diagnosedAt"
+                        [attr.aria-label]="
+                          'Diagnosis date for condition ' + (i + 1)
+                        "
+                      />
                     </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field form-field--full">
+                    <mat-form-field
+                      appearance="outline"
+                      class="form-field form-field--full"
+                    >
                       <mat-label>Notes</mat-label>
-                      <textarea matInput formControlName="notes" rows="2" [attr.aria-label]="'Notes for condition ' + (i + 1)"></textarea>
+                      <textarea
+                        matInput
+                        formControlName="notes"
+                        rows="2"
+                        [attr.aria-label]="'Notes for condition ' + (i + 1)"
+                      ></textarea>
                     </mat-form-field>
-                    <button type="button" mat-stroked-button color="warn" class="remove-btn" (click)="removeCondition(i)" [attr.aria-label]="'Remove condition ' + (i + 1)">Remove</button>
+                    <button
+                      type="button"
+                      mat-stroked-button
+                      color="warn"
+                      class="remove-btn"
+                      (click)="removeCondition(i)"
+                      [attr.aria-label]="'Remove condition ' + (i + 1)"
+                    >
+                      Remove
+                    </button>
                   </div>
                 }
               </div>
-              <button type="button" mat-stroked-button class="add-btn" (click)="addCondition()" aria-label="Add a past diagnosis or condition">+ Add Condition</button>
+              <button
+                type="button"
+                mat-stroked-button
+                class="add-btn"
+                (click)="addCondition()"
+                aria-label="Add a past diagnosis or condition"
+              >
+                + Add Condition
+              </button>
             </section>
 
             <!-- Known Allergies -->
             <section class="subsection" aria-labelledby="allergies-heading">
-              <h3 id="allergies-heading" class="subsection-heading">Known Allergies</h3>
+              <h3 id="allergies-heading" class="subsection-heading">
+                Known Allergies
+              </h3>
               <div formArrayName="allergies" aria-label="Allergies list">
-                @for (ctrl of allergiesArray.controls; track $index; let i = $index) {
+                @for (
+                  ctrl of allergiesArray.controls;
+                  track $index;
+                  let i = $index
+                ) {
                   <div [formGroupName]="i" class="array-item">
                     <mat-form-field appearance="outline" class="form-field">
-                      <mat-label>Substance <span aria-hidden="true">*</span></mat-label>
+                      <mat-label
+                        >Substance <span aria-hidden="true">*</span></mat-label
+                      >
                       <input
                         matInput
                         [id]="'allergy-' + i"
                         formControlName="substance"
                         aria-required="true"
                         [attr.aria-label]="'Allergen ' + (i + 1)"
-                        [attr.aria-invalid]="hasArrayError(allergiesArray, i, 'substance', 'required') || null"
+                        [attr.aria-invalid]="
+                          hasArrayError(
+                            allergiesArray,
+                            i,
+                            'substance',
+                            'required'
+                          ) || null
+                        "
                         (blur)="onFieldBlur()"
                       />
-                      @if (hasArrayError(allergiesArray, i, "substance", "required")) {
+                      @if (
+                        hasArrayError(
+                          allergiesArray,
+                          i,
+                          "substance",
+                          "required"
+                        )
+                      ) {
                         <mat-error>Substance name is required.</mat-error>
                       }
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="form-field">
                       <mat-label>Reaction</mat-label>
-                      <input matInput formControlName="reaction" [attr.aria-label]="'Reaction for allergen ' + (i + 1)" (blur)="onFieldBlur()" />
+                      <input
+                        matInput
+                        formControlName="reaction"
+                        [attr.aria-label]="'Reaction for allergen ' + (i + 1)"
+                        (blur)="onFieldBlur()"
+                      />
                     </mat-form-field>
-                    <button type="button" mat-stroked-button color="warn" class="remove-btn" (click)="removeAllergy(i)" [attr.aria-label]="'Remove allergy ' + (i + 1)">Remove</button>
+                    <button
+                      type="button"
+                      mat-stroked-button
+                      color="warn"
+                      class="remove-btn"
+                      (click)="removeAllergy(i)"
+                      [attr.aria-label]="'Remove allergy ' + (i + 1)"
+                    >
+                      Remove
+                    </button>
                   </div>
                 }
               </div>
-              <button type="button" mat-stroked-button class="add-btn" (click)="addAllergy()" aria-label="Add a known allergy">+ Add Allergy</button>
+              <button
+                type="button"
+                mat-stroked-button
+                class="add-btn"
+                (click)="addAllergy()"
+                aria-label="Add a known allergy"
+              >
+                + Add Allergy
+              </button>
             </section>
 
             <!-- Previous Surgeries -->
             <section class="subsection" aria-labelledby="surgeries-heading">
-              <h3 id="surgeries-heading" class="subsection-heading">Previous Surgeries</h3>
+              <h3 id="surgeries-heading" class="subsection-heading">
+                Previous Surgeries
+              </h3>
               <div formArrayName="surgeries" aria-label="Surgeries list">
-                @for (ctrl of surgeriesArray.controls; track $index; let i = $index) {
+                @for (
+                  ctrl of surgeriesArray.controls;
+                  track $index;
+                  let i = $index
+                ) {
                   <div [formGroupName]="i" class="array-item">
                     <mat-form-field appearance="outline" class="form-field">
-                      <mat-label>Procedure <span aria-hidden="true">*</span></mat-label>
+                      <mat-label
+                        >Procedure <span aria-hidden="true">*</span></mat-label
+                      >
                       <input
                         matInput
                         [id]="'surgery-' + i"
                         formControlName="procedure"
                         aria-required="true"
                         [attr.aria-label]="'Surgical procedure ' + (i + 1)"
-                        [attr.aria-invalid]="hasArrayError(surgeriesArray, i, 'procedure', 'required') || null"
+                        [attr.aria-invalid]="
+                          hasArrayError(
+                            surgeriesArray,
+                            i,
+                            'procedure',
+                            'required'
+                          ) || null
+                        "
                         (blur)="onFieldBlur()"
                       />
-                      @if (hasArrayError(surgeriesArray, i, "procedure", "required")) {
+                      @if (
+                        hasArrayError(
+                          surgeriesArray,
+                          i,
+                          "procedure",
+                          "required"
+                        )
+                      ) {
                         <mat-error>Procedure name is required.</mat-error>
                       }
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="form-field">
                       <mat-label>Year</mat-label>
-                      <input matInput type="number" formControlName="year" [attr.aria-label]="'Year of surgery ' + (i + 1)" min="1900" max="2026" />
+                      <input
+                        matInput
+                        type="number"
+                        formControlName="year"
+                        [attr.aria-label]="'Year of surgery ' + (i + 1)"
+                        min="1900"
+                        max="2026"
+                      />
                     </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field form-field--full">
+                    <mat-form-field
+                      appearance="outline"
+                      class="form-field form-field--full"
+                    >
                       <mat-label>Notes</mat-label>
-                      <textarea matInput formControlName="notes" rows="2" [attr.aria-label]="'Notes for surgery ' + (i + 1)"></textarea>
+                      <textarea
+                        matInput
+                        formControlName="notes"
+                        rows="2"
+                        [attr.aria-label]="'Notes for surgery ' + (i + 1)"
+                      ></textarea>
                     </mat-form-field>
-                    <button type="button" mat-stroked-button color="warn" class="remove-btn" (click)="removeSurgery(i)" [attr.aria-label]="'Remove surgery ' + (i + 1)">Remove</button>
+                    <button
+                      type="button"
+                      mat-stroked-button
+                      color="warn"
+                      class="remove-btn"
+                      (click)="removeSurgery(i)"
+                      [attr.aria-label]="'Remove surgery ' + (i + 1)"
+                    >
+                      Remove
+                    </button>
                   </div>
                 }
               </div>
-              <button type="button" mat-stroked-button class="add-btn" (click)="addSurgery()" aria-label="Add a previous surgery">+ Add Surgery</button>
+              <button
+                type="button"
+                mat-stroked-button
+                class="add-btn"
+                (click)="addSurgery()"
+                aria-label="Add a previous surgery"
+              >
+                + Add Surgery
+              </button>
             </section>
 
             <!-- Family History -->
-            <section class="subsection" aria-labelledby="family-history-heading">
-              <h3 id="family-history-heading" class="subsection-heading">Family History</h3>
-              <mat-form-field appearance="outline" class="form-field form-field--full">
+            <section
+              class="subsection"
+              aria-labelledby="family-history-heading"
+            >
+              <h3 id="family-history-heading" class="subsection-heading">
+                Family History
+              </h3>
+              <mat-form-field
+                appearance="outline"
+                class="form-field form-field--full"
+              >
                 <mat-label>Family Health History</mat-label>
                 <textarea
                   matInput
@@ -371,7 +604,6 @@
                 ></textarea>
               </mat-form-field>
             </section>
-
           </div>
         </mat-expansion-panel>
 
@@ -391,17 +623,26 @@
 
           <div class="section-body">
             <div formArrayName="symptoms" aria-label="Symptom list">
-              @for (ctrl of symptomsArray.controls; track $index; let i = $index) {
+              @for (
+                ctrl of symptomsArray.controls;
+                track $index;
+                let i = $index
+              ) {
                 <div [formGroupName]="i" class="array-item">
                   <mat-form-field appearance="outline" class="form-field">
-                    <mat-label>Symptom <span aria-hidden="true">*</span></mat-label>
+                    <mat-label
+                      >Symptom <span aria-hidden="true">*</span></mat-label
+                    >
                     <input
                       matInput
                       [id]="'symptom-' + i"
                       formControlName="name"
                       aria-required="true"
                       [attr.aria-label]="'Symptom name ' + (i + 1)"
-                      [attr.aria-invalid]="hasArrayError(symptomsArray, i, 'name', 'required') || null"
+                      [attr.aria-invalid]="
+                        hasArrayError(symptomsArray, i, 'name', 'required') ||
+                        null
+                      "
                       (blur)="onFieldBlur()"
                     />
                     @if (hasArrayError(symptomsArray, i, "name", "required")) {
@@ -410,7 +651,10 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Severity</mat-label>
-                    <mat-select formControlName="severity" [attr.aria-label]="'Severity of symptom ' + (i + 1)">
+                    <mat-select
+                      formControlName="severity"
+                      [attr.aria-label]="'Severity of symptom ' + (i + 1)"
+                    >
                       <mat-option value="">Not specified</mat-option>
                       <mat-option value="Mild">Mild</mat-option>
                       <mat-option value="Moderate">Moderate</mat-option>
@@ -419,17 +663,45 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Onset Date</mat-label>
-                    <input matInput type="date" formControlName="onsetDate" [attr.aria-label]="'Onset date of symptom ' + (i + 1)" />
+                    <input
+                      matInput
+                      type="date"
+                      formControlName="onsetDate"
+                      [attr.aria-label]="'Onset date of symptom ' + (i + 1)"
+                    />
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Duration</mat-label>
-                    <input matInput formControlName="duration" placeholder="e.g. 3 days, 2 weeks" [attr.aria-label]="'Duration of symptom ' + (i + 1)" (blur)="onFieldBlur()" />
+                    <input
+                      matInput
+                      formControlName="duration"
+                      placeholder="e.g. 3 days, 2 weeks"
+                      [attr.aria-label]="'Duration of symptom ' + (i + 1)"
+                      (blur)="onFieldBlur()"
+                    />
                   </mat-form-field>
-                  <button type="button" mat-stroked-button color="warn" class="remove-btn" (click)="removeSymptom(i)" [attr.aria-label]="'Remove symptom ' + (i + 1)">Remove</button>
+                  <button
+                    type="button"
+                    mat-stroked-button
+                    color="warn"
+                    class="remove-btn"
+                    (click)="removeSymptom(i)"
+                    [attr.aria-label]="'Remove symptom ' + (i + 1)"
+                  >
+                    Remove
+                  </button>
                 </div>
               }
             </div>
-            <button type="button" mat-stroked-button class="add-btn" (click)="addSymptom()" aria-label="Add a current symptom">+ Add Symptom</button>
+            <button
+              type="button"
+              mat-stroked-button
+              class="add-btn"
+              (click)="addSymptom()"
+              aria-label="Add a current symptom"
+            >
+              + Add Symptom
+            </button>
           </div>
         </mat-expansion-panel>
 
@@ -449,46 +721,94 @@
 
           <div class="section-body">
             <div formArrayName="medications" aria-label="Medication list">
-              @for (ctrl of medicationsArray.controls; track $index; let i = $index) {
+              @for (
+                ctrl of medicationsArray.controls;
+                track $index;
+                let i = $index
+              ) {
                 <div [formGroupName]="i" class="array-item">
                   <mat-form-field appearance="outline" class="form-field">
-                    <mat-label>Medication Name <span aria-hidden="true">*</span></mat-label>
+                    <mat-label
+                      >Medication Name
+                      <span aria-hidden="true">*</span></mat-label
+                    >
                     <input
                       matInput
                       [id]="'medication-' + i"
                       formControlName="name"
                       aria-required="true"
                       [attr.aria-label]="'Medication name ' + (i + 1)"
-                      [attr.aria-invalid]="hasArrayError(medicationsArray, i, 'name', 'required') || null"
+                      [attr.aria-invalid]="
+                        hasArrayError(
+                          medicationsArray,
+                          i,
+                          'name',
+                          'required'
+                        ) || null
+                      "
                       (blur)="onFieldBlur()"
                     />
-                    @if (hasArrayError(medicationsArray, i, "name", "required")) {
+                    @if (
+                      hasArrayError(medicationsArray, i, "name", "required")
+                    ) {
                       <mat-error>Medication name is required.</mat-error>
                     }
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Dosage</mat-label>
-                    <input matInput formControlName="dosage" placeholder="e.g. 500 mg" [attr.aria-label]="'Dosage for medication ' + (i + 1)" (blur)="onFieldBlur()" />
+                    <input
+                      matInput
+                      formControlName="dosage"
+                      placeholder="e.g. 500 mg"
+                      [attr.aria-label]="'Dosage for medication ' + (i + 1)"
+                      (blur)="onFieldBlur()"
+                    />
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Frequency</mat-label>
-                    <input matInput formControlName="frequency" placeholder="e.g. Twice daily" [attr.aria-label]="'Frequency of medication ' + (i + 1)" (blur)="onFieldBlur()" />
+                    <input
+                      matInput
+                      formControlName="frequency"
+                      placeholder="e.g. Twice daily"
+                      [attr.aria-label]="'Frequency of medication ' + (i + 1)"
+                      (blur)="onFieldBlur()"
+                    />
                   </mat-form-field>
                   <mat-checkbox
                     formControlName="isOtcSupplement"
                     class="otc-checkbox"
-                    [attr.aria-label]="'Mark medication ' + (i + 1) + ' as over-the-counter or supplement'"
+                    [attr.aria-label]="
+                      'Mark medication ' +
+                      (i + 1) +
+                      ' as over-the-counter or supplement'
+                    "
                   >
                     Over-the-counter / Supplement
                   </mat-checkbox>
-                  <button type="button" mat-stroked-button color="warn" class="remove-btn" (click)="removeMedication(i)" [attr.aria-label]="'Remove medication ' + (i + 1)">Remove</button>
+                  <button
+                    type="button"
+                    mat-stroked-button
+                    color="warn"
+                    class="remove-btn"
+                    (click)="removeMedication(i)"
+                    [attr.aria-label]="'Remove medication ' + (i + 1)"
+                  >
+                    Remove
+                  </button>
                 </div>
               }
             </div>
-            <button type="button" mat-stroked-button class="add-btn" (click)="addMedication()" aria-label="Add a current medication">+ Add Medication</button>
+            <button
+              type="button"
+              mat-stroked-button
+              class="add-btn"
+              (click)="addMedication()"
+              aria-label="Add a current medication"
+            >
+              + Add Medication
+            </button>
           </div>
         </mat-expansion-panel>
-
       </mat-accordion>
 
       <!-- ── Form actions ────────────────────────────────────────────────── -->
@@ -502,7 +822,11 @@
           aria-label="Submit completed intake form"
         >
           @if (saveStatus() === "saving") {
-            <mat-progress-spinner diameter="18" mode="indeterminate" class="submit-spinner" />
+            <mat-progress-spinner
+              diameter="18"
+              mode="indeterminate"
+              class="submit-spinner"
+            />
             Submitting...
           } @else {
             Submit Intake Form

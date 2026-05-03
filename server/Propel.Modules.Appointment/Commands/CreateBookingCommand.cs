@@ -1,6 +1,7 @@
 using MediatR;
 using Propel.Domain.Enums;
 using Propel.Modules.Appointment.Dtos;
+using System.Text.Json.Serialization;
 
 namespace Propel.Modules.Appointment.Commands;
 
@@ -15,13 +16,32 @@ namespace Propel.Modules.Appointment.Commands;
 /// <see cref="Propel.Domain.Entities.WaitlistEntry"/> (US_023, AC-1, DR-003).
 /// </para>
 /// </summary>
-public sealed record CreateBookingCommand(
-    Guid SlotSpecialtyId,
-    DateOnly SlotDate,
-    TimeOnly SlotTimeStart,
-    TimeOnly SlotTimeEnd,
-    IntakeMode IntakeMode,
-    string? InsuranceName,
-    string? InsuranceId,
-    DateOnly? PreferredDate,
-    TimeOnly? PreferredTimeSlot) : IRequest<BookingResponseDto>;
+public sealed record CreateBookingCommand : IRequest<BookingResponseDto>
+{
+    [JsonPropertyName("slotSpecialtyId")]
+    public Guid SlotSpecialtyId { get; init; }
+
+    [JsonPropertyName("slotDate")]
+    public DateOnly SlotDate { get; init; }
+
+    [JsonPropertyName("slotTimeStart")]
+    public TimeOnly SlotTimeStart { get; init; }
+
+    [JsonPropertyName("slotTimeEnd")]
+    public TimeOnly SlotTimeEnd { get; init; }
+
+    [JsonPropertyName("intakeMode")]
+    public IntakeMode IntakeMode { get; init; }
+
+    [JsonPropertyName("insuranceName")]
+    public string? InsuranceName { get; init; }
+
+    [JsonPropertyName("insuranceId")]
+    public string? InsuranceId { get; init; }
+
+    [JsonPropertyName("preferredDate")]
+    public DateOnly? PreferredDate { get; init; }
+
+    [JsonPropertyName("preferredTimeSlot")]
+    public TimeOnly? PreferredTimeSlot { get; init; }
+}

@@ -145,14 +145,14 @@ jobs:
     name: TLS Enforcement Smoke Tests
     runs-on: ubuntu-latest
     needs: [e2e-playwright]
-    # Skip gracefully when the Railway domain secret is not yet configured.
-    if: ${{ secrets.API_DOMAIN != '' }}
+    # Skip gracefully when the Railway domain variable is not yet configured.
+    if: ${{ vars.API_DOMAIN != '' }}
     steps:
       - name: Verify TLS 1.1 is rejected (AC-4)
         # openssl s_client exits 0 even on handshake failure, so we check the output.
         # A "CONNECTED" string in the output means TLS 1.1 was accepted — that is a failure.
         run: |
-          result=$(openssl s_client -connect "${{ secrets.API_DOMAIN }}:443" -tls1_1 </dev/null 2>&1 || true)
+          result=$(openssl s_client -connect "${{ vars.API_DOMAIN }}:443" -tls1_1 </dev/null 2>&1 || true)
           if echo "$result" | grep -q "CONNECTED"; then
             echo "ERROR: TLS 1.1 was accepted by the server — this violates NFR-005 (AC-4)."
             exit 1
@@ -161,7 +161,7 @@ jobs:
 
       - name: Verify TLS 1.2 is accepted (AC-4)
         run: |
-          result=$(openssl s_client -connect "${{ secrets.API_DOMAIN }}:443" -tls1_2 </dev/null 2>&1 || true)
+          result=$(openssl s_client -connect "${{ vars.API_DOMAIN }}:443" -tls1_2 </dev/null 2>&1 || true)
           if ! echo "$result" | grep -q "CONNECTED"; then
             echo "ERROR: TLS 1.2 was not accepted — server may be misconfigured."
             exit 1
@@ -170,7 +170,7 @@ jobs:
 
       - name: Verify HSTS header present on HTTPS response (AC-4)
         run: |
-          headers=$(curl -sI --max-time 10 "https://${{ secrets.API_DOMAIN }}/health" 2>&1 || true)
+          headers=$(curl -sI --max-time 10 "https://${{ vars.API_DOMAIN }}/health" 2>&1 || true)
           if ! echo "$headers" | grep -qi "strict-transport-security"; then
             echo "ERROR: Strict-Transport-Security header missing from HTTPS response."
             exit 1

@@ -34,7 +34,7 @@ public sealed class OutlookCalendarController : ControllerBase
     /// Generates a MSAL PKCE authorization URL with an encoded CSRF state token
     /// and returns it for the FE to redirect to.
     /// </summary>
-    /// <param name="appointmentId">The appointment to sync to Outlook Calendar.</param>
+    /// <param name="request">The request containing appointmentId.</param>
     /// <param name="cancellationToken">Request cancellation token.</param>
     [HttpPost("outlook/initiate")]
     [Authorize(Roles = "Patient")]
@@ -43,14 +43,14 @@ public sealed class OutlookCalendarController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Initiate(
-        [FromBody] Guid appointmentId,
+        [FromBody] InitiateOutlookSyncRequest request,
         CancellationToken cancellationToken)
     {
-        if (appointmentId == Guid.Empty)
+        if (request.AppointmentId == Guid.Empty)
             return BadRequest("appointmentId is required.");
 
         var result = await _mediator.Send(
-            new InitiateOutlookSyncCommand(appointmentId), cancellationToken);
+            new InitiateOutlookSyncCommand(request.AppointmentId), cancellationToken);
 
         return Ok(result);
     }
@@ -140,3 +140,6 @@ public sealed class OutlookCalendarController : ControllerBase
         return File(icsBytes, "text/calendar; charset=utf-8", "appointment.ics");
     }
 }
+
+/// <summary>Request body for <c>POST /api/calendar/outlook/initiate</c>.</summary>
+public sealed record InitiateOutlookSyncRequest(Guid AppointmentId);

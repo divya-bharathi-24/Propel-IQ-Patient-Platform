@@ -340,9 +340,32 @@ export class SlotSelectionStepComponent implements OnInit, OnDestroy {
       next: (list) => {
         this.specialties.set(list);
         this.specialtyLoadState.set('loaded');
+        this.applyPreselectedValues();
       },
       error: () => this.specialtyLoadState.set('error'),
     });
+  }
+
+  /**
+   * When the patient clicks "Book This Date" in Step 2, the wizard stores a
+   * preselected date and specialty so Step 1 can restore the selection without
+   * requiring the patient to start over. Applied after specialties are loaded.
+   */
+  private applyPreselectedValues(): void {
+    const preselectedSpecialtyId = this.wizardStore.preselectedSpecialtyId();
+    const preselectedDate = this.wizardStore.preselectedDate();
+
+    if (preselectedSpecialtyId) {
+      this.selectedSpecialtyId.set(preselectedSpecialtyId);
+    }
+    if (preselectedDate) {
+      const [y, m, d] = preselectedDate.split('-').map(Number);
+      this.selectedDate.set(new Date(y, m - 1, d));
+    }
+    if (preselectedSpecialtyId && preselectedDate) {
+      const [y, m, d] = preselectedDate.split('-').map(Number);
+      this.fetchSlots(new Date(y, m - 1, d));
+    }
   }
 
   private fetchSlots(date: Date): void {

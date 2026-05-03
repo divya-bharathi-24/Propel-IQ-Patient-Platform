@@ -10,9 +10,6 @@ concurrency:
   group: cd-${{ github.ref }}
   cancel-in-progress: true
 
-# Hard-fail the entire pipeline if the total deploy time exceeds 10 minutes (AC-2 SLA).
-timeout-minutes: 10
-
 jobs:
   # ─────────────────────────────────────────────────────────────────────────────
   # Job 1 — Build Angular 18 SPA (production) and deploy to Netlify
@@ -20,6 +17,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend (Netlify)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,6 +60,7 @@ jobs:
   build-push-docker:
     name: Build & Push Docker Image (GHCR)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
@@ -104,6 +103,7 @@ jobs:
   deploy-backend:
     name: Deploy Backend (Railway)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [deploy-frontend, build-push-docker]
     defaults:
       run:
@@ -182,6 +182,7 @@ jobs:
   post-migration-smoke-test:
     name: Post-Migration Smoke Test (US_009)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [deploy-backend]
     defaults:
       run:

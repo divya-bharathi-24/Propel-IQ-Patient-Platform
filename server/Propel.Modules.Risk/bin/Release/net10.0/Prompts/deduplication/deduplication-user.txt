@@ -1,9 +1,0 @@
-Review the following clinical field pairs extracted from different documents for the same patient.
-Determine for each pair whether the two values represent the same underlying clinical fact.
-
-Field pairs (JSON array):
-
-{{$pairs}}
-
-For each pair, return a confirmation object matching the output schema specified in the system prompt.
-Include ALL pairs in your response — do not omit any entry from the input.

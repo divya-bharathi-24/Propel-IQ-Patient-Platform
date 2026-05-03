@@ -12,8 +12,8 @@ namespace Propel.Api.Gateway.Data.Configurations;
 ///   - <c>Channel</c> and <c>Status</c> stored as strings for human-readable DB values (AC-2).
 ///   - FK to <see cref="Patient"/> uses <see cref="DeleteBehavior.Restrict"/> (DR-009).
 ///   - FK to <see cref="Appointment"/> is optional (nullable <c>AppointmentId</c>) and also
-///     uses <see cref="DeleteBehavior.Restrict"/>; configured without a navigation property
-///     on the notification side because <see cref="Notification"/> has no Appointment nav prop.
+///     uses <see cref="DeleteBehavior.Restrict"/>; configured WITH the Appointment.Notifications
+///     collection navigation property to avoid shadow foreign keys.
 ///   - Three indexes support notification queries by patient, status, and appointment (AC-2).
 ///   - <c>ScheduledAt</c> and <c>SuppressedAt</c> added for US_033 reminder scheduler (task_005).
 ///   - Composite index on (AppointmentId, TemplateType, ScheduledAt) optimises idempotency checks.
@@ -73,9 +73,10 @@ public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notific
                .OnDelete(DeleteBehavior.Restrict);
 
         // FK: notifications → appointments (optional, Restrict — no cascade delete per DR-009)
-        // Configured without navigation property on Notification side.
+        // Configured WITH the Appointment.Notifications collection navigation to prevent
+        // EF Core from creating a shadow AppointmentId1 property.
         builder.HasOne<Appointment>()
-               .WithMany()
+               .WithMany(a => a.Notifications)
                .HasForeignKey(n => n.AppointmentId)
                .IsRequired(false)
                .OnDelete(DeleteBehavior.Restrict);

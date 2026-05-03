@@ -64,7 +64,7 @@ export class WalkInBookingComponent implements OnDestroy {
 
   // ── Step 1: PatientSearch event handlers ─────────────────────────────────
 
-  onPatientSelected(patient: PatientSearchResultDto): void {
+  onPatientSelected(_patient: PatientSearchResultDto): void {
     this.isAnonymous = false;
     this.currentStep = 'confirm';
   }
