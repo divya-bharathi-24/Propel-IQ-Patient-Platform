@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Appointment")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+85baddf8c69c3fcc99c74e5e9504b5787bfbf7d6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9585498937f28e6d5f0e10811a53601957484af1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Appointment")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Appointment")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
