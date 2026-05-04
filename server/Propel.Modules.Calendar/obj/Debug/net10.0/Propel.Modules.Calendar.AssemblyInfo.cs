@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9585498937f28e6d5f0e10811a53601957484af1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+65ef69415743617a8601b577814abe1d250ae04f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
