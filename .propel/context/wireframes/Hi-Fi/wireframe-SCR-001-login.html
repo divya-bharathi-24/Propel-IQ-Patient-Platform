@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-001: Login | UniPatient</title>
+    <meta name="description" content="UniPatient Login - Unified Patient Access & Clinical Intelligence Platform">
+    <link rel="stylesheet" href="../unipatient-design-tokens.css">
+    <style>
+        /* Screen-Specific Styles for SCR-001 Login */
+        .login-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+        }
+
+        /* Hero Section (Left Panel) */
+        .hero-section {
+            background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+            color: var(--color-text-inverse);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--color-text-inverse);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .hero-tagline {
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-6);
+            opacity: 0.95;
+        }
+
+        .hero-features {
+            list-style: none;
+            padding: 0;
+            margin: var(--space-8) 0;
+            text-align: left;
+        }
+
+        .hero-features li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+            font-size: var(--font-size-body-lg);
+            opacity: 0.9;
+        }
+
+        .hero-features li::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-full);
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Login Form Section (Right Panel) */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--space-12);
+            background-color: var(--color-background-default);
+        }
+
+        .form-container {
+            max-width: 420px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .form-header h1 {
+            font-size: var(--font-size-h2);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-header p {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-body);
+            margin-bottom: 0;
+        }
+
+        /* Error Alert - Hidden by default, shown on validation failure */
+        .alert-error {
+            display: none; /* Toggle via JavaScript */
+        }
+
+        .alert-error.active {
+            display: block;
+        }
+
+        .form-footer {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border-muted);
+            text-align: center;
+        }
+
+        .form-footer p {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-body-sm);
+            margin-bottom: var(--space-3);
+        }
+
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: var(--space-2);
+        }
+
+        .forgot-password a {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-primary-500);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-section {
+                min-height: 40vh;
+                padding: var(--space-8);
+            }
+
+            .hero-content {
+                max-width: 100%;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .hero-tagline {
+                font-size: var(--font-size-h5);
+            }
+
+            .hero-features {
+                display: none; /* Hide features list on mobile for space */
+            }
+
+            .form-section {
+                padding: var(--space-6);
+            }
+
+            .form-header h1 {
+                font-size: var(--font-size-h3);
+            }
+        }
+
+        @media (max-width: 390px) {
+            .form-section {
+                padding: var(--space-4);
+            }
+
+            .hero-section {
+                padding: var(--space-6);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Map:
+    | Element | Action | Target Screen |
+    |---------|--------|---------------|
+    | #login-btn | click | SCR-003 (Patient Dashboard) [if role=patient] |
+    | #login-btn | click | SCR-013 (Staff Dashboard) [if role=staff] |
+    | #login-btn | click | SCR-020 (User Management) [if role=admin] |
+    | #create-account-link | click | SCR-002 (Registration) |
+    | #forgot-password-link | click | [Password Reset - future] |
+    -->
+
+    <!-- Skip to Content Link (Accessibility) -->
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+
+    <div class="login-container">
+        <!-- Hero Section (Left Panel) -->
+        <section class="hero-section" aria-label="Welcome to UniPatient">
+            <div class="hero-content">
+                <div class="logo">
+                    <div class="logo-icon" aria-hidden="true">
+                        <span>🏥</span>
+                    </div>
+                    <span>UniPatient</span>
+                </div>
+                
+                <h2 class="hero-tagline">
+                    Unified Patient Access & Clinical Intelligence
+                </h2>
+                
+                <ul class="hero-features">
+                    <li>Seamless appointment booking in 3 clicks</li>
+                    <li>AI-assisted intake for faster visits</li>
+                    <li>360° patient data view for clinicians</li>
+                    <li>HIPAA-compliant security</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Login Form Section (Right Panel) -->
+        <section class="form-section">
+            <main id="main-content" class="form-container">
+                <header class="form-header">
+                    <h1>Sign in to your account</h1>
+                    <p>Welcome back! Please enter your credentials to continue.</p>
+                </header>
+
+                <!-- Error Alert - Shown when login fails -->
+                <div class="alert alert-error" id="error-alert" role="alert">
+                    <strong>Invalid credentials</strong>
+                    <p>The email or password you entered is incorrect. Please try again.</p>
+                </div>
+
+                <!-- Login Form -->
+                <form action="#" method="post" novalidate aria-label="Login form">
+                    <!-- Email Field -->
+                    <div class="input-group">
+                        <label for="email" class="input-label input-required">
+                            Email address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="input-field" 
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                            aria-describedby="email-hint"
+                            aria-invalid="false"
+                        >
+                        <span id="email-hint" class="input-hint">
+                            Use your registered email address
+                        </span>
+                        <!-- Error message (hidden by default, shown on validation failure) -->
+                        <span class="input-error-message" id="email-error" style="display: none;">
+                            Please enter a valid email address
+                        </span>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="input-group">
+                        <label for="password" class="input-label input-required">
+                            Password
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            class="input-field" 
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                            aria-invalid="false"
+                            minlength="8"
+                        >
+                        <div class="forgot-password">
+                            <a href="#" id="forgot-password-link">Forgot password?</a>
+                        </div>
+                        <!-- Error message (hidden by default) -->
+                        <span class="input-error-message" id="password-error" style="display: none;">
+                            Password must be at least 8 characters
+                        </span>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button 
+                            type="submit" 
+                            id="login-btn" 
+                            class="button button-primary"
+                            aria-label="Sign in to your account"
+                        >
+                            Sign in
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Form Footer -->
+                <footer class="form-footer">
+                    <p>Don't have an account?</p>
+                    <a href="wireframe-SCR-002-registration.html" id="create-account-link" class="button button-ghost">
+                        Create account
+                    </a>
+                </footer>
+            </main>
+        </section>
+    </div>
+
+    <!-- Basic Form Validation (For Demonstration) -->
+    <script>
+        // Note: In production, use Angular reactive forms with validators
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('login-btn');
+            const errorAlert = document.getElementById('error-alert');
+
+            // Email validation
+            emailInput.addEventListener('blur', function() {
+                const emailError = document.getElementById('email-error');
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (!emailPattern.test(emailInput.value)) {
+                    emailInput.classList.add('error');
+                    emailInput.setAttribute('aria-invalid', 'true');
+                    emailError.style.display = 'block';
+                } else {
+                    emailInput.classList.remove('error');
+                    emailInput.setAttribute('aria-invalid', 'false');
+                    emailError.style.display = 'none';
+                }
+            });
+
+            // Password validation
+            passwordInput.addEventListener('blur', function() {
+                const passwordError = document.getElementById('password-error');
+                
+                if (passwordInput.value.length < 8) {
+                    passwordInput.classList.add('error');
+                    passwordInput.setAttribute('aria-invalid', 'true');
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordInput.classList.remove('error');
+                    passwordInput.setAttribute('aria-invalid', 'false');
+                    passwordError.style.display = 'none';
+                }
+            });
+
+            // Form submission (Demo only - replace with Angular HTTP)
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+                const passwordValid = passwordInput.value.length >= 8;
+
+                if (emailValid && passwordValid) {
+                    // In production: HTTP POST to authentication API
+                    // For demo: Show role-based navigation targets
+                    console.log('Login successful - Role-based routing:');
+                    console.log('- Patient role → wireframe-SCR-003-patient-dashboard.html');
+                    console.log('- Staff role → wireframe-SCR-013-staff-dashboard.html');
+                    console.log('- Admin role → wireframe-SCR-020-user-management.html');
+                    
+                    // Simulate navigation (replace with Angular Router)
+                    // window.location.href = 'wireframe-SCR-003-patient-dashboard.html';
+                } else {
+                    // Show error alert
+                    errorAlert.classList.add('active');
+                    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    // Announce error to screen readers
+                    errorAlert.setAttribute('aria-live', 'assertive');
+                }
+            });
+
+            // Clear error alert when user starts typing
+            [emailInput, passwordInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    errorAlert.classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

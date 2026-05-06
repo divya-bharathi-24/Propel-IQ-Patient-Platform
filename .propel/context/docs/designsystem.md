@@ -16,7 +16,7 @@ version: "1.0"
 
 This design system defines all primitive and semantic design tokens, component specifications, grid definitions, and interaction standards for the UniPatient platform. All Figma components and Angular 18 implementations MUST reference these tokens exclusively. No hard-coded values are permitted.
 
-**Figma Spec**: `.propel/context/docs/figma_spec_unified_patient_platform.md`
+**Figma Spec**: `.propel/context/docs/figma_spec.md`
 **Component Library**: `.propel/context/docs/component_library.md`
 
 ---

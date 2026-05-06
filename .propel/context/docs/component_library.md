@@ -22,7 +22,7 @@ This document defines all UI components for the UniPatient platform. Each compon
 - Angular 18 component path reference
 
 **Design Tokens**: `.propel/context/docs/designsystem.md`
-**Figma Spec**: `.propel/context/docs/figma_spec_unified_patient_platform.md`
+**Figma Spec**: `.propel/context/docs/figma_spec.md`
 
 ---
 
