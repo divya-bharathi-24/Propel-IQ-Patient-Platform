@@ -73,5 +73,16 @@ export default defineConfig({
       fullyParallel: false,
       dependencies: ['setup'],
     },
+
+    // ── Standalone tests (no auth setup required) ────────────────────────────
+    // Used for registration, login, and other tests that manage their own sessions.
+    {
+      name: 'standalone',
+      testDir: './tests',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: /registration_login|login\.spec|booking\.spec/,
+    },
   ],
 });

@@ -9,7 +9,12 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here"
+        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here",
+        "ConnectionStrings__DefaultConnection": "Host=ep-divine-mode-amg8nhin.c-5.us-east-1.aws.neon.tech;Port=5432;Database=neondb;Username=neondb_owner;Password=npg_QAz7gjyI8WHk;SSL Mode=Require;Trust Server Certificate=true",
+        "Jwt__SecretKey": "propeliq-local-dev-secret-key-minimum-32-chars!!",
+        "Jwt__Issuer": "propeliq-api",
+        "Jwt__Audience": "propeliq-client",
+        "CORS__AllowedOrigins": "http://localhost:4200"
       }
     },
     "https": {
@@ -20,7 +25,12 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here"
+        "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here",
+        "ConnectionStrings__DefaultConnection": "Host=ep-divine-mode-amg8nhin.c-5.us-east-1.aws.neon.tech;Port=5432;Database=neondb;Username=neondb_owner;Password=npg_QAz7gjyI8WHk;SSL Mode=Require;Trust Server Certificate=true",
+        "Jwt__SecretKey": "propeliq-local-dev-secret-key-minimum-32-chars!!",
+        "Jwt__Issuer": "propeliq-api",
+        "Jwt__Audience": "propeliq-client",
+        "CORS__AllowedOrigins": "http://localhost:4200"
       }
     }
   }
