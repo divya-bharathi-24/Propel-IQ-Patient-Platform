@@ -1,0 +1,1005 @@
+{
+  "meta": {
+    "appName": "UniPatient",
+    "fullName": "Unified Patient Access & Clinical Intelligence Platform",
+    "version": "1.0",
+    "generatedDate": "2026-05-05",
+    "platform": "Web (Responsive)",
+    "designSystemRef": ".propel/context/docs/designsystem.md",
+    "componentLibraryRef": ".propel/context/docs/component_library.md",
+    "figmaSpecRef": ".propel/context/docs/figma_spec_unified_patient_platform.md"
+  },
+  "figmaFile": {
+    "name": "UniPatient — Design System & Screens",
+    "pages": [
+      {
+        "id": "00_Cover",
+        "name": "00_Cover",
+        "description": "Project metadata, version history, stakeholder map, design system links",
+        "frames": [
+          {
+            "name": "Cover",
+            "type": "cover",
+            "width": 1440,
+            "height": 900,
+            "contents": [
+              "App logo + wordmark",
+              "Project name: Unified Patient Access & Clinical Intelligence Platform",
+              "Version: 1.0 | Date: 2026-05-05",
+              "Platform: Web Responsive (Angular 18)",
+              "Stakeholders: Patient, Staff, Admin",
+              "Design System ref: designsystem.md",
+              "Spec ref: figma_spec_unified_patient_platform.md"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "01_Foundations",
+        "name": "01_Foundations",
+        "description": "All design tokens: color, typography, spacing, radius, elevation, motion, grids",
+        "frames": [
+          {
+            "name": "Colors / Light Mode",
+            "type": "token-sheet",
+            "sections": ["Primitive Palette (Teal)", "Primitive Palette (Neutral)", "Semantic (Success/Warning/Error/Info)", "Semantic Mapping (Light)", "HIPAA PHI Tokens", "Healthcare Domain Tokens"]
+          },
+          {
+            "name": "Colors / Dark Mode",
+            "type": "token-sheet",
+            "sections": ["Dark Mode Semantic Overrides"]
+          },
+          {
+            "name": "Typography",
+            "type": "token-sheet",
+            "sections": ["Font Families", "Type Scale (Display to Caption)", "Accessibility Notes"]
+          },
+          {
+            "name": "Spacing",
+            "type": "token-sheet",
+            "sections": ["Spacing Scale (4px base)", "Component Spacing Rules"]
+          },
+          {
+            "name": "Border Radius",
+            "type": "token-sheet",
+            "sections": ["Radius Scale (none to full)"]
+          },
+          {
+            "name": "Elevation / Shadows",
+            "type": "token-sheet",
+            "sections": ["Elevation Levels 0–5"]
+          },
+          {
+            "name": "Motion",
+            "type": "token-sheet",
+            "sections": ["Duration Tokens", "Easing Tokens", "Reduced Motion Notes"]
+          },
+          {
+            "name": "Grids",
+            "type": "token-sheet",
+            "sections": ["Desktop 1440px (12-col)", "Tablet 768px (8-col)", "Mobile 390px (4-col)"]
+          },
+          {
+            "name": "Iconography",
+            "type": "token-sheet",
+            "sections": ["Icon Library (Lucide)", "Size Scale", "Key Icon Assignments"]
+          }
+        ]
+      },
+      {
+        "id": "02_Components",
+        "name": "02_Components",
+        "description": "Full component library with all variants and states",
+        "componentGroups": [
+          {
+            "category": "Actions",
+            "figmaPath": "C/Actions/",
+            "components": [
+              {
+                "name": "Button",
+                "figmaId": "C/Actions/Button",
+                "variants": ["Primary", "Secondary", "Ghost", "Destructive"],
+                "sizes": ["S", "M", "L"],
+                "states": ["Default", "Hover", "Focus", "Active", "Disabled", "Loading"],
+                "totalVariants": 72
+              },
+              {
+                "name": "IconButton",
+                "figmaId": "C/Actions/IconButton",
+                "variants": ["Default"],
+                "sizes": ["S", "M", "L"],
+                "states": ["Default", "Hover", "Focus", "Active", "Disabled"],
+                "totalVariants": 15
+              },
+              {
+                "name": "Link",
+                "figmaId": "C/Actions/Link",
+                "variants": ["Default", "Standalone"],
+                "sizes": ["S", "M"],
+                "states": ["Default", "Hover", "Focus", "Visited", "Disabled"],
+                "totalVariants": 20
+              },
+              {
+                "name": "FAB",
+                "figmaId": "C/Actions/FAB",
+                "variants": ["Standard", "Mini"],
+                "sizes": [],
+                "states": ["Default", "Hover", "Focus", "Active"],
+                "totalVariants": 8
+              }
+            ]
+          },
+          {
+            "category": "Inputs",
+            "figmaPath": "C/Inputs/",
+            "components": [
+              {
+                "name": "TextField",
+                "figmaId": "C/Inputs/TextField",
+                "variants": ["Default", "WithLeadingIcon", "WithTrailingIcon", "Masked"],
+                "sizes": ["S", "M", "L"],
+                "states": ["Default", "Focus", "Filled", "Error", "Disabled", "Masked"],
+                "totalVariants": 72
+              },
+              {
+                "name": "TextArea",
+                "figmaId": "C/Inputs/TextArea",
+                "variants": ["Default"],
+                "sizes": ["M"],
+                "states": ["Default", "Focus", "Filled", "Error", "Disabled"],
+                "totalVariants": 5
+              },
+              {
+                "name": "Select",
+                "figmaId": "C/Inputs/Select",
+                "variants": ["Default", "Searchable"],
+                "sizes": ["M"],
+                "states": ["Default", "Open", "Focus", "Error", "Disabled"],
+                "totalVariants": 10
+              },
+              {
+                "name": "Checkbox",
+                "figmaId": "C/Inputs/Checkbox",
+                "variants": ["Single", "Group"],
+                "sizes": [],
+                "states": ["Unchecked", "Checked", "Indeterminate", "Disabled"],
+                "totalVariants": 8
+              },
+              {
+                "name": "Radio",
+                "figmaId": "C/Inputs/Radio",
+                "variants": ["Single", "Group"],
+                "sizes": [],
+                "states": ["Unselected", "Selected", "Disabled"],
+                "totalVariants": 6
+              },
+              {
+                "name": "Toggle",
+                "figmaId": "C/Inputs/Toggle",
+                "variants": ["Default"],
+                "sizes": [],
+                "states": ["Off", "On", "Disabled"],
+                "totalVariants": 3
+              },
+              {
+                "name": "DatePicker",
+                "figmaId": "C/Inputs/DatePicker",
+                "variants": ["Single", "Range", "MonthYear"],
+                "sizes": ["M"],
+                "states": ["Default", "Open", "Focus", "Error", "Disabled"],
+                "totalVariants": 15
+              },
+              {
+                "name": "SearchBar",
+                "figmaId": "C/Inputs/SearchBar",
+                "variants": ["Default"],
+                "sizes": ["M"],
+                "states": ["Default", "Focus", "Filled", "Loading"],
+                "totalVariants": 4
+              },
+              {
+                "name": "DropZone",
+                "figmaId": "C/Inputs/DropZone",
+                "variants": ["Default"],
+                "sizes": [],
+                "states": ["Default", "DragOver", "Uploading", "Success", "Error"],
+                "totalVariants": 5
+              }
+            ]
+          },
+          {
+            "category": "Navigation",
+            "figmaPath": "C/Navigation/",
+            "components": [
+              {
+                "name": "Header",
+                "figmaId": "C/Navigation/Header",
+                "variants": ["Patient", "Staff", "Admin"],
+                "sizes": ["Desktop", "Mobile"],
+                "states": ["Default"],
+                "totalVariants": 6
+              },
+              {
+                "name": "Sidebar",
+                "figmaId": "C/Navigation/Sidebar",
+                "variants": ["Patient", "Staff", "Admin"],
+                "sizes": [],
+                "states": ["Expanded", "Collapsed"],
+                "totalVariants": 6
+              },
+              {
+                "name": "BottomNav",
+                "figmaId": "C/Navigation/BottomNav",
+                "variants": ["Patient", "Staff", "Admin"],
+                "sizes": [],
+                "states": ["Default", "ActiveItem"],
+                "totalVariants": 6
+              },
+              {
+                "name": "Tabs",
+                "figmaId": "C/Navigation/Tabs",
+                "variants": ["Default"],
+                "sizes": [],
+                "states": ["Default", "ActiveItem"],
+                "totalVariants": 2
+              },
+              {
+                "name": "Breadcrumb",
+                "figmaId": "C/Navigation/Breadcrumb",
+                "variants": ["2Level", "3Level"],
+                "sizes": [],
+                "states": ["Default"],
+                "totalVariants": 2
+              }
+            ]
+          },
+          {
+            "category": "Content",
+            "figmaPath": "C/Content/",
+            "components": [
+              {
+                "name": "Card",
+                "figmaId": "C/Content/Card",
+                "variants": ["Appointment", "Stats", "ClinicalData", "Patient", "Confirmation"],
+                "sizes": [],
+                "states": ["Default", "Hover", "Loading", "Error"],
+                "totalVariants": 20
+              },
+              {
+                "name": "Table",
+                "figmaId": "C/Content/Table",
+                "variants": ["Queue", "CodeReview", "AuditLog", "UserManagement", "Appointments", "Reminders"],
+                "sizes": [],
+                "states": ["Default", "Loading", "Empty", "RowHover", "RowSelected"],
+                "totalVariants": 30
+              },
+              {
+                "name": "Avatar",
+                "figmaId": "C/Content/Avatar",
+                "variants": ["Photo", "Initials"],
+                "sizes": ["XS (24px)", "S (32px)", "M (40px)", "L (48px)", "XL (64px)"],
+                "states": ["Default", "Hover"],
+                "totalVariants": 20
+              },
+              {
+                "name": "ChatBubble",
+                "figmaId": "C/Content/ChatBubble",
+                "variants": ["AI", "Patient"],
+                "sizes": [],
+                "states": ["Default", "Loading (typing indicator)"],
+                "totalVariants": 4
+              },
+              {
+                "name": "Badge",
+                "figmaId": "C/Content/Badge",
+                "variants": ["Status", "Risk", "Role", "AIConfidence"],
+                "sizes": ["S", "M"],
+                "states": ["Default"],
+                "totalVariants": 24
+              },
+              {
+                "name": "Tag",
+                "figmaId": "C/Content/Tag",
+                "variants": ["Default"],
+                "sizes": ["S", "M"],
+                "states": ["Default"],
+                "totalVariants": 2
+              },
+              {
+                "name": "Chip",
+                "figmaId": "C/Content/Chip",
+                "variants": ["Removable", "Non-removable"],
+                "sizes": ["M"],
+                "states": ["Default", "Hover", "Active"],
+                "totalVariants": 6
+              }
+            ]
+          },
+          {
+            "category": "Feedback",
+            "figmaPath": "C/Feedback/",
+            "components": [
+              {
+                "name": "Modal",
+                "figmaId": "C/Feedback/Modal",
+                "variants": ["Default", "Large", "SessionTimeout"],
+                "sizes": [],
+                "states": ["Default"],
+                "totalVariants": 3
+              },
+              {
+                "name": "Drawer",
+                "figmaId": "C/Feedback/Drawer",
+                "variants": ["Right"],
+                "sizes": ["Desktop", "Mobile"],
+                "states": ["Open", "Closed"],
+                "totalVariants": 4
+              },
+              {
+                "name": "Toast",
+                "figmaId": "C/Feedback/Toast",
+                "variants": ["Success", "Warning", "Error", "Info", "SlotSwap"],
+                "sizes": [],
+                "states": ["Default", "Dismissing"],
+                "totalVariants": 10
+              },
+              {
+                "name": "Alert",
+                "figmaId": "C/Feedback/Alert",
+                "variants": ["Success", "Warning", "Error", "Info"],
+                "sizes": [],
+                "states": ["Default"],
+                "totalVariants": 4
+              },
+              {
+                "name": "Skeleton",
+                "figmaId": "C/Feedback/Skeleton",
+                "variants": ["TextLine", "Paragraph", "Card", "TableRow", "Avatar", "SlotGrid"],
+                "sizes": [],
+                "states": ["Loading"],
+                "totalVariants": 6
+              },
+              {
+                "name": "ProgressBar",
+                "figmaId": "C/Feedback/ProgressBar",
+                "variants": ["Determinate", "Indeterminate"],
+                "sizes": ["Slim (4px)", "Default (8px)"],
+                "states": ["Default"],
+                "totalVariants": 4
+              }
+            ]
+          },
+          {
+            "category": "Healthcare",
+            "figmaPath": "C/Healthcare/",
+            "components": [
+              {
+                "name": "SlotGrid",
+                "figmaId": "C/Healthcare/SlotGrid",
+                "variants": ["Default"],
+                "sizes": ["Desktop", "Tablet"],
+                "states": ["Available", "Unavailable", "Selected", "Waitlisted"],
+                "totalVariants": 8
+              },
+              {
+                "name": "RiskBadge",
+                "figmaId": "C/Healthcare/RiskBadge",
+                "variants": ["Low", "Medium", "High"],
+                "sizes": [],
+                "states": ["Default"],
+                "totalVariants": 3
+              },
+              {
+                "name": "ConflictIndicator",
+                "figmaId": "C/Healthcare/ConflictIndicator",
+                "variants": ["Critical", "Warning"],
+                "sizes": [],
+                "states": ["Default", "Resolved"],
+                "totalVariants": 4
+              },
+              {
+                "name": "AIConfidenceBadge",
+                "figmaId": "C/Healthcare/AIConfidenceBadge",
+                "variants": ["High", "Medium", "Low"],
+                "sizes": [],
+                "states": ["Default"],
+                "totalVariants": 3
+              },
+              {
+                "name": "SourceTraceTag",
+                "figmaId": "C/Healthcare/SourceTraceTag",
+                "variants": ["Default"],
+                "sizes": [],
+                "states": ["Default", "Hover"],
+                "totalVariants": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "03_Patterns",
+        "name": "03_Patterns",
+        "description": "Reusable layout patterns composed from components",
+        "patterns": [
+          {
+            "name": "Auth Form",
+            "description": "Login / Registration form layout",
+            "usedIn": ["SCR-001", "SCR-002"]
+          },
+          {
+            "name": "Booking Step Flow",
+            "description": "Multi-step appointment booking wizard",
+            "usedIn": ["SCR-005", "SCR-005b", "SCR-006", "SCR-007"]
+          },
+          {
+            "name": "Data Table + Filters",
+            "description": "Table with search, filter, and pagination",
+            "usedIn": ["SCR-014", "SCR-018", "SCR-020", "SCR-021"]
+          },
+          {
+            "name": "Empty State",
+            "description": "Illustration + message + CTA for no-data views",
+            "usedIn": ["SCR-003", "SCR-011", "SCR-013", "SCR-014"]
+          },
+          {
+            "name": "Error / Retry",
+            "description": "API error state with retry action",
+            "usedIn": ["All screens with network calls"]
+          },
+          {
+            "name": "Loading Skeleton",
+            "description": "Skeleton loading state preserving layout",
+            "usedIn": ["SCR-003", "SCR-014", "SCR-016", "SCR-017"]
+          },
+          {
+            "name": "Chat Interface",
+            "description": "AI conversational intake chat layout",
+            "usedIn": ["SCR-008"]
+          },
+          {
+            "name": "Clinical Data Card Grid",
+            "description": "Grid of Clinical Data Cards with source/conflict indicators",
+            "usedIn": ["SCR-016"]
+          },
+          {
+            "name": "Conflict Resolution Drawer",
+            "description": "Drawer pattern for side-by-side conflict resolution",
+            "usedIn": ["OVL-005"]
+          },
+          {
+            "name": "PHI Masked Form",
+            "description": "Form with masked PHI fields and reveal toggles",
+            "usedIn": ["SCR-010", "SCR-003", "SCR-005"]
+          }
+        ]
+      },
+      {
+        "id": "04_Screens",
+        "name": "04_Screens",
+        "description": "All application screens with required states",
+        "screens": [
+          {
+            "id": "SCR-001",
+            "name": "Login",
+            "persona": "All",
+            "priority": "P0",
+            "derivedFrom": ["UC-001"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Error", "Loading"],
+            "components": ["C/Inputs/TextField", "C/Actions/Button/Primary", "C/Actions/Button/Ghost", "C/Actions/Link", "C/Feedback/Alert"]
+          },
+          {
+            "id": "SCR-002",
+            "name": "Registration",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-001"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Validation", "Loading", "Success"],
+            "components": ["C/Inputs/TextField", "C/Inputs/Checkbox", "C/Actions/Button/Primary", "C/Feedback/Alert"]
+          },
+          {
+            "id": "SCR-002a",
+            "name": "Email Verification Pending",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-001"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Error"],
+            "components": ["C/Feedback/Alert", "C/Actions/Link"]
+          },
+          {
+            "id": "SCR-003",
+            "name": "Patient Dashboard",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["FR-009", "FR-023"],
+            "platform": ["Web", "Mobile"],
+            "desktopWidth": 1440,
+            "mobileWidth": 390,
+            "states": ["Default", "Loading", "Empty"],
+            "components": ["C/Content/Card/Appointment", "C/Content/Card/Stats", "C/Content/Badge", "C/Actions/Button/Primary", "C/Feedback/Skeleton"]
+          },
+          {
+            "id": "SCR-004",
+            "name": "Appointment Detail",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["FR-014"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Error"],
+            "components": ["C/Content/Card/Appointment", "C/Actions/Button", "C/Content/Badge"]
+          },
+          {
+            "id": "SCR-004a",
+            "name": "Reschedule Cancel",
+            "persona": "Patient",
+            "priority": "P1",
+            "derivedFrom": ["FR-014"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Confirmation", "Loading", "Error"],
+            "components": ["C/Healthcare/SlotGrid", "C/Actions/Button", "C/Feedback/Modal"]
+          },
+          {
+            "id": "SCR-005",
+            "name": "Slot Selection",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-001", "FR-011"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty", "Error"],
+            "components": ["C/Healthcare/SlotGrid", "C/Inputs/DatePicker", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-005b",
+            "name": "Preferred Slot Selection",
+            "persona": "Patient",
+            "priority": "P1",
+            "derivedFrom": ["UC-002", "FR-020"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Empty"],
+            "components": ["C/Healthcare/SlotGrid", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-006",
+            "name": "Insurance Pre-Check",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["FR-038", "FR-039"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Verified", "NotRecognized", "Incomplete", "Loading"],
+            "components": ["C/Inputs/TextField", "C/Actions/Button", "C/Feedback/Alert"]
+          },
+          {
+            "id": "SCR-007",
+            "name": "Booking Confirmation",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-001", "FR-015"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Error"],
+            "components": ["C/Content/Card/Confirmation", "C/Actions/Button", "C/Actions/Link"]
+          },
+          {
+            "id": "SCR-008",
+            "name": "AI Conversational Intake",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-002", "FR-016"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Error", "Complete"],
+            "components": ["C/Content/ChatBubble", "C/Inputs/TextField", "C/Inputs/Toggle", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-009",
+            "name": "Manual Intake Form",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["FR-017"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Validation", "Loading", "Error", "Complete"],
+            "components": ["C/Inputs/TextField", "C/Inputs/Select", "C/Inputs/Checkbox", "C/Inputs/Radio", "C/Inputs/Toggle", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-010",
+            "name": "Patient Profile",
+            "persona": "Patient",
+            "priority": "P1",
+            "derivedFrom": ["FR-007", "FR-008"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "EditMode", "Loading", "Error", "Success"],
+            "components": ["C/Inputs/TextField", "C/Content/Avatar", "C/Actions/Button", "C/Content/Badge"]
+          },
+          {
+            "id": "SCR-011",
+            "name": "Document Upload",
+            "persona": "Patient",
+            "priority": "P0",
+            "derivedFrom": ["UC-007", "FR-041", "FR-042"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Uploading", "Success", "Error", "Empty"],
+            "components": ["C/Inputs/DropZone", "C/Feedback/ProgressBar", "C/Content/Badge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-012",
+            "name": "Calendar Sync",
+            "persona": "Patient",
+            "priority": "P1",
+            "derivedFrom": ["UC-012", "FR-035"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Success", "Error"],
+            "components": ["C/Actions/Button", "C/Feedback/Alert"]
+          },
+          {
+            "id": "SCR-013",
+            "name": "Staff Dashboard",
+            "persona": "Staff",
+            "priority": "P0",
+            "derivedFrom": ["FR-026", "FR-029"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty"],
+            "components": ["C/Content/Card/Stats", "C/Content/Table", "C/Healthcare/RiskBadge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-014",
+            "name": "Same-Day Queue",
+            "persona": "Staff",
+            "priority": "P0",
+            "derivedFrom": ["FR-026", "FR-027", "UC-006"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty", "Error"],
+            "components": ["C/Content/Table/Queue", "C/Healthcare/RiskBadge", "C/Content/Badge", "C/Actions/Button", "C/Inputs/SearchBar"]
+          },
+          {
+            "id": "SCR-015",
+            "name": "Walk-In Booking",
+            "persona": "Staff",
+            "priority": "P0",
+            "derivedFrom": ["UC-005", "FR-024", "FR-025"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Validation", "Success"],
+            "components": ["C/Inputs/SearchBar", "C/Content/Card/Patient", "C/Healthcare/SlotGrid", "C/Inputs/TextField", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-016",
+            "name": "Patient 360-Degree View",
+            "persona": "Staff",
+            "priority": "P0",
+            "derivedFrom": ["UC-008", "FR-047", "FR-055"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Conflict", "Verified", "Error"],
+            "components": ["C/Navigation/Tabs", "C/Content/Card/ClinicalData", "C/Healthcare/ConflictIndicator", "C/Healthcare/AIConfidenceBadge", "C/Healthcare/SourceTraceTag", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-017",
+            "name": "Medical Code Review",
+            "persona": "Staff",
+            "priority": "P0",
+            "derivedFrom": ["UC-009", "FR-052"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty", "Reviewed"],
+            "components": ["C/Navigation/Tabs", "C/Content/Table/CodeReview", "C/Healthcare/AIConfidenceBadge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-018",
+            "name": "Appointment Management (Staff)",
+            "persona": "Staff",
+            "priority": "P1",
+            "derivedFrom": ["FR-031", "FR-033"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty"],
+            "components": ["C/Content/Table/Appointments", "C/Inputs/SearchBar", "C/Content/Badge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-019",
+            "name": "Reminder Management",
+            "persona": "Staff",
+            "priority": "P1",
+            "derivedFrom": ["FR-033", "FR-034"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Success", "Error"],
+            "components": ["C/Content/Table/Reminders", "C/Content/Badge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-020",
+            "name": "User Management",
+            "persona": "Admin",
+            "priority": "P0",
+            "derivedFrom": ["UC-010", "FR-060", "FR-061"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty", "Validation", "Error"],
+            "components": ["C/Content/Table/UserManagement", "C/Inputs/SearchBar", "C/Content/Badge", "C/Actions/Button"]
+          },
+          {
+            "id": "SCR-021",
+            "name": "Audit Log Viewer",
+            "persona": "Admin",
+            "priority": "P0",
+            "derivedFrom": ["FR-057", "FR-058", "FR-059"],
+            "platform": "Web",
+            "width": 1440,
+            "height": 900,
+            "states": ["Default", "Loading", "Empty", "Error"],
+            "components": ["C/Content/Table/AuditLog", "C/Inputs/DatePicker/Range", "C/Inputs/SearchBar", "C/Content/Badge"]
+          }
+        ],
+        "overlays": [
+          {
+            "id": "OVL-001",
+            "name": "Session Timeout Modal",
+            "type": "Modal",
+            "trigger": "13 minutes of inactivity (2 min warning before auto-logout)",
+            "derivedFrom": ["FR-004", "NFR-007"],
+            "persona": "All",
+            "states": ["Default"],
+            "components": ["C/Feedback/Modal", "C/Actions/Button"]
+          },
+          {
+            "id": "OVL-002",
+            "name": "Slot Swap Toast",
+            "type": "Toast",
+            "trigger": "Backend slot swap event detected",
+            "derivedFrom": ["FR-023", "UC-003"],
+            "persona": "Patient",
+            "states": ["Default"],
+            "components": ["C/Feedback/Toast/SlotSwap"]
+          },
+          {
+            "id": "OVL-003",
+            "name": "Cancel Appointment Confirm Dialog",
+            "type": "Modal",
+            "trigger": "Patient clicks Cancel Appointment",
+            "derivedFrom": ["FR-014"],
+            "persona": "Patient",
+            "states": ["Default"],
+            "components": ["C/Feedback/Modal", "C/Actions/Button/Destructive"]
+          },
+          {
+            "id": "OVL-004",
+            "name": "Admin Re-authentication Modal",
+            "type": "Modal",
+            "trigger": "Admin initiates destructive user management action",
+            "derivedFrom": ["FR-062", "UC-010"],
+            "persona": "Admin",
+            "states": ["Default", "Error"],
+            "components": ["C/Feedback/Modal", "C/Inputs/TextField", "C/Actions/Button"]
+          },
+          {
+            "id": "OVL-005",
+            "name": "Conflict Resolution Drawer",
+            "type": "Drawer",
+            "trigger": "Staff clicks conflict indicator in 360-degree view",
+            "derivedFrom": ["FR-055", "FR-056", "UC-008"],
+            "persona": "Staff",
+            "states": ["Default", "Resolved"],
+            "components": ["C/Feedback/Drawer", "C/Healthcare/ConflictIndicator", "C/Actions/Button", "C/Actions/Radio"]
+          },
+          {
+            "id": "OVL-006",
+            "name": "360-Degree Verify Confirm Dialog",
+            "type": "Modal",
+            "trigger": "Staff clicks Verify Profile on 360-degree view",
+            "derivedFrom": ["UC-008", "UXR-503"],
+            "persona": "Staff",
+            "states": ["Default"],
+            "components": ["C/Feedback/Modal", "C/Actions/Button/Primary"]
+          }
+        ]
+      },
+      {
+        "id": "05_Prototype",
+        "name": "05_Prototype",
+        "description": "Interactive flows wired end-to-end",
+        "flows": [
+          {
+            "id": "FL-001",
+            "name": "Patient Registration & Appointment Booking",
+            "derivedFrom": "UC-001",
+            "persona": "Patient",
+            "entryScreen": "SCR-001",
+            "exitScreen": "SCR-003",
+            "screens": ["SCR-001", "SCR-002", "SCR-002a", "SCR-003", "SCR-005", "SCR-005b", "SCR-006", "SCR-008", "SCR-009", "SCR-007", "SCR-012"],
+            "decisionPoints": ["Intake mode: AI or Manual", "Preferred slot: Yes or No", "Insurance: Verified or Not Recognized"],
+            "requiredInteractions": ["Toggle intake mode (preserves data)", "Slot grid selection", "Insurance validation display"]
+          },
+          {
+            "id": "FL-002",
+            "name": "AI Conversational Intake",
+            "derivedFrom": "UC-002",
+            "persona": "Patient",
+            "entryScreen": "SCR-008",
+            "exitScreen": "SCR-007",
+            "screens": ["SCR-008", "SCR-009"],
+            "decisionPoints": ["Switch to manual form mid-flow"],
+            "requiredInteractions": ["Chat input", "AI response rendering", "Mode switch toggle"]
+          },
+          {
+            "id": "FL-003",
+            "name": "Dynamic Preferred Slot Swap",
+            "derivedFrom": "UC-003",
+            "persona": "Patient",
+            "entryScreen": "SCR-003",
+            "exitScreen": "SCR-003",
+            "screens": ["SCR-003", "SCR-004"],
+            "decisionPoints": [],
+            "requiredInteractions": ["OVL-002 Toast display", "Dashboard card refresh"]
+          },
+          {
+            "id": "FL-004",
+            "name": "Staff Walk-In Booking & Arrival",
+            "derivedFrom": "UC-005",
+            "persona": "Staff",
+            "entryScreen": "SCR-013",
+            "exitScreen": "SCR-014",
+            "screens": ["SCR-013", "SCR-015", "SCR-014"],
+            "decisionPoints": ["Patient found vs not found", "Account creation vs skip"],
+            "requiredInteractions": ["Patient search", "Mark Arrived action", "Queue row update"]
+          },
+          {
+            "id": "FL-005",
+            "name": "Clinical Document Upload & 360-Degree Verification",
+            "derivedFrom": "UC-007, UC-008",
+            "persona": "Patient + Staff",
+            "entryScreen": "SCR-011",
+            "exitScreen": "SCR-016",
+            "screens": ["SCR-011", "SCR-016", "OVL-005", "OVL-006"],
+            "decisionPoints": ["Conflicts present vs none", "Verification confirmation"],
+            "requiredInteractions": ["Drag-and-drop upload", "Per-file progress bar", "Conflict resolution drawer", "Verify confirm dialog"]
+          },
+          {
+            "id": "FL-006",
+            "name": "Medical Code Review",
+            "derivedFrom": "UC-009",
+            "persona": "Staff",
+            "entryScreen": "SCR-017",
+            "exitScreen": "SCR-017",
+            "screens": ["SCR-017"],
+            "decisionPoints": ["Confirm vs Reject vs Add manual code"],
+            "requiredInteractions": ["Per-row confirm/reject buttons", "Add manual code form", "Submit code set"]
+          },
+          {
+            "id": "FL-007",
+            "name": "Admin User Management",
+            "derivedFrom": "UC-010",
+            "persona": "Admin",
+            "entryScreen": "SCR-020",
+            "exitScreen": "SCR-020",
+            "screens": ["SCR-020", "OVL-004"],
+            "decisionPoints": ["Create vs Edit vs Deactivate vs Role Change", "Re-auth success vs failure"],
+            "requiredInteractions": ["Re-authentication modal", "Role change form", "Deactivation confirmation"]
+          }
+        ]
+      },
+      {
+        "id": "06_Handoff",
+        "name": "06_Handoff",
+        "description": "Developer handoff notes, token rules, responsive specs, edge cases, accessibility, Angular mappings",
+        "sections": [
+          {
+            "name": "Token Usage Rules",
+            "description": "When to use which token — color, spacing, typography decision tree"
+          },
+          {
+            "name": "Component Usage Guidelines",
+            "description": "Props, variants, when to use each component variant — ref component_library.md"
+          },
+          {
+            "name": "Responsive Behavior Specs",
+            "description": "Per-screen breakpoint changes: layout shifts, navigation changes, component transformations"
+          },
+          {
+            "name": "Edge Case Handling",
+            "description": "Max content lengths, truncation rules, overflow handling, long names"
+          },
+          {
+            "name": "Accessibility Notes",
+            "description": "Focus management rules, ARIA requirements per component, heading hierarchy, landmark regions"
+          },
+          {
+            "name": "HIPAA Design Patterns",
+            "description": "PHI masking implementation, PHI access warning banner, audit indicator patterns"
+          },
+          {
+            "name": "Angular 18 Component Mapping",
+            "description": "Figma component ID → Angular component path + prop mapping",
+            "mappings": [
+              {"figmaId": "C/Actions/Button", "angularPath": "app/src/app/shared/components/button/button.component.ts"},
+              {"figmaId": "C/Inputs/TextField", "angularPath": "app/src/app/shared/components/text-field/text-field.component.ts"},
+              {"figmaId": "C/Healthcare/SlotGrid", "angularPath": "app/src/app/features/booking/components/slot-grid/slot-grid.component.ts"},
+              {"figmaId": "C/Healthcare/RiskBadge", "angularPath": "app/src/app/features/queue/components/risk-badge/risk-badge.component.ts"},
+              {"figmaId": "C/Healthcare/ConflictIndicator", "angularPath": "app/src/app/features/clinical/components/conflict-indicator/conflict-indicator.component.ts"},
+              {"figmaId": "C/Healthcare/AIConfidenceBadge", "angularPath": "app/src/app/features/clinical/components/ai-confidence-badge/ai-confidence-badge.component.ts"},
+              {"figmaId": "C/Healthcare/SourceTraceTag", "angularPath": "app/src/app/features/clinical/components/source-trace-tag/source-trace-tag.component.ts"},
+              {"figmaId": "C/Inputs/DropZone", "angularPath": "app/src/app/features/documents/components/drop-zone/drop-zone.component.ts"}
+            ]
+          },
+          {
+            "name": "Assumptions Log",
+            "description": "Design decisions made where specs were unclear, requiring stakeholder sign-off"
+          }
+        ]
+      }
+    ]
+  },
+  "exportManifest": {
+    "namingConvention": "<AppName>__<Platform>__<ScreenName>__<State>__v<N>.jpg",
+    "settings": {
+      "format": "JPG",
+      "quality": "85%",
+      "scale": "2x",
+      "colorProfile": "sRGB"
+    },
+    "totalScreens": 22,
+    "totalOverlays": 6,
+    "averageStatesPerScreen": 3.5,
+    "estimatedTotalExports": 98
+  },
+  "accessibilityRequirements": {
+    "wcagLevel": "AA",
+    "wcagVersion": "2.2",
+    "textContrastMin": "4.5:1",
+    "uiContrastMin": "3:1",
+    "touchTargetMin": "44x44px",
+    "focusIndicator": "2px primary outline, 2px offset",
+    "reducedMotion": "All animations respect prefers-reduced-motion"
+  },
+  "qualityGates": {
+    "preExport": [
+      "All screens have required states (Default/Loading/Empty/Error/Validation)",
+      "All overlays (OVL-001 to OVL-006) fully designed",
+      "All components use design tokens (no hard-coded values)",
+      "Color contrast meets WCAG AA (4.5:1 text, 3:1 UI)",
+      "Focus states defined for all interactive elements",
+      "Touch targets >=44x44px on all mobile states",
+      "All 7 prototype flows wired and functional",
+      "Naming conventions followed",
+      "HIPAA masked fields use PHI masking pattern",
+      "Healthcare-specific components present in 02_Components"
+    ]
+  }
+}
