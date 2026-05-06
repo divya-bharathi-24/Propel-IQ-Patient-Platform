@@ -12,7 +12,13 @@ import { AuthService } from '../../features/auth/services/auth.service';
 import { TokenResponse } from '../auth/auth-state.model';
 
 /** Paths that must never carry an Authorization header. */
-const AUTH_BYPASS_PATHS = ['/api/auth/login', '/api/auth/refresh'];
+const AUTH_BYPASS_PATHS = [
+  '/api/auth/login',
+  '/api/auth/refresh',
+  '/api/auth/register',
+  '/api/auth/verify',
+  '/api/auth/resend-verification',
+];
 
 /** Tracks whether a refresh is already in flight (shared across requests). */
 let isRefreshing = false;

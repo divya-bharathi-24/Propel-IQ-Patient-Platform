@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-011 — Document Upload | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element          | Action | Target Screen               |
+|------------------|--------|-----------------------------|
+| #back-dashboard  | click  | SCR-003 (Patient Dashboard) |
+| uploaded docs    | auto   | SCR-016 (360 View for staff)|
+-->
+<div class="wf-meta">
+  <strong>SCR-011</strong> · Document Upload · High-Fidelity · 1440px · States: Default, Uploading, Success, Error, Empty · FL-005
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item" id="back-dashboard"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="wireframe-SCR-005-slot-selection.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>My Appointments</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>My Documents</a>
+      <a href="wireframe-SCR-010-patient-profile.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1 class="page-header__title">My Documents</h1>
+      <div class="page-header__actions">
+        <div class="search-bar" style="width:260px;">
+          <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="form-input search-bar__input" placeholder="Search documents…">
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:860px;">
+      <!-- Drop Zone -->
+      <div class="dropzone mb-6" role="region" aria-label="File upload area" tabindex="0">
+        <div class="dropzone__icon">📁</div>
+        <div class="dropzone__title">Drop files here, or click to browse</div>
+        <div class="dropzone__subtitle">Supports: PDF, DOCX, JPEG, PNG · Max 25 MB per file · Max 10 files</div>
+        <button class="btn btn--primary" style="margin-top:var(--space-5);">Browse files</button>
+      </div>
+
+      <!-- Category filter tabs -->
+      <div class="tabs mb-5" role="tablist">
+        <button class="tab active" role="tab" aria-selected="true">All (7)</button>
+        <button class="tab" role="tab">Lab results (2)</button>
+        <button class="tab" role="tab">Insurance (2)</button>
+        <button class="tab" role="tab">Referrals (1)</button>
+        <button class="tab" role="tab">Other (2)</button>
+      </div>
+
+      <!-- File list -->
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <!-- Uploading state -->
+        <div class="file-item" style="border-color:var(--primary);">
+          <div class="file-item__icon">📄</div>
+          <div class="file-item__info">
+            <div class="file-item__name">BloodworkResults_May2026.pdf</div>
+            <div class="file-item__meta">
+              <div class="progress" style="width:180px;margin-top:var(--space-1);">
+                <div class="progress__bar" style="width:65%;"></div>
+              </div>
+              <span style="margin-left:var(--space-2);">65% · Uploading…</span>
+            </div>
+          </div>
+          <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">Cancel</button>
+        </div>
+
+        <!-- Success uploaded -->
+        <div class="file-item">
+          <div class="file-item__icon">📄</div>
+          <div class="file-item__info">
+            <div class="file-item__name">InsuranceCard_BCBS_2026.pdf</div>
+            <div class="file-item__meta">Uploaded May 1, 2026 · 342 KB · Insurance</div>
+          </div>
+          <span class="badge badge--success">✓ Uploaded</span>
+          <button class="btn btn--ghost btn--sm">⬇</button>
+          <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">🗑</button>
+        </div>
+
+        <div class="file-item">
+          <div class="file-item__icon" style="background:var(--color-info-50);color:var(--color-info-500);">🖼</div>
+          <div class="file-item__info">
+            <div class="file-item__name">XRay_Chest_Apr2026.jpg</div>
+            <div class="file-item__meta">Uploaded Apr 22, 2026 · 1.2 MB · Lab results</div>
+          </div>
+          <span class="badge badge--success">✓ Uploaded</span>
+          <button class="btn btn--ghost btn--sm">⬇</button>
+          <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">🗑</button>
+        </div>
+
+        <div class="file-item">
+          <div class="file-item__icon">📄</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Referral_Cardiology_Mar2026.pdf</div>
+            <div class="file-item__meta">Uploaded Mar 10, 2026 · 128 KB · Referrals</div>
+          </div>
+          <span class="badge badge--success">✓ Uploaded</span>
+          <button class="btn btn--ghost btn--sm">⬇</button>
+          <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">🗑</button>
+        </div>
+
+        <!-- Error upload -->
+        <div class="file-item" style="border-color:var(--color-error-500);background:var(--color-error-50);">
+          <div class="file-item__icon" style="background:var(--color-error-50);color:var(--color-error-500);">⚠</div>
+          <div class="file-item__info">
+            <div class="file-item__name">UnreadableFile.pdf</div>
+            <div class="file-item__meta" style="color:var(--color-error-700);">Upload failed — file may be corrupted or too large</div>
+          </div>
+          <span class="badge badge--error">Failed</span>
+          <button class="btn btn--secondary btn--sm">Retry</button>
+          <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">🗑</button>
+        </div>
+      </div>
+
+      <!-- Storage usage -->
+      <div style="margin-top:var(--space-6);display:flex;align-items:center;gap:var(--space-4);">
+        <span style="font-size:var(--font-size-sm);color:var(--text-secondary);">Storage used:</span>
+        <div class="progress" style="flex:1;">
+          <div class="progress__bar" style="width:22%;background:var(--primary);"></div>
+        </div>
+        <span style="font-size:var(--font-size-sm);color:var(--text-secondary);">2.2 MB of 1 GB</span>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

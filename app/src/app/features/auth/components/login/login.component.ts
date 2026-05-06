@@ -108,6 +108,24 @@ export class LoginComponent implements OnInit {
       },
       error: (err: { status: number; message: string }) => {
         this.isSubmitting.set(false);
+        // Guard: if tokens were stored before the transport error (ERR_EMPTY_RESPONSE
+        // from the proxy dropping the connection after the body was delivered),
+        // treat the login as successful and navigate normally.
+        if (this.authService.isAuthenticated()) {
+          this.authService.registerSessionTimerStop(() =>
+            this.sessionTimer.stop(),
+          );
+          this.sessionTimer.start(() => this.authService.logout('idle_timeout'));
+          const role = this.authService.currentRole();
+          if (role === 'Admin') {
+            this.router.navigate(['/admin/users']);
+          } else if (role === 'Staff') {
+            this.router.navigate(['/staff/walkin']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+          return;
+        }
         if (err.status === 401 || err.status === 400) {
           this.serverError.set('Invalid email or password. Please try again.');
         } else {

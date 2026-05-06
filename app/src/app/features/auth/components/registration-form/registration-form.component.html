@@ -178,6 +178,13 @@
         }
       </mat-form-field>
 
+      <!-- General server error -->
+      @if (serverError()) {
+        <p class="general-error" role="alert" aria-live="polite">
+          {{ serverError() }}
+        </p>
+      }
+
       <!-- Submit -->
       <button
         mat-raised-button

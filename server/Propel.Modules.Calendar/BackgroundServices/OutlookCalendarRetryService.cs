@@ -46,34 +46,41 @@ public sealed class OutlookCalendarRetryService : BackgroundService
     {
         _logger.LogInformation("OutlookCalendarRetryService started.");
 
-        await foreach (var request in _retryChannel.Reader.ReadAllAsync(stoppingToken))
+        try
         {
-            try
+            await foreach (var request in _retryChannel.Reader.ReadAllAsync(stoppingToken))
             {
-                // ── Honour the 10-minute delay from the failure timestamp ──────
-                var delay = request.FailedAt.AddSeconds(RetryDelaySeconds) - DateTime.UtcNow;
-                if (delay > TimeSpan.Zero)
+                try
                 {
-                    _logger.LogDebug(
-                        "Outlook retry waiting {Delay:g} for AppointmentId={AppointmentId}",
-                        delay, request.AppointmentId);
-                    await Task.Delay(delay, stoppingToken);
-                }
+                    // ── Honour the 10-minute delay from the failure timestamp ──────
+                    var delay = request.FailedAt.AddSeconds(RetryDelaySeconds) - DateTime.UtcNow;
+                    if (delay > TimeSpan.Zero)
+                    {
+                        _logger.LogDebug(
+                            "Outlook retry waiting {Delay:g} for AppointmentId={AppointmentId}",
+                            delay, request.AppointmentId);
+                        await Task.Delay(delay, stoppingToken);
+                    }
 
-                await RetryEventCreationAsync(request, stoppingToken);
+                    await RetryEventCreationAsync(request, stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Graceful shutdown — do not log as error (AG-6)
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // AG-6: Never rethrow from BackgroundService.ExecuteAsync
+                    _logger.LogWarning(ex,
+                        "OutlookCalendarRetryService encountered an unexpected error for AppointmentId={AppointmentId}. Skipping.",
+                        request.AppointmentId);
+                }
             }
-            catch (OperationCanceledException)
-            {
-                // Graceful shutdown — do not log as error (AG-6)
-                break;
-            }
-            catch (Exception ex)
-            {
-                // AG-6: Never rethrow from BackgroundService.ExecuteAsync
-                _logger.LogWarning(ex,
-                    "OutlookCalendarRetryService encountered an unexpected error for AppointmentId={AppointmentId}. Skipping.",
-                    request.AppointmentId);
-            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Graceful shutdown during channel read — do not log as error (AG-6)
         }
 
         _logger.LogInformation("OutlookCalendarRetryService stopped.");

@@ -22,28 +22,28 @@ const STAFF_AUTH_FILE   = path.join(__dirname, '..', '.auth', 'staff.json');
 const ADMIN_AUTH_FILE   = path.join(__dirname, '..', '.auth', 'admin.json');
 
 setup('authenticate as patient', async ({ page }) => {
-  await page.goto(`${BASE_URL}/login`);
+  await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(PATIENT_EMAIL);
   await page.getByLabel('Password').fill(PATIENT_PASSWORD);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByRole('button', { name: 'Sign in to your account' }).click();
   await expect(page).toHaveURL(/dashboard/);
   await page.context().storageState({ path: PATIENT_AUTH_FILE });
 });
 
 setup('authenticate as staff', async ({ page }) => {
-  await page.goto(`${BASE_URL}/login`);
+  await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(STAFF_EMAIL);
   await page.getByLabel('Password').fill(STAFF_PASSWORD);
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await page.getByRole('button', { name: 'Sign in to your account' }).click();
+  await expect(page).toHaveURL(/staff/);
   await page.context().storageState({ path: STAFF_AUTH_FILE });
 });
 
 setup('authenticate as admin', async ({ page }) => {
-  await page.goto(`${BASE_URL}/login`);
+  await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(ADMIN_EMAIL);
   await page.getByLabel('Password').fill(ADMIN_PASSWORD);
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await page.getByRole('button', { name: 'Sign in to your account' }).click();
+  await expect(page).toHaveURL(/admin/);
   await page.context().storageState({ path: ADMIN_AUTH_FILE });
 });

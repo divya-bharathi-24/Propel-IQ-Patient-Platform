@@ -53,9 +53,9 @@ export const WalkInStore = signalStore(
             errorMessage: null,
           }),
         ),
-        switchMap((query) =>
+        switchMap((query: string) =>
           service.searchPatients(query).pipe(
-            tap((results) =>
+            tap((results: PatientSearchResultDto[]) =>
               patchState(store, {
                 searchResults: results,
                 actionState: 'idle',
@@ -95,9 +95,9 @@ export const WalkInStore = signalStore(
             slotFullWarning: false,
           }),
         ),
-        switchMap((dto) =>
+        switchMap((dto: WalkInBookingDto) =>
           service.createWalkIn(dto).pipe(
-            tap((response) => {
+            tap((response: WalkInResponseDto) => {
               patchState(store, {
                 actionState: 'success',
                 confirmedBooking: response,

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-002a — Email Verification Pending | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.verify-shell { min-height: 100vh; background: var(--bg-default); display: flex; align-items: center; justify-content: center; padding: var(--space-8) var(--space-4); }
+.verify-card { width: 100%; max-width: 480px; background: var(--bg-surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: var(--space-10) var(--space-8); text-align: center; }
+.verify-icon { width: 80px; height: 80px; background: var(--primary-surface); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-6); font-size: 40px; }
+.verify-email-sample { background: var(--bg-subtle); border-radius: var(--radius-lg); padding: var(--space-5) var(--space-6); margin: var(--space-6) 0; text-align: left; border: 1px solid var(--border-default); }
+.verify-email-sample__from { font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-2); }
+.verify-email-sample__subject { font-size: var(--font-size-sm); font-weight: 600; margin-bottom: var(--space-3); }
+.verify-email-sample__body { font-size: var(--font-size-sm); color: var(--text-secondary); }
+.verify-btn-sample { display: inline-block; background: var(--primary); color: #fff; padding: var(--space-3) var(--space-6); border-radius: var(--radius-md); font-size: var(--font-size-sm); margin-top: var(--space-3); text-decoration: none; }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element            | Action | Target Screen            |
+|--------------------|--------|--------------------------|
+| #verify-link       | click  | SCR-003 (Patient Dashboard) |
+| #resend-email      | click  | Same screen (resend action) |
+| #back-to-login     | click  | SCR-001 (Login)           |
+-->
+<div class="wf-meta">
+  <strong>SCR-002a</strong> · Email Verification Pending · High-Fidelity · 1440px · States: Default, Error · FL-001 Step 3
+</div>
+<div class="verify-shell">
+  <div class="verify-card">
+    <div class="verify-icon">📧</div>
+    <h1 style="font-size:var(--font-size-2xl);font-weight:700;color:var(--color-neutral-800);margin-bottom:var(--space-3);">Check your email</h1>
+    <p style="color:var(--text-secondary);margin-bottom:var(--space-2);">We sent a verification link to</p>
+    <p style="font-weight:600;color:var(--primary);margin-bottom:var(--space-6);">jane.smith@example.com</p>
+
+    <!-- Email preview -->
+    <div class="verify-email-sample">
+      <div class="verify-email-sample__from">From: noreply@unipatient.health</div>
+      <div class="verify-email-sample__subject">✉ Verify your UniPatient account</div>
+      <div class="verify-email-sample__body">Hi Jane, please verify your email address to activate your account.</div>
+      <a href="wireframe-SCR-003-patient-dashboard.html" id="verify-link" class="verify-btn-sample">Verify my email →</a>
+    </div>
+
+    <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-6);">
+      The link expires in 24 hours. Check your spam folder if you don't see it.
+    </p>
+
+    <button id="resend-email" class="btn btn--secondary btn--full">
+      Resend verification email
+    </button>
+    <div style="font-size:var(--font-size-xs);color:var(--text-secondary);margin-top:var(--space-2);">Available again in <strong>58s</strong></div>
+
+    <!-- Error State -->
+    <div class="alert alert--error mt-4" style="display:none" role="alert">
+      <span>⚠</span>
+      <div class="alert__body">Failed to resend email. Please try again in a moment.</div>
+    </div>
+
+    <div class="divider"></div>
+    <a href="wireframe-SCR-001-login.html" id="back-to-login" style="font-size:var(--font-size-sm);color:var(--text-secondary);">← Back to sign in</a>
+  </div>
+</div>
+</body>
+</html>

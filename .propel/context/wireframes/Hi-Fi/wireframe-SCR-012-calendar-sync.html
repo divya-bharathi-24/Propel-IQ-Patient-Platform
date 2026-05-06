@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-012 — Calendar Sync | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.cal-option { border:1px solid var(--border-default); border-radius:var(--radius-lg); padding:var(--space-5) var(--space-6); display:flex; align-items:center; gap:var(--space-5); cursor:pointer; transition:all var(--transition-base); text-decoration:none; color:var(--text-primary); }
+.cal-option:hover { border-color:var(--primary); background:var(--primary-surface); text-decoration:none; }
+.cal-option__logo { width:48px; height:48px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element         | Action | Target Screen               |
+|-----------------|--------|-----------------------------|
+| #back           | click  | SCR-007 (Booking Confirmation) or SCR-004 (Appointment Detail) |
+| #google-sync    | click  | Google OAuth (external)     |
+| #outlook-sync   | click  | Outlook OAuth (external)    |
+| #ics-download   | click  | .ics file download (browser)|
+-->
+<div class="wf-meta">
+  <strong>SCR-012</strong> · Calendar Sync · High-Fidelity · 1440px · States: Default, Success, Error · FL-001 Post-booking
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>My Appointments</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div class="breadcrumb">
+        <a href="wireframe-SCR-007-booking-confirmation.html" id="back">← Back to confirmation</a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:600px;margin:0 auto;">
+      <h1 style="font-size:var(--font-size-2xl);font-weight:700;margin-bottom:var(--space-2);">Add to your calendar</h1>
+      <p style="color:var(--text-secondary);margin-bottom:var(--space-6);">General Check-up · Tuesday, May 20, 2026 · 10:00 – 10:30 AM · Dr. Patel</p>
+
+      <!-- Success state -->
+      <div class="alert alert--success mb-6" role="status" style="display:none" id="sync-success">
+        <span>✓</span>
+        <div>
+          <div class="alert__title">Added to Google Calendar!</div>
+          <div class="alert__body">Your appointment has been added to your calendar. You'll receive a reminder 1 hour before.</div>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div class="alert alert--error mb-6" role="alert" style="display:none" id="sync-error">
+        <span>⚠</span>
+        <div>
+          <div class="alert__title">Sync failed</div>
+          <div class="alert__body">Unable to connect to Google Calendar. Please try again or download the .ics file to add manually.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);margin-bottom:var(--space-8);">
+        <a href="#" class="cal-option" id="google-sync" aria-label="Add to Google Calendar">
+          <div class="cal-option__logo" style="background:#E8F0FE;">
+            <span style="color:#1a73e8;font-weight:700;font-size:20px;">G</span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600;margin-bottom:2px;">Google Calendar</div>
+            <div style="font-size:var(--font-size-sm);color:var(--text-secondary);">Connects your Google account securely — one-click sync</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+
+        <a href="#" class="cal-option" id="outlook-sync" aria-label="Add to Outlook / iCal">
+          <div class="cal-option__logo" style="background:#E3F2FD;">
+            <span style="color:#0078D4;font-size:20px;">⊠</span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600;margin-bottom:2px;">Outlook / iCal</div>
+            <div style="font-size:var(--font-size-sm);color:var(--text-secondary);">Microsoft Outlook, Apple Calendar, or any iCal-compatible app</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="divider"></div>
+      <div style="text-align:center;padding:var(--space-4) 0;">
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3);">Don't want to connect a calendar service?</p>
+        <a href="#" id="ics-download" class="btn btn--ghost" style="gap:var(--space-2);">⬇ Download .ics file</a>
+      </div>
+
+      <div class="divider"></div>
+      <div style="text-align:center;padding-top:var(--space-4);">
+        <a href="wireframe-SCR-003-patient-dashboard.html" class="btn btn--secondary">Skip — go to dashboard</a>
+      </div>
+
+      <p style="text-align:center;margin-top:var(--space-5);font-size:var(--font-size-xs);color:var(--text-secondary);">
+        UniPatient only requests calendar write access for your appointments. We never read existing events or share your data. <a href="#">Privacy Policy</a>
+      </p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

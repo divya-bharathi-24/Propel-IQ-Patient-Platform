@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-002 — Slot Swap Toast | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element           | Action | Target Screen                  |
+|-------------------|--------|--------------------------------|
+| #accept-slot      | click  | SCR-004 (Appointment Detail)   |
+| #decline-slot     | click  | Dismiss toast (no change)      |
+| Auto-dismiss      | ~60s   | Toast disappears automatically |
+| Context screen    | —      | SCR-003 (Patient Dashboard)    |
+-->
+<div class="wf-meta">
+  <strong>OVL-002</strong> · Slot Swap Toast Notification · High-Fidelity · Applied to SCR-003 · FL-003
+</div>
+
+<!-- Background: Patient Dashboard (simplified) -->
+<div style="min-height:100vh;background:var(--bg-default);">
+  <div style="background:var(--color-teal-900);width:240px;min-height:100vh;position:fixed;top:0;left:0;"></div>
+  <div style="margin-left:240px;">
+    <div style="background:var(--bg-surface);height:64px;border-bottom:1px solid var(--border-default);display:flex;align-items:center;padding:0 var(--space-8);">
+      <span style="font-size:var(--font-size-xl);font-weight:600;">Patient Dashboard</span>
+    </div>
+    <div style="padding:var(--space-8);opacity:.5;">
+      <div class="grid grid--4 mb-6">
+        <div class="card skeleton skeleton--card"></div>
+        <div class="card skeleton skeleton--card"></div>
+        <div class="card skeleton skeleton--card"></div>
+        <div class="card skeleton skeleton--card"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification: Slot Available (full interactive state) -->
+<div class="toast-container" style="position:fixed;top:var(--space-6);right:var(--space-6);z-index:1100;max-width:420px;width:100%;">
+  <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);overflow:hidden;" role="alert" aria-live="assertive" aria-atomic="true">
+    <!-- Toast header -->
+    <div style="background:var(--primary);padding:var(--space-3) var(--space-5);display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:var(--space-2);color:#fff;font-weight:600;font-size:var(--font-size-sm);">
+        <span>🔄</span> Preferred slot available!
+      </div>
+      <button style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px;line-height:1;">×</button>
+    </div>
+    <!-- Toast body -->
+    <div style="padding:var(--space-5);">
+      <p style="font-size:var(--font-size-sm);color:var(--text-primary);margin-bottom:var(--space-4);">
+        A slot opened for your preferred time with <strong>Dr. Raj Patel</strong>:
+      </p>
+      <div style="background:var(--primary-surface);border:1px solid var(--color-teal-200);border-radius:var(--radius-md);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-4);">
+        <div style="font-size:var(--font-size-lg);font-weight:700;color:var(--color-teal-800);">Thursday, May 15 · 9:00 AM</div>
+        <div style="font-size:var(--font-size-sm);color:var(--color-teal-700);margin-top:var(--space-1);">Main Clinic · 30 min visit</div>
+      </div>
+      <div style="background:var(--color-warning-50);border:1px solid var(--color-warning-300);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-5);font-size:var(--font-size-sm);color:var(--color-warning-700);">
+        ⏱ <strong>Offer expires in 58 minutes.</strong> This slot will be offered to the next person in queue if not accepted.
+      </div>
+      <div style="display:flex;gap:var(--space-3);">
+        <a href="wireframe-SCR-004-appointment-detail.html" id="accept-slot" class="btn btn--primary" style="flex:1;text-align:center;">Accept slot</a>
+        <button id="decline-slot" class="btn btn--ghost" style="flex:1;">No thanks</button>
+      </div>
+    </div>
+    <!-- Countdown progress bar -->
+    <div style="height:4px;background:var(--border-default);">
+      <div style="height:100%;background:var(--color-warning-500);width:95%;transition:width 1s linear;border-radius:0;"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-016 — Patient 360° View | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.clinical-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); margin-bottom:var(--space-4); }
+.clinical-card__title { font-size:var(--font-size-sm); font-weight:600; color:var(--color-neutral-800); margin-bottom:var(--space-3); display:flex; align-items:center; justify-content:space-between; }
+.source-badge { font-size:10px; padding:2px var(--space-2); border-radius:var(--radius-full); font-weight:500; }
+.source-badge--ehr { background:#E3F2FD; color:#1565C0; }
+.source-badge--patient { background:var(--primary-surface); color:var(--color-teal-700); }
+.source-badge--ai { background:#F3E5F5; color:#6A1B9A; }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element             | Action | Target Screen                    |
+|---------------------|--------|----------------------------------|
+| #back-queue         | click  | SCR-014 (Same-Day Queue)         |
+| #verify-btn         | click  | OVL-006 (360° Verify Confirm)    |
+| .conflict-indicator | click  | OVL-005 (Conflict Resolution Drawer) |
+| #code-review-link   | click  | SCR-017 (Medical Code Review)    |
+-->
+<div class="wf-meta">
+  <strong>SCR-016</strong> · Patient 360° View · High-Fidelity · 1440px · States: Default, Loading, Conflict, Verified, Error · FL-005 · PHI: UXR-402
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-013-staff-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="wireframe-SCR-014-same-day-queue.html" class="nav-item" id="back-queue"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/></svg>Same-Day Queue</a>
+      <a href="wireframe-SCR-017-code-review.html" class="nav-item" id="code-review-link"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Code Review</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar" style="background:var(--color-info-600);">SK</div><div class="sidebar__user-info"><div class="sidebar__user-name">Sarah Kim, RN</div><div class="sidebar__user-role">Staff</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <div class="breadcrumb">
+          <a href="wireframe-SCR-014-same-day-queue.html">Queue</a>
+          <span class="breadcrumb__sep">›</span>
+          <span>Marcus Johnson — 360° View</span>
+        </div>
+      </div>
+      <div class="page-header__actions">
+        <a href="wireframe-SCR-017-code-review.html" class="btn btn--secondary btn--sm">Code Review</a>
+        <a href="wireframe-OVL-006-360-verify-confirm.html" id="verify-btn" class="btn btn--primary">Verify &amp; Sign Off</a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+      <!-- Patient header -->
+      <div class="card mb-5">
+        <div class="card__body" style="display:flex;align-items:center;gap:var(--space-5);">
+          <div class="avatar avatar--xl">MJ</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
+              <h1 style="font-size:var(--font-size-xl);font-weight:700;">Marcus D. Johnson</h1>
+              <span class="risk-badge risk-badge--high">High Risk</span>
+              <span class="badge badge--neutral">Walk-in · Today</span>
+            </div>
+            <div style="display:flex;gap:var(--space-6);font-size:var(--font-size-sm);color:var(--text-secondary);flex-wrap:wrap;">
+              <span>MRN: <strong style="color:var(--color-neutral-800);">00481293</strong></span>
+              <span>DOB: <strong class="phi-masked">••/••/1978</strong> <button class="phi-reveal-btn" aria-label="Reveal DOB">👁</button></span>
+              <span>Insurance: <strong>Aetna PPO</strong></span>
+              <span>Provider: <strong>Dr. Patel</strong></span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:var(--font-size-xs);color:var(--text-secondary);">Last updated</div>
+            <div style="font-size:var(--font-size-sm);font-weight:500;">May 6, 2026 · 9:42 AM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conflict alert -->
+      <div class="alert alert--warning mb-5" role="alert">
+        <span>⚠</span>
+        <div>
+          <div class="alert__title">2 data conflicts detected</div>
+          <div class="alert__body">
+            Medication "Metoprolol 25mg" appears in EHR but not in patient self-report.
+            Allergy to "Aspirin" in patient report conflicts with EHR (no allergy on record).
+            <button class="btn btn--warning btn--sm" style="margin-top:var(--space-2);background:var(--color-warning-500);color:#fff;" onclick="window.location='wireframe-OVL-005-conflict-drawer.html'">Resolve conflicts →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs mb-5" role="tablist">
+        <button class="tab active" role="tab" aria-selected="true">Clinical Summary</button>
+        <button class="tab" role="tab">Appointments</button>
+        <button class="tab" role="tab">Documents <span class="badge badge--neutral" style="margin-left:4px;">4</span></button>
+        <button class="tab" role="tab">Intake Form</button>
+        <button class="tab" role="tab">Billing / Codes</button>
+      </div>
+
+      <!-- Tab Content: Clinical Summary -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);">
+        <!-- Column 1 -->
+        <div>
+          <div class="clinical-card">
+            <div class="clinical-card__title">
+              Chief complaint
+              <span class="source-badge source-badge--patient">Patient</span>
+            </div>
+            <p style="font-size:var(--font-size-sm);">Chest pain and shortness of breath for the past 2 hours. No prior cardiac history.</p>
+          </div>
+
+          <div class="clinical-card">
+            <div class="clinical-card__title">
+              Current medications
+              <div style="display:flex;gap:var(--space-2);">
+                <span class="source-badge source-badge--ehr">EHR</span>
+                <span class="conflict-indicator" onclick="window.location='wireframe-OVL-005-conflict-drawer.html'">⚠ 1 conflict</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--font-size-sm);">
+              <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-default);">
+                <span>Lisinopril</span><span style="color:var(--text-secondary);">10mg · Once daily</span><span class="source-badge source-badge--ehr">EHR</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-default);">
+                <span>Atorvastatin</span><span style="color:var(--text-secondary);">20mg · Once daily</span><span class="source-badge source-badge--ehr">EHR</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;background:var(--color-warning-50);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);">
+                <span>Metoprolol</span><span style="color:var(--text-secondary);">25mg</span><span class="conflict-indicator" onclick="window.location='wireframe-OVL-005-conflict-drawer.html'">⚠ EHR only</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="clinical-card">
+            <div class="clinical-card__title">
+              Allergies
+              <div style="display:flex;gap:var(--space-2);">
+                <span class="source-badge source-badge--patient">Patient</span>
+                <span class="conflict-indicator" onclick="window.location='wireframe-OVL-005-conflict-drawer.html'">⚠ 1 conflict</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <span class="badge badge--error">Aspirin (Patient report only)</span>
+              <span class="badge badge--neutral">NKDA (EHR)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div>
+          <div class="clinical-card">
+            <div class="clinical-card__title">
+              Medical history
+              <span class="source-badge source-badge--ehr">EHR</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--font-size-sm);">
+              <div>✓ Hypertension (Stage 1) — Dx 2019</div>
+              <div>✓ Hyperlipidemia — Dx 2020</div>
+              <div>✓ Type 2 Diabetes (well-controlled) — Dx 2021</div>
+            </div>
+          </div>
+
+          <div class="clinical-card">
+            <div class="clinical-card__title">
+              AI-suggested ICD codes
+              <span class="source-badge source-badge--ai">AI · 89%</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--font-size-sm);">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span><strong>R07.9</strong> — Chest pain, unspecified</span>
+                <span class="badge badge--warning">Pending</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span><strong>I10</strong> — Essential hypertension</span>
+                <span class="badge badge--success">Confirmed</span>
+              </div>
+            </div>
+            <a href="wireframe-SCR-017-code-review.html" class="btn btn--ghost btn--sm" style="margin-top:var(--space-3);">Review all codes →</a>
+          </div>
+
+          <div class="clinical-card">
+            <div class="clinical-card__title">Recent visits</div>
+            <div style="font-size:var(--font-size-sm);display:flex;flex-direction:column;gap:var(--space-3);">
+              <div style="display:flex;justify-content:space-between;"><span>Feb 14, 2026</span><span style="color:var(--text-secondary);">Follow-up · Dr. Patel</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>Oct 3, 2025</span><span style="color:var(--text-secondary);">Annual · Dr. Chen</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>Mar 12, 2025</span><span style="color:var(--text-secondary);">Urgent · Dr. Kim</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

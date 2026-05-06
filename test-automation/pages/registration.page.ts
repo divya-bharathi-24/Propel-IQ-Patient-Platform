@@ -11,12 +11,8 @@ export class RegistrationPage {
     return this.page.getByLabel('Password');
   }
 
-  get firstNameInput(): Locator {
-    return this.page.getByLabel('First name');
-  }
-
-  get lastNameInput(): Locator {
-    return this.page.getByLabel('Last name');
+  get fullNameInput(): Locator {
+    return this.page.getByLabel('Full Name');
   }
 
   get dobInput(): Locator {
@@ -49,8 +45,7 @@ export class RegistrationPage {
   ): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    await this.firstNameInput.fill(firstName);
-    await this.lastNameInput.fill(lastName);
+    await this.fullNameInput.fill(`${firstName} ${lastName}`);
     await this.dobInput.fill(dateOfBirth);
     await this.phoneInput.fill(phone);
     await this.createAccountButton.click();

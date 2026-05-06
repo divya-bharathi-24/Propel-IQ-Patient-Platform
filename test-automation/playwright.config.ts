@@ -9,12 +9,19 @@ export const STORAGE_STATE_ADMIN   = path.join(__dirname, '.auth', 'admin.json')
 
 export default defineConfig({
   testDir: './',
-  timeout: 30_000,
-  expect: { timeout: 5_000 },
+  timeout: 60_000,           // increased: full-journey steps can take >30 s locally
+  webServer: {
+    command: 'npm start',
+    cwd: path.join(__dirname, '..', 'app'),
+    url: 'http://localhost:4200',
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
+  expect: { timeout: 10_000 }, // increased: URL/element assertions need breathing room
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 4 : undefined,
+  workers: process.env.CI ? 4 : 1, // 1 worker locally: predictable, easier to debug
   reporter: [['html', { open: 'never' }], ['list']],
 
   use: {
@@ -71,7 +78,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
       },
       fullyParallel: false,
-      dependencies: ['setup'],
+      // No dependency on 'setup' — E2E journeys manage their own login steps
     },
   ],
 });

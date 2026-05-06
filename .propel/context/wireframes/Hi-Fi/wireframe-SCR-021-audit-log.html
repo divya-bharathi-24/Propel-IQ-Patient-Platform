@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-021 — Audit Log | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element       | Action | Target Screen                  |
+|---------------|--------|--------------------------------|
+| #back-users   | click  | SCR-020 (User Management)      |
+| #export-csv   | click  | CSV file download (browser)    |
+-->
+<div class="wf-meta">
+  <strong>SCR-021</strong> · Audit Log · High-Fidelity · 1440px · States: Default, Loading, Empty, Error · Admin Role
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section-label">Admin</div>
+      <a href="#" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="wireframe-SCR-020-user-management.html" class="nav-item" id="back-users"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>User Management</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Audit Log</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar" style="background:var(--color-neutral-600);">AD</div><div class="sidebar__user-info"><div class="sidebar__user-name">Admin User</div><div class="sidebar__user-role">Administrator</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1 class="page-header__title">Audit Log</h1>
+      <div class="page-header__actions">
+        <button id="export-csv" class="btn btn--secondary">⬇ Export CSV</button>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+      <!-- Filters -->
+      <div class="card mb-5">
+        <div class="card__body" style="display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:flex-end;">
+          <div class="search-bar" style="flex:1;min-width:200px;">
+            <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="form-input search-bar__input" placeholder="Search by user, action, resource…">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" style="margin-bottom:var(--space-1);">Date from</label>
+            <input type="date" class="form-input" value="2026-05-01">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" style="margin-bottom:var(--space-1);">Date to</label>
+            <input type="date" class="form-input" value="2026-05-06">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" style="margin-bottom:var(--space-1);">Action type</label>
+            <select class="form-input form-select">
+              <option>All actions</option>
+              <option>CREATE</option>
+              <option>READ</option>
+              <option>UPDATE</option>
+              <option>DELETE</option>
+              <option>LOGIN</option>
+              <option>LOGOUT</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" style="margin-bottom:var(--space-1);">User role</label>
+            <select class="form-input form-select">
+              <option>All roles</option>
+              <option>Admin</option>
+              <option>Staff</option>
+              <option>Patient</option>
+            </select>
+          </div>
+          <button class="btn btn--primary">Apply filters</button>
+          <button class="btn btn--ghost btn--sm">Reset</button>
+        </div>
+      </div>
+
+      <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3);">Showing 12 of 3,842 log entries (filtered: May 1–6, 2026)</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Action</th>
+              <th>Resource</th>
+              <th>Details</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 6, 2026<br>9:42:14 AM</td>
+              <td style="font-size:var(--font-size-sm);">Sarah Kim</td>
+              <td><span class="badge badge--info">Staff</span></td>
+              <td><span class="badge badge--success">READ</span></td>
+              <td style="font-size:var(--font-size-sm);">Patient 360° View</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Viewed record for MRN:00481293</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--text-secondary);">192.168.1.42</td>
+            </tr>
+            <tr>
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 6, 2026<br>9:40:02 AM</td>
+              <td style="font-size:var(--font-size-sm);">Sarah Kim</td>
+              <td><span class="badge badge--info">Staff</span></td>
+              <td><span class="badge badge--primary">CREATE</span></td>
+              <td style="font-size:var(--font-size-sm);">Walk-In Booking</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Created appointment for Marcus Johnson</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--text-secondary);">192.168.1.42</td>
+            </tr>
+            <tr>
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 6, 2026<br>9:14:37 AM</td>
+              <td style="font-size:var(--font-size-sm);">Jane Anderson</td>
+              <td><span class="badge badge--primary">Patient</span></td>
+              <td><span class="badge badge--success">READ</span></td>
+              <td style="font-size:var(--font-size-sm);">Patient Dashboard</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Login + dashboard access</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--text-secondary);">10.0.0.14</td>
+            </tr>
+            <tr>
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 6, 2026<br>8:02:11 AM</td>
+              <td style="font-size:var(--font-size-sm);">Sarah Kim</td>
+              <td><span class="badge badge--info">Staff</span></td>
+              <td><span class="badge badge--neutral">LOGIN</span></td>
+              <td style="font-size:var(--font-size-sm);">Auth Service</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Successful authentication</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--text-secondary);">192.168.1.42</td>
+            </tr>
+            <tr style="background:var(--color-error-50);">
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 5, 2026<br>11:58:44 PM</td>
+              <td style="font-size:var(--font-size-sm);color:var(--color-error-700);">Unknown (failed)</td>
+              <td><span class="badge badge--neutral">—</span></td>
+              <td><span class="badge badge--error">FAILED</span></td>
+              <td style="font-size:var(--font-size-sm);">Auth Service</td>
+              <td style="font-size:var(--font-size-xs);color:var(--color-error-700);">3 failed login attempts — admin@unipatient.health</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--color-error-700);">203.0.113.45</td>
+            </tr>
+            <tr>
+              <td style="font-size:var(--font-size-xs);white-space:nowrap;">May 5, 2026<br>3:22:09 PM</td>
+              <td style="font-size:var(--font-size-sm);">Admin User</td>
+              <td><span class="badge badge--neutral">Admin</span></td>
+              <td><span class="badge badge--warning">UPDATE</span></td>
+              <td style="font-size:var(--font-size-sm);">User Management</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Changed role for user ID:4821 to Staff</td>
+              <td style="font-size:var(--font-size-xs);font-family:monospace;color:var(--text-secondary);">10.0.0.1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-5);">
+        <span style="font-size:var(--font-size-sm);color:var(--text-secondary);">Page 1 of 321 · 3,842 total entries</span>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn--secondary btn--sm" disabled>← Prev</button>
+          <button class="btn btn--primary btn--sm">1</button>
+          <button class="btn btn--secondary btn--sm">2</button>
+          <button class="btn btn--secondary btn--sm">…</button>
+          <button class="btn btn--secondary btn--sm">321</button>
+          <button class="btn btn--secondary btn--sm">Next →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

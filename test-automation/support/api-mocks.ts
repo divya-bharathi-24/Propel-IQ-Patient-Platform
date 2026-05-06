@@ -111,6 +111,18 @@ export async function mockAiIntakeLowConfidence(page: Page): Promise<void> {
   );
 }
 
+export async function mockVerifyEmailApi(page: Page): Promise<void> {
+  await page.route('**/api/auth/verify**', (route: Route) =>
+    route.fulfill({ status: 200, json: { verified: true } }),
+  );
+}
+
+export async function mockRegistrationApi(page: Page): Promise<void> {
+  await page.route('**/api/auth/register**', (route: Route) =>
+    route.fulfill({ status: 201, json: { message: 'Verification email sent' } }),
+  );
+}
+
 export async function mockDocumentUploadApi(page: Page, count: number): Promise<void> {
   await page.route('**/api/documents**', (route: Route) =>
     route.fulfill({ status: 201, json: Responses.documentProcessing(count) }),

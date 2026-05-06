@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-002 — Patient Registration | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.reg-shell { min-height: 100vh; background: var(--bg-default); display: flex; flex-direction: column; }
+.reg-header { background: var(--color-teal-900); padding: var(--space-4) var(--space-8); display: flex; align-items: center; gap: var(--space-3); }
+.reg-header__logo { width: 32px; height: 32px; background: var(--primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
+.reg-header__name { color: #fff; font-weight: 600; font-size: var(--font-size-base); }
+.reg-body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: var(--space-10) var(--space-4); }
+.reg-card { width: 100%; max-width: 560px; background: var(--bg-surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); overflow: hidden; }
+.reg-card__header { background: var(--primary-surface); padding: var(--space-6) var(--space-8); border-bottom: 1px solid var(--border-default); }
+.reg-card__header h1 { font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-teal-800); }
+.reg-card__header p { font-size: var(--font-size-sm); color: var(--color-teal-700); margin-top: var(--space-1); }
+.reg-card__body { padding: var(--space-8); }
+.name-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.password-rules { background: var(--bg-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-top: var(--space-2); }
+.rule { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: 2px; }
+.rule.met { color: var(--color-success-700); }
+.rule__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-neutral-300); }
+.rule.met .rule__dot { background: var(--color-success-500); }
+.reg-card__footer { padding: var(--space-5) var(--space-8); background: var(--bg-subtle); border-top: 1px solid var(--border-default); }
+.progress-steps { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); }
+.progress-steps span { flex: 1; height: 4px; border-radius: var(--radius-full); }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element          | Action | Target Screen                   |
+|------------------|--------|---------------------------------|
+| #submit-reg      | click  | SCR-002a (Email Verification)   |
+| #sign-in-link    | click  | SCR-001 (Login)                 |
+-->
+<div class="wf-meta">
+  <strong>SCR-002</strong> · Patient Registration · High-Fidelity · 1440px · States: Default, Validation, Loading, Success · FL-001 Step 2
+</div>
+<div class="reg-shell">
+  <div class="reg-header">
+    <div class="reg-header__logo">+</div>
+    <span class="reg-header__name">UniPatient</span>
+    <span style="margin-left:auto;font-size:var(--font-size-sm);color:rgba(255,255,255,.6);">Already have an account? <a href="wireframe-SCR-001-login.html" id="sign-in-link" style="color:var(--color-teal-300);">Sign in</a></span>
+  </div>
+  <div class="reg-body">
+    <div class="reg-card">
+      <div class="reg-card__header">
+        <h1>Create your account</h1>
+        <p>Get started with UniPatient — secure, HIPAA-compliant patient portal</p>
+      </div>
+      <div class="reg-card__body">
+        <!-- Progress dots -->
+        <div class="progress-steps">
+          <span style="background:var(--primary);"></span>
+          <span style="background:var(--border-default);"></span>
+          <span style="background:var(--border-default);"></span>
+        </div>
+
+        <div class="name-row">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First name <span class="form-label__required">*</span></label>
+            <input id="firstName" type="text" class="form-input" placeholder="Jane" autocomplete="given-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last name <span class="form-label__required">*</span></label>
+            <input id="lastName" type="text" class="form-input" placeholder="Smith" autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Email address <span class="form-label__required">*</span></label>
+          <input id="regEmail" type="email" class="form-input" placeholder="jane@example.com" autocomplete="email">
+          <!-- Validation Error State -->
+          <div class="form-error" role="alert" style="display:none">⚠ A UniPatient account already exists for this email. <a href="wireframe-SCR-001-login.html">Sign in instead.</a></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Password <span class="form-label__required">*</span></label>
+          <input id="regPassword" type="password" class="form-input" placeholder="Create a strong password" autocomplete="new-password">
+          <div class="password-rules">
+            <div class="rule met"><div class="rule__dot"></div> At least 8 characters</div>
+            <div class="rule"><div class="rule__dot"></div> One uppercase letter</div>
+            <div class="rule"><div class="rule__dot"></div> One number</div>
+            <div class="rule"><div class="rule__dot"></div> One special character (!@#$%)</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="dob">Date of birth <span class="form-label__required">*</span></label>
+          <input id="dob" type="date" class="form-input" aria-required="true">
+          <div class="form-hint">This is used to verify your identity when accessing medical records.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone number</label>
+          <input id="phone" type="tel" class="form-input" placeholder="+1 (555) 000-0000" autocomplete="tel">
+          <div class="form-hint">Used for appointment reminders and urgent notifications (optional)</div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-5);">
+          <input type="checkbox" id="terms" style="margin-top:3px;width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;">
+          <label for="terms" style="font-size:var(--font-size-sm);color:var(--text-secondary);">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my health data is protected under HIPAA.
+          </label>
+        </div>
+
+        <a href="wireframe-SCR-002a-email-verification.html" id="submit-reg" class="btn btn--primary btn--full btn--lg" role="button">
+          Create account
+        </a>
+      </div>
+      <div class="reg-card__footer">
+        <p style="font-size:var(--font-size-xs);color:var(--text-secondary);text-align:center;">
+          🔒 Your personal health information is encrypted using AES-256 and never sold to third parties.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

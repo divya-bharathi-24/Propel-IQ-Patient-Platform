@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-004 — Appointment Detail | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.timeline { position:relative; padding-left:var(--space-8); }
+.timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--border-default); }
+.timeline-item { position:relative; margin-bottom:var(--space-5); }
+.timeline-item__dot { position:absolute; left:-26px; top:4px; width:16px; height:16px; border-radius:50%; background:var(--bg-surface); border:2px solid var(--border-default); }
+.timeline-item__dot--done { background:var(--primary); border-color:var(--primary); }
+.timeline-item__dot--active { background:var(--bg-surface); border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-surface); }
+.timeline-item__label { font-size:var(--font-size-xs); color:var(--text-secondary); }
+.timeline-item__title { font-size:var(--font-size-sm); font-weight:500; color:var(--color-neutral-700); margin-top:2px; }
+.detail-row { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid var(--border-default); }
+.detail-row:last-child { border-bottom:none; }
+.detail-row__icon { width:36px; height:36px; background:var(--bg-subtle); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.detail-row__label { font-size:var(--font-size-xs); color:var(--text-secondary); }
+.detail-row__value { font-size:var(--font-size-sm); font-weight:500; color:var(--color-neutral-800); }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element                | Action | Target Screen                     |
+|------------------------|--------|-----------------------------------|
+| #back-dashboard        | click  | SCR-003 (Patient Dashboard)       |
+| #reschedule-btn        | click  | SCR-004a (Reschedule/Cancel)      |
+| #cancel-btn            | click  | OVL-003 (Cancel Confirmation)     |
+| #intake-btn            | click  | SCR-008 (AI Intake)               |
+| #view-provider-info    | click  | Provider detail (out of scope)    |
+-->
+<div class="wf-meta">
+  <strong>SCR-004</strong> · Appointment Detail · High-Fidelity · 1440px · States: Default, Loading, Error · FL-001 / FL-003
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item" id="back-dashboard">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+      </a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Appointments</a>
+      <a href="wireframe-SCR-011-document-upload.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>My Documents</a>
+      <a href="wireframe-SCR-010-patient-profile.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div class="breadcrumb">
+        <a href="wireframe-SCR-003-patient-dashboard.html">Dashboard</a>
+        <span class="breadcrumb__sep">›</span>
+        <a href="#">My Appointments</a>
+        <span class="breadcrumb__sep">›</span>
+        <span>General Check-up</span>
+      </div>
+      <div class="page-header__actions">
+        <a href="wireframe-SCR-004a-reschedule-cancel.html" id="reschedule-btn" class="btn btn--secondary">Reschedule</a>
+        <button id="cancel-btn" class="btn btn--danger">Cancel appointment</button>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:900px;">
+      <!-- Title / status -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-6);">
+        <div>
+          <h1 style="font-size:var(--font-size-2xl);font-weight:700;color:var(--color-neutral-800);margin-bottom:var(--space-2);">General Check-up</h1>
+          <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;">
+            <span class="badge badge--success">✓ Confirmed</span>
+            <span class="badge badge--info">Intake Complete</span>
+            <span class="badge badge--primary">In-person</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:var(--space-6);">
+        <!-- Left: Details -->
+        <div>
+          <div class="card mb-6">
+            <div class="card__header"><span class="card__title">Appointment details</span></div>
+            <div class="card__body">
+              <div class="detail-row">
+                <div class="detail-row__icon">📅</div>
+                <div><div class="detail-row__label">Date</div><div class="detail-row__value">Tuesday, May 20, 2026</div></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-row__icon">🕙</div>
+                <div><div class="detail-row__label">Time</div><div class="detail-row__value">10:00 AM – 10:30 AM (30 min)</div></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-row__icon">👨‍⚕️</div>
+                <div><div class="detail-row__label">Provider</div><div class="detail-row__value">Dr. Raj Patel, MD — Internal Medicine</div></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-row__icon">📍</div>
+                <div><div class="detail-row__label">Location</div><div class="detail-row__value">Main Clinic, Room 204B — 123 Health Ave, Boston MA 02115</div></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-row__icon">🏥</div>
+                <div><div class="detail-row__label">Visit type</div><div class="detail-row__value">Annual wellness exam — preventive</div></div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-row__icon">🔖</div>
+                <div><div class="detail-row__label">Reference #</div><div class="detail-row__value" style="font-family:monospace;">APPT-2026-004821</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Intake Status -->
+          <div class="card mb-6">
+            <div class="card__header">
+              <span class="card__title">Pre-visit intake</span>
+              <a href="wireframe-SCR-008-ai-intake.html" id="intake-btn" class="btn btn--ghost btn--sm">Edit responses</a>
+            </div>
+            <div class="card__body">
+              <div class="alert alert--success" role="status">
+                <span>✓</span>
+                <div>
+                  <div class="alert__title">All intake sections completed</div>
+                  <div class="alert__body">Completed via AI Intake on May 3, 2026. Your provider has access to your responses.</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-top:var(--space-4);">
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Chief complaint</div>
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Medical history</div>
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Medications</div>
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Allergies</div>
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Social history</div>
+                <div style="background:var(--bg-subtle);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--font-size-sm);">✓ Insurance info</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Timeline -->
+        <div>
+          <div class="card mb-6">
+            <div class="card__header"><span class="card__title">Visit journey</span></div>
+            <div class="card__body">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-item__dot timeline-item__dot--done"></div>
+                  <div class="timeline-item__label">Apr 28 · Completed</div>
+                  <div class="timeline-item__title">Appointment booked</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__dot timeline-item__dot--done"></div>
+                  <div class="timeline-item__label">Apr 30 · Completed</div>
+                  <div class="timeline-item__title">Insurance verified</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__dot timeline-item__dot--done"></div>
+                  <div class="timeline-item__label">May 3 · Completed</div>
+                  <div class="timeline-item__title">Pre-visit intake submitted</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__dot timeline-item__dot--active"></div>
+                  <div class="timeline-item__label">May 20 · Upcoming</div>
+                  <div class="timeline-item__title" style="color:var(--primary);font-weight:600;">Visit with Dr. Patel</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__dot"></div>
+                  <div class="timeline-item__label">After visit</div>
+                  <div class="timeline-item__title">After-visit summary &amp; follow-up</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header"><span class="card__title">Reminders</span></div>
+            <div class="card__body" style="font-size:var(--font-size-sm);display:flex;flex-direction:column;gap:var(--space-3);">
+              <div style="display:flex;gap:var(--space-3);align-items:center;"><span>📱</span><span>SMS reminder — May 19 at 5:00 PM</span></div>
+              <div style="display:flex;gap:var(--space-3);align-items:center;"><span>📧</span><span>Email reminder — May 20 at 8:00 AM</span></div>
+              <div style="margin-top:var(--space-2);padding-top:var(--space-3);border-top:1px solid var(--border-default);">
+                <a href="wireframe-SCR-012-calendar-sync.html" style="font-size:var(--font-size-sm);">+ Add to calendar</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

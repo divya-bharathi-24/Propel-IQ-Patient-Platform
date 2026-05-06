@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-020 — User Management | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element          | Action | Target Screen                    |
+|------------------|--------|----------------------------------|
+| #create-user     | click  | OVL-004 (Re-auth modal) → Create user form |
+| #edit-user       | click  | User edit inline / modal         |
+| #audit-link      | click  | SCR-021 (Audit Log)              |
+| #back            | click  | Admin Dashboard (out of scope)   |
+-->
+<div class="wf-meta">
+  <strong>SCR-020</strong> · User Management · High-Fidelity · 1440px · States: Default, Loading, Empty, Validation, Error · FL-007 · Admin Role
+</div>
+
+<div class="app-shell">
+  <!-- Admin Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section-label">Admin</div>
+      <a href="#" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active" aria-current="page">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        User Management
+      </a>
+      <a href="wireframe-SCR-021-audit-log.html" class="nav-item" id="audit-link">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Audit Log
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="avatar" style="background:var(--color-neutral-600);">AD</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name">Admin User</div>
+          <div class="sidebar__user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1 class="page-header__title">User Management</h1>
+      <div class="page-header__actions">
+        <div class="search-bar" style="width:280px;">
+          <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="form-input search-bar__input" placeholder="Search users by name or email…">
+        </div>
+        <select class="form-input form-select" style="width:auto;">
+          <option>All roles</option>
+          <option>Admin</option>
+          <option>Staff</option>
+          <option>Patient</option>
+        </select>
+        <select class="form-input form-select" style="width:auto;">
+          <option>All statuses</option>
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>Pending verification</option>
+        </select>
+        <a href="wireframe-OVL-004-reauth-modal.html" id="create-user" class="btn btn--primary">+ Create user</a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+      <!-- Summary stats -->
+      <div class="grid grid--4 mb-6">
+        <div class="card"><div class="card__body stat-card"><div class="stat-card__label">Total users</div><div class="stat-card__value">1,248</div></div></div>
+        <div class="card"><div class="card__body stat-card"><div class="stat-card__label">Active patients</div><div class="stat-card__value">1,102</div></div></div>
+        <div class="card"><div class="card__body stat-card"><div class="stat-card__label">Staff members</div><div class="stat-card__value">142</div></div></div>
+        <div class="card"><div class="card__body stat-card"><div class="stat-card__label">Pending verification</div><div class="stat-card__value" style="color:var(--color-warning-700);">4</div></div></div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" style="accent-color:var(--primary);"></th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Last login</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary);"></td>
+              <td><div style="display:flex;align-items:center;gap:var(--space-3);"><div class="avatar" style="width:32px;height:32px;font-size:var(--font-size-xs);">JA</div><span style="font-weight:500;">Jane Anderson</span></div></td>
+              <td style="color:var(--text-secondary);">jane.anderson@example.com</td>
+              <td><span class="badge badge--primary">Patient</span></td>
+              <td><span class="badge badge--success">Active</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">May 6, 2026 · 9:14 AM</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Jan 15, 2026</td>
+              <td class="table-actions">
+                <button id="edit-user" class="btn btn--ghost btn--sm">Edit</button>
+                <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">Disable</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary);"></td>
+              <td><div style="display:flex;align-items:center;gap:var(--space-3);"><div class="avatar" style="width:32px;height:32px;font-size:var(--font-size-xs);background:var(--color-info-600);">SK</div><span style="font-weight:500;">Sarah Kim</span></div></td>
+              <td style="color:var(--text-secondary);">s.kim@clinic.health</td>
+              <td><span class="badge badge--info">Staff</span></td>
+              <td><span class="badge badge--success">Active</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">May 6, 2026 · 8:02 AM</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Mar 1, 2025</td>
+              <td class="table-actions">
+                <button class="btn btn--ghost btn--sm">Edit</button>
+                <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">Disable</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary);"></td>
+              <td><div style="display:flex;align-items:center;gap:var(--space-3);"><div class="avatar" style="width:32px;height:32px;font-size:var(--font-size-xs);background:var(--color-neutral-600);">AD</div><span style="font-weight:500;">Admin User</span></div></td>
+              <td style="color:var(--text-secondary);">admin@unipatient.health</td>
+              <td><span class="badge badge--neutral">Admin</span></td>
+              <td><span class="badge badge--success">Active</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">May 6, 2026 · 7:45 AM</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Jan 1, 2025</td>
+              <td class="table-actions">
+                <button class="btn btn--ghost btn--sm">Edit</button>
+                <span style="font-size:var(--font-size-xs);color:var(--text-disabled);">Cannot disable self</span>
+              </td>
+            </tr>
+            <tr style="background:var(--color-warning-50);">
+              <td><input type="checkbox" style="accent-color:var(--primary);"></td>
+              <td><div style="display:flex;align-items:center;gap:var(--space-3);"><div class="avatar" style="width:32px;height:32px;font-size:var(--font-size-xs);background:var(--color-neutral-300);color:var(--color-neutral-700);">NP</div><span style="font-weight:500;">New Patient</span></div></td>
+              <td style="color:var(--text-secondary);">newpatient@example.com</td>
+              <td><span class="badge badge--primary">Patient</span></td>
+              <td><span class="badge badge--warning">Pending</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-disabled);">Never</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">May 6, 2026</td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm">Approve</button>
+                <button class="btn btn--danger btn--sm">Reject</button>
+              </td>
+            </tr>
+            <tr style="opacity:.6;">
+              <td><input type="checkbox" style="accent-color:var(--primary);"></td>
+              <td><div style="display:flex;align-items:center;gap:var(--space-3);"><div class="avatar" style="width:32px;height:32px;font-size:var(--font-size-xs);background:var(--color-neutral-400);">LB</div><span style="font-weight:500;">Lucy Brown</span></div></td>
+              <td style="color:var(--text-secondary);">l.brown@example.com</td>
+              <td><span class="badge badge--primary">Patient</span></td>
+              <td><span class="badge badge--error">Disabled</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Apr 15, 2026</td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Jun 3, 2025</td>
+              <td class="table-actions">
+                <button class="btn btn--ghost btn--sm">Edit</button>
+                <button class="btn btn--secondary btn--sm">Enable</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-5);">
+        <span style="font-size:var(--font-size-sm);color:var(--text-secondary);">Showing 1–5 of 1,248 users</span>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn--secondary btn--sm" disabled>← Prev</button>
+          <button class="btn btn--primary btn--sm">1</button>
+          <button class="btn btn--secondary btn--sm">2</button>
+          <button class="btn btn--secondary btn--sm">3</button>
+          <button class="btn btn--secondary btn--sm">Next →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
