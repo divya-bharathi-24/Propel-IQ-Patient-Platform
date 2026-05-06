@@ -1,0 +1,9 @@
+<a [routerLink]="route" class="quick-action">
+  <div 
+    class="quick-action__icon" 
+    [style.background-color]="iconBg || 'var(--color-primary-100)'"
+  >
+    {{ icon }}
+  </div>
+  <div class="quick-action__label">{{ label }}</div>
+</a>

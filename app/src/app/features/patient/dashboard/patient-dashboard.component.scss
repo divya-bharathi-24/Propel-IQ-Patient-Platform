@@ -1,66 +1,217 @@
-.dashboard-page {
-  padding: 24px 16px;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-}
+// SCR-003: Patient Dashboard - UniPatient Design System
+// Uses design tokens from /app/src/styles/design-tokens.css
 
-.dashboard-header {
-  margin-bottom: 24px;
-}
-
-.dashboard-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-  color: rgba(0, 0, 0, 0.87);
-}
-
-/* Error banner */
-.error-banner {
+.page-header {
+  background: var(--color-surface-primary);
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  margin-bottom: 24px;
-  background-color: #fce4ec;
-  border-left: 4px solid #b71c1c;
-  border-radius: 4px;
-  color: #b71c1c;
-  font-size: 0.875rem;
-}
-
-.retry-button {
-  background: none;
-  border: 1px solid #b71c1c;
-  border-radius: 4px;
-  padding: 4px 12px;
-  color: #b71c1c;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: rgba(183, 28, 28, 0.08);
+  min-height: 80px;
+  
+  &__title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-1);
+    color: var(--color-text-primary);
+  }
+  
+  &__subtitle {
+    font-size: var(--font-size-body-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+  
+  &__actions {
+    display: flex;
+    gap: var(--space-3);
   }
 }
 
-/* Responsive grid */
+.page-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-6);
+}
 
-  /* 768px: two columns */
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+.dashboard-main {
+  min-width: 0;
+}
+
+.dashboard-sidebar {
+  min-width: 0;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+/* Appointment Cards */
+.appt-card {
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  transition: box-shadow var(--motion-duration-normal);
+  text-decoration: none;
+  color: inherit;
+  
+  &:hover {
+    box-shadow: var(--shadow-3);
   }
+  
+  &__date-box {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    text-align: center;
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+  
+  &__month {
+    font-size: var(--font-size-caption);
+    color: var(--color-primary-700);
+    font-weight: var(--font-weight-semibold);
+    display: block;
+  }
+  
+  &__day {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary-800);
+    line-height: var(--line-height-tight);
+  }
+  
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  &__title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+    font-size: var(--font-size-body-lg);
+  }
+  
+  &__meta {
+    font-size: var(--font-size-body-sm);
+    color: var(--color-text-secondary);
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
+  
+  &__actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+}
 
-  /* 1440px: two columns remain but with more padding */
-  @media (min-width: 1440px) {
-    max-width: 1280px;
-    margin: 0 auto;
+/* Skeleton Loaders */
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skeleton-card {
+  height: 120px;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200) 25%,
+    var(--color-neutral-100) 50%,
+    var(--color-neutral-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: var(--space-8);
+  
+  .empty-message {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+}
+
+/* Utility Classes */
+.mb-6 {
+  margin-bottom: var(--space-6);
+}
+
+/* Responsive Design */
+@media (max-width: 1023px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-sidebar {
+    order: -1; /* Move to top on mobile */
+  }
+}
+
+@media (max-width: 767px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    
+    &__actions {
+      width: 100%;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+  
+  .page-body {
+    padding: var(--space-4);
+  }
+  
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .appt-card {
+    flex-direction: column;
+    
+    &__date-box {
+      align-self: flex-start;
+    }
   }
 }
 
