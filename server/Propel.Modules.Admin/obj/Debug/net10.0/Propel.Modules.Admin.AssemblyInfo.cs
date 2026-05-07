@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Admin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+65ef69415743617a8601b577814abe1d250ae04f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b9ee06cc0c538f596320cae1605731d6cbe572f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Admin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Admin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
