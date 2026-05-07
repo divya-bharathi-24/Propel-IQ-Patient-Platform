@@ -7,12 +7,13 @@
  */
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/login.page';
+import { loadRegisteredUser } from '../support/test-user-store';
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:4200';
 
-// Credentials for the test patient
-const TEST_EMAIL    = process.env.TEST_PATIENT_EMAIL    ?? 'auth.patient@propeliq.dev';
-const TEST_PASSWORD = process.env.TEST_PATIENT_PASSWORD ?? 'AuthP@ss001!';
+// Defaults — overridden at runtime by beforeAll if a registered user was saved
+let TEST_EMAIL    = process.env.TEST_PATIENT_EMAIL    ?? 'auth.patient@propeliq.dev';
+let TEST_PASSWORD = process.env.TEST_PATIENT_PASSWORD ?? 'AuthP@ss001!';
 
 /** Mock all APIs needed for the full booking flow. */
 async function mockAllApis(page: import('@playwright/test').Page) {
@@ -129,6 +130,16 @@ async function loginAndGoToBooking(page: import('@playwright/test').Page) {
 }
 
 test.describe('@Booking Appointment Booking Wizard', () => {
+
+  test.beforeAll(() => {
+    // Load at execution time so credentials saved by the registration spec
+    // (which may run in a prior step) are picked up correctly.
+    const stored = loadRegisteredUser();
+    if (stored) {
+      TEST_EMAIL    = stored.email;
+      TEST_PASSWORD = stored.password;
+    }
+  });
 
   test('@Booking TC-BOOK-001: Patient logs in and reaches the booking page', async ({ page }) => {
     await mockAllApis(page);

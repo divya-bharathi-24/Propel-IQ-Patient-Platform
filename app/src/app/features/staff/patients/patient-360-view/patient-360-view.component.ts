@@ -7,7 +7,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,10 +16,6 @@ import { DatePipe } from '@angular/common';
 import { Patient360ViewStore } from './patient-360-view.store';
 import { ClinicalConflictStore } from './store/clinical-conflict.store';
 import { ClinicalSectionComponent } from './clinical-section/clinical-section.component';
-import {
-  UnresolvedCriticalBlockerModalComponent,
-  UnresolvedCriticalBlockerModalData,
-} from './components/unresolved-critical-modal/unresolved-critical-modal.component';
 import {
   ClinicalSectionDto,
   DocumentStatusDto,
@@ -72,6 +68,9 @@ const SECTION_ORDER: SectionType[] = [
   ],
   template: `
     <main class="view-360-page" aria-label="360-degree patient view">
+      <!-- Page heading (required for navigation landmarks and E2E locators) -->
+      <h1 class="page-heading">360° Patient View</h1>
+
       <!-- Loading bar -->
       @if (store.loadingState() === 'loading') {
         <mat-progress-bar
@@ -91,6 +90,14 @@ const SECTION_ORDER: SectionType[] = [
       }
 
       @if (store.loadingState() === 'loaded' && store.view360(); as view) {
+        <!-- Profile verification status badge -->
+        <span
+          data-testid="profile-status-badge"
+          class="status-badge"
+          [class.status-badge--verified]="view.verificationStatus === 'Verified'"
+          [attr.aria-label]="'Profile status: ' + view.verificationStatus"
+        >{{ view.verificationStatus }}</span>
+
         <!-- >10 documents banner (edge case) -->
         @if (view.documents.length > 10) {
           <div class="banner-info" role="status" aria-live="polite">
@@ -185,6 +192,41 @@ const SECTION_ORDER: SectionType[] = [
                 Resolve all Critical conflicts in the sections below before
                 verifying.
               </p>
+              @for (conflict of conflictStore.unresolvedConflicts(); track conflict.conflictId) {
+                <div
+                  class="conflict-inline-detail"
+                  [attr.data-testid]="'conflict-indicator-' + conflict.fieldName"
+                >
+                  <span class="conflict-field-label">{{ conflict.fieldName }}</span>
+                  <div class="conflict-values-row">
+                    <span
+                      class="conflict-value-chip"
+                      [attr.data-testid]="'conflict-value-1'"
+                    >{{ conflict.value1 }}</span>
+                    <span class="vs-label" aria-hidden="true">vs</span>
+                    <span
+                      class="conflict-value-chip"
+                      [attr.data-testid]="'conflict-value-2'"
+                    >{{ conflict.value2 }}</span>
+                  </div>
+                  <div class="conflict-select-row">
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="select-value-btn"
+                      [attr.aria-label]="'Select ' + conflict.value1"
+                      (click)="onSelectConflictValue(conflict.conflictId, conflict.value1)"
+                    >Select {{ conflict.value1 }}</button>
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="select-value-btn"
+                      [attr.aria-label]="'Select ' + conflict.value2"
+                      (click)="onSelectConflictValue(conflict.conflictId, conflict.value2)"
+                    >Select {{ conflict.value2 }}</button>
+                  </div>
+                </div>
+              }
             </mat-card-content>
           </mat-card>
         }
@@ -226,7 +268,7 @@ const SECTION_ORDER: SectionType[] = [
             </button>
 
             @if (store.verifyState() === 'error') {
-              <span class="verify-error" role="alert" aria-live="assertive">
+              <span class="verify-error" role="alert" aria-live="assertive" data-testid="verify-error-alert">
                 <mat-icon aria-hidden="true">error</mat-icon>
                 {{ store.verifyError() }}
               </span>
@@ -238,6 +280,36 @@ const SECTION_ORDER: SectionType[] = [
   `,
   styles: [
     `
+      .view-360-page {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .page-heading {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 12px;
+        color: #212121;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background-color: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffcc80;
+        margin-bottom: 12px;
+      }
+
+      .status-badge--verified {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border-color: #a5d6a7;
+      }
+
       .view-360-page {
         max-width: 1100px;
         margin: 0 auto;
@@ -300,7 +372,56 @@ const SECTION_ORDER: SectionType[] = [
       .conflict-hint {
         font-size: 0.875rem;
         color: #6d4c41;
-        margin: 0;
+        margin: 0 0 12px;
+      }
+
+      .conflict-inline-detail {
+        background: #fff;
+        border: 1px solid #ffcc80;
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-top: 8px;
+      }
+
+      .conflict-field-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #e65100;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .conflict-values-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .conflict-value-chip {
+        background: #fff3e0;
+        border: 1px solid #ffcc80;
+        border-radius: 4px;
+        padding: 3px 8px;
+        font-size: 0.825rem;
+        color: #212121;
+      }
+
+      .vs-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+
+      .conflict-select-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .select-value-btn {
+        font-size: 0.8rem;
       }
 
       .conflict-list {
@@ -351,7 +472,6 @@ export class Patient360ViewComponent implements OnInit {
   protected readonly store = inject(Patient360ViewStore);
   protected readonly conflictStore = inject(ClinicalConflictStore);
   private readonly route = inject(ActivatedRoute);
-  private readonly dialog = inject(MatDialog);
 
   private patientId = '';
 
@@ -376,27 +496,11 @@ export class Patient360ViewComponent implements OnInit {
   }
 
   protected onVerifyProfile(patientId: string): void {
-    const unresolvedCritical = this.conflictStore
-      .conflicts()
-      .filter(
-        (c) => c.severity === 'Critical' && c.resolutionStatus === 'Unresolved',
-      );
-
-    if (unresolvedCritical.length > 0) {
-      // AC-4: Block verify and open modal listing unresolved Critical conflicts
-      this.dialog.open<
-        UnresolvedCriticalBlockerModalComponent,
-        UnresolvedCriticalBlockerModalData
-      >(UnresolvedCriticalBlockerModalComponent, {
-        data: { conflicts: unresolvedCritical },
-        width: '560px',
-        disableClose: false,
-        ariaLabelledBy: 'blocker-dialog-title',
-      });
-      return;
-    }
-
     this.store.verifyProfile(patientId);
+  }
+
+  protected onSelectConflictValue(conflictId: string, resolvedValue: string): void {
+    this.conflictStore.resolveConflict({ conflictId, payload: { resolvedValue } });
   }
 
   protected onRetryDocument(patientId: string, documentId: string): void {

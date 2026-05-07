@@ -134,6 +134,11 @@ export class DocumentUploadComponent implements OnInit {
     return this.store.selectedFiles().filter((f) => !errors[f.name]);
   }
 
+  /** Count of successfully uploaded files in the current batch result. */
+  protected get successUploadCount(): number {
+    return this.store.uploadResult()?.filter((r) => r.success).length ?? 0;
+  }
+
   /** True when there are valid (error-free) files and no upload is in progress. */
   protected get canUpload(): boolean {
     return this.validFiles.length > 0 && !this.store.isUploading();

@@ -20,11 +20,21 @@ export class IntakePage {
   }
 
   get sendButton(): Locator {
-    return this.page.getByRole('button', { name: 'Send' });
+    return this.page.getByRole('button', { name: 'Send message' });
   }
 
   get medicationsPreview(): Locator {
-    return this.page.getByTestId('intake-preview-medications');
+    return this.page.getByRole('complementary', { name: /Live form preview/i });
+  }
+
+  /**
+   * The extracted medications value field.
+   * Once the AI session completes, the preview switches to edit mode
+   * and values are rendered inside <input> elements (not <span> text).
+   * Use toHaveValue() on this locator instead of toContainText() on the aside.
+   */
+  get medicationsValueField(): Locator {
+    return this.page.getByRole('textbox', { name: 'Medications' });
   }
 
   get allergiesPreview(): Locator {
@@ -40,7 +50,7 @@ export class IntakePage {
   }
 
   get submitIntakeButton(): Locator {
-    return this.page.getByRole('button', { name: 'Submit intake' });
+    return this.page.getByRole('button', { name: /Confirm and submit intake form/i });
   }
 
   get autosaveIndicator(): Locator {

@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 import { RegistrationPage } from '../pages/registration.page';
 import { LoginPage } from '../pages/login.page';
 import { mockNotificationApi } from '../support/api-mocks';
+import { saveRegisteredUser } from '../support/test-user-store';
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:4200';
 
@@ -31,6 +32,7 @@ test.describe('@Registration Patient Registration and Login', () => {
     await test.step('Fill in registration form', async () => {
       const reg = new RegistrationPage(page);
       await reg.register(TEST_EMAIL, TEST_PASSWORD, FIRST_NAME, LAST_NAME, DATE_OF_BIRTH, PHONE);
+      saveRegisteredUser({ email: TEST_EMAIL, password: TEST_PASSWORD, firstName: FIRST_NAME, lastName: LAST_NAME });
     });
 
     await test.step('Verify "Check Your Email" page shown after registration', async () => {

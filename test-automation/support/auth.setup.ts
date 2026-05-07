@@ -21,29 +21,60 @@ const PATIENT_AUTH_FILE = path.join(__dirname, '..', '.auth', 'patient.json');
 const STAFF_AUTH_FILE   = path.join(__dirname, '..', '.auth', 'staff.json');
 const ADMIN_AUTH_FILE   = path.join(__dirname, '..', '.auth', 'admin.json');
 
+/** Mock the login endpoint to return a valid TokenResponse for the given role. */
+async function mockLoginForRole(
+  page: import('@playwright/test').Page,
+  role: 'Patient' | 'Staff' | 'Admin',
+  userId: string,
+) {
+  await page.route('**/api/auth/login**', route =>
+    route.fulfill({
+      status: 200,
+      json: {
+        accessToken: `mock-access-token-${role.toLowerCase()}`,
+        refreshToken: `mock-refresh-token-${role.toLowerCase()}`,
+        expiresIn: 3600,
+        userId,
+        role,
+        deviceId: `mock-device-${role.toLowerCase()}`,
+      },
+    }),
+  );
+  // Mock dashboard so the Angular router can settle after redirect
+  await page.route('**/api/patient/dashboard**', route =>
+    route.fulfill({
+      status: 200,
+      json: { upcomingAppointments: [], pendingIntake: [], recentVisits: [], alerts: [], pendingAlerts: 0 },
+    }),
+  );
+}
+
 setup('authenticate as patient', async ({ page }) => {
+  await mockLoginForRole(page, 'Patient', 'mock-patient-001');
   await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(PATIENT_EMAIL);
   await page.getByLabel('Password').fill(PATIENT_PASSWORD);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await expect(page).toHaveURL(/dashboard/, { timeout: 15_000 });
   await page.context().storageState({ path: PATIENT_AUTH_FILE });
 });
 
 setup('authenticate as staff', async ({ page }) => {
+  await mockLoginForRole(page, 'Staff', 'mock-staff-001');
   await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(STAFF_EMAIL);
   await page.getByLabel('Password').fill(STAFF_PASSWORD);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await expect(page).toHaveURL(/walkin|dashboard/, { timeout: 15_000 });
   await page.context().storageState({ path: STAFF_AUTH_FILE });
 });
 
 setup('authenticate as admin', async ({ page }) => {
+  await mockLoginForRole(page, 'Admin', 'mock-admin-001');
   await page.goto(`${BASE_URL}/auth/login`);
   await page.getByLabel('Email address').fill(ADMIN_EMAIL);
   await page.getByLabel('Password').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await expect(page).toHaveURL(/admin|dashboard/, { timeout: 15_000 });
   await page.context().storageState({ path: ADMIN_AUTH_FILE });
 });

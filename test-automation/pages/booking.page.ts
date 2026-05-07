@@ -8,15 +8,15 @@ export class BookingPage {
   }
 
   get insuranceProviderInput(): Locator {
-    return this.page.getByLabel('Insurance provider');
+    return this.page.getByLabel('Insurer name');
   }
 
   get memberIdInput(): Locator {
-    return this.page.getByLabel('Member ID');
+    return this.page.getByLabel('Insurance member ID');
   }
 
   get verifyInsuranceButton(): Locator {
-    return this.page.getByRole('button', { name: 'Verify insurance' });
+    return this.page.getByRole('button', { name: /Run insurance pre-check/i });
   }
 
   get insuranceStatusBadge(): Locator {

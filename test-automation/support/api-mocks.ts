@@ -35,11 +35,29 @@ export const Responses = {
     ...fields,
   }),
 
-  documentProcessing: (count: number) =>
+  /** Upload batch response envelope: `{ files: UploadFileResult[] }` (POST /api/documents/upload). */
+  documentUploadBatch: (count: number) => ({
+    files: Array.from({ length: count }, (_, i) => ({
+      fileName: `e2e_doc_${i + 1}.pdf`,
+      success: true,
+      document: {
+        id: `doc-${i + 1}`,
+        fileName: `e2e_doc_${i + 1}.pdf`,
+        fileSize: (i + 1) * 3 * 1024 * 1024,
+        uploadedAt: new Date().toISOString(),
+        processingStatus: 'Pending',
+      },
+    })),
+  }),
+
+  /** History list: `ClinicalDocumentDto[]` (GET /api/documents). */
+  documentHistory: (count: number) =>
     Array.from({ length: count }, (_, i) => ({
       id: `doc-${i + 1}`,
+      fileName: `e2e_doc_${i + 1}.pdf`,
+      fileSize: (i + 1) * 3 * 1024 * 1024,
+      uploadedAt: new Date().toISOString(),
       processingStatus: 'Pending',
-      storagePath: `/encrypted/doc-${i + 1}.pdf`,
     })),
 
   waitlistEntry: (patientEmail: string, slotId: string, status = 'Active') => ({
@@ -50,8 +68,9 @@ export const Responses = {
   }),
 
   patientProfile: (status: 'Verified' | 'Unverified' = 'Verified') => ({
-    status,
-    conflicts: [],
+    verificationStatus: status,
+    verifiedAt: new Date().toISOString(),
+    verifiedByStaffName: 'Staff User',
   }),
 
   medicalCodes: (icd10: string, cpt: string) => [
@@ -112,8 +131,13 @@ export async function mockAiIntakeLowConfidence(page: Page): Promise<void> {
 }
 
 export async function mockDocumentUploadApi(page: Page, count: number): Promise<void> {
-  await page.route('**/api/documents**', (route: Route) =>
-    route.fulfill({ status: 201, json: Responses.documentProcessing(count) }),
+  // POST /api/documents/upload — batch upload result envelope { files: UploadFileResult[] }
+  await page.route('**/api/documents/upload**', (route: Route) =>
+    route.fulfill({ status: 201, json: Responses.documentUploadBatch(count) }),
+  );
+  // GET /api/documents — upload history ClinicalDocumentDto[]
+  await page.route('**/api/documents', (route: Route) =>
+    route.fulfill({ status: 200, json: Responses.documentHistory(count) }),
   );
 }
 
@@ -136,13 +160,13 @@ export async function mockArrivedForbidden(page: Page): Promise<void> {
 }
 
 export async function mockProfileVerifyBlocked(page: Page): Promise<void> {
-  await page.route('**/api/patients/**/360/verify', (route: Route) =>
+  await page.route('**/api/staff/patients/**/360-view/verify', (route: Route) =>
     route.fulfill({ status: 422, json: Responses.http422() }),
   );
 }
 
 export async function mockProfileVerifySuccess(page: Page): Promise<void> {
-  await page.route('**/api/patients/**/360/verify', (route: Route) =>
+  await page.route('**/api/staff/patients/**/360-view/verify', (route: Route) =>
     route.fulfill({ status: 200, json: Responses.patientProfile('Verified') }),
   );
 }

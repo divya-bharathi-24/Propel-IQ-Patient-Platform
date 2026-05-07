@@ -18,7 +18,7 @@ export class DocumentUploadPage {
   }
 
   get uploadButton(): Locator {
-    return this.page.getByRole('button', { name: 'Upload documents' });
+    return this.page.getByRole('button', { name: 'Upload selected PDF files' });
   }
 
   get progressBar(): Locator {
