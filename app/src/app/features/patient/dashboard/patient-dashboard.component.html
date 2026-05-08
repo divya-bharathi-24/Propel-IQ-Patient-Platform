@@ -79,7 +79,7 @@
           ) {
             <div class="appointments-list">
               @for (appt of dashboard()!.upcomingAppointments; track appt.id) {
-                <a href="#" class="appt-card">
+                <a [routerLink]="['/appointments', appt.id]" class="appt-card">
                   <div class="appt-card__date-box">
                     <span class="appt-card__month">{{ appt.date | date: "MMM" | uppercase }}</span>
                     <span class="appt-card__day">{{ appt.date | date: "d" }}</span>

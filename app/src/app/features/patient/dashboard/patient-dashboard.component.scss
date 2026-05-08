@@ -1,6 +1,13 @@
 // SCR-003: Patient Dashboard - UniPatient Design System
 // Uses design tokens from /app/src/styles/design-tokens.css
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
 .page-header {
   background: var(--color-surface-primary);
   padding: var(--space-6);
@@ -9,6 +16,7 @@
   align-items: center;
   justify-content: space-between;
   min-height: 80px;
+  flex-shrink: 0;
   
   &__title {
     font-size: var(--font-size-h3);

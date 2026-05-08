@@ -12,6 +12,24 @@ html, body {
   margin: 0; 
   font-family: var(--font-family-base, Roboto, "Helvetica Neue", sans-serif); 
   background-color: var(--color-background-default, white);
+  overflow: hidden;
+}
+
+/* Global app scrolling setup */
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+router-outlet + * {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 
 .sr-only { 

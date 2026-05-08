@@ -12,6 +12,15 @@ export const appointmentRoutes: Routes = [
     title: 'Book Appointment — Propel IQ',
   },
   {
+    path: ':id',
+    loadComponent: () =>
+      import('./components/appointment-detail/appointment-detail.component').then(
+        (m) => m.AppointmentDetailComponent,
+      ),
+    canActivate: [authGuard],
+    title: 'Appointment Details — Propel IQ',
+  },
+  {
     path: ':id/reschedule',
     loadComponent: () =>
       import('./components/reschedule-wizard/reschedule-wizard.component').then(

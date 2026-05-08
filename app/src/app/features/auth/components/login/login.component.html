@@ -7,14 +7,14 @@
     <div class="hero-content">
       <div class="logo">
         <div class="logo-icon">+</div>
-        <span>UniPatient</span>
+        <h1 class="logo-text">UniPatient</h1>
       </div>
       <h2 class="hero-tagline">Seamless Healthcare Access</h2>
       <ul class="hero-features">
-        <li>Book appointments with ease</li>
-        <li>AI-powered intake forms</li>
-        <li>Secure document sharing</li>
-        <li>Real-time queue updates</li>
+        <li><span class="checkmark">✓</span>Book appointments with ease</li>
+        <li><span class="checkmark">✓</span>AI-powered intake forms</li>
+        <li><span class="checkmark">✓</span>Secure document sharing</li>
+        <li><span class="checkmark">✓</span>Real-time queue updates</li>
       </ul>
     </div>
   </section>
@@ -23,8 +23,8 @@
   <section class="form-section" id="main-content">
     <div class="form-container">
       <div class="form-header">
-        <h1 id="login-title">Sign In</h1>
-        <p>Access your UniPatient account</p>
+        <h2 id="login-title">Sign In</h2>
+        <p class="subtitle">Access your UniPatient account</p>
       </div>
 
       <!-- Session-expiry / idle-timeout banner (non-dismissable) -->
@@ -62,7 +62,7 @@
         <!-- Email -->
         <div class="form-group">
           <label for="email" class="form-label">
-            Email Address <span class="form-label__required" aria-label="required">*</span>
+            Email Address <span class="required">*</span><span class="privacy-note">We'll never share your email with anyone else.</span>
           </label>
           <input
             id="email"
@@ -72,7 +72,7 @@
             aria-required="true"
             [attr.aria-invalid]="emailControl.invalid && emailControl.touched"
             [attr.aria-describedby]="
-              emailControl.invalid && emailControl.touched ? 'email-error' : 'email-hint'
+              emailControl.invalid && emailControl.touched ? 'email-error' : null
             "
             placeholder="jane@example.com"
             class="form-input"
@@ -87,15 +87,13 @@
                 Please enter a valid email address.
               }
             </span>
-          } @else {
-            <span id="email-hint" class="form-hint">We'll never share your email with anyone else.</span>
           }
         </div>
 
         <!-- Password -->
         <div class="form-group">
           <label for="password" class="form-label">
-            Password <span class="form-label__required" aria-label="required">*</span>
+            Password <span class="required">*</span>
           </label>
           <input
             id="password"
@@ -128,7 +126,7 @@
         <!-- Submit -->
         <button
           type="submit"
-          class="btn btn--primary"
+          class="btn-signin"
           [disabled]="isSubmitting()"
           [attr.aria-busy]="isSubmitting()"
           aria-label="Sign in to your account"
@@ -139,17 +137,16 @@
             <span>Sign in</span>
           }
         </button>
-
-        <!-- Forgot Password Link -->
-        <div class="form-footer">
-          <a href="#" class="forgot-password-link">Forgot password?</a>
-        </div>
       </form>
 
-      <!-- Create Account Link -->
-      <div class="register-link">
+      <!-- Forgot Password & Register Links -->
+      <div class="form-footer">
+        <a href="#" class="link-primary">Forgot password?</a>
+      </div>
+      
+      <div class="register-prompt">
         <span>Don't have an account?</span>
-        <a routerLink="/auth/register" id="create-account-link">Create account</a>
+        <a routerLink="/auth/register" class="link-primary">Create account</a>
       </div>
     </div>
   </section>
