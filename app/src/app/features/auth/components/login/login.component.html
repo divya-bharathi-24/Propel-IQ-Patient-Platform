@@ -1,116 +1,156 @@
-<main class="auth-container" role="main" aria-labelledby="login-title">
-  <section class="auth-card">
-    <h1 id="login-title">Sign In</h1>
-    <p class="subtitle">Access your Propel IQ Patient Platform account</p>
+<!-- Skip to Content Link for Accessibility -->
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
 
-    <!-- Session-expiry / idle-timeout banner (non-dismissable) -->
-    @if (sessionBannerMessage()) {
-      <div
-        class="session-banner"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        {{ sessionBannerMessage() }}
+<main class="login-container" role="main" aria-labelledby="login-title">
+  <!-- Hero Section (Left Panel) -->
+  <section class="hero-section" aria-label="Welcome to UniPatient">
+    <div class="hero-content">
+      <div class="logo">
+        <div class="logo-icon">+</div>
+        <span>UniPatient</span>
       </div>
-    }
+      <h2 class="hero-tagline">Seamless Healthcare Access</h2>
+      <ul class="hero-features">
+        <li>Book appointments with ease</li>
+        <li>AI-powered intake forms</li>
+        <li>Secure document sharing</li>
+        <li>Real-time queue updates</li>
+      </ul>
+    </div>
+  </section>
 
-    <!-- Server-side credential error -->
-    @if (serverError()) {
-      <div
-        class="server-error"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        {{ serverError() }}
+  <!-- Login Form Section (Right Panel) -->
+  <section class="form-section" id="main-content">
+    <div class="form-container">
+      <div class="form-header">
+        <h1 id="login-title">Sign In</h1>
+        <p>Access your UniPatient account</p>
       </div>
-    }
 
-    <form
-      [formGroup]="form"
-      (ngSubmit)="onSubmit()"
-      novalidate
-      aria-describedby="login-instructions"
-    >
-      <p id="login-instructions" class="sr-only">All fields are required.</p>
+      <!-- Session-expiry / idle-timeout banner (non-dismissable) -->
+      @if (sessionBannerMessage()) {
+        <div
+          class="alert alert--warning"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          {{ sessionBannerMessage() }}
+        </div>
+      }
 
-      <!-- Email -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Email Address</mat-label>
-        <input
-          matInput
-          id="email"
-          formControlName="email"
-          type="email"
-          autocomplete="email"
-          aria-required="true"
-          [attr.aria-describedby]="
-            emailControl.invalid && emailControl.touched ? 'email-error' : null
-          "
-          placeholder="jane@example.com"
-        />
-        @if (emailControl.invalid && emailControl.touched) {
-          <mat-error id="email-error" role="alert">
-            @if (emailControl.hasError("required")) {
-              Email address is required.
-            }
-            @if (emailControl.hasError("email")) {
-              Please enter a valid email address.
-            }
-          </mat-error>
-        }
-      </mat-form-field>
+      <!-- Server-side credential error -->
+      @if (serverError()) {
+        <div
+          class="alert alert--error"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          {{ serverError() }}
+        </div>
+      }
 
-      <!-- Password -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Password</mat-label>
-        <input
-          matInput
-          id="password"
-          formControlName="password"
-          type="password"
-          autocomplete="current-password"
-          aria-required="true"
-          [attr.aria-describedby]="
-            passwordControl.invalid && passwordControl.touched
-              ? 'password-error'
-              : null
-          "
-          placeholder="Your password"
-        />
-        @if (passwordControl.invalid && passwordControl.touched) {
-          <mat-error id="password-error" role="alert">
-            @if (passwordControl.hasError("required")) {
-              Password is required.
-            }
-            @if (passwordControl.hasError("minlength")) {
-              Password must be at least 8 characters.
-            }
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <!-- Submit -->
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        class="full-width submit-btn"
-        [disabled]="isSubmitting()"
-        aria-label="Sign in to your account"
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        novalidate
+        aria-describedby="login-instructions"
       >
-        @if (isSubmitting()) {
-          <mat-spinner diameter="20" aria-label="Signing in…"></mat-spinner>
-        } @else {
-          Sign In
-        }
-      </button>
-    </form>
+        <p id="login-instructions" class="sr-only">All fields are required.</p>
 
-    <p class="register-link">
-      Don't have an account?
-      <a routerLink="/auth/register">Create one</a>
-    </p>
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            Email Address <span class="form-label__required" aria-label="required">*</span>
+          </label>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            aria-required="true"
+            [attr.aria-invalid]="emailControl.invalid && emailControl.touched"
+            [attr.aria-describedby]="
+              emailControl.invalid && emailControl.touched ? 'email-error' : 'email-hint'
+            "
+            placeholder="jane@example.com"
+            class="form-input"
+            [class.error]="emailControl.invalid && emailControl.touched"
+          />
+          @if (emailControl.invalid && emailControl.touched) {
+            <span id="email-error" class="form-error" role="alert">
+              @if (emailControl.hasError("required")) {
+                Email address is required.
+              }
+              @if (emailControl.hasError("email")) {
+                Please enter a valid email address.
+              }
+            </span>
+          } @else {
+            <span id="email-hint" class="form-hint">We'll never share your email with anyone else.</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            Password <span class="form-label__required" aria-label="required">*</span>
+          </label>
+          <input
+            id="password"
+            formControlName="password"
+            type="password"
+            autocomplete="current-password"
+            aria-required="true"
+            [attr.aria-invalid]="passwordControl.invalid && passwordControl.touched"
+            [attr.aria-describedby]="
+              passwordControl.invalid && passwordControl.touched
+                ? 'password-error'
+                : null
+            "
+            placeholder="Enter your password"
+            class="form-input"
+            [class.error]="passwordControl.invalid && passwordControl.touched"
+          />
+          @if (passwordControl.invalid && passwordControl.touched) {
+            <span id="password-error" class="form-error" role="alert">
+              @if (passwordControl.hasError("required")) {
+                Password is required.
+              }
+              @if (passwordControl.hasError("minlength")) {
+                Password must be at least 8 characters.
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="isSubmitting()"
+          [attr.aria-busy]="isSubmitting()"
+          aria-label="Sign in to your account"
+        >
+          @if (isSubmitting()) {
+            <span>Signing in...</span>
+          } @else {
+            <span>Sign in</span>
+          }
+        </button>
+
+        <!-- Forgot Password Link -->
+        <div class="form-footer">
+          <a href="#" class="forgot-password-link">Forgot password?</a>
+        </div>
+      </form>
+
+      <!-- Create Account Link -->
+      <div class="register-link">
+        <span>Don't have an account?</span>
+        <a routerLink="/auth/register" id="create-account-link">Create account</a>
+      </div>
+    </div>
   </section>
 </main>

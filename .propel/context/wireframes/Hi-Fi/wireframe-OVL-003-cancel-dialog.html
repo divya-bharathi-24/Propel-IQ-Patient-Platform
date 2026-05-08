@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-003 — Cancel Appointment Dialog | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element           | Action | Target Screen               |
+|-------------------|--------|-----------------------------|
+| #confirm-cancel   | click  | SCR-003 (Patient Dashboard) |
+| #keep-appt        | click  | SCR-004 (Appointment Detail)|
+-->
+<div class="wf-meta">
+  <strong>OVL-003</strong> · Cancel Appointment Confirmation Dialog · High-Fidelity · Applied to SCR-004a
+</div>
+
+<!-- Blurred background -->
+<div style="min-height:100vh;background:var(--bg-default);padding:var(--space-8);opacity:.3;pointer-events:none;filter:blur(2px);">
+  <div style="height:64px;background:var(--bg-surface);border-radius:var(--radius-md);margin-bottom:var(--space-6);"></div>
+  <div class="card" style="padding:var(--space-8);max-width:600px;"><div class="skeleton skeleton--card"></div></div>
+</div>
+
+<!-- Dialog -->
+<div class="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-desc" style="position:fixed;">
+  <div class="modal">
+    <div class="modal__header">
+      <h2 class="modal__title" id="cancel-title" style="display:flex;align-items:center;gap:var(--space-3);">
+        <span style="color:var(--color-error-500);font-size:24px;">⚠</span> Cancel appointment?
+      </h2>
+      <button class="modal__close" aria-label="Close dialog">×</button>
+    </div>
+    <div class="modal__body">
+      <div style="background:var(--bg-subtle);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-5);">
+        <div style="font-weight:600;margin-bottom:var(--space-1);">General Check-up</div>
+        <div style="font-size:var(--font-size-sm);color:var(--text-secondary);">Tuesday, May 20, 2026 · 10:00 AM · Dr. Raj Patel</div>
+      </div>
+      <p id="cancel-desc" style="color:var(--text-secondary);margin-bottom:var(--space-5);">
+        Are you sure you want to cancel this appointment? This action cannot be undone.
+      </p>
+      <div class="alert alert--warning" style="margin-bottom:var(--space-5);">
+        <span>ℹ</span>
+        <div class="alert__body">
+          Cancelling less than 24 hours before your appointment (May 20) may incur a <strong>$25 late cancellation fee</strong> per clinic policy.
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason for cancellation (optional)</label>
+        <select class="form-input form-select">
+          <option value="">Select a reason…</option>
+          <option>Schedule conflict</option>
+          <option>Feeling better</option>
+          <option>Provider unavailable</option>
+          <option>Transportation issue</option>
+          <option>Financial concern</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <a href="wireframe-SCR-004-appointment-detail.html" id="keep-appt" class="btn btn--secondary">Keep appointment</a>
+      <a href="wireframe-SCR-003-patient-dashboard.html" id="confirm-cancel" class="btn btn--danger">Yes, cancel appointment</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-006 — Insurance Pre-Check | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element           | Action | Target Screen                   |
+|-------------------|--------|---------------------------------|
+| #continue-btn     | click  | SCR-008 (AI Intake) or SCR-007 (Booking Confirmation) |
+| #back-btn         | click  | SCR-005 (Slot Selection)        |
+| alert--verified   | shown  | Insurance verified state        |
+| alert--not-found  | shown  | Insurance not recognized state  |
+| alert--incomplete | shown  | Incomplete info state           |
+-->
+<div class="wf-meta">
+  <strong>SCR-006</strong> · Insurance Pre-Check · High-Fidelity · 1440px · States: Default, Verified, Not Recognized, Incomplete, Loading · FL-001 Step 5
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>My Appointments</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div class="breadcrumb">
+        <a href="wireframe-SCR-005-slot-selection.html" id="back-btn">← Back to slot selection</a>
+      </div>
+      <div class="page-header__actions">
+        <span class="badge badge--primary">Step 3 of 4</span>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:700px;">
+      <h1 style="font-size:var(--font-size-2xl);font-weight:700;margin-bottom:var(--space-2);">Insurance verification</h1>
+      <p style="color:var(--text-secondary);margin-bottom:var(--space-6);">Enter your insurance details — we'll verify eligibility in real time before confirming your appointment.</p>
+
+      <!-- ── STATE: Verified (active in this demo) ── -->
+      <div class="alert alert--success mb-6" id="alert-verified" role="status">
+        <span>✓</span>
+        <div>
+          <div class="alert__title">Insurance verified!</div>
+          <div class="alert__body">BlueCross BlueShield PPO — Member ID ending •••4521. Your plan is active and covers this visit type (General Check-up). Est. copay: <strong>$25</strong>.</div>
+        </div>
+      </div>
+
+      <!-- ── STATE: Not Recognized (hidden) ── -->
+      <div class="alert alert--error mb-6" id="alert-not-found" style="display:none" role="alert">
+        <span>⚠</span>
+        <div>
+          <div class="alert__title">Insurance not recognized</div>
+          <div class="alert__body">We couldn't verify your insurance with the provided details. Please double-check your member ID and payer name, or continue and settle at the front desk.</div>
+        </div>
+      </div>
+
+      <!-- ── STATE: Incomplete (hidden) ── -->
+      <div class="alert alert--warning mb-6" id="alert-incomplete" style="display:none" role="alert">
+        <span>⚠</span>
+        <div>
+          <div class="alert__title">Incomplete insurance information</div>
+          <div class="alert__body">Some fields are missing. Please complete all required fields to verify your insurance before booking.</div>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <div class="card__header"><span class="card__title">Insurance information</span></div>
+        <div class="card__body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+            <div class="form-group" style="grid-column:span 2;">
+              <label class="form-label">Insurance provider / payer <span class="form-label__required">*</span></label>
+              <input type="text" class="form-input" value="BlueCross BlueShield" placeholder="e.g. Aetna, UnitedHealth…">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Member ID <span class="form-label__required">*</span></label>
+              <input type="text" class="form-input form-input--masked" value="BCB••••4521" placeholder="Your member ID">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Group number</label>
+              <input type="text" class="form-input" value="GRP-88201" placeholder="Group / policy number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plan type <span class="form-label__required">*</span></label>
+              <select class="form-input form-select">
+                <option selected>PPO</option>
+                <option>HMO</option>
+                <option>EPO</option>
+                <option>POS</option>
+                <option>HDHP / HSA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Policy holder</label>
+              <select class="form-input form-select">
+                <option selected>Self</option>
+                <option>Spouse</option>
+                <option>Parent</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:var(--space-4);padding:var(--space-4);background:var(--color-success-50);border-radius:var(--radius-md);border:1px solid var(--color-success-500);">
+            <div style="display:flex;align-items:center;gap:var(--space-3);">
+              <span style="color:var(--color-success-700);font-size:20px;">✓</span>
+              <div>
+                <div style="font-weight:600;color:var(--color-success-700);font-size:var(--font-size-sm);">Eligibility confirmed</div>
+                <div style="font-size:var(--font-size-xs);color:var(--color-success-700);">Verified May 6, 2026 · Policy active through Dec 31, 2026 · Deductible met: $450/$1,500</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--space-3);">
+        <a href="wireframe-SCR-008-ai-intake.html" id="continue-btn" class="btn btn--primary">Continue to intake →</a>
+        <a href="wireframe-SCR-007-booking-confirmation.html" class="btn btn--secondary">Skip intake &amp; confirm</a>
+      </div>
+      <p style="font-size:var(--font-size-xs);color:var(--text-secondary);margin-top:var(--space-3);">Your insurance details are stored securely and only used for eligibility verification. <a href="#">Privacy Policy</a></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

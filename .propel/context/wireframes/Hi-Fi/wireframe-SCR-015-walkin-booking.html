@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-015 — Walk-In Booking | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element           | Action | Target Screen                   |
+|-------------------|--------|---------------------------------|
+| #confirm-walkin   | click  | SCR-014 (Same-Day Queue) — add to queue |
+| #view-360         | click  | SCR-016 (Patient 360° View)     |
+| #back             | click  | SCR-013 (Staff Dashboard)       |
+| #search-result    | click  | Populate patient fields         |
+-->
+<div class="wf-meta">
+  <strong>SCR-015</strong> · Walk-In Booking · High-Fidelity · 1440px · States: Default, Loading, Validation, Success · FL-004
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-013-staff-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/></svg>Dashboard</a>
+      <a href="wireframe-SCR-014-same-day-queue.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/></svg>Same-Day Queue <span class="badge badge--error" style="margin-left:auto;">5</span></a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Walk-In Booking</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar" style="background:var(--color-info-600);">SK</div><div class="sidebar__user-info"><div class="sidebar__user-name">Sarah Kim, RN</div><div class="sidebar__user-role">Staff</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Walk-In Booking</h1>
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);">Register a walk-in patient and add them to today's queue</p>
+      </div>
+      <div class="page-header__actions">
+        <a href="wireframe-SCR-013-staff-dashboard.html" id="back" class="btn btn--ghost">← Dashboard</a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:860px;">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:var(--space-6);">
+        <!-- Main Form -->
+        <div>
+          <!-- Search existing patient -->
+          <div class="card mb-5">
+            <div class="card__header"><span class="card__title">Find existing patient</span></div>
+            <div class="card__body">
+              <div class="search-bar mb-3">
+                <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="form-input search-bar__input" placeholder="Search by name, MRN, email, or phone…" value="Marcus John">
+              </div>
+              <!-- Search result (populated) -->
+              <div style="border:1px solid var(--primary);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);background:var(--primary-surface);display:flex;align-items:center;gap:var(--space-3);cursor:pointer;" id="search-result">
+                <div class="avatar">MJ</div>
+                <div style="flex:1;">
+                  <div style="font-weight:600;font-size:var(--font-size-sm);">Marcus D. Johnson</div>
+                  <div style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00481293 · DOB: ••/••/1978 · Last visit: Feb 14, 2026</div>
+                </div>
+                <span class="badge badge--primary">Select</span>
+              </div>
+              <div style="margin-top:var(--space-3);font-size:var(--font-size-sm);color:var(--text-secondary);">
+                Not found? <a href="#">Register as new patient →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient confirmed -->
+          <div class="card mb-5" style="border-color:var(--primary);">
+            <div class="card__header" style="background:var(--primary-surface);">
+              <span class="card__title">Selected patient</span>
+              <span class="badge badge--primary">From system</span>
+            </div>
+            <div class="card__body">
+              <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4);">
+                <div class="avatar avatar--lg">MJ</div>
+                <div>
+                  <div style="font-size:var(--font-size-lg);font-weight:700;">Marcus D. Johnson</div>
+                  <div style="font-size:var(--font-size-sm);color:var(--text-secondary);">MRN: 00481293 · Male · DOB: <span class="phi-masked">••/••/1978</span></div>
+                </div>
+                <a href="wireframe-SCR-016-patient-360.html" id="view-360" class="btn btn--ghost btn--sm" style="margin-left:auto;">View 360° →</a>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);font-size:var(--font-size-sm);">
+                <div><span style="color:var(--text-secondary);">Phone:</span> <strong>+1 (617) 555-0147</strong></div>
+                <div><span style="color:var(--text-secondary);">Insurance:</span> <strong>Aetna PPO</strong></div>
+                <div><span style="color:var(--text-secondary);">Allergies:</span> <span class="badge badge--error">NKDA</span></div>
+                <div><span style="color:var(--text-secondary);">Risk:</span> <span class="risk-badge risk-badge--high">High</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visit details -->
+          <div class="card mb-5">
+            <div class="card__header"><span class="card__title">Visit details</span></div>
+            <div class="card__body">
+              <div class="form-group">
+                <label class="form-label">Chief complaint <span class="form-label__required">*</span></label>
+                <textarea class="form-input" rows="2" placeholder="Describe the primary reason for the visit…">Chest pain and shortness of breath for the past 2 hours</textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+                <div class="form-group">
+                  <label class="form-label">Visit type <span class="form-label__required">*</span></label>
+                  <select class="form-input form-select">
+                    <option selected>Walk-in / Urgent</option>
+                    <option>Scheduled appointment</option>
+                    <option>Follow-up</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Assigned provider</label>
+                  <select class="form-input form-select">
+                    <option>Auto-assign</option>
+                    <option selected>Dr. Patel (available)</option>
+                    <option>Dr. Chen (available)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Initial triage notes</label>
+                <textarea class="form-input" rows="2" placeholder="BP, vitals, nurse observations…">BP: 148/92, HR: 98 bpm. Patient appears anxious.</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Slot selection -->
+        <div>
+          <div class="card" style="position:sticky;top:var(--space-4);">
+            <div class="card__header"><span class="card__title">Slot assignment</span></div>
+            <div class="card__body">
+              <p style="font-size:var(--font-size-xs);color:var(--text-secondary);margin-bottom:var(--space-3);">Available now</p>
+              <div class="slot-grid" style="grid-template-columns:repeat(2,1fr);">
+                <div class="slot-chip slot-chip--selected">Now (ASAP)</div>
+                <div class="slot-chip slot-chip--available">9:45 AM</div>
+                <div class="slot-chip slot-chip--available">10:00 AM</div>
+                <div class="slot-chip slot-chip--full">10:15 AM</div>
+                <div class="slot-chip slot-chip--available">10:30 AM</div>
+                <div class="slot-chip slot-chip--available">11:00 AM</div>
+              </div>
+              <div class="divider"></div>
+              <div style="font-size:var(--font-size-sm);margin-bottom:var(--space-4);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2);"><span style="color:var(--text-secondary);">Patient</span><span style="font-weight:500;">Marcus Johnson</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2);"><span style="color:var(--text-secondary);">Slot</span><span style="font-weight:500;">Now (ASAP)</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Provider</span><span style="font-weight:500;">Dr. Patel</span></div>
+              </div>
+              <a href="wireframe-SCR-014-same-day-queue.html" id="confirm-walkin" class="btn btn--primary btn--full">
+                Add to queue
+              </a>
+              <button class="btn btn--secondary btn--full mt-2">Save &amp; print slip</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

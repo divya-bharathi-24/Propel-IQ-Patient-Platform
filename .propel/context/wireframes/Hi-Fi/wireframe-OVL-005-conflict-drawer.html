@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-005 — Conflict Resolution Drawer | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.conflict-item { border:1px solid var(--color-warning-300); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); margin-bottom:var(--space-4); background:var(--color-warning-50); }
+.conflict-sources { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); margin:var(--space-3) 0; }
+.source-box { border-radius:var(--radius-md); padding:var(--space-3) var(--space-4); font-size:var(--font-size-sm); }
+.source-box--ehr { background:#E3F2FD; border:1px solid #90CAF9; }
+.source-box--patient { background:var(--primary-surface); border:1px solid var(--color-teal-200); }
+.source-box__label { font-size:10px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; margin-bottom:var(--space-2); }
+.resolve-btns { display:flex; gap:var(--space-2); }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element            | Action | Target Screen                |
+|--------------------|--------|------------------------------|
+| #resolve-all       | click  | OVL-006 (Verify Confirm Dialog) |
+| #close-drawer      | click  | SCR-016 (Patient 360° View)  |
+| Keep EHR / Patient | click  | Resolves individual conflict |
+-->
+<div class="wf-meta">
+  <strong>OVL-005</strong> · Conflict Resolution Drawer · High-Fidelity · Applied to SCR-016 (Patient 360° View) · FL-005
+</div>
+
+<!-- Background: 360° View (simplified) -->
+<div style="min-height:100vh;background:var(--bg-default);">
+  <div style="background:var(--color-teal-900);width:240px;min-height:100vh;position:fixed;top:0;left:0;"></div>
+  <div style="margin-left:240px;opacity:.45;padding:var(--space-8);">
+    <div style="height:64px;background:var(--bg-surface);border-bottom:1px solid var(--border-default);border-radius:var(--radius-md);margin-bottom:var(--space-5);"></div>
+    <div class="alert alert--warning"><span>⚠</span><div class="alert__body">2 data conflicts detected</div></div>
+    <div class="skeleton skeleton--card" style="height:200px;margin-top:var(--space-5);border-radius:var(--radius-lg);"></div>
+  </div>
+</div>
+
+<!-- Drawer (right-side) -->
+<div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="drawer__header" style="background:var(--color-warning-50);border-bottom-color:var(--color-warning-300);">
+    <h2 class="drawer__title" id="drawer-title" style="display:flex;align-items:center;gap:var(--space-3);color:var(--color-warning-800);">
+      <span style="font-size:20px;">⚠</span> Conflict Resolution
+    </h2>
+    <button class="modal__close" id="close-drawer" aria-label="Close drawer" onclick="window.location='wireframe-SCR-016-patient-360.html'">×</button>
+  </div>
+
+  <div class="drawer__body">
+    <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-5);">
+      <strong>Marcus Johnson (MRN: 00481293)</strong> — 2 conflicts found between EHR and patient self-report. Select which source to trust for each field.
+    </p>
+
+    <!-- Conflict 1: Medication -->
+    <div class="conflict-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
+        <div style="font-weight:600;color:var(--color-warning-800);">⚠ Conflict 1 of 2: Medications</div>
+        <span class="badge badge--warning">Unresolved</span>
+      </div>
+      <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3);">
+        "Metoprolol 25mg" appears in EHR records but was not mentioned in patient self-report intake.
+      </p>
+      <div class="conflict-sources">
+        <div class="source-box source-box--ehr">
+          <div class="source-box__label" style="color:#1565C0;">EHR Record</div>
+          <div>Metoprolol 25mg · Once daily<br><span style="font-size:11px;color:#1565C0;">Prescribed Mar 2025</span></div>
+        </div>
+        <div class="source-box source-box--patient">
+          <div class="source-box__label" style="color:var(--color-teal-700);">Patient Report</div>
+          <div style="color:var(--text-secondary);font-style:italic;">Not reported</div>
+        </div>
+      </div>
+      <div class="resolve-btns">
+        <button class="btn btn--secondary btn--sm" style="flex:1;">Keep EHR value</button>
+        <button class="btn btn--ghost btn--sm" style="flex:1;">Remove from record</button>
+        <button class="btn btn--ghost btn--sm" style="flex:1;">Flag for provider</button>
+      </div>
+    </div>
+
+    <!-- Conflict 2: Allergy -->
+    <div class="conflict-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
+        <div style="font-weight:600;color:var(--color-warning-800);">⚠ Conflict 2 of 2: Allergies</div>
+        <span class="badge badge--warning">Unresolved</span>
+      </div>
+      <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-3);">
+        Patient reported "Aspirin" allergy during intake, but EHR shows NKDA (No Known Drug Allergies).
+      </p>
+      <div class="conflict-sources">
+        <div class="source-box source-box--ehr">
+          <div class="source-box__label" style="color:#1565C0;">EHR Record</div>
+          <div>NKDA<br><span style="font-size:11px;color:#1565C0;">Last reviewed Feb 2026</span></div>
+        </div>
+        <div class="source-box source-box--patient">
+          <div class="source-box__label" style="color:var(--color-teal-700);">Patient Report</div>
+          <div>Aspirin — Severe reaction<br><span style="font-size:11px;color:var(--color-teal-700);">Self-reported intake</span></div>
+        </div>
+      </div>
+      <div class="resolve-btns">
+        <button class="btn btn--primary btn--sm" style="flex:1;background:var(--color-warning-600);">Accept patient report</button>
+        <button class="btn btn--secondary btn--sm" style="flex:1;">Keep EHR (NKDA)</button>
+        <button class="btn btn--ghost btn--sm" style="flex:1;">Flag for provider</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer__footer">
+    <a href="wireframe-SCR-016-patient-360.html" id="close-drawer" class="btn btn--secondary">Cancel</a>
+    <a href="wireframe-OVL-006-360-verify-confirm.html" id="resolve-all" class="btn btn--primary">Resolve &amp; verify</a>
+  </div>
+</div>
+</body>
+</html>

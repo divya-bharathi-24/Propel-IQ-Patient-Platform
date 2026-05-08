@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-001 — Session Timeout Modal | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element         | Action | Target Screen                |
+|-----------------|--------|------------------------------|
+| #continue-btn   | click  | Same screen (session extends)|
+| #logout-btn     | click  | SCR-001 (Login)              |
+| Countdown = 0   | auto   | SCR-001 (Login — auto-logout)|
+-->
+<div class="wf-meta">
+  <strong>OVL-001</strong> · Session Timeout Modal · High-Fidelity · Applied to all authenticated screens
+</div>
+
+<!-- Background (simulates an authenticated screen behind the modal) -->
+<div style="min-height:100vh;background:var(--bg-default);padding:var(--space-8);opacity:.4;pointer-events:none;">
+  <div style="height:64px;background:var(--bg-surface);border-bottom:1px solid var(--border-default);border-radius:var(--radius-md);margin-bottom:var(--space-6);"></div>
+  <div class="grid grid--4"><div class="card skeleton skeleton--card"></div><div class="card skeleton skeleton--card"></div><div class="card skeleton skeleton--card"></div><div class="card skeleton skeleton--card"></div></div>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" aria-describedby="timeout-desc" style="position:fixed;">
+  <div class="modal" role="dialog">
+    <div class="modal__header" style="background:var(--color-warning-50);border-bottom-color:var(--color-warning-200);">
+      <h2 class="modal__title" id="timeout-title" style="display:flex;align-items:center;gap:var(--space-3);color:var(--color-warning-700);">
+        <span style="font-size:24px;">⏱</span> Session expiring soon
+      </h2>
+    </div>
+    <div class="modal__body">
+      <p id="timeout-desc" style="margin-bottom:var(--space-5);color:var(--text-secondary);">
+        You've been inactive for a while. For your security, your session will automatically end in:
+      </p>
+      <!-- Countdown display -->
+      <div style="text-align:center;margin-bottom:var(--space-5);">
+        <div style="font-size:64px;font-weight:700;color:var(--color-warning-700);line-height:1;font-family:monospace;">
+          1:45
+        </div>
+        <div style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-top:var(--space-2);">minutes remaining</div>
+      </div>
+      <!-- Countdown progress -->
+      <div class="progress" style="margin-bottom:var(--space-5);">
+        <div class="progress__bar" style="width:35%;background:var(--color-warning-500);"></div>
+      </div>
+      <p style="font-size:var(--font-size-sm);color:var(--text-secondary);">
+        Any unsaved changes will be preserved. You'll be redirected to the sign-in page when the session expires.
+      </p>
+    </div>
+    <div class="modal__footer">
+      <a href="wireframe-SCR-001-login.html" id="logout-btn" class="btn btn--ghost">Sign out now</a>
+      <button id="continue-btn" class="btn btn--primary">Stay signed in</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

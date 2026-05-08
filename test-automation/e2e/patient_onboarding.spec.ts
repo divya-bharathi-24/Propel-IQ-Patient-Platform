@@ -17,6 +17,8 @@ import { ThreeSixtyViewPage } from '../pages/three-sixty-view.page';
 import { LoginPage } from '../pages/login.page';
 import {
   mockNotificationApi,
+  mockRegistrationApi,
+  mockVerifyEmailApi,
   mockAiIntakeApi,
   mockDocumentUploadApi,
   mockProfileVerifyBlocked,
@@ -395,6 +397,11 @@ test.describe('E2E Journey: Patient Onboarding (UC-001 → UC-002 → UC-007 →
       await mockProfileVerifySuccess(page);
       await view.verifyProfile();
       await expect(view.profileStatusBadge).toContainText('Verified');
+    });
+
+    await test.step('Phase 4: Verified profile displays intake medications and allergies', async () => {
+      await expect(page.getByTestId('intake-data-medications')).toContainText(d.conflict.value1);
+      await expect(page.getByTestId('intake-data-allergies')).toContainText(d.intake.expectedAllergies[0]);
     });
   });
 });

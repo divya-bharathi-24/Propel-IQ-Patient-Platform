@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-003 — Patient Dashboard | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.appt-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); padding:var(--space-5); display:flex; gap:var(--space-5); align-items:flex-start; transition:box-shadow var(--transition-base); }
+.appt-card:hover { box-shadow:var(--shadow-md); }
+.appt-card__date-box { background:var(--primary-surface); border:1px solid var(--color-teal-200); border-radius:var(--radius-md); padding:var(--space-3) var(--space-4); text-align:center; min-width:60px; flex-shrink:0; }
+.appt-card__month { font-size:var(--font-size-xs); color:var(--color-teal-700); font-weight:600; text-transform:uppercase; }
+.appt-card__day { font-size:var(--font-size-2xl); font-weight:700; color:var(--color-teal-800); line-height:1; }
+.appt-card__info { flex:1; min-width:0; }
+.appt-card__title { font-weight:600; color:var(--color-neutral-800); margin-bottom:var(--space-1); }
+.appt-card__meta { font-size:var(--font-size-sm); color:var(--text-secondary); display:flex; gap:var(--space-4); flex-wrap:wrap; }
+.appt-card__actions { display:flex; gap:var(--space-2); margin-top:var(--space-3); }
+.quick-action { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); padding:var(--space-5) var(--space-4); display:flex; flex-direction:column; align-items:center; gap:var(--space-3); text-align:center; cursor:pointer; transition:all var(--transition-base); text-decoration:none; color:var(--text-primary); }
+.quick-action:hover { border-color:var(--primary); background:var(--primary-surface); text-decoration:none; color:var(--primary); }
+.quick-action__icon { width:44px; height:44px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.waitlist-card { background:var(--color-warning-50); border:1px solid var(--color-warning-500); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); display:flex; align-items:center; gap:var(--space-4); }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element                    | Action | Target Screen                |
+|----------------------------|--------|------------------------------|
+| #book-appt-cta             | click  | SCR-005 (Slot Selection)     |
+| .appt-card (upcoming)      | click  | SCR-004 (Appointment Detail) |
+| #upload-docs               | click  | SCR-011 (Document Upload)    |
+| #ai-intake                 | click  | SCR-008 (AI Intake)          |
+| #sync-calendar             | click  | SCR-012 (Calendar Sync)      |
+| #profile-link (sidebar)    | click  | SCR-010 (Patient Profile)    |
+| OVL-002 toast              | auto   | SCR-004 (updated appointment)|
+-->
+<div class="wf-meta">
+  <strong>SCR-003</strong> · Patient Dashboard · High-Fidelity · 1440px · States: Default, Loading, Empty · FL-001 Exit / FL-003
+</div>
+
+<!-- OVL-002: Slot Swap Toast (active state demo) -->
+<div class="toast-container">
+  <div class="toast toast--success" role="alert" aria-live="polite">
+    <span>🔄</span>
+    <div>
+      <strong>Slot updated!</strong> Your preferred slot for May 20 at 10:00 AM is now confirmed.
+      <a href="wireframe-SCR-004-appointment-detail.html" style="color:rgba(255,255,255,.9);text-decoration:underline;font-size:var(--font-size-xs);display:block;margin-top:2px;">View appointment →</a>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+  <!-- Sidebar — Patient Role -->
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-icon">+</div>
+      <span class="sidebar__brand-name">UniPatient</span>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="#" class="nav-item active" aria-current="page">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="wireframe-SCR-005-slot-selection.html" class="nav-item">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        My Appointments
+      </a>
+      <a href="wireframe-SCR-011-document-upload.html" class="nav-item">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        My Documents
+      </a>
+      <a href="wireframe-SCR-010-patient-profile.html" class="nav-item" id="profile-link">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="avatar">JA</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name">Jane Anderson</div>
+          <div class="sidebar__user-role">Patient</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content" id="main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Good morning, Jane 👋</h1>
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);">Tuesday, May 6, 2026</p>
+      </div>
+      <div class="page-header__actions">
+        <a href="wireframe-SCR-005-slot-selection.html" id="book-appt-cta" class="btn btn--primary">
+          + Book appointment
+        </a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+
+      <!-- Stats Row -->
+      <div class="grid grid--4 mb-6">
+        <div class="card stat-card">
+          <div class="stat-card__label">Upcoming appointments</div>
+          <div class="stat-card__value">2</div>
+          <div class="stat-card__delta stat-card__delta--up">↑ 1 this week</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-card__label">Documents uploaded</div>
+          <div class="stat-card__value">7</div>
+          <div class="stat-card__delta" style="color:var(--text-secondary);">Across 3 visits</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-card__label">Intake status</div>
+          <div class="stat-card__value" style="font-size:var(--font-size-xl);">Completed</div>
+          <div class="badge badge--success mt-2">✓ All sections done</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-card__label">Waitlisted slots</div>
+          <div class="stat-card__value">1</div>
+          <div class="stat-card__delta" style="color:var(--color-warning-700);">🕐 Position #3</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:var(--space-6);">
+        <!-- Left Column -->
+        <div>
+          <!-- Upcoming Appointments -->
+          <div class="card mb-6">
+            <div class="card__header">
+              <span class="card__title">Upcoming appointments</span>
+              <a href="wireframe-SCR-005-slot-selection.html" class="btn btn--ghost btn--sm">+ Book new</a>
+            </div>
+            <div class="card__body" style="padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);">
+              <a href="wireframe-SCR-004-appointment-detail.html" class="appt-card" style="text-decoration:none;color:inherit;">
+                <div class="appt-card__date-box">
+                  <div class="appt-card__month">MAY</div>
+                  <div class="appt-card__day">20</div>
+                </div>
+                <div class="appt-card__info">
+                  <div class="appt-card__title">General Check-up</div>
+                  <div class="appt-card__meta">
+                    <span>🕙 10:00 AM</span>
+                    <span>👨‍⚕️ Dr. Patel</span>
+                    <span>📍 Main Clinic</span>
+                  </div>
+                  <div class="appt-card__actions">
+                    <span class="badge badge--success">Confirmed</span>
+                    <span class="badge badge--info">Intake Complete</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="wireframe-SCR-004-appointment-detail.html" class="appt-card" style="text-decoration:none;color:inherit;">
+                <div class="appt-card__date-box">
+                  <div class="appt-card__month">JUN</div>
+                  <div class="appt-card__day">4</div>
+                </div>
+                <div class="appt-card__info">
+                  <div class="appt-card__title">Follow-up Consultation</div>
+                  <div class="appt-card__meta">
+                    <span>🕑 2:30 PM</span>
+                    <span>👩‍⚕️ Dr. Chen</span>
+                    <span>📍 East Wing</span>
+                  </div>
+                  <div class="appt-card__actions">
+                    <span class="badge badge--warning">Intake Pending</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Waitlisted slot -->
+          <div class="card mb-6">
+            <div class="card__header">
+              <span class="card__title">Preferred slots watchlist</span>
+              <a href="wireframe-SCR-005b-preferred-slot.html" class="btn btn--ghost btn--sm">Manage</a>
+            </div>
+            <div class="card__body">
+              <div class="waitlist-card">
+                <span style="font-size:24px;">⏳</span>
+                <div>
+                  <div style="font-weight:600;color:var(--color-warning-700);">May 15, 2026 — 9:00 AM</div>
+                  <div style="font-size:var(--font-size-sm);color:var(--text-secondary);">Queue position #3 — you'll be notified when this slot opens</div>
+                </div>
+                <button class="btn btn--secondary btn--sm" style="margin-left:auto;">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+          <!-- Quick Actions -->
+          <div class="card mb-6">
+            <div class="card__header"><span class="card__title">Quick actions</span></div>
+            <div class="card__body" style="padding:var(--space-4);">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+                <a href="wireframe-SCR-008-ai-intake.html" class="quick-action" id="ai-intake">
+                  <div class="quick-action__icon" style="background:var(--color-info-50);color:var(--color-info-700);">🤖</div>
+                  <span style="font-size:var(--font-size-sm);font-weight:500;">AI Intake</span>
+                </a>
+                <a href="wireframe-SCR-011-document-upload.html" class="quick-action" id="upload-docs">
+                  <div class="quick-action__icon" style="background:var(--color-success-50);color:var(--color-success-700);">📄</div>
+                  <span style="font-size:var(--font-size-sm);font-weight:500;">Upload Docs</span>
+                </a>
+                <a href="wireframe-SCR-012-calendar-sync.html" class="quick-action" id="sync-calendar">
+                  <div class="quick-action__icon" style="background:var(--color-warning-50);color:var(--color-warning-700);">📅</div>
+                  <span style="font-size:var(--font-size-sm);font-weight:500;">Sync Calendar</span>
+                </a>
+                <a href="wireframe-SCR-010-patient-profile.html" class="quick-action">
+                  <div class="quick-action__icon" style="background:var(--primary-surface);color:var(--primary);">👤</div>
+                  <span style="font-size:var(--font-size-sm);font-weight:500;">My Profile</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Summary -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Health summary</span></div>
+            <div class="card__body">
+              <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+                <div>
+                  <div style="font-size:var(--font-size-xs);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-2);">Current medications</div>
+                  <div class="badge badge--neutral">Lisinopril 10mg</div>
+                  <div class="badge badge--neutral" style="margin-left:var(--space-2);">Metformin 500mg</div>
+                </div>
+                <div class="divider"></div>
+                <div>
+                  <div style="font-size:var(--font-size-xs);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-2);">Allergies</div>
+                  <div class="badge badge--error">Penicillin</div>
+                  <div class="badge badge--warning" style="margin-left:var(--space-2);">Sulfa (mild)</div>
+                </div>
+                <div class="divider"></div>
+                <div style="font-size:var(--font-size-xs);color:var(--text-secondary);">Last updated: May 1, 2026 via AI Intake</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State variant (hidden in default state) -->
+      <div style="display:none;text-align:center;padding:var(--space-16) var(--space-8);" id="empty-state">
+        <div style="font-size:64px;margin-bottom:var(--space-4);">🏥</div>
+        <h2 style="font-size:var(--font-size-xl);font-weight:600;color:var(--color-neutral-700);margin-bottom:var(--space-3);">No appointments yet</h2>
+        <p style="color:var(--text-secondary);margin-bottom:var(--space-6);">Book your first visit to get started with UniPatient.</p>
+        <a href="wireframe-SCR-005-slot-selection.html" class="btn btn--primary btn--lg">Book your first appointment</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

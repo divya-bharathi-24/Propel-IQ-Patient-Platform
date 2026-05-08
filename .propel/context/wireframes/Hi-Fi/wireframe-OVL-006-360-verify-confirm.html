@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-006 — 360° Verify & Sign-Off Dialog | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element           | Action | Target Screen                    |
+|-------------------|--------|----------------------------------|
+| #sign-off         | click  | SCR-016 (Patient 360° — signed)  |
+| #cancel-verify    | click  | SCR-016 (Patient 360° View)      |
+| Opened from       | —      | OVL-005 or SCR-016 "Verify" btn  |
+-->
+<div class="wf-meta">
+  <strong>OVL-006</strong> · 360° Clinical Verify &amp; Sign-Off Dialog · High-Fidelity · Applied to SCR-016 (Patient 360°) · FL-005 · Staff Role
+</div>
+
+<!-- Background: 360° View (dimmed) -->
+<div style="min-height:100vh;background:var(--bg-default);padding:var(--space-8);opacity:.3;pointer-events:none;">
+  <div style="height:64px;background:var(--bg-surface);border-radius:var(--radius-md);margin-bottom:var(--space-6);"></div>
+  <div class="skeleton skeleton--card" style="height:160px;margin-bottom:var(--space-4);border-radius:var(--radius-lg);"></div>
+  <div class="skeleton skeleton--card" style="height:200px;border-radius:var(--radius-lg);"></div>
+</div>
+
+<!-- Dialog -->
+<div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="verify-title" style="position:fixed;">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal__header" style="background:var(--primary);border-bottom:none;">
+      <h2 class="modal__title" id="verify-title" style="color:#fff;display:flex;align-items:center;gap:var(--space-3);">
+        <span style="font-size:20px;">✓</span> Clinical Verification Sign-Off
+      </h2>
+    </div>
+    <div class="modal__body">
+      <!-- Patient summary -->
+      <div style="background:var(--bg-subtle);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-5);">
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--space-2);">Marcus Johnson · MRN: 00481293</div>
+        <div style="display:flex;gap:var(--space-6);font-size:var(--font-size-sm);color:var(--text-secondary);">
+          <span>Visit: May 20, 2026 · 10:00 AM</span>
+          <span>Provider: Dr. Raj Patel</span>
+        </div>
+      </div>
+
+      <!-- Verification checklist -->
+      <div style="margin-bottom:var(--space-5);">
+        <div style="font-weight:600;margin-bottom:var(--space-3);">Verification checklist</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <label style="display:flex;align-items:center;gap:var(--space-3);font-size:var(--font-size-sm);cursor:pointer;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--bg-subtle);">
+            <input type="checkbox" checked> Clinical data reviewed and confirmed accurate
+          </label>
+          <label style="display:flex;align-items:center;gap:var(--space-3);font-size:var(--font-size-sm);cursor:pointer;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--bg-subtle);">
+            <input type="checkbox" checked> Medication list conflicts resolved
+          </label>
+          <label style="display:flex;align-items:center;gap:var(--space-3);font-size:var(--font-size-sm);cursor:pointer;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--bg-subtle);">
+            <input type="checkbox"> Allergy conflict reviewed with patient
+          </label>
+          <label style="display:flex;align-items:center;gap:var(--space-3);font-size:var(--font-size-sm);cursor:pointer;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--bg-subtle);">
+            <input type="checkbox" checked> Intake form completeness verified
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="verify-notes">Provider sign-off notes (optional)</label>
+        <textarea id="verify-notes" class="form-input" rows="3" placeholder="Add any notes for this visit record…"></textarea>
+      </div>
+
+      <div class="alert alert--warning" role="alert" style="margin-bottom:0;">
+        <span>ℹ</span>
+        <div class="alert__body">
+          <strong>Responsibility notice:</strong> By signing off, you confirm that you have reviewed the clinical summary and take responsibility for its accuracy under HIPAA guidelines.
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <a href="wireframe-SCR-016-patient-360.html" id="cancel-verify" class="btn btn--secondary">Cancel</a>
+      <a href="wireframe-SCR-016-patient-360.html" id="sign-off" class="btn btn--primary">Sign off &amp; verify</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

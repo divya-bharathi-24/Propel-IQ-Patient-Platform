@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-009 — Manual Intake Form | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.section-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); margin-bottom:var(--space-5); overflow:hidden; }
+.section-header { background:var(--bg-subtle); padding:var(--space-4) var(--space-5); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-default); cursor:pointer; }
+.section-header__title { font-weight:600; font-size:var(--font-size-sm); display:flex; align-items:center; gap:var(--space-3); }
+.section-body { padding:var(--space-5) var(--space-5); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4); }
+.intake-mode-toggle { display:flex; background:var(--bg-subtle); border-radius:var(--radius-full); padding:4px; gap:4px; }
+.toggle-btn { flex:1; padding:var(--space-2) var(--space-4); border-radius:var(--radius-full); font-size:var(--font-size-sm); font-weight:500; cursor:pointer; border:none; background:transparent; color:var(--text-secondary); transition:all var(--transition-micro); white-space:nowrap; text-decoration:none; }
+.toggle-btn.active { background:var(--bg-surface); color:var(--primary); box-shadow:var(--shadow-sm); }
+</style>
+</head>
+<body>
+<!-- Navigation Map
+| Element              | Action | Target Screen                  |
+|----------------------|--------|--------------------------------|
+| #mode-ai             | click  | SCR-008 (AI Intake)            |
+| #submit-intake       | click  | SCR-007 (Booking Confirmation) |
+| #save-exit           | click  | SCR-003 (Patient Dashboard)    |
+-->
+<div class="wf-meta">
+  <strong>SCR-009</strong> · Manual Intake Form · High-Fidelity · 1440px · States: Default, Validation, Loading, Error, Complete · FL-002
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>My Appointments</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Pre-visit intake</h1>
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);">General Check-up · May 20 · Dr. Patel</p>
+      </div>
+      <div class="page-header__actions">
+        <div class="intake-mode-toggle" role="group" aria-label="Intake mode">
+          <a href="wireframe-SCR-008-ai-intake.html" class="toggle-btn" id="mode-ai">🤖 AI Chat</a>
+          <button class="toggle-btn active" id="mode-manual" aria-pressed="true">📋 Manual Form</button>
+        </div>
+        <button class="btn btn--ghost btn--sm" id="save-exit">Save &amp; exit</button>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:760px;">
+      <!-- Validation Error Banner -->
+      <div class="alert alert--error mb-5" role="alert" style="display:none" id="validation-banner">
+        <span>⚠</span>
+        <div>
+          <div class="alert__title">Please complete required fields</div>
+          <div class="alert__body">Chief complaint and allergies are required before submission.</div>
+        </div>
+      </div>
+
+      <!-- Section 1: Chief Complaint -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-header__title"><span style="color:var(--color-success-500);">✓</span> Chief complaint</span>
+          <span class="badge badge--success">Complete</span>
+        </div>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Reason for visit <span class="form-label__required">*</span></label>
+            <textarea class="form-input" rows="3" placeholder="Describe your main concern or reason for visiting…">Recurring headaches and fatigue over the past few weeks.</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration of symptoms</label>
+            <div class="form-row">
+              <input type="number" class="form-input" placeholder="3" min="1">
+              <select class="form-input form-select"><option>Weeks</option><option>Days</option><option>Months</option></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severity (1–10)</label>
+            <input type="range" min="1" max="10" value="4" style="width:100%;accent-color:var(--primary);">
+            <div style="display:flex;justify-content:space-between;font-size:var(--font-size-xs);color:var(--text-secondary);margin-top:var(--space-1);"><span>1 — Mild</span><span>4</span><span>10 — Severe</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Medical History -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-header__title"><span style="color:var(--color-success-500);">✓</span> Medical history</span>
+          <span class="badge badge--success">Complete</span>
+        </div>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Previous diagnoses</label>
+            <textarea class="form-input" rows="2" placeholder="List any known conditions…">Type 2 Diabetes (managed), Hypertension</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Previous surgeries</label>
+            <textarea class="form-input" rows="2" placeholder="List any surgeries with approximate year…">Appendectomy (2018)</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Family history</label>
+            <textarea class="form-input" rows="2" placeholder="Notable family medical history…">Mother: Type 2 Diabetes, Father: Hypertension</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Medications -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-header__title"><span style="color:var(--color-success-500);">✓</span> Current medications</span>
+          <span class="badge badge--success">Complete</span>
+        </div>
+        <div class="section-body">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-4);">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:var(--space-3);align-items:center;">
+              <input class="form-input" value="Lisinopril" placeholder="Medication name">
+              <input class="form-input" value="10mg" placeholder="Dose">
+              <input class="form-input" value="Once daily" placeholder="Frequency">
+              <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:var(--space-3);align-items:center;">
+              <input class="form-input" value="Metformin" placeholder="Medication name">
+              <input class="form-input" value="500mg" placeholder="Dose">
+              <input class="form-input" value="Twice daily" placeholder="Frequency">
+              <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">✕</button>
+            </div>
+          </div>
+          <button class="btn btn--secondary btn--sm">+ Add medication</button>
+        </div>
+      </div>
+
+      <!-- Section 4: Allergies -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-header__title"><span style="color:var(--primary);">●</span> Allergies (active)</span>
+          <span class="badge badge--warning">In progress</span>
+        </div>
+        <div class="section-body">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-4);">
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:var(--space-3);align-items:center;">
+              <input class="form-input" value="Penicillin" placeholder="Allergen">
+              <select class="form-input form-select"><option selected>Severe</option><option>Mild</option><option>Moderate</option></select>
+              <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:var(--space-3);align-items:center;">
+              <input class="form-input form-input--error" placeholder="Allergen name *" style="border-color:var(--color-error-500);">
+              <select class="form-input form-select"><option>Select severity</option><option>Mild</option><option>Moderate</option><option>Severe</option></select>
+              <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">✕</button>
+            </div>
+            <div class="form-error">⚠ Allergen name is required</div>
+          </div>
+          <button class="btn btn--secondary btn--sm">+ Add allergy</button>
+        </div>
+      </div>
+
+      <!-- Sections 5 & 6 collapsed -->
+      <div class="section-card">
+        <div class="section-header" style="opacity:.6;">
+          <span class="section-header__title"><span style="color:var(--text-disabled);">○</span> Social history</span>
+          <span class="badge badge--neutral">Not started</span>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header" style="opacity:.6;">
+          <span class="section-header__title"><span style="color:var(--text-disabled);">○</span> Review &amp; submit</span>
+          <span class="badge badge--neutral">Not started</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:var(--space-3);padding-top:var(--space-4);">
+        <a href="wireframe-SCR-007-booking-confirmation.html" id="submit-intake" class="btn btn--primary">Submit intake</a>
+        <button class="btn btn--secondary">Save draft</button>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
