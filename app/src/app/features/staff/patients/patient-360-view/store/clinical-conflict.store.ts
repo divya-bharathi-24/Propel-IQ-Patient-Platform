@@ -56,6 +56,12 @@ export const ClinicalConflictStore = signalStore(
               c.severity === 'Critical' && c.resolutionStatus === 'Unresolved',
           ).length,
     ),
+    unresolvedConflicts: computed(
+      () =>
+        store
+          .conflicts()
+          .filter((c) => c.resolutionStatus === 'Unresolved'),
+    ),
   })),
 
   withMethods((store, service = inject(ConflictService)) => ({

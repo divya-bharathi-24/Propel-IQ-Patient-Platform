@@ -80,5 +80,16 @@ export default defineConfig({
       fullyParallel: false,
       // No dependency on 'setup' — E2E journeys manage their own login steps
     },
+
+    // ── Standalone tests (no auth setup required) ────────────────────────────
+    // Used for registration, login, and other tests that manage their own sessions.
+    {
+      name: 'standalone',
+      testDir: './tests',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: /registration_login|login\.spec|booking\.spec/,
+    },
   ],
 });
