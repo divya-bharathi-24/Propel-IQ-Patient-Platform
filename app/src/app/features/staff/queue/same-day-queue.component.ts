@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../features/auth/services/auth.service';
 import {
   EMPTY,
   Subject,
@@ -49,6 +50,7 @@ import { QueueRowComponent } from './queue-row/queue-row.component';
 export class SameDayQueueComponent {
   private readonly queueService = inject(QueueService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly authService = inject(AuthService);
 
   readonly queueItems = signal<QueueItem[]>([]);
   readonly isLoading = signal(true);

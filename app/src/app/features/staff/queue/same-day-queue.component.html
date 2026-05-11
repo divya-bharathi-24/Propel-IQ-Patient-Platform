@@ -33,10 +33,10 @@
 
     <div class="sidebar__footer">
       <div class="sidebar__user">
-        <div class="avatar" style="background:var(--color-info-600);">SK</div>
+        <div class="avatar" style="background:var(--color-info-600);">{{ authService.currentInitials() }}</div>
         <div class="sidebar__user-info">
-          <div class="sidebar__user-name">Sarah Kim, RN</div>
-          <div class="sidebar__user-role">Staff</div>
+          <div class="sidebar__user-name">{{ authService.currentDisplayName() }}</div>
+          <div class="sidebar__user-role">{{ authService.currentRole() }}</div>
         </div>
       </div>
     </div>

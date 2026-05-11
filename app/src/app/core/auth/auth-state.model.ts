@@ -7,6 +7,8 @@ export interface AuthState {
   deviceId: string | null;
   /** UTC epoch milliseconds at which the access token expires. */
   expiresAt: number | null;
+  /** Email address of the logged-in user, used for display purposes only. */
+  email: string | null;
 }
 
 /** Shape of the login / refresh response from the backend. */
@@ -18,4 +20,6 @@ export interface TokenResponse {
   userId: string;
   role: string;
   deviceId: string;
+  /** Optional: email returned by the backend (may not always be present). */
+  email?: string;
 }

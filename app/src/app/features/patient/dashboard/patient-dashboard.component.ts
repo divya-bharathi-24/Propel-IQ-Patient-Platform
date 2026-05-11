@@ -7,13 +7,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AppointmentStatusBadgeComponent } from '../../../shared/components/appointment-status-badge/appointment-status-badge.component';
 import { StatCardComponent } from '../../../shared/components/stat-card/stat-card.component';
 import { QuickActionCardComponent } from '../../../shared/components/quick-action-card/quick-action-card.component';
 import { PatientDashboardService } from './patient-dashboard.service';
+import { AuthService } from '../../auth/services/auth.service';
 import {
   DashboardLoadState,
   PatientDashboardDto,
@@ -25,6 +26,7 @@ import {
   standalone: true,
   imports: [
     RouterLink,
+    RouterLinkActive,
     DatePipe,
     UpperCasePipe,
     AppointmentStatusBadgeComponent,
@@ -38,6 +40,7 @@ import {
 export class PatientDashboardComponent implements OnInit {
   private readonly dashboardService = inject(PatientDashboardService);
   private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loadState = signal<DashboardLoadState>('idle');

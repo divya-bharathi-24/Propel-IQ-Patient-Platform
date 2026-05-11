@@ -5,6 +5,7 @@ import { WalkInStore } from '../../state/walkin.store';
 import { PatientSearchComponent } from '../patient-search/patient-search.component';
 import { QuickCreatePatientFormComponent } from '../quick-create-patient/quick-create-patient-form.component';
 import { effect } from '@angular/core';
+import { AuthService } from '../../../auth/services/auth.service';
 
 /** Wizard step identifiers */
 type WalkInStep = 'search' | 'create' | 'confirm';
@@ -24,6 +25,7 @@ type WalkInStep = 'search' | 'create' | 'confirm';
 export class WalkInBookingComponent implements OnDestroy {
   protected readonly store = inject(WalkInStore);
   private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
 
   currentStep: WalkInStep = 'search';
   isAnonymous = false;

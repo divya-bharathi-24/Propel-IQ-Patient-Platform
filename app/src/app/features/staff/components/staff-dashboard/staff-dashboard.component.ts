@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { RequiresAttentionSectionComponent } from '../requires-attention-section/requires-attention-section.component';
+import { AuthService } from '../../../auth/services/auth.service';
 
 /**
  * Staff dashboard page — the primary landing view for Staff and Admin users
@@ -23,4 +24,5 @@ import { RequiresAttentionSectionComponent } from '../requires-attention-section
 })
 export class StaffDashboardComponent {
   readonly today = new Date();
+  readonly authService = inject(AuthService);
 }
