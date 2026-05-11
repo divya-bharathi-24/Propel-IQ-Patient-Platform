@@ -60,6 +60,10 @@ export class UserManagementPageComponent implements OnInit {
     this.store.loadUsers();
   }
 
+  logout(): void {
+    this.authService.logout();
+  }
+
   openCreateUserDialog(): void {
     const dialogRef = this.dialog.open<
       UserFormDialogComponent,

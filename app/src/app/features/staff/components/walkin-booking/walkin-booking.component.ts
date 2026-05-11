@@ -27,6 +27,10 @@ export class WalkInBookingComponent implements OnDestroy {
   private readonly router = inject(Router);
   readonly authService = inject(AuthService);
 
+  logout(): void {
+    this.authService.logout();
+  }
+
   currentStep: WalkInStep = 'search';
   isAnonymous = false;
 

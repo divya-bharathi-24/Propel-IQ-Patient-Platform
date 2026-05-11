@@ -41,6 +41,10 @@ export class PatientDashboardComponent implements OnInit {
   private readonly dashboardService = inject(PatientDashboardService);
   private readonly router = inject(Router);
   readonly authService = inject(AuthService);
+
+  logout(): void {
+    this.authService.logout();
+  }
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loadState = signal<DashboardLoadState>('idle');

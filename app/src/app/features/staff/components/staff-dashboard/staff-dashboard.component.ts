@@ -25,4 +25,8 @@ import { AuthService } from '../../../auth/services/auth.service';
 export class StaffDashboardComponent {
   readonly today = new Date();
   readonly authService = inject(AuthService);
+
+  logout(): void {
+    this.authService.logout();
+  }
 }
