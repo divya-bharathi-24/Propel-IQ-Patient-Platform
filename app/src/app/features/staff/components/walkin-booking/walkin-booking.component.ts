@@ -34,6 +34,7 @@ export class WalkInBookingComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly specialtyService = inject(SpecialtyService);
+  readonly authService = inject(AuthService);
 
   currentStep: WalkInStep = 'search';
   isAnonymous = false;
@@ -77,6 +78,10 @@ export class WalkInBookingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.store.clearState();
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   // ── Step 1: PatientSearch event handlers ─────────────────────────────────

@@ -99,4 +99,8 @@ export class StaffDashboardComponent implements OnInit {
   viewAppointment(appointmentId: string): void {
     void this.router.navigate(['/staff/appointments', appointmentId]);
   }
+
+  logout(): void {
+    this.authService.logout();
+  }
 }

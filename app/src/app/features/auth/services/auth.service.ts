@@ -58,6 +58,25 @@ export class AuthService {
   /** The authenticated user's display name. */
   readonly currentUserName = computed(() => this._authState().name);
 
+  /** Alias for currentUserName — used by sidebar components. */
+  readonly currentDisplayName = computed(() => this._authState().name ?? '');
+
+  /**
+   * Two-letter initials derived from the display name (e.g. "Sarah Kim" → "SK").
+   * Falls back to the first character of the role if no name is set.
+   */
+  readonly currentInitials = computed(() => {
+    const name = this._authState().name;
+    if (name) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
+    return (this._authState().role ?? '??').substring(0, 2).toUpperCase();
+  });
+
   /**
    * True when the access token is within the proactive-refresh window
    * (i.e. expires within the next 60 s).
