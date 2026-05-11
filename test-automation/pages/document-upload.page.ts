@@ -45,7 +45,18 @@ export class DocumentUploadPage {
   async uploadBufferedFiles(
     files: Array<{ name: string; mimeType: string; buffer: Buffer }>,
   ): Promise<void> {
+    // The file input uses .visually-hidden (clip: rect(0,0,0,0), 1×1 px) which
+    // causes Playwright ≥1.38 visibility checks on setInputFiles to fail.
+    // Temporarily expose it, set files (Playwright dispatches the change event),
+    // then wait for the upload button that renders only after files are selected.
+    await this.fileInput.evaluate((el: HTMLElement) => {
+      el.style.clip = 'auto';
+      el.style.overflow = 'visible';
+      el.style.width = '1px';
+      el.style.height = '1px';
+    });
     await this.fileInput.setInputFiles(files);
+    await this.uploadButton.waitFor({ state: 'visible', timeout: 10_000 });
     await this.uploadButton.click();
   }
 

@@ -4,7 +4,12 @@ export class ThreeSixtyViewPage {
   constructor(private readonly page: Page) {}
 
   get heading(): Locator {
-    return this.page.getByRole('heading', { name: '360° Patient View' });
+    // The h1.page-heading is not consistently in the DOM when navigating via
+    // Angular Router from the walkin component (outside-zone CD cycle). Use the
+    // "Verify Profile" button as the page-readiness indicator instead — it is
+    // inside the @if (loadingState === 'loaded') block, so its presence confirms
+    // both the route change and the data fetch completed.
+    return this.page.getByRole('button', { name: /Verify [Pp]rofile/i });
   }
 
   get profileStatusBadge(): Locator {
