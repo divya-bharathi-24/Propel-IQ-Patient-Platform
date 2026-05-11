@@ -1,9 +1,5 @@
 import { Component, OnDestroy, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { PatientSearchResultDto } from '../../models/walkin.models';
 import { WalkInStore } from '../../state/walkin.store';
 import { PatientSearchComponent } from '../patient-search/patient-search.component';
@@ -17,19 +13,17 @@ type WalkInStep = 'search' | 'create' | 'confirm';
   selector: 'app-walkin-booking',
   standalone: true,
   imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
+    RouterLink,
+    RouterLinkActive,
     PatientSearchComponent,
     QuickCreatePatientFormComponent,
   ],
   templateUrl: './walkin-booking.component.html',
+  styleUrls: ['./walkin-booking.component.scss'],
 })
 export class WalkInBookingComponent implements OnDestroy {
   protected readonly store = inject(WalkInStore);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
 
   currentStep: WalkInStep = 'search';
   isAnonymous = false;
@@ -48,10 +42,6 @@ export class WalkInBookingComponent implements OnDestroy {
           return;
         }
         if (this.currentStep === 'confirm') {
-          this.snackBar.open('Walk-in registered', 'Dismiss', {
-            duration: 4000,
-          });
-          this.store.clearState();
           this.router.navigate(['/staff/queue']);
         }
       }
@@ -93,7 +83,6 @@ export class WalkInBookingComponent implements OnDestroy {
 
     // If the walk-in was already submitted (e.g. 'create'/'link' mode), navigate
     if (booking && this.store.actionState() === 'success') {
-      this.snackBar.open('Walk-in registered', 'Dismiss', { duration: 4000 });
       this.store.clearState();
       this.router.navigate(['/staff/queue']);
       return;

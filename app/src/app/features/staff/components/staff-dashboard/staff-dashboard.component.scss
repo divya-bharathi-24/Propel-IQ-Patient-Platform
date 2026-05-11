@@ -1,0 +1,312 @@
+// SCR-013: Staff Dashboard — UniPatient Design System
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-surface-secondary);
+}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--color-primary-900);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-4);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+
+  &__brand-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--color-primary-400);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  &__brand-name {
+    color: white;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-body-lg);
+  }
+
+  &__nav {
+    flex: 1;
+    padding: var(--space-4) var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__section-label {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-300);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: var(--space-3) var(--space-3) var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  &__footer {
+    padding: var(--space-4);
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  &__user-info {
+    min-width: 0;
+  }
+
+  &__user-name {
+    color: white;
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user-role {
+    color: var(--color-primary-300);
+    font-size: var(--font-size-caption);
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-primary-200);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background var(--motion-duration-fast), color var(--motion-duration-fast);
+
+  &:hover {
+    background: rgba(255,255,255,.08);
+    color: white;
+  }
+
+  &.active {
+    background: rgba(255,255,255,.15);
+    color: white;
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Main content ──────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.page-header {
+  background: var(--color-surface-primary);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-1);
+  }
+
+  &__subtitle {
+    font-size: var(--font-size-body-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--space-3);
+  }
+}
+
+.page-body {
+  flex: 1;
+  padding: var(--space-6);
+  overflow-y: auto;
+}
+
+/* ── Dashboard grid ────────────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6);
+}
+
+.dashboard-sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Patient link ──────────────────────────────────────── */
+.patient-link {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.wait-time--urgent {
+  color: var(--color-error-700);
+  font-weight: var(--font-weight-semibold);
+}
+
+.text-xs {
+  font-size: var(--font-size-caption);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+/* ── Risk badges ───────────────────────────────────────── */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+
+  &--high {
+    background: var(--color-error-100);
+    color: var(--color-error-700);
+  }
+
+  &--medium {
+    background: var(--color-warning-100);
+    color: var(--color-warning-700);
+  }
+
+  &--low {
+    background: var(--color-success-100);
+    color: var(--color-success-700);
+  }
+}
+
+/* ── Code reviews ──────────────────────────────────────── */
+.code-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.code-review-item {
+  background: var(--color-warning-50);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__title {
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  &__sub {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+}
+
+/* ── Quick links ───────────────────────────────────────── */
+.quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  .btn {
+    justify-content: flex-start;
+    gap: var(--space-3);
+  }
+}
+
+/* ── Utility ───────────────────────────────────────────── */
+.mb-6 { margin-bottom: var(--space-6); }
+
+/* ── Avatar ────────────────────────────────────────────── */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-600);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 1199px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+
+  .page-body {
+    padding: var(--space-4);
+  }
+
+  .dashboard-sidebar-right {
+    grid-template-columns: 1fr;
+  }
+}
