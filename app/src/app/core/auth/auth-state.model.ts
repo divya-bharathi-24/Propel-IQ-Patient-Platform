@@ -7,8 +7,8 @@ export interface AuthState {
   deviceId: string | null;
   /** UTC epoch milliseconds at which the access token expires. */
   expiresAt: number | null;
-  /** Email address of the logged-in user, used for display purposes only. */
-  email: string | null;
+  /** Display name of the authenticated user (Staff/Patient). */
+  name: string | null;
 }
 
 /** Shape of the login / refresh response from the backend. */
@@ -20,6 +20,6 @@ export interface TokenResponse {
   userId: string;
   role: string;
   deviceId: string;
-  /** Optional: email returned by the backend (may not always be present). */
-  email?: string;
+  /** User's display name — only returned on login, not on refresh. */
+  name?: string;
 }

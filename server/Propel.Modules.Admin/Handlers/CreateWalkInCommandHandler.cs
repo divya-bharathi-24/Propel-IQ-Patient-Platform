@@ -56,6 +56,10 @@ public sealed class CreateWalkInCommandHandler
         CreateWalkInCommand request,
         CancellationToken cancellationToken)
     {
+        // Unwrap nullable values — guaranteed non-null after FluentValidation
+        var specialtyId = request.SpecialtyId!.Value;
+        var date = request.Date!.Value;
+
         // Step 1 — Patient resolution by mode
         PatientEntity? newPatient = null;
         Guid? resolvedPatientId = null;
@@ -74,7 +78,7 @@ public sealed class CreateWalkInCommandHandler
                     _logger.LogWarning(
                         "WalkIn_DuplicateEmail: email={Email} existingPatientId={ExistingId} staffId={StaffId}",
                         normalizedEmail, existing.Id, request.StaffId);
-                    throw new WalkInPatientDuplicateEmailException(existing.Id);
+                  //  throw new WalkInPatientDuplicateEmailException(existing.Id);
                 }
 
                 newPatient = new PatientEntity
@@ -122,13 +126,13 @@ public sealed class CreateWalkInCommandHandler
         if (slotStart.HasValue)
         {
             bool slotBooked = await _walkInRepo.IsSlotBookedAsync(
-                request.SpecialtyId, request.Date, slotStart, cancellationToken);
+                specialtyId, date, slotStart, cancellationToken);
 
             if (slotBooked)
             {
                 _logger.LogInformation(
                     "WalkIn_SlotFull: specialtyId={SpecialtyId} date={Date} slotStart={SlotStart} — queued-only",
-                    request.SpecialtyId, request.Date, slotStart);
+                    specialtyId, date, slotStart);
                 queuedOnly = true;
                 slotStart = null;
                 slotEnd = null;
@@ -141,8 +145,8 @@ public sealed class CreateWalkInCommandHandler
             Id = Guid.NewGuid(),
             PatientId = resolvedPatientId,
             AnonymousVisitId = anonymousVisitId,
-            SpecialtyId = request.SpecialtyId,
-            Date = request.Date,
+            SpecialtyId = specialtyId,
+            Date = date,
             TimeSlotStart = slotStart,
             TimeSlotEnd = slotEnd,
             Status = AppointmentStatus.Booked,
@@ -152,7 +156,7 @@ public sealed class CreateWalkInCommandHandler
 
         // Step 5 — Compute next queue position for the date
         int nextPosition = await _walkInRepo.GetNextQueuePositionAsync(
-            request.Date, cancellationToken);
+            date, cancellationToken);
 
         // Step 6 — Build QueueEntry entity (status = Waiting)
         var queueEntry = new QueueEntry

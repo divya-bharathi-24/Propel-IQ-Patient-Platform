@@ -10,41 +10,123 @@
 
     <nav class="sidebar__nav">
       <div class="sidebar__section-label">Overview</div>
-      <a routerLink="/staff/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item" aria-current="page">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <a
+        routerLink="/staff/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        aria-current="page"
+      >
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
         Dashboard
       </a>
 
       <div class="sidebar__section-label">Patient Care</div>
       <a routerLink="/staff/queue" routerLinkActive="active" class="nav-item">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
         Same-Day Queue
-        <span class="badge badge--error" style="margin-left:auto;">5</span>
+        <span class="badge badge--error" style="margin-left: auto">5</span>
       </a>
       <a routerLink="/staff/walkin" routerLinkActive="active" class="nav-item">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
         Walk-In Booking
       </a>
 
       <div class="sidebar__section-label">Clinical</div>
-      <a routerLink="/staff/appointments" routerLinkActive="active" class="nav-item">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <a
+        routerLink="/staff/appointments"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
         Appointments
       </a>
-      <a routerLink="/staff/patients" routerLinkActive="active" class="nav-item">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <a
+        routerLink="/staff/patients"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
         Code Review
-        <span class="badge badge--warning" style="margin-left:auto;">3</span>
+        <span class="badge badge--warning" style="margin-left: auto">3</span>
       </a>
-      <a routerLink="/staff/settings/reminders" routerLinkActive="active" class="nav-item">
-        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <a
+        routerLink="/staff/settings/reminders"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
         Reminders
       </a>
     </nav>
 
     <div class="sidebar__footer">
       <div class="sidebar__user">
-        <div class="avatar" style="background:var(--color-info-600);">{{ authService.currentInitials() }}</div>
+        <div class="avatar" style="background: var(--color-info-600)">SK</div>
         <div class="sidebar__user-info">
           <div class="sidebar__user-name">{{ authService.currentDisplayName() }}</div>
           <div class="sidebar__user-role">{{ authService.currentRole() }}</div>
@@ -61,11 +143,17 @@
   <main class="main-content" id="main-content">
     <header class="page-header">
       <div>
-        <h1 class="page-header__title">Good morning, {{ authService.currentDisplayName() }} 👋</h1>
-        <p class="page-header__subtitle">{{ today | date:'EEEE, MMMM d, yyyy' }} · Main Clinic</p>
+        <h1 class="page-header__title">
+          Good {{ greetingWord() }}, {{ greetingName() }} 👋
+        </h1>
+        <p class="page-header__subtitle">
+          {{ today | date: "EEEE, MMMM d, yyyy" }} · Main Clinic
+        </p>
       </div>
       <div class="page-header__actions">
-        <a routerLink="/staff/walkin" class="btn btn--primary">+ Walk-in booking</a>
+        <a routerLink="/staff/walkin" class="btn btn--primary"
+          >+ Walk-in booking</a
+        >
       </div>
     </header>
 
@@ -81,7 +169,9 @@
               <div>
                 <div class="stat-card__label">Today's appointments</div>
                 <div class="stat-card__value">18</div>
-                <div class="stat-card__delta stat-card__delta--up">↑ 3 vs yesterday</div>
+                <div class="stat-card__delta stat-card__delta--up">
+                  ↑ 3 vs yesterday
+                </div>
               </div>
               <div class="stat-card__icon stat-card__icon--primary">📅</div>
             </div>
@@ -93,7 +183,12 @@
               <div>
                 <div class="stat-card__label">Queue size</div>
                 <div class="stat-card__value">5</div>
-                <div class="stat-card__delta" style="color:var(--color-warning-700);">2 high-risk patients</div>
+                <div
+                  class="stat-card__delta"
+                  style="color: var(--color-warning-700)"
+                >
+                  2 high-risk patients
+                </div>
               </div>
               <div class="stat-card__icon stat-card__icon--warning">⏳</div>
             </div>
@@ -105,7 +200,12 @@
               <div>
                 <div class="stat-card__label">Pending intakes</div>
                 <div class="stat-card__value">4</div>
-                <div class="stat-card__delta" style="color:var(--color-text-secondary);">Need review</div>
+                <div
+                  class="stat-card__delta"
+                  style="color: var(--color-text-secondary)"
+                >
+                  Need review
+                </div>
               </div>
               <div class="stat-card__icon stat-card__icon--info">📋</div>
             </div>
@@ -117,7 +217,12 @@
               <div>
                 <div class="stat-card__label">Code reviews</div>
                 <div class="stat-card__value">3</div>
-                <div class="stat-card__delta" style="color:var(--color-error-600);">Awaiting approval</div>
+                <div
+                  class="stat-card__delta"
+                  style="color: var(--color-error-600)"
+                >
+                  Awaiting approval
+                </div>
               </div>
               <div class="stat-card__icon stat-card__icon--error">⚕</div>
             </div>
@@ -131,67 +236,93 @@
         <div class="card">
           <div class="card__header">
             <h2 class="card__title">Today's queue</h2>
-            <a routerLink="/staff/queue" class="btn btn--ghost btn--sm">View all →</a>
+            <a routerLink="/staff/queue" class="btn btn--ghost btn--sm"
+              >View all →</a
+            >
           </div>
-          <div class="table-container" style="border:none;border-radius:0;">
-            <table aria-label="Today's patient queue">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Arrival</th>
-                  <th>Wait</th>
-                  <th>Risk</th>
-                  <th>Status</th>
-                  <th><span class="sr-only">Actions</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <a routerLink="/staff/patients/1" class="patient-link">M. Johnson</a>
-                    <br><span class="text-xs text-secondary">Chest pain · Walk-in</span>
-                  </td>
-                  <td>8:42 AM</td>
-                  <td class="wait-time--urgent">47 min</td>
-                  <td><span class="risk-badge risk-badge--high">High</span></td>
-                  <td><span class="badge badge--warning">Waiting</span></td>
-                  <td class="table-actions"><button class="btn btn--primary btn--sm">Check in</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <a routerLink="/staff/patients/2" class="patient-link">R. Thompson</a>
-                    <br><span class="text-xs text-secondary">Follow-up</span>
-                  </td>
-                  <td>9:10 AM</td>
-                  <td>19 min</td>
-                  <td><span class="risk-badge risk-badge--medium">Medium</span></td>
-                  <td><span class="badge badge--success">In Progress</span></td>
-                  <td class="table-actions"><button class="btn btn--secondary btn--sm">View</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <a routerLink="/staff/patients/3" class="patient-link">P. Williams</a>
-                    <br><span class="text-xs text-secondary">Annual check</span>
-                  </td>
-                  <td>9:20 AM</td>
-                  <td>9 min</td>
-                  <td><span class="risk-badge risk-badge--low">Low</span></td>
-                  <td><span class="badge badge--warning">Waiting</span></td>
-                  <td class="table-actions"><button class="btn btn--primary btn--sm">Check in</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <a routerLink="/staff/patients/4" class="patient-link">S. Martinez</a>
-                    <br><span class="text-xs text-secondary">Vaccination</span>
-                  </td>
-                  <td>9:30 AM</td>
-                  <td>—</td>
-                  <td><span class="risk-badge risk-badge--low">Low</span></td>
-                  <td><span class="badge badge--neutral">Scheduled</span></td>
-                  <td class="table-actions"><button class="btn btn--secondary btn--sm">View</button></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="table-container" style="border: none; border-radius: 0">
+            @if (queueLoading()) {
+              <p class="queue-loading" role="status" aria-live="polite">
+                Loading queue…
+              </p>
+            } @else if (queueError()) {
+              <p class="queue-error" role="alert">{{ queueError() }}</p>
+            } @else if (queueItems().length === 0) {
+              <p class="queue-empty">No patients currently in queue.</p>
+            } @else {
+              <table aria-label="Today's patient queue">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Arrival</th>
+                    <th>Status</th>
+                    <th><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of queueItems(); track item.appointmentId) {
+                    <tr>
+                      <td>
+                        <span class="patient-link">{{ item.patientName }}</span>
+                        <br /><span class="text-xs text-secondary">{{
+                          item.bookingType === "WalkIn"
+                            ? "Walk-in"
+                            : "Self-booked"
+                        }}</span>
+                      </td>
+                      <td>
+                        {{
+                          item.timeSlotStart
+                            ? (item.timeSlotStart | slice: 0 : 5)
+                            : "—"
+                        }}
+                      </td>
+                      <td>
+                        <span
+                          class="badge"
+                          [class.badge--warning]="
+                            item.arrivalStatus === 'Waiting'
+                          "
+                          [class.badge--success]="
+                            item.arrivalStatus === 'Arrived'
+                          "
+                          [class.badge--neutral]="
+                            item.arrivalStatus === 'Cancelled'
+                          "
+                          >{{ item.arrivalStatus }}</span
+                        >
+                      </td>
+                      <td class="table-actions">
+                        @if (item.arrivalStatus === "Waiting") {
+                          <button
+                            class="btn btn--primary btn--sm"
+                            [disabled]="checkingInId() === item.appointmentId"
+                            (click)="checkIn(item.appointmentId)"
+                            [attr.aria-label]="'Check in ' + item.patientName"
+                          >
+                            {{
+                              checkingInId() === item.appointmentId
+                                ? "…"
+                                : "Check in"
+                            }}
+                          </button>
+                        } @else {
+                          <button
+                            class="btn btn--secondary btn--sm"
+                            (click)="viewAppointment(item.appointmentId)"
+                            [attr.aria-label]="
+                              'View appointment for ' + item.patientName
+                            "
+                          >
+                            View
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
           </div>
         </div>
 
@@ -201,7 +332,9 @@
           <div class="card">
             <div class="card__header">
               <h2 class="card__title">Pending code reviews</h2>
-              <a routerLink="/staff/patients" class="btn btn--ghost btn--sm">Review all →</a>
+              <a routerLink="/staff/patients" class="btn btn--ghost btn--sm"
+                >Review all →</a
+              >
             </div>
             <div class="card__body code-reviews-list">
               <div class="code-review-item">
@@ -220,7 +353,9 @@
               </div>
               <div class="code-review-item">
                 <div>
-                  <div class="code-review-item__title">P. Williams · Z00.00</div>
+                  <div class="code-review-item__title">
+                    P. Williams · Z00.00
+                  </div>
                   <div class="code-review-item__sub">AI confidence: 95%</div>
                 </div>
                 <span class="badge badge--warning">Pending</span>
@@ -234,9 +369,21 @@
               <h2 class="card__title">Quick links</h2>
             </div>
             <div class="card__body quick-links">
-              <a routerLink="/staff/patients" class="btn btn--secondary btn--full">👤 Patient 360° View</a>
-              <a routerLink="/staff/settings/reminders" class="btn btn--secondary btn--full">🔔 Manage Reminders</a>
-              <a routerLink="/staff/appointments" class="btn btn--secondary btn--full">📅 Appointment Manager</a>
+              <a
+                routerLink="/staff/patients"
+                class="btn btn--secondary btn--full"
+                >👤 Patient 360° View</a
+              >
+              <a
+                routerLink="/staff/settings/reminders"
+                class="btn btn--secondary btn--full"
+                >🔔 Manage Reminders</a
+              >
+              <a
+                routerLink="/staff/appointments"
+                class="btn btn--secondary btn--full"
+                >📅 Appointment Manager</a
+              >
             </div>
           </div>
         </div>

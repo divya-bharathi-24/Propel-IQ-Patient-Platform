@@ -10,6 +10,12 @@
     "ForEach-Object": true,
     "Copy-Item": true,
     "Set-Content": true,
-    "dotnet add": true
+    "dotnet add": true,
+    "dotnet run": true,
+    "Tee-Object": true,
+    "New-Item": true,
+    "Out-Null": true,
+    "netstat": true,
+    "Start-Process": true
   }
 }

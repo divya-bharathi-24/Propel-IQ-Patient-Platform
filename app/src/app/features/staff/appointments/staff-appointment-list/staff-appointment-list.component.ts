@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
+import { SlicePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { StaffAppointmentStore } from '../../state/staff-appointment.store';
 import { RiskBadgeComponent } from '../../../../shared/components/risk-badge/risk-badge.component';
@@ -30,6 +31,7 @@ import { HighRiskFlagBannerComponent } from '../../components/high-risk-flag-ban
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SlicePipe,
     RiskBadgeComponent,
     AppointmentStatusBadgeComponent,
     HighRiskFlagBannerComponent,
@@ -103,11 +105,17 @@ import { HighRiskFlagBannerComponent } from '../../components/high-risk-flag-ban
                 </tr>
               </thead>
               <tbody>
-                @for (row of store.appointments(); track row.id) {
+                @for (row of store.appointments(); track row.appointmentId) {
                   <tr class="appointment-row">
-                    <td class="cell-time">{{ row.timeSlot }}</td>
+                    <td class="cell-time">
+                      {{
+                        row.timeSlotStart
+                          ? (row.timeSlotStart | slice: 0 : 5)
+                          : '—'
+                      }}
+                    </td>
                     <td class="cell-patient">{{ row.patientName }}</td>
-                    <td class="cell-specialty">{{ row.specialty }}</td>
+                    <td class="cell-specialty">{{ row.specialtyName }}</td>
                     <td class="cell-status">
                       <app-appointment-status-badge
                         [status]="asStatus(row.status)"
@@ -122,7 +130,7 @@ import { HighRiskFlagBannerComponent } from '../../components/high-risk-flag-ban
                     <td class="cell-action">
                       <button
                         class="view-btn"
-                        (click)="viewDetail(row.id)"
+                        (click)="viewDetail(row.appointmentId)"
                         [attr.aria-label]="
                           'View details for ' + row.patientName
                         "
@@ -135,7 +143,9 @@ import { HighRiskFlagBannerComponent } from '../../components/high-risk-flag-ban
                   @if (row.noShowRisk?.severity === 'High') {
                     <tr class="banner-row">
                       <td colspan="6" class="banner-cell">
-                        <app-high-risk-flag-banner [appointmentId]="row.id" />
+                        <app-high-risk-flag-banner
+                          [appointmentId]="row.appointmentId"
+                        />
                       </td>
                     </tr>
                   }

@@ -57,10 +57,18 @@ public sealed class CalendarSyncRetryProcessor : BackgroundService
 
         using var timer = new PeriodicTimer(PollingInterval);
 
-        while (!stoppingToken.IsCancellationRequested &&
-               await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            await ProcessDueRetriesAsync(stoppingToken);
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await ProcessDueRetriesAsync(stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Expected during graceful host shutdown — swallow so the host does not
+            // log this as an unhandled background-service failure. (NFR-018)
+            _logger.LogInformation("CalendarSyncRetryProcessor stopped via cancellation.");
         }
     }
 

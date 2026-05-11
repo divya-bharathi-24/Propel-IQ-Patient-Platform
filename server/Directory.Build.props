@@ -1,0 +1,66 @@
+<Project>
+  <!-- This file contains common properties for all projects in the solution -->
+
+  <PropertyGroup>
+    <!-- Enable deterministic builds for better caching -->
+    <Deterministic>true</Deterministic>
+
+    <!-- Standard output settings - let MSBuild manage copies normally -->
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
+
+    <!-- Shared Roslyn compiler for faster incremental builds -->
+    <UseSharedCompilation>true</UseSharedCompilation>
+
+    <!-- Skip reference assembly generation (not needed for app projects) -->
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+    <!-- Disable doc XML generation unless explicitly enabled per-project -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Suppress unnecessary package generation -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Keep assembly info generation on -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- Faster VS incremental build checks -->
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+  </PropertyGroup>
+
+  <!--
+    Pre-build target: Before building the API Gateway, kill any running
+    instance so MSBuild can overwrite the locked bin/obj files.
+
+    Two cases are handled:
+      1. Apphost process  – When the app was started via 'dotnet run', .NET
+         launches an apphost whose process name equals the assembly name
+         ("Propel.Api.Gateway"). Kill it by name.
+      2. dotnet run host  – Older invocations may show up as a "dotnet"
+         process. Use Get-CimInstance (replaces deprecated WMI) to match
+         only those whose command line references this project's DLL.
+
+    ContinueOnError/IgnoreExitCode ensure the build never fails here even
+    when nothing is running.
+  -->
+  <Target Name="KillRunningGateway"
+          BeforeTargets="BeforeBuild"
+          Condition="'$(MSBuildProjectName)' == 'Propel.Api.Gateway'">
+    <Message Text="[PreBuild] Stopping any running Propel.Api.Gateway instance..." Importance="high" />
+    <Exec Command="powershell -NonInteractive -NoProfile -Command &quot;
+      # 1. Kill the apphost process (launched by dotnet run or direct execution)
+      Stop-Process -Name 'Propel.Api.Gateway' -Force -ErrorAction SilentlyContinue;
+
+      # 2. Kill any 'dotnet' process whose command line references this project DLL
+      Get-CimInstance Win32_Process -Filter &quot;&quot;Name='dotnet.exe'&quot;&quot; -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -like '*Propel.Api.Gateway*' } |
+        ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue };
+
+      # Brief pause to let the OS release file handles before MSBuild copies
+      Start-Sleep -Milliseconds 800
+    &quot;"
+          IgnoreExitCode="true"
+          ContinueOnError="true" />
+  </Target>
+
+</Project>

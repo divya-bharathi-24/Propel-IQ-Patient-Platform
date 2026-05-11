@@ -1,0 +1,24 @@
+# MSBuild Build Configuration to Prevent File Locking
+
+# This file should be placed in your solution root directory
+# It helps prevent "file is being used by another process" errors
+
+[*.csproj]
+# MSBuild properties to reduce file locking
+msbuild_use_shared_compilation = true
+msbuild_disable_out_of_proc_task_host = false
+msbuild_produce_reference_assembly = false
+
+# Build optimization
+msbuild_deterministic = true
+msbuild_accelerate_builds_in_visual_studio = true
+
+# File copy optimization
+msbuild_create_hard_links_for_copy_additional_files_if_possible = true
+msbuild_create_hard_links_for_copy_local_if_possible = true
+msbuild_create_hard_links_for_publish_files_if_possible = true
+
+[*.sln]
+# Solution-level settings
+indent_style = space
+indent_size = 2

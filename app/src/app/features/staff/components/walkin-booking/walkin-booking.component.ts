@@ -1,9 +1,15 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { PatientSearchResultDto } from '../../models/walkin.models';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import {
+  PatientSearchResultDto,
+  WalkInBookingDto,
+} from '../../models/walkin.models';
 import { WalkInStore } from '../../state/walkin.store';
 import { PatientSearchComponent } from '../patient-search/patient-search.component';
 import { QuickCreatePatientFormComponent } from '../quick-create-patient/quick-create-patient-form.component';
+import { SpecialtyService } from '../../../appointments/services/specialty.service';
+import { SpecialtyDto } from '../../../appointments/models/slot.models';
 import { effect } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -16,34 +22,40 @@ type WalkInStep = 'search' | 'create' | 'confirm';
   imports: [
     RouterLink,
     RouterLinkActive,
+    ReactiveFormsModule,
     PatientSearchComponent,
     QuickCreatePatientFormComponent,
   ],
   templateUrl: './walkin-booking.component.html',
   styleUrls: ['./walkin-booking.component.scss'],
 })
-export class WalkInBookingComponent implements OnDestroy {
+export class WalkInBookingComponent implements OnInit, OnDestroy {
   protected readonly store = inject(WalkInStore);
   private readonly router = inject(Router);
-  readonly authService = inject(AuthService);
-
-  logout(): void {
-    this.authService.logout();
-  }
+  private readonly fb = inject(FormBuilder);
+  private readonly specialtyService = inject(SpecialtyService);
 
   currentStep: WalkInStep = 'search';
   isAnonymous = false;
+  specialties = signal<SpecialtyDto[]>([]);
+
+  /** Today's date in YYYY-MM-DD for the min date attribute */
+  readonly todayStr = new Date().toISOString().split('T')[0];
+
+  confirmForm = this.fb.group({
+    specialtyId: ['', Validators.required],
+    date: [this.todayStr, Validators.required],
+  });
 
   constructor() {
-    // Navigate to queue on successful submission
+    // Navigate to confirm step on successful submission, then to queue
     effect(() => {
       if (
         this.store.actionState() === 'success' &&
         this.store.confirmedBooking()
       ) {
-        const booking = this.store.confirmedBooking()!;
-        if (booking.queuedOnly && this.currentStep !== 'confirm') {
-          // Slot full — move to confirm step to show the queue banner
+        if (this.currentStep !== 'confirm') {
+          // Always advance to confirm step to show booking result (queue banner or summary)
           this.currentStep = 'confirm';
           return;
         }
@@ -54,13 +66,23 @@ export class WalkInBookingComponent implements OnDestroy {
     });
   }
 
+  ngOnInit(): void {
+    this.specialtyService.getSpecialties().subscribe({
+      next: (list) => this.specialties.set(list),
+      error: () => {
+        /* non-critical — user can still type the specialty manually */
+      },
+    });
+  }
+
   ngOnDestroy(): void {
     this.store.clearState();
   }
 
   // ── Step 1: PatientSearch event handlers ─────────────────────────────────
 
-  onPatientSelected(_patient: PatientSearchResultDto): void {
+  onPatientSelected(patient: PatientSearchResultDto): void {
+    this.store.selectPatient(patient);
     this.isAnonymous = false;
     this.currentStep = 'confirm';
   }
@@ -94,16 +116,33 @@ export class WalkInBookingComponent implements OnDestroy {
       return;
     }
 
+    if (this.confirmForm.invalid) {
+      this.confirmForm.markAllAsTouched();
+      return;
+    }
+
+    const specialtyId = this.confirmForm.value.specialtyId!;
+    const date = this.confirmForm.value.date!;
+
+    const basePayload: Pick<WalkInBookingDto, 'specialtyId' | 'date'> = {
+      specialtyId,
+      date,
+    };
+
     // Anonymous path — submit now
     if (this.isAnonymous) {
-      this.store.submitWalkIn({ mode: 'anonymous' });
+      this.store.submitWalkIn({ mode: 'anonymous', ...basePayload });
       return;
     }
 
     // Linked patient path — submit with patientId
     const selected = this.store.selectedPatient();
     if (selected) {
-      this.store.submitWalkIn({ mode: 'link', patientId: selected.patientId });
+      this.store.submitWalkIn({
+        mode: 'link',
+        patientId: selected.patientId,
+        ...basePayload,
+      });
     }
   }
 

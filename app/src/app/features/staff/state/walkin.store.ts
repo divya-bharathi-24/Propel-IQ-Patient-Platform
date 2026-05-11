@@ -19,6 +19,8 @@ export type WalkInActionState =
 export interface WalkInState {
   searchResults: PatientSearchResultDto[];
   selectedPatient: PatientSearchResultDto | null;
+  selectedSpecialtyId: string | null;
+  selectedDate: string | null;
   actionState: WalkInActionState;
   errorMessage: string | null;
   duplicatePatient: { patientId: string; name: string } | null;
@@ -29,6 +31,8 @@ export interface WalkInState {
 const initialState: WalkInState = {
   searchResults: [],
   selectedPatient: null,
+  selectedSpecialtyId: null,
+  selectedDate: null,
   actionState: 'idle',
   errorMessage: null,
   duplicatePatient: null,
@@ -77,6 +81,16 @@ export const WalkInStore = signalStore(
     /** Selects a patient from search results. */
     selectPatient(patient: PatientSearchResultDto): void {
       patchState(store, { selectedPatient: patient });
+    },
+
+    /** Sets the selected specialty for the walk-in booking. */
+    setSpecialty(specialtyId: string): void {
+      patchState(store, { selectedSpecialtyId: specialtyId });
+    },
+
+    /** Sets the appointment date for the walk-in booking (YYYY-MM-DD). */
+    setDate(date: string): void {
+      patchState(store, { selectedDate: date });
     },
 
     /**

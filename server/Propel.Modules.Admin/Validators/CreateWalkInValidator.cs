@@ -37,13 +37,13 @@ public sealed class CreateWalkInValidator : AbstractValidator<CreateWalkInComman
 
         // SpecialtyId: always required
         RuleFor(x => x.SpecialtyId)
-            .NotEmpty()
-            .WithMessage("'SpecialtyId' must not be empty.");
+            .NotNull().WithMessage("'SpecialtyId' is required.")
+            .NotEqual(Guid.Empty).WithMessage("'SpecialtyId' must not be empty.");
 
         // Date: always today or a future date
         RuleFor(x => x.Date)
-            .NotEmpty()
-            .Must(date => date >= DateOnly.FromDateTime(DateTime.UtcNow.Date))
+            .NotNull().WithMessage("'Date' is required.")
+            .Must(date => date.HasValue && date.Value >= DateOnly.FromDateTime(DateTime.UtcNow.Date))
             .WithMessage("'Date' must be today or a future date.");
 
         // TimeSlotEnd must be provided when TimeSlotStart is provided

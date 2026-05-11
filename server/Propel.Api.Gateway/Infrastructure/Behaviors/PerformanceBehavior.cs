@@ -57,9 +57,9 @@ public sealed class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior
     {
         try
         {
-            // Resolve Redis at call time so development mode (where factory throws) is handled
-            // gracefully without breaking the DI container build or the behavior pipeline.
-            var redis = _serviceProvider.GetRequiredService<IConnectionMultiplexer>();
+            // Resolve Redis at call time; if not registered (e.g. Development mode), skip silently.
+            var redis = _serviceProvider.GetService<IConnectionMultiplexer>();
+            if (redis is null) return;
             var db    = redis.GetDatabase();
 
             string listKey   = $"api:perf:latency:{requestName}";

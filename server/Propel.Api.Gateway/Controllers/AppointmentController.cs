@@ -32,9 +32,10 @@ public sealed class AppointmentController : ControllerBase
     /// <summary>
     /// Returns all available medical specialties (US_018, AC-1).
     /// Used by the booking wizard to populate the specialty dropdown before slot selection.
+    /// Also used by Staff when creating walk-in bookings or quick-creating patients.
     /// </summary>
     [HttpGet("specialties")]
-    [Authorize(Roles = "Patient")]
+    [Authorize(Roles = "Patient,Staff,Admin")]
     [ProducesResponseType(typeof(IReadOnlyList<SpecialtyDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

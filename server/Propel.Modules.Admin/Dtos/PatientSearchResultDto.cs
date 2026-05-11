@@ -5,7 +5,7 @@ namespace Propel.Modules.Admin.Dtos;
 /// Contains only the minimum fields required for the live-search UI — no PHI beyond name.
 /// </summary>
 public sealed record PatientSearchResultDto(
-    Guid Id,
+    Guid PatientId,
     string Name,
     DateOnly DateOfBirth,
     string Email);

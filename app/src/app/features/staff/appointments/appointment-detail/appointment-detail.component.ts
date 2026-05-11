@@ -4,7 +4,7 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -38,6 +38,7 @@ import { SendReminderNowButtonComponent } from './send-reminder-now-button/send-
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatePipe,
+    SlicePipe,
     RouterLink,
     MatButtonModule,
     MatCardModule,

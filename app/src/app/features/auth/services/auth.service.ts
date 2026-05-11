@@ -33,7 +33,7 @@ export class AuthService {
     role: null,
     deviceId: null,
     expiresAt: null,
-    email: null,
+    name: null,
   });
 
   /** True when a valid access token is held in memory. */
@@ -55,36 +55,8 @@ export class AuthService {
   /** The authenticated user's ID from the current JWT. */
   readonly currentUserId = computed(() => this._authState().userId);
 
-  /** Email of the logged-in user (stored at login time). */
-  readonly currentUserEmail = computed(() => this._authState().email);
-
-  /**
-   * Display-friendly name derived from the stored email.
-   * e.g. "john.doe@clinic.com" → "John Doe"
-   */
-  readonly currentDisplayName = computed(() => {
-    const email = this._authState().email;
-    if (!email) return 'User';
-    const localPart = email.split('@')[0];
-    return localPart
-      .replace(/[._-]/g, ' ')
-      .split(' ')
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-  });
-
-  /**
-   * Single initial(s) for avatar display.
-   * e.g. "John Doe" → "JD"
-   */
-  readonly currentInitials = computed(() => {
-    const name = this.currentDisplayName();
-    return name
-      .split(' ')
-      .slice(0, 2)
-      .map(w => w.charAt(0).toUpperCase())
-      .join('');
-  });
+  /** The authenticated user's display name. */
+  readonly currentUserName = computed(() => this._authState().name);
 
   /**
    * True when the access token is within the proactive-refresh window
@@ -187,7 +159,8 @@ export class AuthService {
       role: res.role,
       deviceId: res.deviceId,
       expiresAt: Date.now() + res.expiresIn * 1_000,
-      email: res.email ?? this._loginEmail,
+      // Preserve existing name on refresh (refresh response doesn't include name)
+      name: res.name ?? this._authState().name,
     });
 
     console.log('[AuthService] Token state after storage:', {
@@ -207,7 +180,7 @@ export class AuthService {
       role: null,
       deviceId: null,
       expiresAt: null,
-      email: null,
+      name: null,
     });
   }
 
