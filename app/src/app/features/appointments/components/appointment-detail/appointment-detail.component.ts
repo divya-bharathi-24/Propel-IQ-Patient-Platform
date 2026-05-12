@@ -62,8 +62,7 @@ import { CommonModule } from '@angular/common';
             <div class="detail-section">
               <h2>Actions</h2>
               <div class="action-buttons">
-                <button class="btn btn--outline" (click)="completeIntake()">Complete Intake Form</button>
-                <button class="btn btn--outline" (click)="viewDocuments()">View Documents</button>
+
                 <button class="btn btn--outline" routerLink="/dashboard">Back to Dashboard</button>
               </div>
             </div>
