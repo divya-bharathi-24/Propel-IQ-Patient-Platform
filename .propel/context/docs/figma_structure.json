@@ -7,7 +7,7 @@
     "platform": "Web (Responsive)",
     "designSystemRef": ".propel/context/docs/designsystem.md",
     "componentLibraryRef": ".propel/context/docs/component_library.md",
-    "figmaSpecRef": ".propel/context/docs/figma_spec_unified_patient_platform.md"
+    "figmaSpecRef": ".propel/context/docs/figma_spec.md"
   },
   "figmaFile": {
     "name": "UniPatient — Design System & Screens",
@@ -29,7 +29,7 @@
               "Platform: Web Responsive (Angular 18)",
               "Stakeholders: Patient, Staff, Admin",
               "Design System ref: designsystem.md",
-              "Spec ref: figma_spec_unified_patient_platform.md"
+              "Spec ref: figma_spec.md"
             ]
           }
         ]

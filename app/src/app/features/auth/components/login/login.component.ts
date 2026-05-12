@@ -7,10 +7,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../services/auth.service';
 import { SessionTimerService } from '../../../../core/auth/session-timer.service';
 
@@ -28,10 +24,6 @@ const SESSION_MESSAGES: Record<SessionReason, string> = {
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -108,6 +100,24 @@ export class LoginComponent implements OnInit {
       },
       error: (err: { status: number; message: string }) => {
         this.isSubmitting.set(false);
+        // Guard: if tokens were stored before the transport error (ERR_EMPTY_RESPONSE
+        // from the proxy dropping the connection after the body was delivered),
+        // treat the login as successful and navigate normally.
+        if (this.authService.isAuthenticated()) {
+          this.authService.registerSessionTimerStop(() =>
+            this.sessionTimer.stop(),
+          );
+          this.sessionTimer.start(() => this.authService.logout('idle_timeout'));
+          const role = this.authService.currentRole();
+          if (role === 'Admin') {
+            this.router.navigate(['/admin/users']);
+          } else if (role === 'Staff') {
+            this.router.navigate(['/staff/walkin']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+          return;
+        }
         if (err.status === 401 || err.status === 400) {
           this.serverError.set('Invalid email or password. Please try again.');
         } else {

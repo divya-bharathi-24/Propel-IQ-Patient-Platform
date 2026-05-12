@@ -1,0 +1,165 @@
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+<div class="app-shell">
+  <!-- Staff Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-icon">+</div>
+      <span class="sidebar__brand-name">UniPatient</span>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="sidebar__section-label">Overview</div>
+      <a routerLink="/staff/dashboard" routerLinkActive="active" class="nav-item">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <div class="sidebar__section-label">Patient Care</div>
+      <a routerLink="/staff/queue" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item" aria-current="page">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Same-Day Queue
+        <span class="badge badge--error queue-badge">{{ queueItems().length }}</span>
+      </a>
+      <a routerLink="/staff/walkin" routerLinkActive="active" class="nav-item">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Walk-In Booking
+      </a>
+      <div class="sidebar__section-label">Clinical</div>
+      <a routerLink="/staff/appointments" routerLinkActive="active" class="nav-item">
+        <svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="avatar" style="background:var(--color-info-600);">{{ authService.currentInitials() }}</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name">{{ authService.currentDisplayName() }}</div>
+          <div class="sidebar__user-role">{{ authService.currentRole() }}</div>
+        </div>
+      </div>
+      <button class="sidebar__logout" (click)="logout()" aria-label="Log out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+    <header class="page-header">
+      <h1 class="page-header__title">Same-Day Queue</h1>
+      <div class="page-header__actions">
+        <div class="search-bar">
+          <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input
+            type="text"
+            class="form-input search-bar__input"
+            placeholder="Search by patient name…"
+            [(ngModel)]="searchQuery"
+            aria-label="Search queue by patient name"
+          />
+        </div>
+        <select class="form-input form-select" [(ngModel)]="statusFilter" aria-label="Filter by status">
+          <option value="">All statuses</option>
+          <option value="Waiting">Waiting</option>
+          <option value="Arrived">In Progress</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <a routerLink="/staff/walkin" class="btn btn--primary">+ Walk-in</a>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <!-- Live stats -->
+      <div class="grid grid--4 mb-6">
+        <div class="card stat-card--waiting">
+          <div class="card__body stat-card">
+            <div class="stat-card__label">Waiting</div>
+            <div class="stat-card__value" style="color:var(--color-error-700);">{{ waitingCount() }}</div>
+          </div>
+        </div>
+        <div class="card stat-card--inprogress">
+          <div class="card__body stat-card">
+            <div class="stat-card__label">In progress</div>
+            <div class="stat-card__value" style="color:var(--color-primary-700);">{{ arrivedCount() }}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__body stat-card">
+            <div class="stat-card__label">Completed today</div>
+            <div class="stat-card__value">{{ completedCount() }}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__body stat-card">
+            <div class="stat-card__label">Avg wait time</div>
+            <div class="stat-card__value stat-card__value--lg">23 min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error banner -->
+      @if (errorMessage()) {
+        <div class="alert alert--error mb-6" role="alert" aria-live="assertive">
+          <span>{{ errorMessage() }}</span>
+          <button type="button" class="btn btn--secondary btn--sm" (click)="refresh$.next()">Retry</button>
+        </div>
+      }
+
+      <!-- Queue table -->
+      <div
+        class="table-container"
+        aria-label="Same-Day Appointment Queue"
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        <!-- Skeleton loader (initial load only) -->
+        @if (isLoading()) {
+          <div class="skeleton-list" aria-label="Loading queue…" role="status" aria-hidden="true">
+            @for (n of skeletonRows; track n) {
+              <div class="skeleton-card"></div>
+            }
+          </div>
+        }
+
+        <!-- Populated table -->
+        @if (!isLoading()) {
+          <table aria-label="Same-Day Queue">
+            <thead>
+              <tr>
+                <th scope="col">Position</th>
+                <th scope="col">Patient</th>
+                <th scope="col">Chief complaint</th>
+                <th scope="col">Arrival time</th>
+                <th scope="col">Wait</th>
+                <th scope="col">Risk</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of filteredItems(); track item.appointmentId; let i = $index) {
+                <app-queue-row
+                  [item]="item"
+                  (markArrived)="onMarkArrived($event)"
+                  (revertArrived)="onRevertArrived($event)"
+                />
+              } @empty {
+                <tr>
+                  <td colspan="8" class="empty-state" role="status">
+                    <div class="empty-state__icon">✅</div>
+                    <h2 class="empty-state__title">Queue is clear</h2>
+                    <p class="empty-state__message">No patients currently waiting.</p>
+                    <a routerLink="/staff/walkin" class="btn btn--primary">Register walk-in</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </main>
+</div>

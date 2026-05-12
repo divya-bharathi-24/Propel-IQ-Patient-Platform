@@ -1,0 +1,26 @@
+<div class="card stat-card">
+  <div class="stat-card__label">{{ label }}</div>
+  <div class="stat-card__value">{{ value }}</div>
+  @if (delta) {
+    <div 
+      class="stat-card__delta"
+      [class.stat-card__delta--up]="deltaType === 'up'"
+      [class.stat-card__delta--down]="deltaType === 'down'"
+    >
+      @if (deltaType === 'up') { ↑ }
+      @if (deltaType === 'down') { ↓ }
+      {{ delta }}
+    </div>
+  }
+  @if (badgeText) {
+    <span 
+      class="badge mt-2"
+      [class.badge--success]="badgeType === 'success'"
+      [class.badge--warning]="badgeType === 'warning'"
+      [class.badge--error]="badgeType === 'error'"
+      [class.badge--info]="badgeType === 'info'"
+    >
+      {{ badgeText }}
+    </span>
+  }
+</div>

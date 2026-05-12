@@ -39,6 +39,7 @@ export class RegistrationFormComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
+  readonly serverError = signal<string | null>(null);
   readonly maxDob = new Date();
 
   form!: FormGroup;
@@ -83,6 +84,7 @@ export class RegistrationFormComponent implements OnInit {
     }
 
     this.isSubmitting.set(true);
+    this.serverError.set(null);
 
     const raw = this.form.getRawValue();
     const dobValue: Date | string = raw.dateOfBirth;
@@ -112,6 +114,10 @@ export class RegistrationFormComponent implements OnInit {
           this.emailControl.setErrors({ alreadyRegistered: true });
         } else if (err.status === 400) {
           this.emailControl.setErrors({ serverError: err.message });
+        } else {
+          this.serverError.set(
+            err.message || 'Something went wrong. Please try again.',
+          );
         }
       },
     });

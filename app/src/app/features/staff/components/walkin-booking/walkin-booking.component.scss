@@ -1,0 +1,321 @@
+// SCR-015: Walk-In Booking — UniPatient Design System
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-surface-secondary);
+}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--color-primary-900);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.sidebar__brand-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary-400);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.sidebar__brand-name {
+  color: white;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-body-lg);
+}
+
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sidebar__footer {
+  padding: var(--space-4);
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sidebar__user-info { min-width: 0; }
+
+.sidebar__user-name {
+  color: white;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__user-role {
+  color: var(--color-primary-300);
+  font-size: var(--font-size-caption);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-primary-200);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background var(--motion-duration-fast), color var(--motion-duration-fast);
+}
+
+.nav-item:hover { background: rgba(255,255,255,.08); color: white; }
+.nav-item.active { background: rgba(255,255,255,.15); color: white; }
+.nav-item__icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ── Main content ──────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.page-header {
+  background: var(--color-surface-primary);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-header__title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.page-header__subtitle {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.page-header__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* ── Stepper ───────────────────────────────────────────── */
+.stepper {
+  background: var(--color-surface-primary);
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 0 var(--space-6);
+}
+
+.stepper__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.stepper__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  position: relative;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  border-bottom: 2px solid transparent;
+  transition: color var(--motion-duration-fast);
+}
+
+.stepper__item + .stepper__item::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+}
+
+.stepper__item--active {
+  color: var(--color-primary-700);
+  border-bottom-color: var(--color-primary-700);
+}
+
+.stepper__item--active .stepper__number {
+  background: var(--color-primary-700);
+  color: white;
+}
+
+.stepper__number {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-200);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+/* ── Page body ─────────────────────────────────────────── */
+.page-body {
+  flex: 1;
+  padding: var(--space-6);
+  max-width: 900px;
+  overflow-y: auto;
+}
+
+/* ── Confirm step ──────────────────────────────────────── */
+.confirm-card {
+  max-width: 600px;
+  margin-bottom: var(--space-5);
+}
+
+.summary-row {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+.summary-row:last-child { border-bottom: none; }
+
+.summary-row__label {
+  color: var(--color-text-secondary);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.summary-row__value {
+  color: var(--color-text-primary);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+/* ── Spinner ───────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: white;
+  border-radius: var(--radius-full);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Avatar ────────────────────────────────────────────── */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-600);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+/* ── Utility ───────────────────────────────────────────── */
+.mb-5 { margin-bottom: var(--space-5); }
+.mt-4 { margin-top: var(--space-4); }
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .sidebar { display: none; }
+  .page-body { padding: var(--space-4); }
+  .stepper__label { display: none; }
+  .confirm-actions { flex-direction: column; }
+}
+
+/* -- Logout Button -- */
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar__logout:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* -- Logout Button -- */
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar__logout:hover {
+  background: rgba(239,68,68,0.2);
+  color: #fca5a5;
+  border-color: rgba(239,68,68,0.4);
+}

@@ -101,9 +101,9 @@ export const StaffAppointmentStore = signalStore(
               errorMessage: null,
             }),
           ),
-          switchMap((date) =>
+          switchMap((date: string) =>
             service.getAppointments(date).pipe(
-              tap((appointments) =>
+              tap((appointments: StaffAppointmentDto[]) =>
                 patchState(store, {
                   appointments,
                   loadingState: 'loaded',
@@ -147,7 +147,7 @@ export const StaffAppointmentStore = signalStore(
               reminderErrorReason: null,
             }),
           ),
-          switchMap((id) =>
+          switchMap((id: string) =>
             service.getAppointmentById(id).pipe(
               tap((appointment: StaffAppointmentDetailDto) => {
                 const reminderState: ReminderState =
@@ -188,7 +188,7 @@ export const StaffAppointmentStore = signalStore(
               reminderErrorReason: null,
             }),
           ),
-          switchMap((appointmentId) =>
+          switchMap((appointmentId: string) =>
             reminderService.triggerManualReminder(appointmentId).pipe(
               tap((response: TriggerReminderResponseDto) => {
                 const lastManualReminder: LastManualReminderDto = {

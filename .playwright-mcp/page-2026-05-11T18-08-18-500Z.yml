@@ -1,0 +1,54 @@
+- generic [ref=e40]:
+  - link "Skip to main content" [ref=e41] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e42]:
+    - navigation "Staff navigation" [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: +
+        - generic [ref=e46]: UniPatient
+      - navigation [ref=e47]:
+        - link "Dashboard" [ref=e48] [cursor=pointer]:
+          - /url: /staff/dashboard
+          - img [ref=e49]
+          - text: Dashboard
+        - link "Same-Day Queue 5" [ref=e54] [cursor=pointer]:
+          - /url: /staff/queue
+          - img [ref=e55]
+          - text: Same-Day Queue
+          - generic [ref=e56]: "5"
+        - link "Walk-In Booking" [ref=e57] [cursor=pointer]:
+          - /url: /staff/walkin
+          - img [ref=e58]
+          - text: Walk-In Booking
+      - generic [ref=e62]:
+        - generic [ref=e63]: SK
+        - generic [ref=e64]:
+          - generic [ref=e65]: Sarah Kim, RN
+          - generic [ref=e66]: Staff
+    - main "Walk-in booking wizard" [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - heading "Walk-In Booking" [level=1] [ref=e70]
+          - paragraph [ref=e71]: Register a walk-in patient and add them to today's queue
+        - link "← Dashboard" [ref=e73] [cursor=pointer]:
+          - /url: /staff/dashboard
+      - navigation "Booking steps" [ref=e74]:
+        - list [ref=e75]:
+          - listitem [ref=e76]:
+            - generic [ref=e77]: "1"
+            - generic [ref=e78]: Search Patient
+          - listitem [ref=e79]:
+            - text: ›
+            - generic [ref=e80]: "2"
+            - generic [ref=e81]: Create Patient
+          - listitem [ref=e82]:
+            - text: ›
+            - generic [ref=e83]: "3"
+            - generic [ref=e84]: Confirm
+      - region "Search for existing patient" [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e90]:
+            - generic [ref=e91]: Search by name or date of birth
+            - searchbox "Search by name or date of birth" [ref=e93]
+            - img [ref=e95]: search
+          - generic [ref=e98]: Enter at least 2 characters to search

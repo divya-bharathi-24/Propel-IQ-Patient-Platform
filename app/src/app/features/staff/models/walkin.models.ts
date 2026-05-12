@@ -19,6 +19,10 @@ export interface WalkInBookingDto {
   name?: string;
   contactNumber?: string;
   email?: string;
+  /** Always required — UUID of the target specialty */
+  specialtyId: string;
+  /** Always required — appointment date in 'YYYY-MM-DD' format */
+  date: string;
 }
 
 /** Response from POST /api/staff/walkin */

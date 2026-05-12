@@ -14,11 +14,13 @@ export interface NoShowRiskDto {
 
 /** A single row returned by GET /api/staff/appointments?date={date} */
 export interface StaffAppointmentDto {
-  id: string;
+  appointmentId: string;
   patientName: string;
-  specialty: string;
-  /** Formatted as "HH:mm" */
-  timeSlot: string;
+  specialtyName: string;
+  date: string;
+  /** Formatted as "HH:mm:ss" — null when no slot assigned */
+  timeSlotStart: string | null;
+  timeSlotEnd: string | null;
   status: string;
   /** Null when the risk calculation job has not yet run for this appointment. */
   noShowRisk: NoShowRiskDto | null;

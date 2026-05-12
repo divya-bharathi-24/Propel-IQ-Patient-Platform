@@ -20,7 +20,7 @@ export class ThreeSixtyViewPage {
   }
 
   get errorAlert(): Locator {
-    return this.page.getByRole('alert');
+    return this.page.getByTestId('verify-error-alert');
   }
 
   get extractionFailedNotice(): Locator {

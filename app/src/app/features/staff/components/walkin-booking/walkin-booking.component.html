@@ -1,129 +1,277 @@
-<main class="walkin-booking-wizard" aria-label="Walk-in booking wizard">
-  <header class="wizard-header">
-    <h1>Walk-In Booking</h1>
-    <button
-      mat-icon-button
-      type="button"
-      (click)="onCancelWizard()"
-      aria-label="Cancel walk-in booking and return to queue"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-  </header>
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
 
-  <!-- Step indicator (visual only) -->
-  <nav class="wizard-steps" aria-label="Booking steps">
-    <ol>
-      <li
-        [class.active]="currentStep === 'search'"
-        [attr.aria-current]="currentStep === 'search' ? 'step' : undefined"
+<div class="app-shell">
+  <!-- Staff Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-icon">+</div>
+      <span class="sidebar__brand-name">UniPatient</span>
+    </div>
+    <nav class="sidebar__nav">
+      <a
+        routerLink="/staff/dashboard"
+        routerLinkActive="active"
+        class="nav-item"
       >
-        1. Search Patient
-      </li>
-      <li
-        [class.active]="currentStep === 'create'"
-        [attr.aria-current]="currentStep === 'create' ? 'step' : undefined"
-      >
-        2. Create Patient
-      </li>
-      <li
-        [class.active]="currentStep === 'confirm'"
-        [attr.aria-current]="currentStep === 'confirm' ? 'step' : undefined"
-      >
-        3. Confirm
-      </li>
-    </ol>
-  </nav>
-
-  <!-- Step 1: Patient Search -->
-  @if (currentStep === "search") {
-    <app-patient-search
-      (patientSelected)="onPatientSelected($event)"
-      (createNewRequested)="onCreateNewRequested()"
-      (anonymousRequested)="onAnonymousRequested()"
-    />
-  }
-
-  <!-- Step 2: Quick Create Patient Form -->
-  @if (currentStep === "create") {
-    <app-quick-create-patient-form (backRequested)="onBackToSearch()" />
-  }
-
-  <!-- Step 3: Confirmation -->
-  @if (currentStep === "confirm") {
-    <section class="confirm-step" aria-label="Confirm walk-in booking">
-      <!-- Slot full informational banner (not an error) -->
-      @if (store.slotFullWarning()) {
-        <div
-          class="slot-full-banner"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <mat-icon aria-hidden="true">queue</mat-icon>
-          <p>
-            This time slot is fully booked — the walk-in will be added to the
-            <strong>same-day queue</strong> without a specific time slot
-            assignment.
-          </p>
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+        Dashboard
+      </a>
+      <a routerLink="/staff/queue" routerLinkActive="active" class="nav-item">
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+        </svg>
+        Same-Day Queue
+        <span class="badge badge--error" style="margin-left: auto">5</span>
+      </a>
+      <a
+        routerLink="/staff/walkin"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item active"
+        aria-current="page"
+      >
+        <svg
+          class="nav-item__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+        </svg>
+        Walk-In Booking
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="avatar" style="background: var(--color-info-600)">SK</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name">{{ authService.currentDisplayName() }}</div>
+          <div class="sidebar__user-role">{{ authService.currentRole() }}</div>
         </div>
-      }
-
-      <!-- Appointment summary -->
-      <div class="appointment-summary">
-        @if (isAnonymous) {
-          <p>
-            <mat-icon aria-hidden="true">hail</mat-icon>
-            <strong>Anonymous visit</strong> — no patient record linked.
-          </p>
-        } @else if (store.selectedPatient()) {
-          <p>
-            <mat-icon aria-hidden="true">person</mat-icon>
-            Patient: <strong>{{ store.selectedPatient()!.name }}</strong> ({{
-              store.selectedPatient()!.email
-            }})
-          </p>
-        }
-        <p>Date: <strong>Today</strong></p>
       </div>
+      <button class="sidebar__logout" (click)="logout()" aria-label="Log out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
+      </button>
+    </div>
+  </aside>
 
-      <!-- Error state -->
-      @if (store.actionState() === "error" && store.errorMessage()) {
-        <div
-          class="inline-error"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
+  <!-- Main Content -->
+  <main
+    class="main-content"
+    id="main-content"
+    aria-label="Walk-in booking wizard"
+  >
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Walk-In Booking</h1>
+        <p class="page-header__subtitle">
+          Register a walk-in patient and add them to today's queue
+        </p>
+      </div>
+      <div class="page-header__actions">
+        <a routerLink="/staff/dashboard" class="btn btn--ghost">← Dashboard</a>
+      </div>
+    </header>
+
+    <!-- Step indicator -->
+    <nav class="stepper" aria-label="Booking steps">
+      <ol class="stepper__list">
+        <li
+          class="stepper__item"
+          [class.stepper__item--active]="currentStep === 'search'"
+          [attr.aria-current]="currentStep === 'search' ? 'step' : undefined"
         >
-          {{ store.errorMessage() }}
-        </div>
+          <span class="stepper__number">1</span>
+          <span class="stepper__label">Search Patient</span>
+        </li>
+        <li
+          class="stepper__item"
+          [class.stepper__item--active]="currentStep === 'create'"
+          [attr.aria-current]="currentStep === 'create' ? 'step' : undefined"
+        >
+          <span class="stepper__number">2</span>
+          <span class="stepper__label">Create Patient</span>
+        </li>
+        <li
+          class="stepper__item"
+          [class.stepper__item--active]="currentStep === 'confirm'"
+          [attr.aria-current]="currentStep === 'confirm' ? 'step' : undefined"
+        >
+          <span class="stepper__number">3</span>
+          <span class="stepper__label">Confirm</span>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="page-body">
+      <!-- Step 1: Patient Search -->
+      @if (currentStep === "search") {
+        <app-patient-search
+          (patientSelected)="onPatientSelected($event)"
+          (createNewRequested)="onCreateNewRequested()"
+          (anonymousRequested)="onAnonymousRequested()"
+        />
       }
 
-      <div class="confirm-actions">
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="onCancelWizard()"
-          aria-label="Cancel and return to queue"
-        >
-          Cancel
-        </button>
+      <!-- Step 2: Quick Create Patient Form -->
+      @if (currentStep === "create") {
+        <app-quick-create-patient-form (backRequested)="onBackToSearch()" />
+      }
 
-        <button
-          mat-flat-button
-          color="primary"
-          type="button"
-          (click)="onConfirm()"
-          [disabled]="store.actionState() === 'submitting'"
-          aria-label="Confirm walk-in booking"
-        >
-          @if (store.actionState() === "submitting") {
-            <mat-spinner diameter="20" aria-label="Submitting…"></mat-spinner>
-          } @else {
-            Confirm Walk-In
+      <!-- Step 3: Confirmation -->
+      @if (currentStep === "confirm") {
+        <section class="confirm-step" aria-label="Confirm walk-in booking">
+          <!-- Slot full informational banner -->
+          @if (store.slotFullWarning()) {
+            <div
+              class="alert alert--info mb-5"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <span>⚠️</span>
+              <p>
+                This time slot is fully booked — the walk-in will be added to
+                the <strong>same-day queue</strong> without a specific time slot
+                assignment.
+              </p>
+            </div>
           }
-        </button>
-      </div>
-    </section>
-  }
-</main>
+
+          <!-- Appointment summary card -->
+          <div class="card confirm-card">
+            <div class="card__header">
+              <h2 class="card__title">Booking summary</h2>
+            </div>
+            <div class="card__body">
+              @if (isAnonymous) {
+                <div class="summary-row">
+                  <span class="summary-row__label">Patient</span>
+                  <span class="summary-row__value"
+                    >🚶 Anonymous visit — no patient record linked</span
+                  >
+                </div>
+              } @else if (store.selectedPatient()) {
+                <div class="summary-row">
+                  <span class="summary-row__label">Patient</span>
+                  <span class="summary-row__value"
+                    >👤 <strong>{{ store.selectedPatient()!.name }}</strong> ({{
+                      store.selectedPatient()!.email
+                    }})</span
+                  >
+                </div>
+              }
+
+              <!-- Specialty selection -->
+              <form [formGroup]="confirmForm" class="confirm-form">
+                <div class="form-row">
+                  <label for="conf-specialty" class="form-label"
+                    >Specialty <span aria-hidden="true">*</span></label
+                  >
+                  <select
+                    id="conf-specialty"
+                    formControlName="specialtyId"
+                    class="form-select"
+                    aria-required="true"
+                  >
+                    <option value="" disabled>Select specialty…</option>
+                    @for (s of specialties(); track s.id) {
+                      <option [value]="s.id">{{ s.name }}</option>
+                    }
+                  </select>
+                  @if (
+                    confirmForm.get("specialtyId")!.invalid &&
+                    confirmForm.get("specialtyId")!.touched
+                  ) {
+                    <span class="field-error" role="alert"
+                      >Specialty is required.</span
+                    >
+                  }
+                </div>
+                <div class="form-row">
+                  <label for="conf-date" class="form-label"
+                    >Appointment Date <span aria-hidden="true">*</span></label
+                  >
+                  <input
+                    id="conf-date"
+                    type="date"
+                    formControlName="date"
+                    class="form-input"
+                    [min]="todayStr"
+                    aria-required="true"
+                  />
+                  @if (
+                    confirmForm.get("date")!.invalid &&
+                    confirmForm.get("date")!.touched
+                  ) {
+                    <span class="field-error" role="alert"
+                      >A valid date is required.</span
+                    >
+                  }
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Error state -->
+          @if (store.actionState() === "error" && store.errorMessage()) {
+            <div
+              class="alert alert--error mt-4"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              {{ store.errorMessage() }}
+            </div>
+          }
+
+          <div class="confirm-actions">
+            <button
+              type="button"
+              class="btn btn--secondary"
+              (click)="onCancelWizard()"
+              aria-label="Cancel and return to queue"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn--primary"
+              (click)="onConfirm()"
+              [disabled]="store.actionState() === 'submitting'"
+              aria-label="Confirm walk-in booking"
+            >
+              @if (store.actionState() === "submitting") {
+                <span class="spinner" aria-label="Submitting…"></span>
+              } @else {
+                Confirm Walk-In
+              }
+            </button>
+          </div>
+        </section>
+      }
+    </div>
+  </main>
+</div>

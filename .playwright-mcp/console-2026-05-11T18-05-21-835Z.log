@@ -1,0 +1,87 @@
+[      59ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/env.js:0
+[      59ms] [ERROR] Refused to execute script from 'http://localhost:4200/assets/env.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:4200/auth/login:0
+[     113ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/D:/Propel_IQ/Propel-IQ-Patient-Platform/app/.angular/cache/18.2.21/propel-iq-patient-platform/vite/deps/chunk-TL4DGONE.js?v=d99ac778:19323
+[   39261ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:4200/api/auth/login:0
+[  175634ms] [LOG] [AuthService] Storing tokens: {hasAccessToken: true, hasRefreshToken: true, userId: b7a90ff4-710b-47e3-bfc1-abb8f4fb1d7e, role: Staff, deviceId: auto-4cee36a7-b2fe-4956-b952-e091da8ca8b0} @ http://localhost:4200/chunk-3IYOYDN5.js:83
+[  175635ms] [LOG] [AuthService] Token state after storage: {hasAccessToken: true, isAuthenticated: true, deviceId: auto-4cee36a7-b2fe-4956-b952-e091da8ca8b0, expiresAt: 2026-05-11T18:23:17.469Z} @ http://localhost:4200/chunk-3IYOYDN5.js:99
+[  389649ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:4200/@vite/client:553
+[  391984ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  395364ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  395605ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  397024ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  398702ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  400575ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  402276ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  404192ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  405640ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  407037ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  410754ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  414450ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  414740ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  417348ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  420716ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  424082ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  427031ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  427268ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  430599ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  433970ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  437004ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  437325ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  440708ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  444055ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  447011ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  447260ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  450610ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  453957ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  457027ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  457269ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  460624ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  463980ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  467007ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  467294ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  470674ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  474021ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  477067ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  477328ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  480755ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  484244ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  487346ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  487448ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  491135ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  494854ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  495043ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/api/queue/today:0
+[  497063ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  498207ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  500448ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  501589ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[  502793ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/env.js:0
+[  502793ms] [ERROR] Refused to execute script from 'http://localhost:4200/assets/env.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:4200/staff/queue:0
+[  502956ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/D:/Propel_IQ/Propel-IQ-Patient-Platform/app/.angular/cache/18.2.21/propel-iq-patient-platform/vite/deps/chunk-TL4DGONE.js?v=d99ac778:19323
+[ 1974112ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:4200/@vite/client:553
+[ 1976452ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1979827ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1983164ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1986518ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1989877ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1993210ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1996538ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 1999877ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2003207ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2006552ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2009901ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2013248ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2016829ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2020509ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2024184ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2027625ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2030985ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2034602ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2038167ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2041823ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2045624ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2049324ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2052904ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2056734ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/:0
+[ 2059142ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/env.js:0
+[ 2059142ms] [ERROR] Refused to execute script from 'http://localhost:4200/assets/env.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:4200/auth/login:0
+[ 2059289ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/D:/Propel_IQ/Propel-IQ-Patient-Platform/app/.angular/cache/18.2.21/propel-iq-patient-platform/vite/deps/chunk-TL4DGONE.js?v=d99ac778:19323

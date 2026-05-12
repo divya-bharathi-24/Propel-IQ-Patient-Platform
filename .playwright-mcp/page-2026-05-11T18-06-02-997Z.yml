@@ -1,0 +1,47 @@
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - main "Sign In" [ref=e5]:
+    - region "Welcome to UniPatient" [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: +
+          - heading "UniPatient" [level=1] [ref=e10]
+        - heading "Seamless Healthcare Access" [level=2] [ref=e11]
+        - list [ref=e12]:
+          - listitem [ref=e13]:
+            - generic [ref=e14]: ✓
+            - text: Book appointments with ease
+          - listitem [ref=e15]:
+            - generic [ref=e16]: ✓
+            - text: AI-powered intake forms
+          - listitem [ref=e17]:
+            - generic [ref=e18]: ✓
+            - text: Secure document sharing
+          - listitem [ref=e19]:
+            - generic [ref=e20]: ✓
+            - text: Real-time queue updates
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - heading "Sign In" [level=2] [ref=e24]
+        - paragraph [ref=e25]: Access your UniPatient account
+      - alert [ref=e39]: An unexpected error occurred.
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: All fields are required.
+        - generic [ref=e28]:
+          - generic [ref=e29]: Email Address *We'll never share your email with anyone else.
+          - textbox "Email Address *We'll never share your email with anyone else." [ref=e30]:
+            - /placeholder: jane@example.com
+            - text: staff@gmail.com
+        - generic [ref=e31]:
+          - generic [ref=e32]: Password *
+          - textbox "Password *" [ref=e33]:
+            - /placeholder: Enter your password
+            - text: Admin@123
+        - button "Sign in to your account" [ref=e34] [cursor=pointer]: Sign in
+      - link "Forgot password?" [ref=e36] [cursor=pointer]:
+        - /url: "#"
+      - generic [ref=e37]:
+        - text: Don't have an account?
+        - link "Create account" [ref=e38] [cursor=pointer]:
+          - /url: /auth/register

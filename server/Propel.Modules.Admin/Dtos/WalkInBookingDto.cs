@@ -29,10 +29,10 @@ public sealed record WalkInBookingDto(
     string? Email,
 
     /// <summary>Target specialty for the appointment — always required.</summary>
-    Guid SpecialtyId,
+    Guid? SpecialtyId,
 
     /// <summary>Appointment date — must be today or a future date.</summary>
-    DateOnly Date,
+    DateOnly? Date,
 
     /// <summary>Requested time slot start — optional; when null or fully booked, appointment is queued-only.</summary>
     TimeOnly? TimeSlotStart,

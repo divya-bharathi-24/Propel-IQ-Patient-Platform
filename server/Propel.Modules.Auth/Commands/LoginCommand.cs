@@ -21,5 +21,6 @@ public sealed record LoginResult(
     int ExpiresIn,
     string UserId,
     string Role,
-    string DeviceId
+    string DeviceId,
+    string? Name
 );

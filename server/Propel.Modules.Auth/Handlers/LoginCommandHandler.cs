@@ -148,6 +148,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
 
         _logger.LogInformation("User {UserId} with role {Role} logged in from device {DeviceId}", userId.Value, role, request.DeviceId);
 
-        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900, userId.Value.ToString(), role!, request.DeviceId);
+        string? displayName = patient?.Name ?? user?.Name;
+        return new LoginResult(accessToken, rawRefreshToken, ExpiresIn: 900, userId.Value.ToString(), role!, request.DeviceId, displayName);
     }
 }

@@ -7,39 +7,31 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import { AppointmentStatusBadgeComponent } from '../../../shared/components/appointment-status-badge/appointment-status-badge.component';
-import { DocumentStatusChipComponent } from '../../../shared/components/document-status-chip/document-status-chip.component';
-import { ViewReadinessIndicatorComponent } from '../../../shared/components/view-readiness-indicator/view-readiness-indicator.component';
-import { InsuranceStatusBadgeComponent } from '../../../shared/components/insurance-status-badge/insurance-status-badge.component';
-import { OutlookCalendarSyncComponent } from '../../calendar/outlook-sync/outlook-calendar-sync.component';
+import { StatCardComponent } from '../../../shared/components/stat-card/stat-card.component';
+import { QuickActionCardComponent } from '../../../shared/components/quick-action-card/quick-action-card.component';
 import { PatientDashboardService } from './patient-dashboard.service';
+import { AuthService } from '../../auth/services/auth.service';
 import {
   DashboardLoadState,
   PatientDashboardDto,
   UpcomingAppointmentItem,
 } from './patient-dashboard.model';
-import { InsuranceCheckResult } from '../../../shared/models/insurance.models';
 
 @Component({
   selector: 'app-patient-dashboard',
   standalone: true,
   imports: [
     RouterLink,
+    RouterLinkActive,
     DatePipe,
-    MatButtonModule,
-    MatCardModule,
-    MatDividerModule,
+    UpperCasePipe,
     AppointmentStatusBadgeComponent,
-    DocumentStatusChipComponent,
-    ViewReadinessIndicatorComponent,
-    InsuranceStatusBadgeComponent,
-    OutlookCalendarSyncComponent,
+    StatCardComponent,
+    QuickActionCardComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-dashboard.component.html',
@@ -48,6 +40,11 @@ import { InsuranceCheckResult } from '../../../shared/models/insurance.models';
 export class PatientDashboardComponent implements OnInit {
   private readonly dashboardService = inject(PatientDashboardService);
   private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
+
+  logout(): void {
+    this.authService.logout();
+  }
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loadState = signal<DashboardLoadState>('idle');
@@ -84,17 +81,5 @@ export class PatientDashboardComponent implements OnInit {
     this.router.navigate(['/documents', 'upload'], {
       queryParams: { appointmentId },
     });
-  }
-
-  /**
-   * Adapts the appointment's insuranceStatus string into an `InsuranceCheckResult`
-   * for the reusable badge component (AC-4, FR-039).
-   * Returns null when no insurance status is present.
-   */
-  appointmentInsuranceResult(
-    appt: UpcomingAppointmentItem,
-  ): InsuranceCheckResult | null {
-    if (!appt.insuranceStatus) return null;
-    return { status: appt.insuranceStatus, guidance: '' };
   }
 }

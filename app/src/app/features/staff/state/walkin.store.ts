@@ -19,6 +19,8 @@ export type WalkInActionState =
 export interface WalkInState {
   searchResults: PatientSearchResultDto[];
   selectedPatient: PatientSearchResultDto | null;
+  selectedSpecialtyId: string | null;
+  selectedDate: string | null;
   actionState: WalkInActionState;
   errorMessage: string | null;
   duplicatePatient: { patientId: string; name: string } | null;
@@ -29,6 +31,8 @@ export interface WalkInState {
 const initialState: WalkInState = {
   searchResults: [],
   selectedPatient: null,
+  selectedSpecialtyId: null,
+  selectedDate: null,
   actionState: 'idle',
   errorMessage: null,
   duplicatePatient: null,
@@ -53,9 +57,9 @@ export const WalkInStore = signalStore(
             errorMessage: null,
           }),
         ),
-        switchMap((query) =>
+        switchMap((query: string) =>
           service.searchPatients(query).pipe(
-            tap((results) =>
+            tap((results: PatientSearchResultDto[]) =>
               patchState(store, {
                 searchResults: results,
                 actionState: 'idle',
@@ -79,6 +83,16 @@ export const WalkInStore = signalStore(
       patchState(store, { selectedPatient: patient });
     },
 
+    /** Sets the selected specialty for the walk-in booking. */
+    setSpecialty(specialtyId: string): void {
+      patchState(store, { selectedSpecialtyId: specialtyId });
+    },
+
+    /** Sets the appointment date for the walk-in booking (YYYY-MM-DD). */
+    setDate(date: string): void {
+      patchState(store, { selectedDate: date });
+    },
+
     /**
      * Submits a walk-in booking (link, create, or anonymous).
      * POST /api/staff/walkin
@@ -95,9 +109,9 @@ export const WalkInStore = signalStore(
             slotFullWarning: false,
           }),
         ),
-        switchMap((dto) =>
+        switchMap((dto: WalkInBookingDto) =>
           service.createWalkIn(dto).pipe(
-            tap((response) => {
+            tap((response: WalkInResponseDto) => {
               patchState(store, {
                 actionState: 'success',
                 confirmedBooking: response,

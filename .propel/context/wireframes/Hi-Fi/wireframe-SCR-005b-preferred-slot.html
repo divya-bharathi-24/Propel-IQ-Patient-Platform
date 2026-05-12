@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-005b — Preferred Slot Waitlist | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element              | Action | Target Screen               |
+|----------------------|---------|-----------------------------|
+| #save-preferences    | click   | SCR-003 (Patient Dashboard) |
+| #back-slots          | click   | SCR-005 (Slot Selection)    |
+| OVL-002              | auto    | When slot opens (toast)     |
+-->
+<div class="wf-meta">
+  <strong>SCR-005b</strong> · Preferred Slot Waitlist · High-Fidelity · 1440px · States: Default, Empty · FL-003
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>My Appointments</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1 class="page-header__title">Preferred slot preferences</h1>
+        <p style="font-size:var(--font-size-sm);color:var(--text-secondary);">Tell us when you'd prefer an earlier opening — we'll notify you automatically</p>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:700px;">
+      <div class="alert alert--info mb-6">
+        <span>ℹ</span>
+        <div>
+          <div class="alert__title">How preferred slots work</div>
+          <div class="alert__body">When a slot matching your preferences opens, we'll send you an SMS and email. You'll have 1 hour to accept before it's offered to the next person in line.</div>
+        </div>
+      </div>
+
+      <!-- Active watchlist items -->
+      <div class="card mb-6">
+        <div class="card__header">
+          <span class="card__title">Your watchlist (1 active)</span>
+        </div>
+        <div class="card__body" style="padding:0;">
+          <div style="padding:var(--space-4) var(--space-5);display:flex;align-items:center;gap:var(--space-4);border-bottom:1px solid var(--border-default);">
+            <div style="background:var(--color-warning-50);border-radius:var(--radius-md);padding:var(--space-3);color:var(--color-warning-700);font-size:20px;">⏳</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:var(--font-size-sm);">Dr. Patel — May 15, 2026 · 9:00 AM</div>
+              <div style="font-size:var(--font-size-xs);color:var(--text-secondary);">Added May 5 · Queue position <strong>#3</strong></div>
+            </div>
+            <span class="badge badge--warning">Waiting</span>
+            <button class="btn btn--ghost btn--sm" style="color:var(--color-error-500);">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add new preference -->
+      <div class="card">
+        <div class="card__header"><span class="card__title">Add preferred slot preference</span></div>
+        <div class="card__body">
+          <div class="form-group">
+            <label class="form-label">Provider <span class="form-label__required">*</span></label>
+            <select class="form-input form-select">
+              <option>Dr. Raj Patel — Internal Medicine</option>
+              <option>Dr. Li Chen — Family Medicine</option>
+              <option>Any available provider</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+            <div class="form-group">
+              <label class="form-label">Preferred date range start</label>
+              <input type="date" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date range end</label>
+              <input type="date" class="form-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred time of day</label>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-sm);background:var(--primary-surface);border:1px solid var(--primary);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:var(--primary);"> Morning (8–12)
+              </label>
+              <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-sm);background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--primary);"> Afternoon (12–5)
+              </label>
+              <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-sm);background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--primary);"> Evening (5–7)
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notification preference</label>
+            <div style="display:flex;gap:var(--space-4);">
+              <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-sm);">
+                <input type="checkbox" checked style="accent-color:var(--primary);"> SMS
+              </label>
+              <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--font-size-sm);">
+                <input type="checkbox" checked style="accent-color:var(--primary);"> Email
+              </label>
+            </div>
+          </div>
+          <div style="display:flex;gap:var(--space-3);">
+            <a href="wireframe-SCR-003-patient-dashboard.html" id="save-preferences" class="btn btn--primary">Save preferences</a>
+            <a href="wireframe-SCR-005-slot-selection.html" id="back-slots" class="btn btn--secondary">Back to slots</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

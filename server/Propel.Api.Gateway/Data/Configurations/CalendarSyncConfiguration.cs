@@ -74,9 +74,11 @@ public sealed class CalendarSyncConfiguration : IEntityTypeConfiguration<Calenda
                .OnDelete(DeleteBehavior.Restrict);
 
         // FK: calendar_syncs → appointments (Restrict — no cascade delete per DR-009)
+        // Using WithOne to explicitly register the Appointment.CalendarSync inverse navigation,
+        // preventing EF Core from creating a shadow FK property 'AppointmentId1'.
         builder.HasOne(cs => cs.Appointment)
-               .WithMany()
-               .HasForeignKey(cs => cs.AppointmentId)
+               .WithOne(a => a.CalendarSync)
+               .HasForeignKey<CalendarSync>(cs => cs.AppointmentId)
                .OnDelete(DeleteBehavior.Restrict);
 
         // Unique composite index: prevents duplicate sync records for the same external event (AC-3)

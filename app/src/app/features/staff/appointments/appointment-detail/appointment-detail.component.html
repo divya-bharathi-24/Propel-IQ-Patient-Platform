@@ -39,10 +39,12 @@
         <dd>{{ appt.patientName }}</dd>
 
         <dt>Time</dt>
-        <dd>{{ appt.timeSlot }}</dd>
+        <dd>
+          {{ appt.timeSlotStart ? (appt.timeSlotStart | slice: 0 : 5) : "—" }}
+        </dd>
 
         <dt>Specialty</dt>
-        <dd>{{ appt.specialty }}</dd>
+        <dd>{{ appt.specialtyName }}</dd>
 
         <dt>Status</dt>
         <dd>{{ appt.status }}</dd>

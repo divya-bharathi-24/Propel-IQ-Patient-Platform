@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-014 — Same-Day Queue | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element              | Action | Target Screen               |
+|----------------------|---------|-----------------------------|
+| .patient-name link   | click   | SCR-016 (Patient 360° View) |
+| #walkin-new          | click   | SCR-015 (Walk-In Booking)   |
+| #back-dashboard      | click   | SCR-013 (Staff Dashboard)   |
+-->
+<div class="wf-meta">
+  <strong>SCR-014</strong> · Same-Day Queue · High-Fidelity · 1440px · States: Default, Loading, Empty, Error · FL-004
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section-label">Overview</div>
+      <a href="wireframe-SCR-013-staff-dashboard.html" class="nav-item" id="back-dashboard"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <div class="sidebar__section-label">Patient Care</div>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Same-Day Queue <span class="badge badge--error" style="margin-left:auto;">5</span></a>
+      <a href="wireframe-SCR-015-walkin-booking.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Walk-In Booking</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar" style="background:var(--color-info-600);">SK</div><div class="sidebar__user-info"><div class="sidebar__user-name">Sarah Kim, RN</div><div class="sidebar__user-role">Staff</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1 class="page-header__title">Same-Day Queue</h1>
+      <div class="page-header__actions">
+        <div class="search-bar" style="width:280px;">
+          <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="form-input search-bar__input" placeholder="Search by patient name or MRN…">
+        </div>
+        <select class="form-input form-select" style="width:auto;">
+          <option>All statuses</option>
+          <option>Waiting</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
+        <a href="wireframe-SCR-015-walkin-booking.html" id="walkin-new" class="btn btn--primary">+ Walk-in</a>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+      <!-- Live stats -->
+      <div class="grid grid--4 mb-6">
+        <div class="card" style="background:var(--color-error-50);border-color:var(--color-error-200);">
+          <div class="card__body stat-card"><div class="stat-card__label">Waiting</div><div class="stat-card__value" style="color:var(--color-error-700);">3</div></div>
+        </div>
+        <div class="card" style="background:var(--primary-surface);border-color:var(--color-teal-200);">
+          <div class="card__body stat-card"><div class="stat-card__label">In progress</div><div class="stat-card__value" style="color:var(--primary);">2</div></div>
+        </div>
+        <div class="card">
+          <div class="card__body stat-card"><div class="stat-card__label">Completed today</div><div class="stat-card__value">11</div></div>
+        </div>
+        <div class="card">
+          <div class="card__body stat-card"><div class="stat-card__label">Avg wait time</div><div class="stat-card__value" style="font-size:var(--font-size-2xl);">23 min</div></div>
+        </div>
+      </div>
+
+      <!-- Queue table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Patient</th>
+              <th>Chief complaint</th>
+              <th>Arrival time</th>
+              <th>Wait time</th>
+              <th>Risk</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:var(--color-error-50);">
+              <td style="font-weight:700;color:var(--color-error-700);">#1</td>
+              <td><a href="wireframe-SCR-016-patient-360.html" class="patient-name" style="font-weight:600;color:var(--primary);">Marcus Johnson</a><br><span style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00481293</span></td>
+              <td>Chest pain, shortness of breath</td>
+              <td>8:42 AM</td>
+              <td><strong style="color:var(--color-error-700);">47 min</strong></td>
+              <td><span class="risk-badge risk-badge--high">High</span></td>
+              <td><span class="badge badge--warning">Waiting</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm">Arrived</button>
+                <a href="wireframe-SCR-016-patient-360.html" class="btn btn--ghost btn--sm">360°</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#2</td>
+              <td><a href="wireframe-SCR-016-patient-360.html" class="patient-name" style="font-weight:600;color:var(--primary);">Rachel Thompson</a><br><span style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00381044</span></td>
+              <td>Diabetes follow-up</td>
+              <td>9:10 AM</td>
+              <td>19 min</td>
+              <td><span class="risk-badge risk-badge--medium">Medium</span></td>
+              <td><span class="badge badge--success">In Progress</span></td>
+              <td class="table-actions">
+                <button class="btn btn--secondary btn--sm">Complete</button>
+                <a href="wireframe-SCR-016-patient-360.html" class="btn btn--ghost btn--sm">360°</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#3</td>
+              <td><a href="wireframe-SCR-016-patient-360.html" class="patient-name" style="font-weight:600;color:var(--primary);">Paul Williams</a><br><span style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00492011</span></td>
+              <td>Annual wellness check</td>
+              <td>9:20 AM</td>
+              <td>9 min</td>
+              <td><span class="risk-badge risk-badge--low">Low</span></td>
+              <td><span class="badge badge--warning">Waiting</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm">Arrived</button>
+                <a href="wireframe-SCR-016-patient-360.html" class="btn btn--ghost btn--sm">360°</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#4</td>
+              <td><a href="wireframe-SCR-016-patient-360.html" class="patient-name" style="font-weight:600;color:var(--primary);">Sofia Martinez</a><br><span style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00564820</span></td>
+              <td>Vaccination — flu shot</td>
+              <td>9:30 AM</td>
+              <td>—</td>
+              <td><span class="risk-badge risk-badge--low">Low</span></td>
+              <td><span class="badge badge--neutral">Scheduled</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm">Arrived</button>
+                <a href="wireframe-SCR-016-patient-360.html" class="btn btn--ghost btn--sm">360°</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#5</td>
+              <td><a href="wireframe-SCR-016-patient-360.html" class="patient-name" style="font-weight:600;color:var(--primary);">David Kim</a><br><span style="font-size:var(--font-size-xs);color:var(--text-secondary);">MRN: 00391827</span></td>
+              <td>Prescription renewal</td>
+              <td>9:45 AM</td>
+              <td>—</td>
+              <td><span class="risk-badge risk-badge--low">Low</span></td>
+              <td><span class="badge badge--neutral">Scheduled</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm">Arrived</button>
+                <a href="wireframe-SCR-016-patient-360.html" class="btn btn--ghost btn--sm">360°</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state (when no queue) -->
+      <div style="display:none;text-align:center;padding:var(--space-16);" id="empty-queue">
+        <div style="font-size:64px;margin-bottom:var(--space-4);">✅</div>
+        <h2 style="font-weight:600;color:var(--color-neutral-700);margin-bottom:var(--space-3);">Queue is clear</h2>
+        <p style="color:var(--text-secondary);margin-bottom:var(--space-5);">No patients currently waiting.</p>
+        <a href="wireframe-SCR-015-walkin-booking.html" class="btn btn--primary">Register walk-in</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

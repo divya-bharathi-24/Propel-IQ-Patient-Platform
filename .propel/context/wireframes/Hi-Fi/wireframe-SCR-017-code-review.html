@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-017 — Medical Code Review | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element          | Action | Target Screen               |
+|------------------|--------|-----------------------------|
+| #confirm-btn     | click  | Confirms code (in-page)     |
+| #reject-btn      | click  | Rejects code (in-page)      |
+| #add-code        | click  | Opens code search modal     |
+| #back-360        | click  | SCR-016 (Patient 360° View) |
+-->
+<div class="wf-meta">
+  <strong>SCR-017</strong> · Medical Code Review · High-Fidelity · 1440px · States: Default, Loading, Empty, Reviewed · FL-006
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Staff navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-013-staff-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="wireframe-SCR-014-same-day-queue.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/></svg>Same-Day Queue</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Code Review</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar" style="background:var(--color-info-600);">SK</div><div class="sidebar__user-info"><div class="sidebar__user-name">Sarah Kim, RN</div><div class="sidebar__user-role">Staff</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <div class="breadcrumb">
+          <a href="wireframe-SCR-016-patient-360.html" id="back-360">Marcus Johnson — 360° View</a>
+          <span class="breadcrumb__sep">›</span>
+          <span>Medical Code Review</span>
+        </div>
+      </div>
+      <div class="page-header__actions">
+        <button id="add-code" class="btn btn--secondary">+ Add code manually</button>
+        <button class="btn btn--primary">Submit all reviews</button>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:var(--content-max-width);">
+      <!-- Progress bar -->
+      <div class="card mb-5">
+        <div class="card__body" style="display:flex;align-items:center;gap:var(--space-5);">
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2);font-size:var(--font-size-sm);">
+              <span>Review progress for <strong>Marcus Johnson</strong> · Visit May 6, 2026</span>
+              <span style="font-weight:600;">2 of 5 reviewed</span>
+            </div>
+            <div class="progress"><div class="progress__bar" style="width:40%;"></div></div>
+          </div>
+          <span class="badge badge--warning">3 pending</span>
+          <span class="badge badge--success">2 approved</span>
+        </div>
+      </div>
+
+      <!-- Codes table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ICD Code</th>
+              <th>Description</th>
+              <th>AI Confidence</th>
+              <th>Source</th>
+              <th>Notes</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Pending -->
+            <tr>
+              <td><strong>R07.9</strong></td>
+              <td>Chest pain, unspecified</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div class="progress" style="width:80px;"><div class="progress__bar" style="width:87%;background:var(--color-warning-500);"></div></div>
+                  <span class="badge badge--warning">87%</span>
+                </div>
+              </td>
+              <td><span style="font-size:11px;background:#F3E5F5;color:#6A1B9A;padding:2px 6px;border-radius:var(--radius-full);">AI Intake</span></td>
+              <td><input type="text" class="form-input" style="min-height:36px;font-size:var(--font-size-xs);" placeholder="Add note…"></td>
+              <td><span class="badge badge--warning">Pending</span></td>
+              <td class="table-actions">
+                <button id="confirm-btn" class="btn btn--primary btn--sm" style="background:var(--color-success-700);">✓ Confirm</button>
+                <button id="reject-btn" class="btn btn--danger btn--sm">✕ Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>R06.00</strong></td>
+              <td>Dyspnea, unspecified (shortness of breath)</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div class="progress" style="width:80px;"><div class="progress__bar" style="width:82%;background:var(--color-warning-500);"></div></div>
+                  <span class="badge badge--warning">82%</span>
+                </div>
+              </td>
+              <td><span style="font-size:11px;background:#F3E5F5;color:#6A1B9A;padding:2px 6px;border-radius:var(--radius-full);">AI Intake</span></td>
+              <td><input type="text" class="form-input" style="min-height:36px;font-size:var(--font-size-xs);" placeholder="Add note…"></td>
+              <td><span class="badge badge--warning">Pending</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm" style="background:var(--color-success-700);">✓ Confirm</button>
+                <button class="btn btn--danger btn--sm">✕ Reject</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Z79.01</strong></td>
+              <td>Long-term use of anticoagulants</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div class="progress" style="width:80px;"><div class="progress__bar" style="width:71%;background:var(--color-error-500);"></div></div>
+                  <span class="badge badge--error">71%</span>
+                </div>
+              </td>
+              <td><span style="font-size:11px;background:#E3F2FD;color:#1565C0;padding:2px 6px;border-radius:var(--radius-full);">EHR</span></td>
+              <td><input type="text" class="form-input" style="min-height:36px;font-size:var(--font-size-xs);" placeholder="Add note…"></td>
+              <td><span class="badge badge--warning">Pending</span></td>
+              <td class="table-actions">
+                <button class="btn btn--primary btn--sm" style="background:var(--color-success-700);">✓ Confirm</button>
+                <button class="btn btn--danger btn--sm">✕ Reject</button>
+              </td>
+            </tr>
+            <!-- Approved -->
+            <tr style="background:var(--color-success-50);">
+              <td><strong>I10</strong></td>
+              <td>Essential (primary) hypertension</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div class="progress" style="width:80px;"><div class="progress__bar" style="width:95%;"></div></div>
+                  <span class="badge badge--success">95%</span>
+                </div>
+              </td>
+              <td><span style="font-size:11px;background:#E3F2FD;color:#1565C0;padding:2px 6px;border-radius:var(--radius-full);">EHR</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Chronic — confirmed</td>
+              <td><span class="badge badge--success">✓ Approved</span></td>
+              <td><button class="btn btn--ghost btn--sm">Undo</button></td>
+            </tr>
+            <tr style="background:var(--color-success-50);">
+              <td><strong>E11.9</strong></td>
+              <td>Type 2 diabetes without complications</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div class="progress" style="width:80px;"><div class="progress__bar" style="width:92%;"></div></div>
+                  <span class="badge badge--success">92%</span>
+                </div>
+              </td>
+              <td><span style="font-size:11px;background:#E3F2FD;color:#1565C0;padding:2px 6px;border-radius:var(--radius-full);">EHR</span></td>
+              <td style="font-size:var(--font-size-xs);color:var(--text-secondary);">Well-controlled A1C</td>
+              <td><span class="badge badge--success">✓ Approved</span></td>
+              <td><button class="btn btn--ghost btn--sm">Undo</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div style="display:none;text-align:center;padding:var(--space-12);" id="all-reviewed">
+        <div style="font-size:64px;margin-bottom:var(--space-4);">✅</div>
+        <h2 style="font-weight:600;margin-bottom:var(--space-3);">All codes reviewed!</h2>
+        <p style="color:var(--text-secondary);margin-bottom:var(--space-5);">Review complete for Marcus Johnson's visit.</p>
+        <a href="wireframe-SCR-016-patient-360.html" class="btn btn--primary">Return to 360° View</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

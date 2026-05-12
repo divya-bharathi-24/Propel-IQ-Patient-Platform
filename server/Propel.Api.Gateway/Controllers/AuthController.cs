@@ -112,7 +112,7 @@ public sealed class AuthController : ControllerBase
         var command = new LoginCommand(request.Email, request.Password, deviceId,
             HttpContext.Connection.RemoteIpAddress?.ToString());
         var result = await _mediator.Send(command, cancellationToken);
-        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn, result.UserId, result.Role, result.DeviceId });
+        return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn, result.UserId, result.Role, result.DeviceId, result.Name });
     }
 
     /// <summary>

@@ -33,6 +33,7 @@ export class AuthService {
     role: null,
     deviceId: null,
     expiresAt: null,
+    name: null,
   });
 
   /** True when a valid access token is held in memory. */
@@ -53,6 +54,28 @@ export class AuthService {
 
   /** The authenticated user's ID from the current JWT. */
   readonly currentUserId = computed(() => this._authState().userId);
+
+  /** The authenticated user's display name. */
+  readonly currentUserName = computed(() => this._authState().name);
+
+  /** Alias for currentUserName — used by sidebar components. */
+  readonly currentDisplayName = computed(() => this._authState().name ?? '');
+
+  /**
+   * Two-letter initials derived from the display name (e.g. "Sarah Kim" → "SK").
+   * Falls back to the first character of the role if no name is set.
+   */
+  readonly currentInitials = computed(() => {
+    const name = this._authState().name;
+    if (name) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
+    return (this._authState().role ?? '??').substring(0, 2).toUpperCase();
+  });
 
   /**
    * True when the access token is within the proactive-refresh window
@@ -79,6 +102,7 @@ export class AuthService {
    * Navigates to /dashboard on success.
    */
   login(email: string, password: string): Observable<TokenResponse> {
+    this._loginEmail = email;
     return this.http
       .post<TokenResponse>(`${this.apiBase}/login`, { email, password })
       .pipe(
@@ -135,6 +159,8 @@ export class AuthService {
 
   // ── Private helpers ───────────────────────────────────────────────────────
 
+  private _loginEmail: string | null = null;
+
   private _storeTokens(res: TokenResponse): void {
     console.log('[AuthService] Storing tokens:', {
       hasAccessToken: !!res.accessToken,
@@ -152,6 +178,8 @@ export class AuthService {
       role: res.role,
       deviceId: res.deviceId,
       expiresAt: Date.now() + res.expiresIn * 1_000,
+      // Preserve existing name on refresh (refresh response doesn't include name)
+      name: res.name ?? this._authState().name,
     });
 
     console.log('[AuthService] Token state after storage:', {
@@ -163,6 +191,7 @@ export class AuthService {
   }
 
   private _clearState(): void {
+    this._loginEmail = null;
     this._authState.set({
       accessToken: null,
       refreshToken: null,
@@ -170,6 +199,7 @@ export class AuthService {
       role: null,
       deviceId: null,
       expiresAt: null,
+      name: null,
     });
   }
 

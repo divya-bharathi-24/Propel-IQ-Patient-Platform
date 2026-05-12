@@ -1,6 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { RequiresAttentionSectionComponent } from '../requires-attention-section/requires-attention-section.component';
+import { QueueService } from '../../queue/queue.service';
+import { QueueItem } from '../../queue/queue.models';
+import { AuthService } from '../../../../features/auth/services/auth.service';
 
 /**
  * Staff dashboard page — the primary landing view for Staff and Admin users
@@ -16,127 +27,80 @@ import { RequiresAttentionSectionComponent } from '../requires-attention-section
   selector: 'app-staff-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RequiresAttentionSectionComponent, RouterLink],
-  template: `
-    <div class="dashboard-page">
-      <header class="page-header">
-        <h1 class="page-title">Staff Dashboard</h1>
-        <p class="page-subtitle">
-          Manage appointments, walk-ins, and high-risk patient flags.
-        </p>
-      </header>
-
-      <!-- Requires Attention is rendered at the top (AC-4) -->
-      <app-requires-attention-section />
-
-      <!-- Quick navigation links -->
-      <nav class="quick-nav" aria-label="Staff quick navigation">
-        <a
-          class="nav-card"
-          routerLink="/staff/appointments"
-          aria-label="Manage appointments"
-        >
-          <span class="nav-icon" aria-hidden="true">📅</span>
-          <span class="nav-label">Appointments</span>
-        </a>
-        <a
-          class="nav-card"
-          routerLink="/staff/walkin"
-          aria-label="Manage walk-in bookings"
-        >
-          <span class="nav-icon" aria-hidden="true">🚶</span>
-          <span class="nav-label">Walk-In</span>
-        </a>
-        <a
-          class="nav-card"
-          routerLink="/staff/queue"
-          aria-label="Manage same-day queue"
-        >
-          <span class="nav-icon" aria-hidden="true">🏥</span>
-          <span class="nav-label">Queue</span>
-        </a>
-        <a
-          class="nav-card"
-          routerLink="/staff/settings/reminders"
-          aria-label="Configure reminder settings"
-        >
-          <span class="nav-icon" aria-hidden="true">⏰</span>
-          <span class="nav-label">Reminders</span>
-        </a>
-      </nav>
-    </div>
-  `,
-  styles: [
-    `
-      .dashboard-page {
-        padding: 24px;
-        max-width: 1040px;
-        margin: 0 auto;
-      }
-
-      .page-header {
-        margin-bottom: 20px;
-      }
-
-      .page-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #212121;
-        margin: 0 0 4px;
-      }
-
-      .page-subtitle {
-        font-size: 0.875rem;
-        color: #757575;
-        margin: 0;
-      }
-
-      /* ── Quick nav cards ────────────────────── */
-      .quick-nav {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-top: 8px;
-      }
-
-      .nav-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 140px;
-        padding: 20px 16px;
-        background-color: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #212121;
-        transition:
-          border-color 0.15s,
-          box-shadow 0.15s;
-      }
-
-      .nav-card:hover {
-        border-color: #1565c0;
-        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15);
-      }
-
-      .nav-card:focus-visible {
-        outline: 2px solid #1565c0;
-        outline-offset: 2px;
-      }
-
-      .nav-icon {
-        font-size: 1.75rem;
-      }
-
-      .nav-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #1565c0;
-      }
-    `,
+  imports: [
+    RequiresAttentionSectionComponent,
+    RouterLink,
+    RouterLinkActive,
+    DatePipe,
+    SlicePipe,
   ],
+  templateUrl: './staff-dashboard.component.html',
+  styleUrl: './staff-dashboard.component.scss',
 })
-export class StaffDashboardComponent {}
+export class StaffDashboardComponent implements OnInit {
+  readonly today = new Date();
+
+  protected readonly queueItems = signal<QueueItem[]>([]);
+  protected readonly queueLoading = signal(false);
+  protected readonly queueError = signal<string | null>(null);
+  protected readonly checkingInId = signal<string | null>(null);
+
+  private readonly queueService = inject(QueueService);
+  readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  /** First name of the logged-in staff member, derived from the full display name. */
+  protected readonly greetingName = computed(() => {
+    const name = this.authService.currentUserName();
+    if (!name) return 'there';
+    return name.split(' ')[0];
+  });
+
+  /** Time-of-day greeting word. */
+  protected readonly greetingWord = computed(() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'morning';
+    if (h < 18) return 'afternoon';
+    return 'evening';
+  });
+
+  ngOnInit(): void {
+    this.loadQueue();
+  }
+
+  loadQueue(): void {
+    this.queueLoading.set(true);
+    this.queueError.set(null);
+    this.queueService.getQueue().subscribe({
+      next: (items) => {
+        this.queueItems.set(items);
+        this.queueLoading.set(false);
+      },
+      error: () => {
+        this.queueError.set('Failed to load queue data.');
+        this.queueLoading.set(false);
+      },
+    });
+  }
+
+  checkIn(appointmentId: string): void {
+    this.checkingInId.set(appointmentId);
+    this.queueService.markArrived(appointmentId).subscribe({
+      next: () => {
+        this.checkingInId.set(null);
+        this.loadQueue();
+      },
+      error: () => {
+        this.checkingInId.set(null);
+      },
+    });
+  }
+
+  viewAppointment(appointmentId: string): void {
+    void this.router.navigate(['/staff/appointments', appointmentId]);
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+}

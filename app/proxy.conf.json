@@ -3,21 +3,25 @@
     "target": "https://localhost:5001",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "agent": false
   },
   "/health": {
     "target": "https://localhost:5001",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "agent": false
   },
   "/healthz": {
     "target": "https://localhost:5001",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "agent": false
   },
   "/swagger": {
     "target": "https://localhost:5001",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "agent": false
   }
 }

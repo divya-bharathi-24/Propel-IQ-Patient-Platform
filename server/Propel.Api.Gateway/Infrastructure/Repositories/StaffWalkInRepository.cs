@@ -30,19 +30,30 @@ public sealed class StaffWalkInRepository : IStaffWalkInRepository
         int maxResults,
         CancellationToken cancellationToken = default)
     {
-        // Parameterised ILIKE search on name and exact match on date_of_birth::text (OWASP A03).
-        // EF Core translates the LINQ Contains to a LIKE query; EF.Functions.ILike provides
-        // case-insensitive PostgreSQL ILIKE semantics without string concatenation.
-        var normalizedQuery = query.Trim();
+        // PHI fields (Name, DateOfBirth) are encrypted at rest via EF Core value converters.
+        // Database-level pattern matching (ILIKE) cannot operate on encrypted ciphertext.
+        // Solution: Load all active patients, let EF decrypt via value converters, then filter in-memory.
+        // 
+        // Performance note: For large patient datasets (>10k records), consider:
+        // 1. Email-based lookup (Email is not encrypted and can use database indexes)
+        // 2. Dedicated search service with encrypted-field indexing (e.g., searchable encryption)
+        // 3. Partial decryption via stored procedures (requires key in database — security trade-off)
+        //
+        // Current approach is acceptable for typical clinic sizes (<5k patients).
+        var normalizedQuery = query.Trim().ToLowerInvariant();
 
-        return await _db.Patients
+        var allPatients = await _db.Patients
             .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return allPatients
             .Where(p =>
-                EF.Functions.ILike(p.Name, $"%{normalizedQuery}%") ||
-                p.DateOfBirth.ToString() == normalizedQuery)
+                p.Name.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase) ||
+                p.DateOfBirth.ToString("yyyy-MM-dd").Equals(normalizedQuery, StringComparison.Ordinal))
             .OrderBy(p => p.Name)
             .Take(maxResults)
-            .ToListAsync(cancellationToken);
+            .ToList()
+            .AsReadOnly();
     }
 
     /// <inheritdoc/>

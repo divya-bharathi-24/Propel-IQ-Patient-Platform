@@ -128,6 +128,41 @@
       }
     </mat-form-field>
 
+    <!-- Specialty -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Specialty</mat-label>
+      <mat-select
+        id="qc-specialty"
+        formControlName="specialtyId"
+        aria-required="true"
+      >
+        @for (s of specialties(); track s.id) {
+          <mat-option [value]="s.id">{{ s.name }}</mat-option>
+        }
+      </mat-select>
+      @if (
+        specialtyIdControl.hasError("required") && specialtyIdControl.touched
+      ) {
+        <mat-error>Specialty is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Appointment Date -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Appointment Date</mat-label>
+      <input
+        matInput
+        id="qc-date"
+        formControlName="date"
+        type="date"
+        [min]="todayStr"
+        aria-required="true"
+      />
+      @if (dateControl.hasError("required") && dateControl.touched) {
+        <mat-error>Date is required.</mat-error>
+      }
+    </mat-form-field>
+
     <div class="form-actions">
       <button
         mat-stroked-button

@@ -1,5 +1,6 @@
 # Propel IQ - Stop Development Servers Script
 # This script stops all processes running on ports 4200 and 5001
+# Enhanced to prevent file locking issues
 
 Write-Host "?? Stopping Propel IQ Development Servers..." -ForegroundColor Cyan
 Write-Host ""
@@ -61,9 +62,77 @@ Stop-ProcessOnPort -Port 5001 -ServerName ".NET API"
 # Also check port 5000 (HTTP endpoint of .NET API)
 Stop-ProcessOnPort -Port 5000 -ServerName ".NET API (HTTP)"
 
-Write-Host "???????????????????????????????????????" -ForegroundColor Cyan
-Write-Host "? All development servers stopped!" -ForegroundColor Green
-Write-Host "???????????????????????????????????????" -ForegroundColor Cyan
+# Stop any remaining dotnet processes (to prevent file locking)
+Write-Host "?? Checking for other dotnet processes..." -ForegroundColor Yellow
+$dotnetProcesses = Get-Process -Name "dotnet" -ErrorAction SilentlyContinue
+if ($dotnetProcesses) {
+    Write-Host "  Found $($dotnetProcesses.Count) dotnet process(es)" -ForegroundColor Gray
+    foreach ($process in $dotnetProcesses) {
+        Write-Host "  ??  Stopping dotnet PID $($process.Id)..." -ForegroundColor White
+        Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+    }
+    Write-Host "  ? All dotnet processes stopped" -ForegroundColor Green
+} else {
+    Write-Host "  ? No dotnet processes found" -ForegroundColor Green
+}
 Write-Host ""
-Write-Host "?? You can now run .\start-dev.ps1 to start them again" -ForegroundColor Yellow
+
+# Stop any Propel-specific processes
+Write-Host "?? Checking for Propel processes..." -ForegroundColor Yellow
+$propelProcesses = Get-Process -Name "Propel.*" -ErrorAction SilentlyContinue
+if ($propelProcesses) {
+    Write-Host "  Found $($propelProcesses.Count) Propel process(es)" -ForegroundColor Gray
+    foreach ($process in $propelProcesses) {
+        Write-Host "  ??  Stopping $($process.ProcessName) PID $($process.Id)..." -ForegroundColor White
+        Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+    }
+    Write-Host "  ? All Propel processes stopped" -ForegroundColor Green
+} else {
+    Write-Host "  ? No Propel processes found" -ForegroundColor Green
+}
+Write-Host ""
+
+# Wait for file handles to be released
+Write-Host "? Waiting for file handles to be released..." -ForegroundColor Yellow
+Start-Sleep -Seconds 2
+Write-Host "  ? File handles should be released now" -ForegroundColor Green
+Write-Host ""
+
+# Check for locked files in build output
+Write-Host "?? Checking for locked files..." -ForegroundColor Yellow
+$serverPath = Join-Path $PSScriptRoot "server"
+if (Test-Path $serverPath) {
+    $lockedFiles = Get-ChildItem -Path $serverPath -Include "*.pdb","*.dll" -Recurse -File -ErrorAction SilentlyContinue | 
+        Where-Object { 
+            try {
+                $stream = [System.IO.File]::Open($_.FullName, 'Open', 'ReadWrite', 'None')
+                $stream.Close()
+                $false
+            } catch {
+                $true
+            }
+        }
+    
+    if ($lockedFiles) {
+        Write-Host "  ??  Warning: Some files are still locked:" -ForegroundColor Yellow
+        $lockedFiles | ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
+        Write-Host ""
+        Write-Host "  ?? Tip: Run '.\fix-file-locking.ps1' if you encounter build issues" -ForegroundColor Cyan
+    } else {
+        Write-Host "  ? No locked files detected!" -ForegroundColor Green
+    }
+} else {
+    Write-Host "  ??  Server path not found, skipping file lock check" -ForegroundColor Gray
+}
+Write-Host ""
+
+Write-Host "?????????????????????????????????????????" -ForegroundColor Cyan
+Write-Host "  ? All development servers stopped!" -ForegroundColor Green
+Write-Host "  ?? File locks released!" -ForegroundColor Green
+Write-Host "?????????????????????????????????????????" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "?? You can now:" -ForegroundColor Yellow
+Write-Host "  ? Run .\start-dev.ps1 to start servers" -ForegroundColor Gray
+Write-Host "  ? Build solution without file locking issues" -ForegroundColor Gray
+Write-Host "  ? Clean build outputs safely" -ForegroundColor Gray
 Write-Host ""

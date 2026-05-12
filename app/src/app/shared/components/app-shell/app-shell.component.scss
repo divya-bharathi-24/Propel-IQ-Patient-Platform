@@ -1,0 +1,190 @@
+// SCR-003+ : App Shell with Sidebar Navigation
+// Uses design tokens from /app/src/styles/design-tokens.css
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  width: 240px;
+  background: var(--color-primary-900);
+  color: var(--color-text-inverse);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-3);
+  flex-shrink: 0;
+  
+  &__brand {
+    padding: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  
+  &__brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-500);
+    color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: var(--font-weight-bold);
+  }
+  
+  &__brand-name {
+    font-size: var(--font-size-h6);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  &__nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4) 0;
+  }
+  
+  &__footer {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    min-width: 0;
+  }
+  
+  &__user-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  &__user-name {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-body-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  &__user-role {
+    font-size: var(--font-size-caption);
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Navigation Items */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all var(--motion-duration-fast);
+  border-left: 3px solid transparent;
+  font-size: var(--font-size-body);
+  
+  &:hover {
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  &--active {
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--color-primary-300);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  &__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+/* Avatar */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-300);
+  color: var(--color-primary-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body-sm);
+  flex-shrink: 0;
+}
+
+/* Logout Button */
+.logout-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: var(--space-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--motion-duration-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &:hover {
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  &:focus {
+    outline: 2px solid var(--color-primary-300);
+    outline-offset: 2px;
+  }
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-background-subtle);
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: var(--z-index-modal);
+    transform: translateX(-100%);
+    transition: transform var(--motion-duration-slow);
+    
+    &--open {
+      transform: translateX(0);
+    }
+  }
+  
+  .main-content {
+    width: 100%;
+  }
+}

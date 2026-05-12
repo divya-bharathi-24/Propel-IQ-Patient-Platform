@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCR-004a — Reschedule / Cancel | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element              | Action | Target Screen                    |
+|----------------------|--------|----------------------------------|
+| #confirm-reschedule  | click  | SCR-005 (Slot Selection)         |
+| #confirm-cancel      | click  | OVL-003 (Cancel Confirm Dialog)  |
+| #back-detail         | click  | SCR-004 (Appointment Detail)     |
+-->
+<div class="wf-meta">
+  <strong>SCR-004a</strong> · Reschedule / Cancel Appointment · High-Fidelity · 1440px · States: Default, Confirmation
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" role="navigation" aria-label="Patient navigation">
+    <div class="sidebar__brand"><div class="sidebar__brand-icon">+</div><span class="sidebar__brand-name">UniPatient</span></div>
+    <nav class="sidebar__nav">
+      <a href="wireframe-SCR-003-patient-dashboard.html" class="nav-item"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="#" class="nav-item active"><svg class="nav-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Appointments</a>
+    </nav>
+    <div class="sidebar__footer"><div class="sidebar__user"><div class="avatar">JA</div><div class="sidebar__user-info"><div class="sidebar__user-name">Jane Anderson</div><div class="sidebar__user-role">Patient</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div class="breadcrumb">
+        <a href="wireframe-SCR-003-patient-dashboard.html">Dashboard</a>
+        <span class="breadcrumb__sep">›</span>
+        <a href="wireframe-SCR-004-appointment-detail.html" id="back-detail">General Check-up</a>
+        <span class="breadcrumb__sep">›</span>
+        <span>Manage Appointment</span>
+      </div>
+    </header>
+
+    <div class="page-body" style="max-width:680px;">
+      <h1 style="font-size:var(--font-size-2xl);font-weight:700;margin-bottom:var(--space-2);">Manage your appointment</h1>
+      <p style="color:var(--text-secondary);margin-bottom:var(--space-6);">General Check-up · May 20, 2026 · 10:00 AM · Dr. Patel</p>
+
+      <!-- Policy alert -->
+      <div class="alert alert--info mb-6">
+        <span>ℹ</span>
+        <div>
+          <div class="alert__title">Cancellation policy</div>
+          <div class="alert__body">You can reschedule or cancel free of charge up to 24 hours before your appointment. Late cancellations may incur a fee.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-8);">
+        <!-- Reschedule Card -->
+        <div class="card" style="border:2px solid var(--primary);">
+          <div class="card__body" style="text-align:center;padding:var(--space-8) var(--space-6);">
+            <div style="font-size:40px;margin-bottom:var(--space-4);">📅</div>
+            <h3 style="font-size:var(--font-size-lg);font-weight:600;margin-bottom:var(--space-3);">Reschedule</h3>
+            <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-6);">Pick a new date and time. Your intake responses will be carried over.</p>
+            <a href="wireframe-SCR-005-slot-selection.html" id="confirm-reschedule" class="btn btn--primary btn--full">Find new slots</a>
+          </div>
+        </div>
+        <!-- Cancel Card -->
+        <div class="card">
+          <div class="card__body" style="text-align:center;padding:var(--space-8) var(--space-6);">
+            <div style="font-size:40px;margin-bottom:var(--space-4);">❌</div>
+            <h3 style="font-size:var(--font-size-lg);font-weight:600;margin-bottom:var(--space-3);">Cancel</h3>
+            <p style="font-size:var(--font-size-sm);color:var(--text-secondary);margin-bottom:var(--space-6);">Remove this appointment. You can book a new one at any time.</p>
+            <a href="wireframe-OVL-003-cancel-dialog.html" id="confirm-cancel" class="btn btn--danger btn--full">Cancel appointment</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <a href="wireframe-SCR-004-appointment-detail.html" class="btn btn--ghost">← Keep my appointment</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -5,16 +5,28 @@
 >
   <header class="page-header">
     <h1 id="user-management-title">User Management</h1>
-    <button
-      mat-flat-button
-      color="primary"
-      type="button"
-      (click)="openCreateUserDialog()"
-      aria-label="Create a new user account"
-    >
-      <mat-icon aria-hidden="true">person_add</mat-icon>
-      Create User
-    </button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="openCreateUserDialog()"
+        aria-label="Create a new user account"
+      >
+        <mat-icon aria-hidden="true">person_add</mat-icon>
+        Create User
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="logout()"
+        aria-label="Log out"
+        style="display:flex;align-items:center;gap:6px;color:#d32f2f;border-color:#d32f2f;"
+      >
+        <mat-icon aria-hidden="true">logout</mat-icon>
+        Log out
+      </button>
+    </div>
   </header>
 
   <!-- Loading state -->

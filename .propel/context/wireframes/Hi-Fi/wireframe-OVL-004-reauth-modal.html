@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVL-004 — Re-Authentication Modal | UniPatient Hi-Fi Wireframe</title>
+<link rel="stylesheet" href="./_tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Map
+| Element          | Action | Target Screen                      |
+|------------------|--------|------------------------------------|
+| #confirm-reauth  | click  | SCR-020 (User Management - create) |
+| #cancel-reauth   | click  | SCR-020 (User Management)          |
+| Error state      | shown  | Bad password entered               |
+-->
+<div class="wf-meta">
+  <strong>OVL-004</strong> · Re-Authentication Modal · High-Fidelity · Applied to SCR-020 (User Management) · FL-007 · Admin Role
+</div>
+
+<!-- Background: User Management (dimmed) -->
+<div style="min-height:100vh;background:var(--bg-default);padding:var(--space-8);opacity:.3;pointer-events:none;">
+  <div style="height:64px;background:var(--bg-surface);border-radius:var(--radius-md);margin-bottom:var(--space-6);"></div>
+  <div style="height:48px;background:var(--bg-surface);border-radius:var(--radius-md);margin-bottom:var(--space-4);"></div>
+  <div class="skeleton skeleton--card" style="height:240px;border-radius:var(--radius-lg);"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reauth-title" style="position:fixed;">
+  <div class="modal">
+    <div class="modal__header" style="background:var(--color-neutral-900);">
+      <h2 class="modal__title" id="reauth-title" style="color:#fff;display:flex;align-items:center;gap:var(--space-3);">
+        <span style="font-size:20px;">🔐</span> Confirm your identity
+      </h2>
+    </div>
+    <div class="modal__body">
+      <p style="color:var(--text-secondary);margin-bottom:var(--space-5);">
+        This action requires you to verify your identity. Please enter your password to continue.
+      </p>
+
+      <div style="background:var(--color-info-50);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-5);font-size:var(--font-size-sm);color:var(--color-info-700);">
+        <strong>Sensitive action:</strong> Creating a new admin user account
+      </div>
+
+      <!-- Error state (shown on wrong password) -->
+      <div class="alert alert--error mb-4" role="alert" style="display:none" id="reauth-error">
+        <span>⚠</span>
+        <div class="alert__body">Incorrect password. <strong>2 attempts remaining</strong> before account lock.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reauth-user">Signed in as</label>
+        <input id="reauth-user" type="text" class="form-input" value="admin@unipatient.health" readonly style="background:var(--bg-subtle);color:var(--text-secondary);">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reauth-pwd">Password <span class="form-label__required">*</span></label>
+        <input id="reauth-pwd" type="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <a href="wireframe-SCR-020-user-management.html" id="cancel-reauth" class="btn btn--secondary">Cancel</a>
+      <a href="wireframe-SCR-020-user-management.html" id="confirm-reauth" class="btn btn--primary">Verify &amp; continue</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
