@@ -122,7 +122,28 @@ async function mockAllE2EApis(page: import('@playwright/test').Page, d: typeof j
           sourceDoc2: d.conflict.source2,
         }],
         documents: [],
-        sections: [],
+        sections: [
+          {
+            sectionType: 'Medications',
+            items: [{
+              fieldName: 'Medication',
+              value: d.conflict.value1,
+              confidence: 0.95,
+              isLowConfidence: false,
+              sources: [],
+            }],
+          },
+          {
+            sectionType: 'Allergies',
+            items: [{
+              fieldName: 'Allergy',
+              value: d.intake.expectedAllergies[0],
+              confidence: 0.95,
+              isLowConfidence: false,
+              sources: [],
+            }],
+          },
+        ],
       },
     }),
   );
@@ -285,8 +306,8 @@ test.describe('E2E Journey: Patient Onboarding (UC-001 → UC-002 → UC-007 →
 
     await test.step('Phase 2: Patient submits AI intake', async () => {
       const intake = new IntakePage(page);
-      await expect(intake.submitIntakeButton).toBeVisible({ timeout: 10_000 });
-      await intake.submitIntakeButton.click();
+      await expect(intake.aiSubmitButton).toBeVisible({ timeout: 10_000 });
+      await intake.aiSubmitButton.click();
       // After submission, Angular navigates to /appointments
       await expect(page).toHaveURL(/appointments/, { timeout: 15_000 });
     });

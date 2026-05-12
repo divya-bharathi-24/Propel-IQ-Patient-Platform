@@ -16,7 +16,7 @@ export class LoginPage {
   }
 
   get errorAlert(): Locator {
-    return this.page.locator('.server-error[role="alert"]');
+    return this.page.locator('.alert--error[role="alert"]');
   }
 
   get roleBadge(): Locator {

@@ -50,7 +50,7 @@
   <!-- ── Form (shown once load succeeds) ───────────────────────────────── -->
   @if (loadState() === "success") {
     <!-- Autosave status chip -->
-    <div class="save-status" aria-live="polite">
+    <div class="save-status" aria-live="polite" data-testid="autosave-indicator">
       @if (saveStatus() === "saving") {
         <span class="save-status__chip save-status__chip--saving"
           >Saving...</span

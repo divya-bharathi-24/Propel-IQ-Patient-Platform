@@ -176,7 +176,7 @@ After mocking, the Angular app will:
 
 ## Regression Prevention Strategy
 
-- [ ] After fix, run `npx playwright test tests/login.spec.ts --project=standalone` with NO backend running — all 4 tests must pass
+- [x] After fix, run `npx playwright test tests/login.spec.ts --project=standalone` with NO backend running — all 4 tests must pass
 - [ ] Run `npx playwright test tests/login.spec.ts --project=standalone` with backend running — all 4 tests must still pass (mocks take precedence)
 - [ ] Verify `registration_login.spec.ts` still passes (no regression from locator changes)
 
@@ -214,17 +214,17 @@ npx playwright test --project=standalone
 
 ## Implementation Validation Strategy
 
-- [ ] `@login shows error on invalid credentials` — PASS (`.server-error[role="alert"]` visible within 15s)
-- [ ] `@login shows validation error on empty submit` — PASS (no strict-mode violation)
-- [ ] `@login successful login redirects to dashboard` — PASS (URL matches `/dashboard`)
-- [ ] `@login renders login form correctly` — PASS (unchanged)
-- [ ] All 4 tests pass with exit code 0
+- [x] `@login shows error on invalid credentials` — PASS (`.alert--error[role="alert"]` visible within 15s)
+- [x] `@login shows validation error on empty submit` — PASS (no strict-mode violation)
+- [x] `@login successful login redirects to dashboard` — PASS (URL matches `/dashboard`)
+- [x] `@login renders login form correctly` — PASS (unchanged)
+- [x] All 4 tests pass with exit code 0
 
 ## Implementation Checklist
 
-- [ ] Add `page.route('**/api/auth/login**', ...)` returning 401 in invalid-credentials test
-- [ ] Add `page.route('**/api/auth/login**', ...)` returning TokenResponse in successful-login test
-- [ ] Confirm `.first()` applied to `getByText(/required/i)` in empty-submit test
-- [ ] Confirm `errorAlert` locator = `.server-error[role="alert"]` in `login.page.ts`
-- [ ] Run `npx playwright test tests/login.spec.ts --project=standalone` — 4/4 pass
+- [x] Add `page.route('**/api/auth/login**', ...)` returning 401 in invalid-credentials test
+- [x] Add `page.route('**/api/auth/login**', ...)` returning TokenResponse in successful-login test
+- [x] Confirm `.first()` applied to `getByText(/required/i)` in empty-submit test
+- [x] Confirm `errorAlert` locator = `.alert--error[role="alert"]` in `login.page.ts` (corrected from `.server-error`)
+- [x] Run `npx playwright test tests/login.spec.ts --project=standalone` — 4/4 pass
 - [ ] Commit fix with message: `fix(e2e): mock login API in standalone tests to remove backend dependency`
