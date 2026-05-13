@@ -1,18 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   computed,
   inject,
 } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BookingWizardStore } from '../booking-wizard.store';
-import { CalendarSyncStore } from '../../../../features/patient/calendar/calendar-sync.store';
-import { CalendarSyncButtonComponent } from '../../../../shared/components/calendar-sync-button/calendar-sync-button.component';
-import { CalendarSyncStatusComponent } from '../../../../shared/components/calendar-sync-status/calendar-sync-status.component';
-import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outlook-sync/outlook-calendar-sync.component';
 
 @Component({
   selector: 'app-booking-confirmation-step',
@@ -21,9 +16,6 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
     RouterLink,
     MatButtonModule,
     MatProgressSpinnerModule,
-    CalendarSyncButtonComponent,
-    CalendarSyncStatusComponent,
-    OutlookCalendarSyncComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -58,9 +50,13 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
           </dl>
 
           <div class="actions">
-            <app-calendar-sync-button
-              [appointmentId]="result()!.appointmentId"
-            />
+            <button
+              mat-stroked-button
+              (click)="downloadCalendar()"
+              aria-label="Download ICS calendar file"
+            >
+              Download ICS
+            </button>
 
             <a
               mat-flat-button
@@ -71,14 +67,6 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
               Back to Dashboard
             </a>
           </div>
-
-          <!-- Google Calendar sync status badge (AC-2, AC-3, AC-4) -->
-          <app-calendar-sync-status [appointmentId]="result()!.appointmentId" />
-
-          <!-- Outlook Calendar sync (EP-007 / US_036 — AC-1 through AC-4) -->
-          <app-outlook-calendar-sync
-            [appointmentId]="result()!.appointmentId"
-          />
         </div>
       } @else if (store.isSubmitting()) {
         <div class="loading-state" role="status" aria-live="polite">
@@ -191,42 +179,11 @@ import { OutlookCalendarSyncComponent } from '../../../../features/calendar/outl
     `,
   ],
 })
-export class BookingConfirmationStepComponent implements OnInit {
+export class BookingConfirmationStepComponent {
   protected readonly store = inject(BookingWizardStore);
-  private readonly calendarStore = inject(CalendarSyncStore);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   protected readonly result = computed(() => this.store.bookingResult());
-
-  /**
-   * On init: read the `calendarResult` query param produced by the BE OAuth
-   * callback redirect and update the CalendarSyncStore accordingly (AC-1 – AC-4).
-   *
-   * After reading, query params are replaced out of the URL history so the user
-   * cannot accidentally trigger the handler again on a hard reload.
-   */
-  ngOnInit(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const calendarResult = params.get('calendarResult') as
-      | 'success'
-      | 'failed'
-      | 'declined'
-      | null;
-    const appointmentId = params.get('appointmentId');
-
-    if (calendarResult && appointmentId) {
-      this.calendarStore.handleOAuthResult(calendarResult);
-
-      if (calendarResult === 'success') {
-        // Fetch the real sync status + event link from the server (AC-2).
-        this.calendarStore.loadSyncStatus(appointmentId);
-      }
-
-      // Remove query params from URL without adding a browser history entry.
-      this.router.navigate([], { queryParams: {}, replaceUrl: true });
-    }
-  }
 
   protected readonly formattedDate = computed(() => {
     const date = this.result()?.date;
@@ -246,7 +203,10 @@ export class BookingConfirmationStepComponent implements OnInit {
 
     // Build compact date-time strings for iCalendar (YYYYMMDDTHHMMSSZ)
     const dtStart = this.toIcsDateTime(r.date, r.timeSlotStart);
-    const dtEnd = this.toIcsDateTime(r.date, r.timeSlotEnd);
+    // Default end to 30 min after start if not available
+    const dtEnd = r.timeSlotEnd
+      ? this.toIcsDateTime(r.date, r.timeSlotEnd)
+      : dtStart;
 
     const ics = [
       'BEGIN:VCALENDAR',
@@ -261,11 +221,15 @@ export class BookingConfirmationStepComponent implements OnInit {
       'END:VCALENDAR',
     ].join('\r\n');
 
-    const uri = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
-    anchor.href = uri;
+    anchor.href = url;
     anchor.download = `appointment-${r.referenceNumber}.ics`;
+    document.body.appendChild(anchor);
     anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
   }
 
   /**

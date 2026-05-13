@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Notification")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c99c3d8a553bd8a92c6fe952ad3ada237f6d9950")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c03c286c2ca58ff6fbb047e3051c5443be275752")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Notification")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Notification")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
