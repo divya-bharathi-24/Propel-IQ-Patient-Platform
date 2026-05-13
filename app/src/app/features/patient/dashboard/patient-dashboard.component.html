@@ -125,6 +125,15 @@
                     </div>
                   </div>
                 </a>
+                @if (appt.hasPendingIntake) {
+                  <a
+                    [routerLink]="['/intake', appt.id]"
+                    class="btn btn--primary btn--sm"
+                    aria-label="Complete intake form"
+                  >
+                    Complete intake form
+                  </a>
+                }
               }
             </div>
           }
@@ -171,7 +180,8 @@
             <app-quick-action-card 
               label="Upload Documents" 
               icon="📄" 
-              route="/documents/upload"
+              route="/documents"
+              ariaLabel="Upload medical documents"
               iconBg="var(--color-info-100)" />
             <app-quick-action-card 
               label="My Calendar" 

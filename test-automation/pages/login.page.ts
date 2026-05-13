@@ -16,11 +16,12 @@ export class LoginPage {
   }
 
   get errorAlert(): Locator {
-    return this.page.locator('.server-error[role="alert"]');
+    return this.page.locator('.alert--error[role="alert"]');
   }
 
   get roleBadge(): Locator {
-    return this.page.getByTestId('user-role-badge');
+    // Sidebar renders the current role in .sidebar__user-role
+    return this.page.locator('.sidebar__user-role');
   }
 
   async login(email: string, password: string): Promise<void> {

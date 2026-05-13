@@ -135,6 +135,7 @@ public sealed class AuthController : ControllerBase
     /// <summary>
     /// Terminates the session for the calling device: deletes the Redis session key,
     /// revokes the refresh token, and writes a LOGOUT audit event (AC-4, FR-006).
+    /// DeviceId and RefreshToken are optional — if missing, cleanup is skipped (forgiving logout).
     /// </summary>
     [HttpPost("logout")]
     [Authorize]
@@ -148,11 +149,19 @@ public sealed class AuthController : ControllerBase
         if (!Guid.TryParse(userIdStr, out Guid userId))
             return Unauthorized(new { error = "invalid_token" });
 
-        string deviceId = User.FindFirstValue("deviceId") ?? request.DeviceId;
+        // Try to get deviceId from JWT claims first, then from request body, fallback to empty string
+        string deviceId = User.FindFirstValue("deviceId") 
+            ?? request.DeviceId 
+            ?? string.Empty;
         string? ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         string? role = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
 
-        var command = new LogoutCommand(userId, deviceId, request.RefreshToken, ipAddress, role);
+        var command = new LogoutCommand(
+            userId, 
+            deviceId, 
+            request.RefreshToken ?? string.Empty, 
+            ipAddress, 
+            role);
         await _mediator.Send(command, cancellationToken);
         return NoContent();
     }
@@ -210,5 +219,5 @@ public sealed record RefreshRequest(string RefreshToken, string DeviceId);
 public sealed record SetupCredentialsRequest(string Token, string Password);
 
 /// <summary>Request body for POST /api/auth/logout.</summary>
-public sealed record LogoutRequest(string RefreshToken, string DeviceId);
+public sealed record LogoutRequest(string? RefreshToken, string? DeviceId);
 

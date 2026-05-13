@@ -3,40 +3,34 @@ import { type Locator, type Page } from '@playwright/test';
 export class QueuePage {
   constructor(private readonly page: Page) {}
 
-  get searchInput(): Locator {
-    return this.page.getByLabel('Search by patient name or reference');
+  /** Queue table row containing the patient's name. */
+  queueEntry(patientName: string): Locator {
+    return this.page.locator('tr.queue-row').filter({ hasText: patientName });
   }
 
-  get searchButton(): Locator {
-    return this.page.getByRole('button', { name: 'Search' });
+  /**
+   * "Mark as Arrived" button for the given patient.
+   * aria-label = 'Mark {patientName} as arrived' (from queue-row template).
+   */
+  arrivedButton(patientName: string): Locator {
+    return this.page.getByRole('button', {
+      name: new RegExp(`mark ${patientName} as arrived`, 'i'),
+    });
   }
 
-  queueEntry(ref: string): Locator {
-    return this.page.getByTestId(`queue-entry-${ref}`);
+  /**
+   * The status chip inside the patient's row (shows 'Arrived' after marking).
+   */
+  arrivalTime(patientName: string): Locator {
+    return this.queueEntry(patientName).locator('app-queue-status-chip');
   }
 
-  arrivedButton(ref: string): Locator {
-    return this.page.getByTestId(`arrived-button-${ref}`);
+  /** Walk-In badge rendered by BookingTypeBadgeComponent inside the row. */
+  walkinBadge(patientName: string): Locator {
+    return this.queueEntry(patientName).getByLabel('Booking type: Walk-In');
   }
 
-  arrivalTime(ref: string): Locator {
-    return this.page.getByTestId(`arrival-time-${ref}`);
-  }
-
-  walkinBadge(ref: string): Locator {
-    return this.page.getByTestId(`walkin-badge-${ref}`);
-  }
-
-  nextActionBadge(ref: string): Locator {
-    return this.page.getByTestId(`next-action-badge-${ref}`);
-  }
-
-  async markArrived(ref: string): Promise<void> {
-    await this.arrivedButton(ref).click();
-  }
-
-  async searchByReference(reference: string): Promise<void> {
-    await this.searchInput.fill(reference);
-    await this.searchButton.click();
+  async markArrived(patientName: string): Promise<void> {
+    await this.arrivedButton(patientName).click();
   }
 }

@@ -3,56 +3,49 @@ import { type Locator, type Page } from '@playwright/test';
 export class MedicalCodingPage {
   constructor(private readonly page: Page) {}
 
+  /**
+   * The page's <main> landmark — aria-label="Medical code review".
+   * The component has no <h1>; the main element carries the accessible name.
+   */
   get heading(): Locator {
-    return this.page.getByRole('heading', { name: 'Medical Code Review' });
+    return this.page.locator('main[aria-label="Medical code review"]');
   }
 
+  /**
+   * Submit Review button (aria-label from MedicalCodeReviewPageComponent template).
+   */
   get saveCodesButton(): Locator {
-    return this.page.getByRole('button', { name: 'Save confirmed codes' });
+    return this.page.getByRole('button', { name: 'Submit code review decisions' });
   }
 
-  get addManuallyButton(): Locator {
-    return this.page.getByRole('button', { name: 'Add code manually' });
-  }
-
-  get codeInput(): Locator {
-    return this.page.getByLabel('ICD-10 code');
-  }
-
-  get validateCodeButton(): Locator {
-    return this.page.getByRole('button', { name: 'Validate code' });
-  }
-
-  get validationResult(): Locator {
-    return this.page.getByTestId('code-validation-result');
-  }
-
-  get addToConfirmedButton(): Locator {
-    return this.page.getByRole('button', { name: 'Add to confirmed codes' });
-  }
-
-  get successAlert(): Locator {
-    return this.page.getByRole('alert');
-  }
-
-  get codingCompleteBadge(): Locator {
-    return this.page.getByTestId('coding-completion-badge');
-  }
-
+  /**
+   * mat-card for a given code. The card's aria-label is
+   * "{code} — {description}" (set in MedicalCodeCardComponent).
+   */
   icd10Suggestion(code: string): Locator {
-    return this.page.getByTestId(`icd10-suggestion-${code}`);
+    return this.page.locator(`mat-card[aria-label*="${code}"]`);
   }
 
   cptSuggestion(code: string): Locator {
-    return this.page.getByTestId(`cpt-suggestion-${code}`);
+    return this.page.locator(`mat-card[aria-label*="${code}"]`);
   }
 
+  /**
+   * The Confirm button inside a code card.
+   * aria-label = 'Confirm code {code}' (MedicalCodeCardComponent template).
+   */
   confirmCodeButton(code: string): Locator {
-    return this.page.getByRole('button', { name: `Confirm ${code}` });
+    return this.page.getByRole('button', { name: `Confirm code ${code}` });
   }
 
-  confirmedBadge(prefix: 'icd10' | 'cpt', code: string): Locator {
-    return this.page.getByTestId(`${prefix}-confirmed-${code}`);
+  /**
+   * Decision banner shown inside the card after confirming.
+   * role="status" aria-label="Decision: Accepted"
+   */
+  confirmedBadge(_prefix: 'icd10' | 'cpt', code: string): Locator {
+    return this.page
+      .locator(`mat-card[aria-label*="${code}"]`)
+      .locator('[role="status"][aria-label="Decision: Accepted"]');
   }
 
   async confirmCode(code: string): Promise<void> {
@@ -61,11 +54,5 @@ export class MedicalCodingPage {
 
   async saveCodes(): Promise<void> {
     await this.saveCodesButton.click();
-  }
-
-  async addManualCode(code: string): Promise<void> {
-    await this.addManuallyButton.click();
-    await this.codeInput.fill(code);
-    await this.validateCodeButton.click();
   }
 }

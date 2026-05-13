@@ -550,6 +550,7 @@ builder.Services.AddScoped<ICorrelationIdAccessor, HttpContextCorrelationIdAcces
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IEmailVerificationTokenRepository, EmailVerificationTokenRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<AuditLogService>();
 
 // ── US_047 — Audit log read repository (task_002) ─────────────────────────────
 // EfAuditLogReadRepository exposes only read methods; no write surface (AD-7, FR-059).

@@ -41,6 +41,26 @@ test.describe('@login Login Page', () => {
     const login = new LoginPage(page);
     await login.login('wrong@example.com', 'WrongPass123!');
     await expect(login.errorAlert).toBeVisible({ timeout: 10_000 });
+    await expect(login.errorAlert).toContainText('Invalid email or password');
+  });
+
+  test('@login shows error on server error (5xx)', async ({ page }) => {
+    await page.route('**/api/auth/login**', route =>
+      route.fulfill({ status: 500, json: { message: 'Internal server error.' } }),
+    );
+    const login = new LoginPage(page);
+    await login.login('wrong@example.com', 'WrongPass123!');
+    await expect(login.errorAlert).toBeVisible({ timeout: 10_000 });
+    // 5xx should still show "Invalid email or password" — not leak server details
+    await expect(login.errorAlert).toContainText('Invalid email or password');
+  });
+
+  test('@login shows connectivity error when network is unavailable', async ({ page }) => {
+    await page.route('**/api/auth/login**', route => route.abort('connectionrefused'));
+    const login = new LoginPage(page);
+    await login.login('any@example.com', 'AnyPass123!');
+    await expect(login.errorAlert).toBeVisible({ timeout: 10_000 });
+    await expect(login.errorAlert).toContainText('Unable to reach the server');
   });
 
   test('@login shows validation error on empty submit', async ({ page }) => {

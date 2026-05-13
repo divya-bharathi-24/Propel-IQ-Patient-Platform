@@ -142,7 +142,6 @@ export class AuthService {
   logout(reason?: 'idle_timeout' | 'session_expired'): void {
     const { refreshToken, deviceId } = this._authState();
 
-    this._clearState();
     this._sessionTimerStopFn?.();
 
     // Fire-and-forget — errors are intentionally suppressed
@@ -152,6 +151,10 @@ export class AuthService {
         .pipe(catchError(() => []))
         .subscribe();
     }
+
+    // Clear state AFTER subscribe so the interceptor can attach the Bearer token
+    this._clearState();
+
 
     const queryParams = reason ? { reason } : {};
     this.router.navigate(['/auth/login'], { queryParams });

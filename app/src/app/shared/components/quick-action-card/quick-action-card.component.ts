@@ -14,4 +14,5 @@ export class QuickActionCardComponent {
   @Input() icon!: string;
   @Input() route!: string;
   @Input() iconBg?: string;
+  @Input() ariaLabel?: string;
 }

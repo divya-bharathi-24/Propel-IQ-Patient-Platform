@@ -118,12 +118,12 @@ export class LoginComponent implements OnInit {
           }
           return;
         }
-        if (err.status === 401 || err.status === 400) {
-          this.serverError.set('Invalid email or password. Please try again.');
+        if (err.status === 0) {
+          this.serverError.set('Unable to reach the server. Please check your connection and try again.');
         } else {
-          this.serverError.set(
-            err.message ?? 'An unexpected error occurred. Please try again.',
-          );
+          // Treat all HTTP errors (401, 400, 403, 5xx, etc.) as invalid credentials
+          // to avoid leaking server-side details on the login form.
+          this.serverError.set('Invalid email or password. Please try again.');
         }
       },
     });

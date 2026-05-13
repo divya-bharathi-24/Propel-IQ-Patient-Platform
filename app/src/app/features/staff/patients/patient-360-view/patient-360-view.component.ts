@@ -240,6 +240,7 @@ const SECTION_ORDER: SectionType[] = [
             <app-clinical-section
               [section]="section"
               [conflicts]="conflictStore.conflicts()"
+              [attr.data-testid]="'intake-data-' + section.sectionType.toLowerCase()"
             />
           }
         </section>

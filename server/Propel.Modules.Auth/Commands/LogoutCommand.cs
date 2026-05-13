@@ -8,8 +8,8 @@ namespace Propel.Modules.Auth.Commands;
 /// </summary>
 public sealed record LogoutCommand(
     Guid UserId,
-    string DeviceId,
-    string RefreshToken,
+    string? DeviceId,
+    string? RefreshToken,
     string? IpAddress,
     string? Role
 ) : IRequest;

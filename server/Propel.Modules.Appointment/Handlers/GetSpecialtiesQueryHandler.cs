@@ -25,6 +25,7 @@ public sealed class GetSpecialtiesQueryHandler
     {
         var specialties = await _repository.GetAllAsync(cancellationToken);
         return specialties
+            .DistinctBy(s => s.Name)   // defence-in-depth: never surface name duplicates to clients
             .Select(s => new SpecialtyDto(s.Id, s.Name))
             .ToList()
             .AsReadOnly();

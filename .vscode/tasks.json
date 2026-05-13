@@ -7,6 +7,34 @@
 			"command": "cd app ; npm start",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Run Login Tests (standalone)",
+			"type": "shell",
+			"command": "cd test-automation ; npx playwright test tests/login.spec.ts --project=standalone --headed",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Run Login Tests (standalone) - with text assertion",
+			"type": "shell",
+			"command": "cd test-automation ; npx playwright test tests/login.spec.ts --project=standalone --headed",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git current branch",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git branch --show-current",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git stage files",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git add test-automation/tests/login.spec.ts .vscode/tasks.json ; git status",
+			"isBackground": false,
+			"group": "test"
 		}
 	]
 }

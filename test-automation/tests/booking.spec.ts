@@ -157,6 +157,29 @@ test.describe('@Booking Appointment Booking Wizard', () => {
     });
   });
 
+  test('@Booking TC-BOOK-REG-001: Specialty dropdown contains no duplicate options', async ({ page }) => {
+    // Regression guard for bug_duplicate_specialties:
+    // Mock returns 2 distinct specialties — dropdown must show exactly 2 options with no duplicates.
+    await mockAllApis(page);
+    await loginAndGoToBooking(page);
+
+    await test.step('Open the specialty dropdown', async () => {
+      await expect(page.getByLabel('Appointment specialty')).toBeVisible({ timeout: 10_000 });
+      await page.getByLabel('Appointment specialty').click();
+    });
+
+    await test.step('Verify no duplicate specialty options are rendered', async () => {
+      const options = page.getByRole('option');
+      await expect(options).toHaveCount(2, { timeout: 5_000 });
+      // Both options are distinct
+      await expect(page.getByRole('option', { name: 'General Practice' })).toHaveCount(1);
+      await expect(page.getByRole('option', { name: 'Cardiology' })).toHaveCount(1);
+    });
+
+    // Close panel
+    await page.keyboard.press('Escape');
+  });
+
   test('@Booking TC-BOOK-002: Patient selects a specialty and an available slot', async ({ page }) => {
     await mockAllApis(page);
     await loginAndGoToBooking(page);

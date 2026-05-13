@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Clinical")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf54fd09b33f253396c2b4bf2b32a2dac89a1ce1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c03c286c2ca58ff6fbb047e3051c5443be275752")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Clinical")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Clinical")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

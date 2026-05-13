@@ -1,4 +1,4 @@
-<a [routerLink]="route" class="quick-action">
+<a [routerLink]="route" class="quick-action" [attr.aria-label]="ariaLabel || null">
   <div 
     class="quick-action__icon" 
     [style.background-color]="iconBg || 'var(--color-primary-100)'"
