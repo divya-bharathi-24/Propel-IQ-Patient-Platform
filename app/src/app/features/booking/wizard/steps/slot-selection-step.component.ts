@@ -395,6 +395,7 @@ export class SlotSelectionStepComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
+      timeZone: 'UTC', // slots are generated as UTC business hours (09:00–17:00 UTC)
     });
   }
 }

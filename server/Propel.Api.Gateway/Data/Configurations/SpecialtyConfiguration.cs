@@ -27,6 +27,11 @@ public sealed class SpecialtyConfiguration : IEntityTypeConfiguration<Specialty>
                .HasMaxLength(100)
                .IsRequired();
 
+        // Unique constraint prevents duplicate specialty names from either seeding path.
+        builder.HasIndex(s => s.Name)
+               .IsUnique()
+               .HasDatabaseName("ix_specialties_name_unique");
+
         builder.Property(s => s.Description)
                .HasMaxLength(500);
 
