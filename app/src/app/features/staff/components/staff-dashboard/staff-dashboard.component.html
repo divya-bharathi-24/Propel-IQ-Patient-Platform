@@ -87,24 +87,7 @@
         </svg>
         Appointments
       </a>
-      <a
-        routerLink="/staff/patients"
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        <svg
-          class="nav-item__icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-        Code Review
-        <span class="badge badge--warning" style="margin-left: auto">3</span>
-      </a>
+
       <a
         routerLink="/staff/settings/reminders"
         routerLinkActive="active"
@@ -211,23 +194,7 @@
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card__body stat-card">
-            <div class="stat-card__content">
-              <div>
-                <div class="stat-card__label">Code reviews</div>
-                <div class="stat-card__value">3</div>
-                <div
-                  class="stat-card__delta"
-                  style="color: var(--color-error-600)"
-                >
-                  Awaiting approval
-                </div>
-              </div>
-              <div class="stat-card__icon stat-card__icon--error">⚕</div>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       <!-- Main grid -->
@@ -328,40 +295,7 @@
 
         <!-- Right Column -->
         <div class="dashboard-sidebar-right">
-          <!-- Pending Code Reviews -->
-          <div class="card">
-            <div class="card__header">
-              <h2 class="card__title">Pending code reviews</h2>
-              <a routerLink="/staff/patients" class="btn btn--ghost btn--sm"
-                >Review all →</a
-              >
-            </div>
-            <div class="card__body code-reviews-list">
-              <div class="code-review-item">
-                <div>
-                  <div class="code-review-item__title">M. Johnson · J45.9</div>
-                  <div class="code-review-item__sub">AI confidence: 87%</div>
-                </div>
-                <span class="badge badge--warning">Pending</span>
-              </div>
-              <div class="code-review-item">
-                <div>
-                  <div class="code-review-item__title">R. Thompson · E11.9</div>
-                  <div class="code-review-item__sub">AI confidence: 92%</div>
-                </div>
-                <span class="badge badge--warning">Pending</span>
-              </div>
-              <div class="code-review-item">
-                <div>
-                  <div class="code-review-item__title">
-                    P. Williams · Z00.00
-                  </div>
-                  <div class="code-review-item__sub">AI confidence: 95%</div>
-                </div>
-                <span class="badge badge--warning">Pending</span>
-              </div>
-            </div>
-          </div>
+
 
           <!-- Quick Links -->
           <div class="card">
