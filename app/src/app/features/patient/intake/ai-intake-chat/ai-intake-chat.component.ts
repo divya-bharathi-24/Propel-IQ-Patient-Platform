@@ -11,7 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +38,7 @@ import { IntakePreviewPanelComponent } from '../intake-preview-panel/intake-prev
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
@@ -75,6 +76,8 @@ export class AiIntakeChatComponent implements OnInit {
   readonly userInput = signal('');
   readonly isPending = signal(false);
   readonly showConfirmation = signal(false);
+  /** True when accessed from a direct link with no appointmentId context. */
+  readonly noAppointmentContext = signal(false);
 
   constructor() {
     // Navigate to manual intake when fallback mode activates
@@ -94,6 +97,12 @@ export class AiIntakeChatComponent implements OnInit {
       this.route.snapshot.queryParamMap.get('appointmentId') ??
       '';
     this.appointmentId.set(id);
+
+    if (!id) {
+      // Accessed from quick-action without an appointment context — prompt user to pick one.
+      this.noAppointmentContext.set(true);
+      return;
+    }
 
     // If IntakePageComponent injected a resume question (Manual → AI, AC-2),
     // display it directly instead of starting a brand-new AI session.
@@ -134,7 +143,7 @@ export class AiIntakeChatComponent implements OnInit {
         },
         error: () => {
           this.isPending.set(false);
-          this.store.activateFallbackMode();
+          this.store.activateFallbackMode(this.appointmentId());
         },
       });
   }
@@ -169,7 +178,7 @@ export class AiIntakeChatComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.isFallback) {
-            this.store.activateFallbackMode();
+            this.store.activateFallbackMode(this.appointmentId());
             return;
           }
 
@@ -190,7 +199,7 @@ export class AiIntakeChatComponent implements OnInit {
         },
         error: () => {
           this.isPending.set(false);
-          this.store.activateFallbackMode();
+          this.store.activateFallbackMode(this.appointmentId());
         },
       });
   }

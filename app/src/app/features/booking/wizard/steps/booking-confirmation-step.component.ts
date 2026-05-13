@@ -58,9 +58,29 @@ import { BookingWizardStore } from '../booking-wizard.store';
               Download ICS
             </button>
 
+            @if (store.intakeMode() === 'AiAssisted') {
+              <a
+                mat-flat-button
+                color="primary"
+                [routerLink]="['/intake', result()!.appointmentId]"
+                aria-label="Start AI-assisted intake for this appointment"
+              >
+                🤖 Start AI Intake
+              </a>
+            } @else {
+              <a
+                mat-flat-button
+                color="primary"
+                [routerLink]="['/intake', result()!.appointmentId]"
+                [queryParams]="{ mode: 'manual' }"
+                aria-label="Complete intake form for this appointment"
+              >
+                📝 Complete Intake Form
+              </a>
+            }
+
             <a
-              mat-flat-button
-              color="primary"
+              mat-stroked-button
               routerLink="/dashboard"
               aria-label="Return to your dashboard"
             >

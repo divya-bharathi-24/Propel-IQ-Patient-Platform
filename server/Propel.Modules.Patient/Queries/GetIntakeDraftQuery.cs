@@ -15,5 +15,5 @@ namespace Propel.Modules.Patient.Queries;
 /// </summary>
 public sealed record GetIntakeDraftQuery(Guid AppointmentId, Guid PatientId) : IRequest<GetIntakeDraftResult>;
 
-/// <summary>Handler result containing the draft DTO.</summary>
-public sealed record GetIntakeDraftResult(IntakeDraftDto Draft);
+/// <summary>Handler result: null Draft means no draft exists (AC-4).</summary>
+public sealed record GetIntakeDraftResult(IntakeDraftDto? Draft);

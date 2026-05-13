@@ -45,10 +45,16 @@ public sealed class NoShowRiskCalculationBackgroundService : BackgroundService
         await RunBatchAsync(stoppingToken);
 
         using var timer = new PeriodicTimer(Interval);
-        while (!stoppingToken.IsCancellationRequested &&
-               await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            await RunBatchAsync(stoppingToken);
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await RunBatchAsync(stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal graceful shutdown — stoppingToken was cancelled.
         }
     }
 
@@ -81,6 +87,9 @@ public sealed class NoShowRiskCalculationBackgroundService : BackgroundService
                         "NoShowRisk_BatchItemFailed: AppointmentId={AppointmentId}",
                         appointmentId);
                 }
+
+                // Throttle to ~4 RPM to avoid exhausting the shared Gemini API key quota (15 RPM free tier).
+                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
 
             _logger.LogInformation(

@@ -73,10 +73,16 @@ public sealed class ReminderSchedulerService : BackgroundService, IReminderSched
         await ResumeIncompleteJobsAsync(stoppingToken);
 
         using var timer = new PeriodicTimer(PollInterval);
-        while (!stoppingToken.IsCancellationRequested
-               && await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            await EvaluateAndQueueRemindersAsync(stoppingToken);
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await EvaluateAndQueueRemindersAsync(stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal graceful shutdown — stoppingToken was cancelled.
         }
 
         _logger.LogInformation("ReminderScheduler_Stopped.");

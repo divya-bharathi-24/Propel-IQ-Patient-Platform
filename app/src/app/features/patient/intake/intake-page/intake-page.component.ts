@@ -94,6 +94,12 @@ export class IntakePageComponent implements OnInit, OnDestroy {
     const id = this.route.snapshot.paramMap.get('appointmentId') ?? '';
     this.appointmentId.set(id);
 
+    // Respect ?mode=manual from booking confirmation redirect.
+    const modeParam = this.route.snapshot.queryParamMap.get('mode');
+    if (modeParam === 'manual') {
+      this.store.setMode('Manual');
+    }
+
     this.autosaveService.init(id);
     this.localDraftService.init(id, (local, server) =>
       this.handleSyncConflict(local, server),

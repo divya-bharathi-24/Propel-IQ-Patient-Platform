@@ -14,7 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c03c286c2ca58ff6fbb047e3051c5443be275752")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd2d61f60ed3198e8c3031f32c8b75843510bd98")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.Calendar")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

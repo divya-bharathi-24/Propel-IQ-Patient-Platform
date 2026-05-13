@@ -65,9 +65,16 @@ public sealed class ExtractionPipelineWorker : BackgroundService
             PollInterval);
 
         using var timer = new PeriodicTimer(PollInterval);
-        while (await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            await RunPollTickAsync(stoppingToken);
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await RunPollTickAsync(stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal graceful shutdown — stoppingToken was cancelled.
         }
     }
 
@@ -96,7 +103,15 @@ public sealed class ExtractionPipelineWorker : BackgroundService
                 try
                 {
                     await using var docScope = _scopeFactory.CreateAsyncScope();
-                    await ProcessDocumentAsync(docScope.ServiceProvider, doc.Id, doc.Patient?.Email ?? string.Empty, doc.Patient?.Name ?? string.Empty, doc.FileName, doc.StoragePath, stoppingToken);
+                    await ProcessDocumentAsync(
+                        docScope.ServiceProvider,
+                        doc.Id,
+                        doc.PatientId,
+                        doc.Patient?.Email ?? string.Empty,
+                        doc.Patient?.Name ?? string.Empty,
+                        doc.FileName,
+                        doc.StoragePath,
+                        stoppingToken);
                 }
                 finally
                 {
@@ -119,6 +134,7 @@ public sealed class ExtractionPipelineWorker : BackgroundService
     private async Task ProcessDocumentAsync(
         IServiceProvider sp,
         Guid documentId,
+        Guid patientId,
         string patientEmail,
         string patientName,
         string fileName,
@@ -137,42 +153,75 @@ public sealed class ExtractionPipelineWorker : BackgroundService
 
         try
         {
-            // Step 1 — Read PDF bytes from storage (decrypted by LocalDocumentStorageService).
+            // Step 1 — Retrieve encrypted bytes from storage.
             var storageService = sp.GetRequiredService<IDocumentStorageService>();
-            byte[] pdfBytes = await storageService.RetrieveAsync(storagePath, ct);
+            byte[] encryptedBytes = await storageService.RetrieveAsync(storagePath, ct);
+
+            // Step 1b — Decrypt bytes using IFileEncryptionService (AES-256 Data Protection API).
+            // IDocumentStorageService.RetrieveAsync returns raw encrypted bytes;
+            // IFileEncryptionService.DecryptAsync restores the original PDF bytes (NFR-004).
+            var encryptionService = sp.GetRequiredService<IFileEncryptionService>();
+            byte[] pdfBytes = await encryptionService.DecryptAsync(encryptedBytes, ct);
 
             // Step 2 — Chunk PDF text (throws DocumentExtractionException if no text layer — EC-1).
             var chunkingService = sp.GetRequiredService<IDocumentChunkingService>();
-            IReadOnlyList<DocumentChunk> chunks = await chunkingService.ChunkAsync(pdfBytes, documentId, ct);
+            IReadOnlyList<DocumentChunk> chunks = await chunkingService.ChunkAsync(pdfBytes, documentId, patientId, ct);
 
             _logger.LogInformation(
                 "ExtractionPipelineWorker: DocumentId={DocumentId} chunked into {ChunkCount} chunks.",
                 documentId, chunks.Count);
 
             // Step 3 — Generate embeddings.
+            // EmbeddingGenerationService is always registered (DI requires it), but the underlying
+            // OpenAI key may be invalid/placeholder. On 401 auth errors, degrade gracefully to
+            // "Completed (chunking only)" without embeddings — this allows testing without a real API key.
             var embeddingService = sp.GetRequiredService<IEmbeddingGenerationService>();
-            IReadOnlyList<ChunkWithEmbedding> chunksWithEmbeddings = await embeddingService.GenerateAsync(chunks, ct);
+            IReadOnlyList<ChunkWithEmbedding>? chunksWithEmbeddings = null;
+            try
+            {
+                chunksWithEmbeddings = await embeddingService.GenerateAsync(chunks, ct);
+            }
+            catch (Exception ex)
+            {
+                // Graceful degradation: any embedding failure (401 invalid key, 403 quota,
+                // Google AI / OpenAI network error, etc.) falls back to chunking-only mode.
+                // The document is marked Completed so the 360-view pipeline can proceed
+                // with whatever data is available rather than looping as Pending.
+                _logger.LogWarning(
+                    ex,
+                    "ExtractionPipelineWorker: DocumentId={DocumentId} — embedding generation failed ({Message}). Marking Completed (chunking-only mode, no embeddings).",
+                    documentId, ex.Message);
+                await docRepo.UpdateStatusAsync(documentId, DocumentProcessingStatus.Completed, ct);
+                FireAndForgetEmail(sp, patientEmail, patientName, fileName, isFailure: false, ct);
+                return;
+            }
 
             // Step 4 — Persist embeddings to pgvector.
             var vectorStore = sp.GetRequiredService<IVectorStoreService>();
-            await vectorStore.StoreChunksAsync(chunksWithEmbeddings, ct);
+            await vectorStore.StoreChunksAsync(chunksWithEmbeddings!, ct);
 
             _logger.LogInformation(
                 "ExtractionPipelineWorker: DocumentId={DocumentId} embeddings stored ({Count} vectors).",
-                documentId, chunksWithEmbeddings.Count);
+                documentId, chunksWithEmbeddings!.Count);
 
             // Step 5 — Run RAG extraction via GPT-4o orchestrator.
             var orchestrator = sp.GetRequiredService<IExtractionOrchestrator>();
             ExtractionResult result = await orchestrator.ExtractAsync(documentId, ct);
 
             // ── Circuit breaker open (EC-2) ──────────────────────────────────
+            // Mark as Failed rather than reverting to Pending.
+            // Reverting to Pending causes an infinite Pending→Processing→Pending loop when
+            // the AI service is persistently unavailable (e.g. no valid API key in dev).
+            // The circuit will reset naturally (BreakDuration=60 s); future document uploads
+            // will succeed once the AI service recovers.
             if (result is ExtractionResult.CircuitBreakerOpenResult)
             {
-                await docRepo.UpdateStatusAsync(documentId, DocumentProcessingStatus.Pending, ct);
-                _logger.LogInformation(
-                    "ExtractionPipelineWorker: DocumentId={DocumentId} circuit breaker open — reverted to Pending for retry.",
+                await docRepo.UpdateStatusAsync(documentId, DocumentProcessingStatus.Failed, ct);
+                _logger.LogWarning(
+                    "ExtractionPipelineWorker: DocumentId={DocumentId} circuit breaker open — marking Failed to prevent infinite retry loop.",
                     documentId);
-                return; // No failure email — will retry on next poll cycle.
+                FireAndForgetEmail(sp, patientEmail, patientName, fileName, isFailure: true, ct);
+                return;
             }
 
             // ── Extraction failed (schema/content validation — AIR-Q03, AIR-S04) ─

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Pgvector;
 using Propel.Api.Gateway.Data;
 
 #nullable disable
@@ -18,7 +19,7 @@ namespace Propel.Api.Gateway.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.15")
+                .HasAnnotation("ProductVersion", "9.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -362,10 +363,6 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("appointment_id");
 
-                    b.Property<Guid?>("AppointmentId1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("appointment_id1");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -431,11 +428,8 @@ namespace Propel.Api.Gateway.Migrations
                         .HasName("pk_calendar_syncs");
 
                     b.HasIndex("AppointmentId")
-                        .HasDatabaseName("ix_calendar_sync_appointment_id");
-
-                    b.HasIndex("AppointmentId1")
                         .IsUnique()
-                        .HasDatabaseName("ix_calendar_syncs_appointment_id1");
+                        .HasDatabaseName("ix_calendar_sync_appointment_id");
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_calendar_syncs_patient_id");
@@ -710,9 +704,9 @@ namespace Propel.Api.Gateway.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("document_id");
 
-                    b.PrimitiveCollection<float[]>("Embedding")
+                    b.Property<Vector>("Embedding")
                         .IsRequired()
-                        .HasColumnType("real[]")
+                        .HasColumnType("vector(768)")
                         .HasColumnName("embedding");
 
                     b.Property<int>("EndTokenIndex")
@@ -733,6 +727,12 @@ namespace Propel.Api.Gateway.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_document_chunk_embeddings");
+
+                    b.HasIndex("Embedding")
+                        .HasDatabaseName("ix_document_chunk_embeddings_embedding_hnsw");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_document_chunk_embeddings_patient_id");
@@ -1906,16 +1906,11 @@ namespace Propel.Api.Gateway.Migrations
             modelBuilder.Entity("Propel.Domain.Entities.CalendarSync", b =>
                 {
                     b.HasOne("Propel.Domain.Entities.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
+                        .WithOne("CalendarSync")
+                        .HasForeignKey("Propel.Domain.Entities.CalendarSync", "AppointmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_calendar_syncs_appointments_appointment_id");
-
-                    b.HasOne("Propel.Domain.Entities.Appointment", null)
-                        .WithOne("CalendarSync")
-                        .HasForeignKey("Propel.Domain.Entities.CalendarSync", "AppointmentId1")
-                        .HasConstraintName("fk_calendar_syncs_appointments_appointment_id1");
 
                     b.HasOne("Propel.Domain.Entities.Patient", "Patient")
                         .WithMany()

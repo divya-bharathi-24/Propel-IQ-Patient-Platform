@@ -7,7 +7,16 @@ import {
   withState,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { EMPTY, catchError, pipe, switchMap, tap } from 'rxjs';
+import {
+  EMPTY,
+  catchError,
+  pipe,
+  switchMap,
+  take,
+  takeWhile,
+  tap,
+  timer,
+} from 'rxjs';
 import {
   Patient360ViewDto,
   Patient360ViewService,
@@ -17,7 +26,12 @@ import { ClinicalConflictStore } from './store/clinical-conflict.store';
 
 // ── State shape ───────────────────────────────────────────────────────────────
 
-export type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
+export type LoadingState =
+  | 'idle'
+  | 'loading'
+  | 'loaded'
+  | 'aggregating'
+  | 'error';
 export type VerifyState = 'idle' | 'loading' | 'success' | 'error';
 
 export interface Patient360ViewState {
@@ -68,101 +82,123 @@ export const Patient360ViewStore = signalStore(
     };
   }),
 
-  withMethods((store, service = inject(Patient360ViewService), conflictStore = inject(ClinicalConflictStore)) => ({
-    /**
-     * Loads the 360-degree patient view.
-     * GET /api/staff/patients/{patientId}/360-view
-     */
-    load360View: rxMethod<string>(
-      pipe(
-        tap(() =>
-          patchState(store, { loadingState: 'loading', loadError: null }),
-        ),
-        switchMap((patientId) =>
-          service.get360View(patientId).pipe(
-            tap((view360) => {
-              patchState(store, { view360, loadingState: 'loaded' });
-              // Hydrate the conflict store from the 360-view payload (US_044)
-              conflictStore.loadConflicts(view360.conflicts ?? []);
-            }),
-            catchError((err) => {
-              patchState(store, {
-                loadingState: 'error',
-                loadError: err?.message ?? 'Failed to load patient 360 view.',
-              });
-              return EMPTY;
-            }),
+  withMethods(
+    (
+      store,
+      service = inject(Patient360ViewService),
+      conflictStore = inject(ClinicalConflictStore),
+    ) => ({
+      /**
+       * Loads the 360-degree patient view.
+       * GET /api/staff/patients/{patientId}/360-view
+       */
+      load360View: rxMethod<string>(
+        pipe(
+          tap(() =>
+            patchState(store, { loadingState: 'loading', loadError: null }),
+          ),
+          switchMap((patientId) =>
+            // Poll every 5 s (up to 25 attempts ≈ 2 min) while the backend is
+            // still aggregating (HTTP 202). The stream completes as soon as a
+            // real 200 payload arrives or when a new patientId is emitted.
+            timer(0, 5_000).pipe(
+              take(25),
+              switchMap(() => service.get360View(patientId)),
+              tap((view360) => {
+                if (view360 === null) {
+                  // HTTP 202 — AI extraction pipeline still in progress.
+                  patchState(store, {
+                    loadingState: 'aggregating',
+                    view360: null,
+                  });
+                  return;
+                }
+                patchState(store, { view360, loadingState: 'loaded' });
+                // Hydrate the conflict store from the 360-view payload (US_044)
+                conflictStore.loadConflicts(view360.conflicts ?? []);
+              }),
+              // Stop polling once we have real data (inclusive keeps the final
+              // non-null value so the tap above already patched state).
+              takeWhile((view360) => view360 === null, true),
+              catchError((err) => {
+                patchState(store, {
+                  loadingState: 'error',
+                  loadError: err?.message ?? 'Failed to load patient 360 view.',
+                });
+                return EMPTY;
+              }),
+            ),
           ),
         ),
       ),
-    ),
 
-    /**
-     * Submits staff verification for the patient's aggregated profile.
-     * POST /api/staff/patients/{patientId}/360-view/verify
-     */
-    verifyProfile: rxMethod<string>(
-      pipe(
-        tap(() =>
-          patchState(store, { verifyState: 'loading', verifyError: null }),
-        ),
-        switchMap((patientId) =>
-          service.verifyProfile(patientId).pipe(
-            tap((verifyResult) => {
-              patchState(store, {
-                verifyState: 'success',
-                verifyResult,
-                // Mirror the updated status into the loaded view snapshot
-                view360: store.view360()
-                  ? {
-                      ...store.view360()!,
-                      verificationStatus: verifyResult.verificationStatus,
-                      verifiedAt: verifyResult.verifiedAt,
-                      verifiedByStaffName: verifyResult.verifiedByStaffName,
-                    }
-                  : null,
-              });
-            }),
-            catchError((err) => {
-              patchState(store, {
-                verifyState: 'error',
-                verifyError:
-                  err?.message ?? 'Verification failed. Please try again.',
-              });
-              return EMPTY;
-            }),
+      /**
+       * Submits staff verification for the patient's aggregated profile.
+       * POST /api/staff/patients/{patientId}/360-view/verify
+       */
+      verifyProfile: rxMethod<string>(
+        pipe(
+          tap(() =>
+            patchState(store, { verifyState: 'loading', verifyError: null }),
+          ),
+          switchMap((patientId) =>
+            service.verifyProfile(patientId).pipe(
+              tap((verifyResult) => {
+                patchState(store, {
+                  verifyState: 'success',
+                  verifyResult,
+                  // Mirror the updated status into the loaded view snapshot
+                  view360: store.view360()
+                    ? {
+                        ...store.view360()!,
+                        verificationStatus: verifyResult.verificationStatus,
+                        verifiedAt: verifyResult.verifiedAt,
+                        verifiedByStaffName: verifyResult.verifiedByStaffName,
+                      }
+                    : null,
+                });
+              }),
+              catchError((err) => {
+                patchState(store, {
+                  verifyState: 'error',
+                  verifyError:
+                    err?.message ?? 'Verification failed. Please try again.',
+                });
+                return EMPTY;
+              }),
+            ),
           ),
         ),
       ),
-    ),
 
-    /**
-     * Retries extraction for a failed document.
-     * POST /api/staff/patients/{patientId}/360-view/retry/{documentId}
-     */
-    retryDocument: rxMethod<{ patientId: string; documentId: string }>(
-      pipe(
-        switchMap(({ patientId, documentId }) =>
-          service.retryDocument(patientId, documentId).pipe(
-            tap(() => {
-              // Optimistically mark the document as Processing in local state
-              const current = store.view360();
-              if (!current) return;
-              patchState(store, {
-                view360: {
-                  ...current,
-                  documents: current.documents.map((d) =>
-                    d.documentId === documentId
-                      ? { ...d, status: 'Completed' as const }
-                      : d,
-                  ),
-                },
-              });
-            }),
-            catchError(() => EMPTY),
+      /**
+       * Retries extraction for a failed document.
+       * POST /api/staff/patients/{patientId}/360-view/retry/{documentId}
+       */
+      retryDocument: rxMethod<{ patientId: string; documentId: string }>(
+        pipe(
+          switchMap(({ patientId, documentId }) =>
+            service.retryDocument(patientId, documentId).pipe(
+              tap(() => {
+                // Optimistically mark the document as Processing in local state
+                const current = store.view360();
+                if (!current) return;
+                patchState(store, {
+                  view360: {
+                    ...current,
+                    documents: (current.documents ?? []).map((d) =>
+                      d.documentId === documentId
+                        ? { ...d, status: 'Completed' as const }
+                        : d,
+                    ),
+                  },
+                });
+              }),
+              catchError(() => EMPTY),
+            ),
           ),
         ),
       ),
-    ),
-  })),
+    }),
+  ),
 );

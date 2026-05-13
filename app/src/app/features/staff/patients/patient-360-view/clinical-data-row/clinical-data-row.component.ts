@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgClass, DatePipe } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { ConfidenceBadgeComponent } from '../../../../../shared/components/confidence-badge/confidence-badge.component';
@@ -18,13 +18,7 @@ import { ClinicalItemDto } from '../../../../../core/services/patient-360-view.s
 @Component({
   selector: 'app-clinical-data-row',
   standalone: true,
-  imports: [
-    NgClass,
-    DatePipe,
-    MatTooltipModule,
-    MatIconModule,
-    ConfidenceBadgeComponent,
-  ],
+  imports: [NgClass, MatTooltipModule, MatIconModule, ConfidenceBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div

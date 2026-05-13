@@ -16,10 +16,10 @@ namespace Propel.Api.Gateway.Features.Clinical360;
 ///   <item>Builds source citation arrays from all contributing records for each field.</item>
 ///   <item>Sets <c>IsLowConfidence = Confidence &lt; 0.80</c> (AIR-003).</item>
 ///   <item>Returns HTTP 202 (via <c>null</c> result) when no <c>ExtractedData</c> exists for the patient (aggregation in progress).</item>
-///   <item>Sets <c>ExceedsSlaThreshold = true</c> when completed documents &gt; 10.</item>
-///   <item>Enriches response with <c>PatientProfileVerification</c> when available.</item>
+///   <item>Enriches response with conflict data and PatientProfileVerification when available.</item>
 /// </list>
 ///
+/// Response shape matches the Angular <c>Patient360ViewDto</c> interface (US_041, task_001).
 /// All EF Core queries use parameterised LINQ — no raw SQL (OWASP A03).
 /// </summary>
 public sealed class GetPatient360ViewQueryHandler
@@ -57,11 +57,16 @@ public sealed class GetPatient360ViewQueryHandler
             .Select(d => d.Id)
             .ToHashSet();
 
-        // ── 2. SLA gate: return null (HTTP 202) if no extracted data exists ─────
-        var hasExtractedData = await _db.ExtractedData
-            .AnyAsync(e => e.PatientId == request.PatientId, cancellationToken);
+        // ── 2. SLA gate: return null (HTTP 202) while pipeline is still running ─
+        // Return 202 only when at least one document is still Pending or Processing.
+        // If all documents are in terminal states (Completed / Failed) — including the
+        // chunking-only case where the AI key is absent and no ExtractedData rows were
+        // written — fall through and build the response with whatever data exists.
+        var hasPipelineInProgress = documents.Any(d =>
+            d.ProcessingStatus == DocumentProcessingStatus.Pending ||
+            d.ProcessingStatus == DocumentProcessingStatus.Processing);
 
-        if (!hasExtractedData)
+        if (hasPipelineInProgress)
             return null;
 
         // ── 3. Load extracted data for completed documents only ──────────────────
@@ -117,6 +122,7 @@ public sealed class GetPatient360ViewQueryHandler
                     })
                     .ToList();
 
+                // SectionType matches the Angular SectionType union (task_001, AC-1)
                 return new ClinicalSectionDto(
                     dataTypeGroup.Key.ToString(),
                     items);
@@ -127,33 +133,65 @@ public sealed class GetPatient360ViewQueryHandler
         var documentStatuses = documents
             .Select(d => new DocumentStatusDto(
                 d.Id,
-                d.FileName,
+                d.FileName,     // serialised as "documentName" (camelCase)
                 d.ProcessingStatus.ToString(),
                 d.UploadedAt))
             .ToList();
 
-        // ── 6. SLA threshold flag ────────────────────────────────────────────────
-        var exceedsSlaThreshold = completedDocumentIds.Count > SlaDocumentLimit;
+        // ── 6. Load conflicts for this patient (US_044; empty when not yet detected) ─
+        var conflictEntities = await _db.DataConflicts
+            .AsNoTracking()
+            .Include(c => c.SourceDocument1)
+            .Include(c => c.SourceDocument2)
+            .Where(c => c.PatientId == request.PatientId)
+            .ToListAsync(cancellationToken);
+
+        var conflicts = conflictEntities
+            .Select(c => new DataConflictItemDto(
+                c.Id,
+                c.FieldName,
+                c.Severity.ToString(),
+                c.ResolutionStatus.ToString(),
+                c.Value1,
+                c.SourceDocument1?.FileName ?? string.Empty,
+                c.Value2,
+                c.SourceDocument2?.FileName ?? string.Empty,
+                c.ResolvedValue))
+            .ToList();
+
+        var unresolvedCritical = conflictEntities
+            .Where(c =>
+                c.Severity == DataConflictSeverity.Critical &&
+                c.ResolutionStatus == DataConflictResolutionStatus.Unresolved)
+            .Select(c => new ConflictSummaryDto(
+                c.FieldName,
+                $"Conflicting values across source documents"))
+            .ToList();
 
         // ── 7. Enrich with PatientProfileVerification (if exists) ────────────────
-        var verification = await _db.PatientProfileVerifications
+        var verificationRow = await _db.PatientProfileVerifications
             .AsNoTracking()
             .Where(v => v.PatientId == request.PatientId)
             .Join(
                 _db.Users.AsNoTracking(),
                 v => v.VerifiedBy,
                 u => u.Id,
-                (v, u) => new VerificationInfoDto(
-                    v.Status.ToString(),
+                (v, u) => new
+                {
+                    Status = v.Status.ToString(),
                     v.VerifiedAt,
-                    u.Name))
+                    VerifiedByName = u.Name
+                })
             .FirstOrDefaultAsync(cancellationToken);
 
         return new Patient360ViewDto(
             request.PatientId,
-            sections,
+            verificationRow?.Status ?? "Unverified",
+            verificationRow?.VerifiedAt,
+            verificationRow?.VerifiedByName,
+            unresolvedCritical,
+            conflicts,
             documentStatuses,
-            exceedsSlaThreshold,
-            verification);
+            sections);
     }
 }

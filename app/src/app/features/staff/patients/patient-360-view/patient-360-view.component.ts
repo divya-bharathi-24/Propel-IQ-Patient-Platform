@@ -89,14 +89,28 @@ const SECTION_ORDER: SectionType[] = [
         </mat-card>
       }
 
+      <!-- Aggregating: AI extraction still in progress (HTTP 202) -->
+      @if (store.loadingState() === 'aggregating') {
+        <mat-card class="aggregating-card" role="status" aria-live="polite">
+          <mat-card-content>
+            <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+            Clinical data is still being extracted from uploaded documents.
+            Please check back in a moment.
+          </mat-card-content>
+        </mat-card>
+      }
+
       @if (store.loadingState() === 'loaded' && store.view360(); as view) {
         <!-- Profile verification status badge -->
         <span
           data-testid="profile-status-badge"
           class="status-badge"
-          [class.status-badge--verified]="view.verificationStatus === 'Verified'"
+          [class.status-badge--verified]="
+            view.verificationStatus === 'Verified'
+          "
           [attr.aria-label]="'Profile status: ' + view.verificationStatus"
-        >{{ view.verificationStatus }}</span>
+          >{{ view.verificationStatus }}</span
+        >
 
         <!-- >10 documents banner (edge case) -->
         @if (view.documents.length > 10) {
@@ -132,7 +146,7 @@ const SECTION_ORDER: SectionType[] = [
                   <button
                     mat-stroked-button
                     type="button"
-                    (click)="onRetryDocument(view.patientId, doc.documentId)"
+                    (click)="onRetryDocument(doc.documentId)"
                     [attr.aria-label]="
                       'Retry extraction for ' + doc.documentName
                     "
@@ -192,22 +206,31 @@ const SECTION_ORDER: SectionType[] = [
                 Resolve all Critical conflicts in the sections below before
                 verifying.
               </p>
-              @for (conflict of conflictStore.unresolvedConflicts(); track conflict.conflictId) {
+              @for (
+                conflict of conflictStore.unresolvedConflicts();
+                track conflict.conflictId
+              ) {
                 <div
                   class="conflict-inline-detail"
-                  [attr.data-testid]="'conflict-indicator-' + conflict.fieldName"
+                  [attr.data-testid]="
+                    'conflict-indicator-' + conflict.fieldName
+                  "
                 >
-                  <span class="conflict-field-label">{{ conflict.fieldName }}</span>
+                  <span class="conflict-field-label">{{
+                    conflict.fieldName
+                  }}</span>
                   <div class="conflict-values-row">
                     <span
                       class="conflict-value-chip"
                       [attr.data-testid]="'conflict-value-1'"
-                    >{{ conflict.value1 }}</span>
+                      >{{ conflict.value1 }}</span
+                    >
                     <span class="vs-label" aria-hidden="true">vs</span>
                     <span
                       class="conflict-value-chip"
                       [attr.data-testid]="'conflict-value-2'"
-                    >{{ conflict.value2 }}</span>
+                      >{{ conflict.value2 }}</span
+                    >
                   </div>
                   <div class="conflict-select-row">
                     <button
@@ -215,15 +238,29 @@ const SECTION_ORDER: SectionType[] = [
                       type="button"
                       class="select-value-btn"
                       [attr.aria-label]="'Select ' + conflict.value1"
-                      (click)="onSelectConflictValue(conflict.conflictId, conflict.value1)"
-                    >Select {{ conflict.value1 }}</button>
+                      (click)="
+                        onSelectConflictValue(
+                          conflict.conflictId,
+                          conflict.value1
+                        )
+                      "
+                    >
+                      Select {{ conflict.value1 }}
+                    </button>
                     <button
                       mat-stroked-button
                       type="button"
                       class="select-value-btn"
                       [attr.aria-label]="'Select ' + conflict.value2"
-                      (click)="onSelectConflictValue(conflict.conflictId, conflict.value2)"
-                    >Select {{ conflict.value2 }}</button>
+                      (click)="
+                        onSelectConflictValue(
+                          conflict.conflictId,
+                          conflict.value2
+                        )
+                      "
+                    >
+                      Select {{ conflict.value2 }}
+                    </button>
                   </div>
                 </div>
               }
@@ -258,7 +295,7 @@ const SECTION_ORDER: SectionType[] = [
                   ? 'conflict-warning-block'
                   : null
               "
-              (click)="onVerifyProfile(view.patientId)"
+              (click)="onVerifyProfile()"
             >
               @if (store.verifyState() === 'loading') {
                 <mat-spinner diameter="18" strokeWidth="2" />
@@ -269,7 +306,12 @@ const SECTION_ORDER: SectionType[] = [
             </button>
 
             @if (store.verifyState() === 'error') {
-              <span class="verify-error" role="alert" aria-live="assertive" data-testid="verify-error-alert">
+              <span
+                class="verify-error"
+                role="alert"
+                aria-live="assertive"
+                data-testid="verify-error-alert"
+              >
                 <mat-icon aria-hidden="true">error</mat-icon>
                 {{ store.verifyError() }}
               </span>
@@ -466,6 +508,19 @@ const SECTION_ORDER: SectionType[] = [
         align-items: center;
         gap: 8px;
       }
+
+      .aggregating-card {
+        border-left: 4px solid #1976d2;
+        background: #e3f2fd;
+      }
+
+      .aggregating-card mat-card-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #0d47a1;
+        font-size: 0.9rem;
+      }
     `,
   ],
 })
@@ -484,27 +539,36 @@ export class Patient360ViewComponent implements OnInit {
   }
 
   protected orderedSections(
-    sections: ClinicalSectionDto[],
+    sections: ClinicalSectionDto[] | undefined | null,
   ): ClinicalSectionDto[] {
-    const sectionMap = new Map(sections.map((s) => [s.sectionType, s]));
+    const sectionMap = new Map((sections ?? []).map((s) => [s.sectionType, s]));
     return SECTION_ORDER.map((type) => sectionMap.get(type)).filter(
       (s): s is ClinicalSectionDto => s !== undefined,
     );
   }
 
-  protected failedDocuments(docs: DocumentStatusDto[]): DocumentStatusDto[] {
-    return docs.filter((d) => d.status === 'Failed');
+  protected failedDocuments(
+    docs: DocumentStatusDto[] | undefined | null,
+  ): DocumentStatusDto[] {
+    return (docs ?? []).filter((d) => d.status === 'Failed');
   }
 
-  protected onVerifyProfile(patientId: string): void {
-    this.store.verifyProfile(patientId);
+  /** Uses the route-param patientId — never view.patientId, which can be undefined on 202. */
+  protected onVerifyProfile(): void {
+    this.store.verifyProfile(this.patientId);
   }
 
-  protected onSelectConflictValue(conflictId: string, resolvedValue: string): void {
-    this.conflictStore.resolveConflict({ conflictId, payload: { resolvedValue } });
+  protected onSelectConflictValue(
+    conflictId: string,
+    resolvedValue: string,
+  ): void {
+    this.conflictStore.resolveConflict({
+      conflictId,
+      payload: { resolvedValue },
+    });
   }
 
-  protected onRetryDocument(patientId: string, documentId: string): void {
-    this.store.retryDocument({ patientId, documentId });
+  protected onRetryDocument(documentId: string): void {
+    this.store.retryDocument({ patientId: this.patientId, documentId });
   }
 }

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.Google;
 using Npgsql;
 using Polly;
 using Polly.CircuitBreaker;
@@ -216,9 +217,8 @@ if (!connectionString.Contains("Maximum Pool Size", StringComparison.OrdinalIgno
 
 // UseVector() registers the pgvector type handler so the Npgsql driver can
 // serialize/deserialize float[] ↔ vector columns at runtime (US_040, task_002, AC-1).
-// TEMPORARY: pgvector disabled until extension is installed (uncomment after running docker-compose up)
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-// dataSourceBuilder.UseVector();
+dataSourceBuilder.UseVector();
 var dataSource = dataSourceBuilder.Build();
 
 // IDbContextFactory<AppDbContext> — used by AuditLogRepository to create isolated DbContext
@@ -229,9 +229,8 @@ var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContextFactory<AppDbContext>(
     (serviceProvider, opt) =>
     {
-        // TEMPORARY: pgvector disabled until extension is installed (uncomment after running docker-compose up)
         // UseVector() registers EF Core type mappings for Pgvector.Vector ↔ vector(N) columns (US_040, task_002, AC-1).
-        opt.UseNpgsql(dataSource /*, o => o.UseVector()*/)
+        opt.UseNpgsql(dataSource, o => o.UseVector())
            .UseSnakeCaseNamingConvention()
            .UseApplicationServiceProvider(serviceProvider)
            .ConfigureWarnings(warnings =>
@@ -763,7 +762,8 @@ builder.Services.Configure<AiSettings>(configuration.GetSection("Ai"));
 var aiSettings = configuration.GetSection("Ai").Get<AiSettings>() ?? new AiSettings();
 
 // ── Register Semantic Kernel chat completion service ──────────────────────────
-// Dev/staging: direct OpenAI endpoint. Production: Azure OpenAI (HIPAA BAA path).
+// Priority: Azure OpenAI (production) → Google AI Studio → OpenAI direct.
+// API keys sourced from env vars only — never from appsettings (OWASP A02).
 if (aiSettings.UseAzureOpenAI)
 {
     var azureEndpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
@@ -782,15 +782,43 @@ if (aiSettings.UseAzureOpenAI)
 }
 else
 {
-    var openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-        ?? throw new InvalidOperationException(
-            "OPENAI_API_KEY environment variable is required when Ai:UseAzureOpenAI = false.");
+    var googleApiKey = Environment.GetEnvironmentVariable("GOOGLE_AI_API_KEY");
+    var openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
-    builder.Services.AddOpenAIChatCompletion(
-        modelId : aiSettings.ModelDeploymentName,
-        apiKey  : openAiApiKey);
+    if (!string.IsNullOrWhiteSpace(googleApiKey))
+    {
+        // Google AI Studio: gemini-2.5-flash for chat, gemini-embedding-001 (768 dims via outputDimensionality) for RAG.
+        builder.Services.AddGoogleAIGeminiChatCompletion(
+            modelId : "gemini-2.5-flash",
+            apiKey  : googleApiKey);
 
-    Log.Information("AI: OpenAI chat completion registered (model={Model})", aiSettings.ModelDeploymentName);
+        builder.Services.AddGoogleAIEmbeddingGeneration(
+            modelId  : "gemini-embedding-001",
+            apiKey   : googleApiKey,
+            dimensions: 768);
+
+        Log.Information("AI: Google AI Studio — gemini-2.5-flash (chat) + gemini-embedding-001 (768-dim) registered.");
+    }
+    else if (!string.IsNullOrWhiteSpace(openAiApiKey))
+    {
+        builder.Services.AddOpenAIChatCompletion(
+            modelId : aiSettings.ModelDeploymentName,
+            apiKey  : openAiApiKey);
+
+        // text-embedding-3-small (1536 dims) for US_040 RAG pipeline (AIR-R01)
+        builder.Services.AddOpenAITextEmbeddingGeneration(
+            modelId : "text-embedding-3-small",
+            apiKey  : openAiApiKey);
+
+        Log.Information("AI: OpenAI chat completion + embedding registered (model={Model})", aiSettings.ModelDeploymentName);
+    }
+    else
+    {
+        if (builder.Environment.IsProduction())
+            throw new InvalidOperationException(
+                "OPENAI_API_KEY or GOOGLE_AI_API_KEY environment variable is required when Ai:UseAzureOpenAI = false.");
+        Log.Warning("No AI API key set — AI extraction pipeline disabled in development. Documents will stay Pending.");
+    }
 }
 
 // ── Polly circuit breaker pipeline (AIR-O02) ─────────────────────────────────
@@ -830,19 +858,37 @@ builder.Services.AddKeyedSingleton<ResiliencePipeline>("risk-augmenter", riskAug
 
 // ── AI intake helpers and concrete service (task_003) ────────────────────────
 builder.Services.AddSingleton<IntakePromptBuilder>();
-builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
-    Propel.Modules.AI.Services.SemanticKernelAiIntakeService>();
+// Development: always use NullAiIntakeService (scripted responses) so the chat works
+// without a live AI API key / rate-limit quota (AIR-O02 graceful degradation).
+// Production: use SemanticKernelAiIntakeService backed by the configured AI provider.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
+        Propel.Modules.AI.Services.NullAiIntakeService>();
+    Log.Information("IAiIntakeService: Using NullAiIntakeService (development mode).");
+}
+else
+{
+    builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IAiIntakeService,
+        Propel.Modules.AI.Services.SemanticKernelAiIntakeService>();
+    Log.Information("IAiIntakeService: Using SemanticKernelAiIntakeService (production mode).");
+}
 
 // ── US_040 — AI RAG vector store: pgvector chunk storage and retrieval (task_002) ──────────
-// TEMPORARY: Vector store disabled until pgvector extension is installed
 // IDocumentChunkEmbeddingRepository: EF Core + raw SQL pgvector <=> cosine similarity search.
-// ACL filter (AIR-S02), threshold filtering (AIR-R02), and re-ranking (AIR-R03) applied per retrieval.
-// builder.Services.AddScoped<IDocumentChunkEmbeddingRepository, DocumentChunkEmbeddingRepository>();
-// IVectorStoreService: orchestrates StoreChunksAsync (task_001→task_002 handoff) and
-// RetrieveRelevantChunksAsync (task_002→task_003 handoff) with full AIR pipeline enforcement.
-// builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IVectorStoreService,
-//     Propel.Modules.AI.Services.VectorStoreService>();
-// Log.Information("VectorStoreService registered (US_040, task_002).");
+builder.Services.AddScoped<IDocumentChunkEmbeddingRepository, DocumentChunkEmbeddingRepository>();
+// IVectorStoreService: orchestrates StoreChunksAsync and RetrieveRelevantChunksAsync.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IVectorStoreService,
+    Propel.Modules.AI.Services.VectorStoreService>();
+// IDocumentChunkingService: PdfPig text extraction + tokeniser-based sliding window chunking (task_001).
+// TiktokenTokenizer singleton: GPT-4o cl100k_base tokenizer shared across all scoped instances (thread-safe).
+builder.Services.AddSingleton(_ => Microsoft.ML.Tokenizers.TiktokenTokenizer.CreateForModel("gpt-4o"));
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IDocumentChunkingService,
+    Propel.Modules.AI.Services.DocumentChunkingService>();
+// IEmbeddingGenerationService: OpenAI text-embedding-3-small batched embedding with PII redaction.
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IEmbeddingGenerationService,
+    Propel.Modules.AI.Services.EmbeddingGenerationService>();
+Log.Information("VectorStoreService, DocumentChunkingService, EmbeddingGenerationService registered (US_040, task_001/002).");
 
 // ── US_040 — AI RAG extraction orchestrator (task_003) ─────────────────────────────────────
 // Polly circuit breaker for the extraction pipeline — isolated from the intake and risk circuits.
@@ -878,10 +924,9 @@ builder.Services.AddScoped<IPatientProfileVerificationRepository,
 Log.Information("360-view aggregation repositories registered (EP-008-I/us_041, task_002).");
 
 // IExtractionOrchestrator: full RAG + GPT-4o extraction pass per document (US_040, AC-2, AC-3, AIR-O01, AIR-O02).
-        // TEMPORARY: ExtractionOrchestrator disabled until pgvector extension is installed
-        // builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IExtractionOrchestrator,
-        //     Propel.Modules.AI.Services.ExtractionOrchestrator>();
-        // Log.Information("ExtractionOrchestrator registered (US_040, task_003).");
+builder.Services.AddScoped<Propel.Modules.AI.Interfaces.IExtractionOrchestrator,
+    Propel.Modules.AI.Services.ExtractionOrchestrator>();
+Log.Information("ExtractionOrchestrator registered (US_040, task_003).");
 
 // ── EP-008-I/us_041 — AI semantic de-duplication service (task_003) ───────────
 // Isolated Polly circuit breaker: 3 consecutive GPT-4o failures / 5-min window → FallbackManual
@@ -1069,12 +1114,11 @@ Log.Information("AI operational metrics services registered (EP-010/us_050, task
 builder.Services.AddScoped<IClinicalDocumentRepository,
     Propel.Api.Gateway.Infrastructure.Repositories.ClinicalDocumentRepository>();
     
-// TEMPORARY: ExtractionPipelineWorker disabled until pgvector extension is installed
 // ExtractionPipelineWorker: 30-second PeriodicTimer worker orchestrating the full extraction
 // pipeline (ChunkAsync → GenerateAsync → StoreChunksAsync → ExtractAsync) with SemaphoreSlim(3)
 // concurrency control and idempotency locking via ProcessingStatus = Processing (AC-1, AC-4, EC-1, EC-2).
-/* builder.Services.AddHostedService<Propel.Modules.Clinical.Workers.ExtractionPipelineWorker>();
-Log.Information("ExtractionPipelineWorker registered (US_040, task_004)."); */
+builder.Services.AddHostedService<Propel.Modules.Clinical.Workers.ExtractionPipelineWorker>();
+Log.Information("ExtractionPipelineWorker registered (US_040, task_004).");
 
 // ── us_031 — No-Show Risk Engine (task_002 + task_003) ────────────────────────
 // INoShowRiskCalculator: scoped rule-based engine with AI augmentation hook.

@@ -90,7 +90,8 @@ public sealed class PatientDashboardRepository : IPatientDashboardRepository
         return new PatientDashboardReadModel(
             UpcomingAppointments: upcomingAppointments,
             Documents: documents,
-            ViewVerified: viewVerified);
+            ViewVerified: viewVerified,
+            Patient360: null);
     }
 
     /// <inheritdoc />

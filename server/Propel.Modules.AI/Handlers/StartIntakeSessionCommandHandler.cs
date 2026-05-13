@@ -64,6 +64,10 @@ public sealed class StartIntakeSessionCommandHandler
             "AI intake session {SessionId} started for PatientId={PatientId} AppointmentId={AppointmentId}",
             sessionId, request.PatientId, request.AppointmentId);
 
-        return new StartSessionResponseDto(sessionId);
+        const string openingQuestion =
+            "Hi! I'm your AI intake assistant. I'll guide you through a few quick questions so we can prepare for your appointment. " +
+            "Let's start — could you briefly describe what brings you in today?";
+
+        return new StartSessionResponseDto(sessionId, openingQuestion);
     }
 }

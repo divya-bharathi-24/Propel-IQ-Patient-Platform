@@ -54,20 +54,29 @@ public sealed class IntakeController : ControllerBase
 
     /// <summary>
     /// Fetches the persisted draft state from the <c>draftData</c> JSONB column (US_017, AC-3, AC-4).
-    /// Returns HTTP 200 with partial field values, or HTTP 404 when no draft exists.
+    /// Returns HTTP 200 with <c>{ exists: true, draftData, savedAt }</c> when a draft exists,
+    /// or <c>{ exists: false }</c> when no draft has been saved yet.
     /// </summary>
     [HttpGet("{appointmentId:guid}/draft")]
-    [ProducesResponseType(typeof(IntakeDraftDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetIntakeDraft(
         [FromRoute] Guid appointmentId,
         CancellationToken cancellationToken)
     {
         var patientId = GetCurrentUserId();
         var result = await _mediator.Send(new GetIntakeDraftQuery(appointmentId, patientId), cancellationToken);
-        return Ok(result.Draft);
+
+        if (result.Draft is null)
+            return Ok(new { exists = false });
+
+        return Ok(new
+        {
+            exists = true,
+            draftData = result.Draft.DraftData,
+            savedAt = result.Draft.LastModifiedAt,
+        });
     }
 
     /// <summary>

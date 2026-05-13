@@ -43,6 +43,12 @@ public sealed class AiIntakeController : ControllerBase
         [FromBody] StartSessionRequestDto request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+            return BadRequest(new { error = "Request body is required." });
+
+        if (request.AppointmentId == Guid.Empty)
+            return BadRequest(new { error = "A valid AppointmentId is required to start an AI intake session." });
+
         var patientId = GetCurrentPatientId();
         var command = new StartIntakeSessionCommand(request.AppointmentId, patientId);
         var result = await _mediator.Send(command, cancellationToken);

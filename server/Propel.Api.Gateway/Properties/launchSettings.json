@@ -10,6 +10,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here",
+        "GOOGLE_AI_API_KEY": "AIzaSyBOEOiRA_6ARedx9D93beStI_IxTu7cfLs",
         "ConnectionStrings__DefaultConnection": "Host=ep-divine-mode-amg8nhin.c-5.us-east-1.aws.neon.tech;Port=5432;Database=neondb;Username=neondb_owner;Password=npg_QAz7gjyI8WHk;SSL Mode=Require;Trust Server Certificate=true",
         "Jwt__SecretKey": "propeliq-local-dev-secret-key-minimum-32-chars!!",
         "Jwt__Issuer": "propeliq-api",
@@ -26,6 +27,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OPENAI_API_KEY": "sk-proj-your-openai-api-key-here",
+        "GOOGLE_AI_API_KEY": "AIzaSyBOEOiRA_6ARedx9D93beStI_IxTu7cfLs",
         "ConnectionStrings__DefaultConnection": "Host=ep-divine-mode-amg8nhin.c-5.us-east-1.aws.neon.tech;Port=5432;Database=neondb;Username=neondb_owner;Password=npg_QAz7gjyI8WHk;SSL Mode=Require;Trust Server Certificate=true",
         "Jwt__SecretKey": "propeliq-local-dev-secret-key-minimum-32-chars!!",
         "Jwt__Issuer": "propeliq-api",

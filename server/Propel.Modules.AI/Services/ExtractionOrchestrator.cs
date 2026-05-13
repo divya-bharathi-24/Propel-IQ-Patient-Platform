@@ -4,8 +4,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Connectors.Google;
 using Polly;
 using Polly.CircuitBreaker;
 using Propel.Domain.Entities;
@@ -165,12 +166,15 @@ public sealed class ExtractionOrchestrator : IExtractionOrchestrator
         chatHistory.AddSystemMessage(systemMessage);
         chatHistory.AddUserMessage(userMessage);
 
-        var executionSettings = new OpenAIPromptExecutionSettings
+#pragma warning disable SKEXP0070 // GeminiPromptExecutionSettings is experimental
+        var executionSettings = new GeminiPromptExecutionSettings
         {
-            MaxTokens       = 500,
-            Temperature     = 0.0,
-            ResponseFormat  = "json_object"
+            MaxTokens   = 2048,
+            Temperature = 0.0
+            // ResponseMimeType intentionally omitted: Gemini JSON mode truncates at ~19 tokens
+            // when no schema is provided. Prompt instructions alone produce valid full JSON.
         };
+#pragma warning restore SKEXP0070
 
         var stopwatch = Stopwatch.StartNew();
         Microsoft.SemanticKernel.ChatMessageContent aiContent;
@@ -213,6 +217,17 @@ public sealed class ExtractionOrchestrator : IExtractionOrchestrator
             stopwatch.Stop();
             _ = _metricsWriter.RecordProviderErrorAsync(documentId, _settings.ModelDeploymentName, ex.GetType().Name);
             _ = _metricsWriter.RecordLatencyAsync(documentId, _settings.ModelDeploymentName, stopwatch.ElapsedMilliseconds);
+
+            // Treat 429 (rate limit) as transient — revert to Pending so the pipeline retries next poll cycle.
+            if (ex is Microsoft.SemanticKernel.HttpOperationException httpEx &&
+                httpEx.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                Log.Warning(
+                    "ExtractionOrchestrator_RateLimited: documentId={DocumentId} — 429 from Gemini, reverting to Pending for retry.",
+                    documentId);
+                return ExtractionResult.CircuitBreakerOpen;
+            }
+
             Log.Error(ex,
                 "ExtractionOrchestrator_GptCallFailed: documentId={DocumentId}",
                 documentId);

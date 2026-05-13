@@ -25,6 +25,9 @@ public interface IDocumentChunkingService
     /// Primary key of the <c>ClinicalDocument</c> — embedded in each returned chunk
     /// so downstream services maintain document lineage without a second lookup.
     /// </param>
+    /// <param name="patientId">
+    /// Patient owner of the document — embedded in each chunk for ACL-filtered retrieval (AIR-S02).
+    /// </param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>
     /// An ordered, non-empty list of <see cref="DocumentChunk"/> records — one per
@@ -36,5 +39,6 @@ public interface IDocumentChunkingService
     Task<IReadOnlyList<DocumentChunk>> ChunkAsync(
         byte[] pdfBytes,
         Guid documentId,
+        Guid patientId,
         CancellationToken ct = default);
 }

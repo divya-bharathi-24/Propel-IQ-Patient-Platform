@@ -126,7 +126,10 @@ export class IntakeService {
   ): Observable<void> {
     return this.http.post<void>(`${this.apiBase}/submit`, {
       appointmentId,
-      data,
+      demographics: data.demographics,
+      medicalHistory: data.medicalHistory,
+      symptoms: data.symptoms,
+      medications: data.medications,
     });
   }
 

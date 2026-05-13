@@ -78,7 +78,7 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   onRetryUpload(appointmentId: string): void {
-    this.router.navigate(['/documents', 'upload'], {
+    this.router.navigate(['/documents'], {
       queryParams: { appointmentId },
     });
   }

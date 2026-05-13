@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
@@ -111,11 +111,17 @@ export class Patient360ViewService {
   /**
    * Fetches the aggregated 360-degree view for a patient.
    * GET /api/staff/patients/{patientId}/360-view
+   *
+   * Returns `null` when the backend responds with HTTP 202 (extraction still in progress).
+   * The caller (store) must show an "aggregating" state in that case.
    */
-  get360View(patientId: string): Observable<Patient360ViewDto> {
+  get360View(patientId: string): Observable<Patient360ViewDto | null> {
     return this.http
-      .get<Patient360ViewDto>(`${this.base}/${patientId}/360-view`)
+      .get<Patient360ViewDto>(`${this.base}/${patientId}/360-view`, {
+        observe: 'response',
+      })
       .pipe(
+        map((response) => (response.status === 202 ? null : response.body)),
         catchError((err: HttpErrorResponse) =>
           throwError(() => this.mapError(err)),
         ),

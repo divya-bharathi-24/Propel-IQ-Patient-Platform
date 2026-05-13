@@ -1,7 +1,3 @@
-// TEMPORARY: DocumentChunkEmbeddingRepository disabled until pgvector extension is installed
-// This file is commented out because it depends on DocumentChunkEmbeddings DbSet which is disabled
-#if false
-
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Pgvector;
@@ -92,13 +88,13 @@ public sealed class DocumentChunkEmbeddingRepository : IDocumentChunkEmbeddingRe
         // when ordering by <=> with LIMIT — verify via EXPLAIN ANALYZE in staging (task_002 checklist).
         const string sql = """
             SELECT
-                ce.id                                     AS "ChunkId",
-                ce.chunk_text                             AS "ChunkText",
-                ce.page_number                            AS "PageNumber",
-                ce.document_id                            AS "DocumentId",
-                cd.file_name                              AS "DocumentName",
-                (ce.embedding <=> @queryVector)::real     AS "CosineDistance",
-                cd.uploaded_at                            AS "UploadedAt"
+                ce.id                                     AS chunk_id,
+                ce.chunk_text                             AS chunk_text,
+                ce.page_number                            AS page_number,
+                ce.document_id                            AS document_id,
+                cd.file_name                              AS document_name,
+                (ce.embedding <=> @queryVector)::real     AS cosine_distance,
+                cd.uploaded_at                            AS uploaded_at
             FROM   document_chunk_embeddings ce
             JOIN   clinical_documents        cd ON cd.id = ce.document_id
             WHERE  ce.document_id = ANY(@authorizedDocIds)
@@ -118,5 +114,3 @@ public sealed class DocumentChunkEmbeddingRepository : IDocumentChunkEmbeddingRe
         return results;
     }
 }
-
-#endif

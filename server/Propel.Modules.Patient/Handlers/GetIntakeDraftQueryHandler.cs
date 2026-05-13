@@ -12,8 +12,8 @@ namespace Propel.Modules.Patient.Handlers;
 /// <list type="number">
 ///   <item>Loads the <see cref="Domain.Entities.IntakeRecord"/> patient-scoped by
 ///         <c>(appointmentId, patientId)</c> (OWASP A01 — Broken Access Control).</item>
-///   <item>Returns <see cref="KeyNotFoundException"/> (→ HTTP 404) when no record exists
-///         or when <c>draftData</c> is null — there is no draft to restore (AC-4).</item>
+///   <item>Returns <see cref="GetIntakeDraftResult"/> with a null <c>Draft</c> when no record exists
+///         or when <c>draftData</c> is null — the controller maps this to <c>{ exists: false }</c> (AC-4).</item>
 ///   <item>Returns <see cref="GetIntakeDraftResult"/> with <see cref="IntakeDraftDto"/>
 ///         containing the partial draft JSON and <c>lastModifiedAt</c>.</item>
 /// </list>
@@ -47,8 +47,7 @@ public sealed class GetIntakeDraftQueryHandler : IRequestHandler<GetIntakeDraftQ
             _logger.LogDebug(
                 "No draft found for AppointmentId {AppointmentId} PatientId {PatientId}",
                 request.AppointmentId, request.PatientId);
-            throw new KeyNotFoundException(
-                $"No draft exists for appointment {request.AppointmentId}.");
+            return new GetIntakeDraftResult(null);
         }
 
         _logger.LogDebug(

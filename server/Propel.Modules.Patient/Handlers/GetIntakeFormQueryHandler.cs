@@ -38,16 +38,12 @@ public sealed class GetIntakeFormQueryHandler : IRequestHandler<GetIntakeFormQue
         GetIntakeFormQuery request,
         CancellationToken cancellationToken)
     {
-        // Load both records in parallel — independent queries (AD-2 CQRS read model, AsNoTracking in repo)
-        var manualDraftTask = _intakeRepo.GetManualDraftAsync(
+        // Run sequentially — IIntakeRepository is scoped to a single DbContext instance,
+        // and EF Core does not allow concurrent async operations on the same context.
+        var manualDraft = await _intakeRepo.GetManualDraftAsync(
             request.AppointmentId, request.PatientId, cancellationToken);
-        var aiExtractedTask = _intakeRepo.GetAiExtractedAsync(
+        var aiExtracted = await _intakeRepo.GetAiExtractedAsync(
             request.AppointmentId, request.PatientId, cancellationToken);
-
-        await Task.WhenAll(manualDraftTask, aiExtractedTask);
-
-        var manualDraft = manualDraftTask.Result;
-        var aiExtracted = aiExtractedTask.Result;
 
         _logger.LogInformation(
             "GetIntakeForm: AppointmentId={AppointmentId} PatientId={PatientId} " +

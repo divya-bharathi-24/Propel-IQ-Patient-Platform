@@ -69,8 +69,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<PatientOAuthToken> PatientOAuthTokens => Set<PatientOAuthToken>();
 
     // ── US_040 — AI RAG pipeline: pgvector chunk embeddings (task_002) ──────────
-    // TEMPORARY: DocumentChunkEmbeddings table disabled until pgvector extension is installed
-    // public DbSet<DocumentChunkEmbedding> DocumentChunkEmbeddings => Set<DocumentChunkEmbedding>();
+    public DbSet<DocumentChunkEmbedding> DocumentChunkEmbeddings => Set<DocumentChunkEmbedding>();
 
     // ── EP-008-I/us_041 — 360-degree profile verification (task_002) ─────────
     public DbSet<PatientProfileVerification> PatientProfileVerifications => Set<PatientProfileVerification>();

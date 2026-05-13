@@ -70,9 +70,10 @@ export const IntakeChatStore = signalStore(
       /**
        * Switches to fallback manual mode.
        * Persists draft extracted fields in sessionStorage for pre-population
-       * on the manual intake form route.
+       * on the manual intake form route, then navigates to manual intake
+       * for the same appointment.
        */
-      activateFallbackMode(): void {
+      activateFallbackMode(appointmentId: string): void {
         try {
           sessionStorage.setItem(
             INTAKE_DRAFT_KEY,
@@ -82,9 +83,12 @@ export const IntakeChatStore = signalStore(
           // sessionStorage may be unavailable (private browsing edge case)
         }
         patchState(store, { chatMode: 'fallback_manual' });
-        router.navigate(['/intake/manual'], {
-          state: { prefill: store.extractedFields() },
-        });
+        if (appointmentId) {
+          router.navigate(['/intake', appointmentId], {
+            queryParams: { mode: 'manual' },
+            state: { prefill: store.extractedFields() },
+          });
+        }
       },
 
       reset(): void {

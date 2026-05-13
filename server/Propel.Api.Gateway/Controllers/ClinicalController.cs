@@ -3,7 +3,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Propel.Api.Gateway.Features.Clinical360;
+using Propel.Domain.Enums;
+using Propel.Domain.Interfaces;
 using Propel.Modules.Clinical.Commands;
+using Propel.Modules.Clinical.Queries;
 
 namespace Propel.Api.Gateway.Controllers;
 
@@ -12,10 +15,12 @@ namespace Propel.Api.Gateway.Controllers;
 public sealed class ClinicalController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IClinicalDocumentRepository _docRepo;
 
-    public ClinicalController(IMediator mediator)
+    public ClinicalController(IMediator mediator, IClinicalDocumentRepository docRepo)
     {
         _mediator = mediator;
+        _docRepo  = docRepo;
     }
 
     [HttpGet("ping")]
@@ -61,7 +66,7 @@ public sealed class ClinicalController : ControllerBase
     /// </summary>
     [HttpPost("/api/staff/patients/{patientId:guid}/360-view/verify")]
     [Authorize(Roles = "Staff")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -71,10 +76,31 @@ public sealed class ClinicalController : ControllerBase
         // OWASP A01 — staff userId sourced exclusively from JWT; never from request body.
         var staffUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        await _mediator.Send(
+        var result = await _mediator.Send(
             new VerifyPatientProfileCommand(patientId, staffUserId),
             cancellationToken);
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Re-queues a failed document for re-processing by resetting its status to Pending.
+    /// The ExtractionPipelineWorker will pick it up within 30 seconds.
+    /// Staff <c>userId</c> is sourced from the JWT claim (OWASP A01).
+    /// </summary>
+    [HttpPost("/api/staff/patients/{patientId:guid}/360-view/retry/{documentId:guid}")]
+    [Authorize(Roles = "Staff")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RetryDocument(
+        Guid patientId,
+        Guid documentId,
+        CancellationToken cancellationToken)
+    {
+        // Reset to Pending so ExtractionPipelineWorker picks it up on its next poll tick.
+        await _docRepo.UpdateStatusAsync(documentId, DocumentProcessingStatus.Pending, cancellationToken);
         return NoContent();
     }
 }

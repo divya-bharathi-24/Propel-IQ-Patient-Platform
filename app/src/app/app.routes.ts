@@ -46,23 +46,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     title: 'My Dashboard — Propel IQ',
   },
+  // Static intake sub-routes MUST be declared before the parameterised
+  // `intake/:appointmentId` route, otherwise Angular matches 'ai' and 'edit'
+  // as the appointmentId param (NG04002 + wrong component loaded).
   {
-    path: 'intake/:appointmentId',
-    loadComponent: () =>
-      import('./features/patient/intake/intake-page/intake-page.component').then(
-        (m) => m.IntakePageComponent,
-      ),
-    canActivate: [authGuard],
-    title: 'Patient Intake — Propel IQ',
-  },
-  {
-    path: 'intake/edit/:appointmentId',
-    loadComponent: () =>
-      import('./features/patient/intake/intake-edit.component').then(
-        (m) => m.IntakeEditComponent,
-      ),
-    canActivate: [authGuard],
-    title: 'Edit Intake — Propel IQ',
+    path: 'intake',
+    redirectTo: 'intake/ai',
+    pathMatch: 'full',
   },
   {
     path: 'intake/ai',
@@ -74,6 +64,24 @@ export const routes: Routes = [
     title: 'AI-Assisted Intake — Propel IQ',
   },
   {
+    path: 'intake/edit/:appointmentId',
+    loadComponent: () =>
+      import('./features/patient/intake/intake-edit.component').then(
+        (m) => m.IntakeEditComponent,
+      ),
+    canActivate: [authGuard],
+    title: 'Edit Intake — Propel IQ',
+  },
+  {
+    path: 'intake/:appointmentId',
+    loadComponent: () =>
+      import('./features/patient/intake/intake-page/intake-page.component').then(
+        (m) => m.IntakePageComponent,
+      ),
+    canActivate: [authGuard],
+    title: 'Patient Intake — Propel IQ',
+  },
+  {
     path: 'patient/intake/:appointmentId',
     loadComponent: () =>
       import('./features/patient/intake/manual-intake-form/manual-intake-form.component').then(
@@ -81,6 +89,11 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
     title: 'Manual Intake Form — Propel IQ',
+  },
+  {
+    path: 'documents/upload',
+    redirectTo: 'documents',
+    pathMatch: 'full',
   },
   {
     path: 'documents',

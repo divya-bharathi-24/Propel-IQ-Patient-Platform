@@ -29,13 +29,34 @@ public sealed record DocumentReadModel(
     string ProcessingStatus);
 
 /// <summary>
+/// 360-degree patient profile read model (FR-047, US_016).
+/// Contains non-PHI demographic fields, latest no-show risk, and the most recent
+/// completed intake summary (raw JSON strings from JSONB columns).
+/// </summary>
+public sealed record Patient360ReadModel(
+    string Name,
+    DateOnly DateOfBirth,
+    string? BiologicalSex,
+    string? InsurerName,
+    string? MemberId,
+    string? GroupNumber,
+    string? LatestIntakeDemographicsJson,
+    string? LatestIntakeMedicalHistoryJson,
+    string? LatestIntakeMedicationsJson,
+    string? LatestIntakeSymptomsJson,
+    decimal? LatestNoShowRiskScore,
+    string? LatestNoShowRiskSeverity,
+    DateTime? LatestNoShowRiskCalculatedAt);
+
+/// <summary>
 /// Aggregated dashboard read model returned by <see cref="IPatientDashboardRepository"/>.
 /// Combines upcoming appointments, document history, and the 360° view-verified flag.
 /// </summary>
 public sealed record PatientDashboardReadModel(
     IReadOnlyList<UpcomingAppointmentReadModel> UpcomingAppointments,
     IReadOnlyList<DocumentReadModel> Documents,
-    bool ViewVerified);
+    bool ViewVerified,
+    Patient360ReadModel? Patient360);
 
 /// <summary>
 /// Repository abstraction for the patient dashboard aggregation query (US_016, TASK_002).

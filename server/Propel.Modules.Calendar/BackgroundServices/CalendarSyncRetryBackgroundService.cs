@@ -40,10 +40,16 @@ public sealed class CalendarSyncRetryBackgroundService : BackgroundService
             Interval);
 
         using var timer = new PeriodicTimer(Interval);
-        while (!stoppingToken.IsCancellationRequested &&
-               await timer.WaitForNextTickAsync(stoppingToken))
+        try
         {
-            await RetryFailedSyncsAsync(stoppingToken);
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await RetryFailedSyncsAsync(stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal graceful shutdown — stoppingToken was cancelled.
         }
     }
 

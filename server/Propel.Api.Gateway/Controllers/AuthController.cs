@@ -40,6 +40,9 @@ public sealed class AuthController : ControllerBase
         [FromBody] RegisterPatientRequest request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+            return BadRequest(new { message = "Invalid or missing request body." });
+
         var command = new RegisterPatientCommand(
             request.Email,
             request.Password,
@@ -48,6 +51,7 @@ public sealed class AuthController : ControllerBase
             request.DateOfBirth);
 
         var result = await _mediator.Send(command, cancellationToken);
+        if (result is null) return StatusCode(500, new { message = "Registration failed unexpectedly." });
         return CreatedAtAction(nameof(Register), new { result.PatientId },
             new { result.PatientId, message = "Registration successful. Please check your email to verify your account." });
     }
@@ -105,6 +109,9 @@ public sealed class AuthController : ControllerBase
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+            return BadRequest(new { message = "Invalid or missing request body." });
+
         var deviceId = string.IsNullOrWhiteSpace(request.DeviceId)
             ? $"auto-{Guid.NewGuid()}"
             : request.DeviceId;
@@ -112,6 +119,7 @@ public sealed class AuthController : ControllerBase
         var command = new LoginCommand(request.Email, request.Password, deviceId,
             HttpContext.Connection.RemoteIpAddress?.ToString());
         var result = await _mediator.Send(command, cancellationToken);
+        if (result is null) return Unauthorized(new { error = "invalid_credentials" });
         return Ok(new { result.AccessToken, result.RefreshToken, result.ExpiresIn, result.UserId, result.Role, result.DeviceId, result.Name });
     }
 

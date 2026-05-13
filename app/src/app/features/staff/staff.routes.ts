@@ -58,6 +58,15 @@ export const staffRoutes: Routes = [
     title: 'Reminder Settings — Propel IQ',
   },
   {
+    path: 'patients',
+    loadComponent: () =>
+      import('./patients/patient-list-page.component').then(
+        (m) => m.PatientListPageComponent,
+      ),
+    canActivate: [authGuard, staffGuard],
+    title: 'Patient 360° View Search — Propel IQ',
+  },
+  {
     path: 'patients/:patientId',
     loadComponent: () =>
       import('./patient-record/staff-patient-record.component').then(

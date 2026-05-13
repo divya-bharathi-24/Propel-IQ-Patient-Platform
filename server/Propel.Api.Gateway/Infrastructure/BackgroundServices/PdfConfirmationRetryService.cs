@@ -51,9 +51,16 @@ public sealed class PdfConfirmationRetryService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var request in _retryChannel.Reader.ReadAllAsync(stoppingToken))
+        try
         {
-            await ProcessRetryAsync(request, stoppingToken);
+            await foreach (var request in _retryChannel.Reader.ReadAllAsync(stoppingToken))
+            {
+                await ProcessRetryAsync(request, stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal graceful shutdown — stoppingToken was cancelled.
         }
     }
 

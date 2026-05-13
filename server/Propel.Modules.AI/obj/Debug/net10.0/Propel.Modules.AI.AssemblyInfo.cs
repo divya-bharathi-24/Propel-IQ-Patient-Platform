@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Propel.Modules.AI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c03c286c2ca58ff6fbb047e3051c5443be275752")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+938a83635b71b49b23063521f284c4b1f3be95bf")]
 [assembly: System.Reflection.AssemblyProductAttribute("Propel.Modules.AI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Propel.Modules.AI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

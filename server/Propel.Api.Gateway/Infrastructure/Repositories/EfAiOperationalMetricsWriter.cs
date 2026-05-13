@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Propel.Api.Gateway.Data;
 using Propel.Domain.Entities;
 using Propel.Domain.Enums;
@@ -10,24 +11,18 @@ namespace Propel.Api.Gateway.Infrastructure.Repositories;
 /// INSERT-only EF Core implementation of <see cref="IAiOperationalMetricsWriter"/>
 /// (EP-010/us_050, task_002 — API).
 /// <para>
-/// All four write methods issue a single INSERT via <c>Add</c> + <c>SaveChangesAsync</c>.
-/// Exceptions are caught and logged via Serilog Error — they are never propagated to callers
-/// (fire-and-forget contract, NFR-018). Metric write failures must not affect the primary
-/// clinical write path.
-/// </para>
-/// <para>
-/// Registered as <c>Scoped</c> — shares <see cref="AppDbContext"/> lifetime with the
-/// HTTP request. Callers use the discard pattern (<c>_ = writer.RecordXxx()</c>) so the
-/// metrics write races concurrently without blocking the primary response (AD-7).
+/// Uses <see cref="IDbContextFactory{AppDbContext}"/> to create an isolated DbContext per write,
+/// preventing EF Core concurrency errors when callers use the fire-and-forget discard pattern
+/// (<c>_ = writer.RecordXxx()</c>) alongside concurrent primary-path DbContext operations (AD-7, NFR-018).
 /// </para>
 /// </summary>
 public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
 {
-    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-    public EfAiOperationalMetricsWriter(AppDbContext context)
+    public EfAiOperationalMetricsWriter(IDbContextFactory<AppDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     /// <inheritdoc />
@@ -39,7 +34,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
     {
         try
         {
-            var entity = new AiOperationalMetric
+            await using var ctx = await _contextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            ctx.AiOperationalMetrics.Add(new AiOperationalMetric
             {
                 Id           = Guid.NewGuid(),
                 MetricType   = AiOperationalMetricType.TokenConsumption,
@@ -48,9 +44,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
                 ValueA       = promptTokens,
                 ValueB       = responseTokens,
                 RecordedAt   = DateTimeOffset.UtcNow
-            };
-            _context.AiOperationalMetrics.Add(entity);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            });
+            await ctx.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -69,7 +64,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
     {
         try
         {
-            var entity = new AiOperationalMetric
+            await using var ctx = await _contextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            ctx.AiOperationalMetrics.Add(new AiOperationalMetric
             {
                 Id           = Guid.NewGuid(),
                 MetricType   = AiOperationalMetricType.Latency,
@@ -77,9 +73,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
                 ModelVersion = modelVersion,
                 ValueA       = latencyMs,
                 RecordedAt   = DateTimeOffset.UtcNow
-            };
-            _context.AiOperationalMetrics.Add(entity);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            });
+            await ctx.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -97,7 +92,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
     {
         try
         {
-            var entity = new AiOperationalMetric
+            await using var ctx = await _contextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            ctx.AiOperationalMetrics.Add(new AiOperationalMetric
             {
                 Id           = Guid.NewGuid(),
                 MetricType   = AiOperationalMetricType.ProviderError,
@@ -105,9 +101,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
                 ModelVersion = modelVersion,
                 Metadata     = errorType,
                 RecordedAt   = DateTimeOffset.UtcNow
-            };
-            _context.AiOperationalMetrics.Add(entity);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            });
+            await ctx.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -125,7 +120,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
     {
         try
         {
-            var entity = new AiOperationalMetric
+            await using var ctx = await _contextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            ctx.AiOperationalMetrics.Add(new AiOperationalMetric
             {
                 Id           = Guid.NewGuid(),
                 MetricType   = AiOperationalMetricType.CircuitBreakerTrip,
@@ -134,9 +130,8 @@ public sealed class EfAiOperationalMetricsWriter : IAiOperationalMetricsWriter
                 ValueA       = tripCountThisHour,
                 Metadata     = ((int)openDuration.TotalMinutes).ToString(),
                 RecordedAt   = DateTimeOffset.UtcNow
-            };
-            _context.AiOperationalMetrics.Add(entity);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            });
+            await ctx.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

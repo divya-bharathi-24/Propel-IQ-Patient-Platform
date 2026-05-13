@@ -127,8 +127,11 @@ public sealed class SubmitIntakeCommandHandler : IRequestHandler<SubmitIntakeCom
         }
         else
         {
-            if (!HasNonEmptyStringProperty(command.Demographics, "fullName"))
-                missingFields.Add("demographics.fullName");
+            // Frontend sends firstName + lastName separately (not a combined fullName).
+            var hasFirstName = HasNonEmptyStringProperty(command.Demographics, "firstName");
+            var hasLastName  = HasNonEmptyStringProperty(command.Demographics, "lastName");
+            if (!hasFirstName || !hasLastName)
+                missingFields.Add("demographics.name");
 
             if (!HasNonEmptyStringProperty(command.Demographics, "dateOfBirth"))
                 missingFields.Add("demographics.dateOfBirth");
@@ -141,8 +144,8 @@ public sealed class SubmitIntakeCommandHandler : IRequestHandler<SubmitIntakeCom
                 missingFields.Add("demographics.phone");
         }
 
-        if (command.Symptoms is null || !HasNonEmptyArray(command.Symptoms, "symptoms"))
-            missingFields.Add("symptoms.symptoms");
+        // Symptoms is a flat JSON array — root element is the array itself.
+        // An empty or absent symptoms list is allowed; patients may be asymptomatic.
 
         if (missingFields.Count > 0)
             throw new IntakeMissingFieldsException(missingFields);
