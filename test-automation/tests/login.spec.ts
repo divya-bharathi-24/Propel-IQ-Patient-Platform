@@ -41,6 +41,7 @@ test.describe('@login Login Page', () => {
     const login = new LoginPage(page);
     await login.login('wrong@example.com', 'WrongPass123!');
     await expect(login.errorAlert).toBeVisible({ timeout: 10_000 });
+    await expect(login.errorAlert).toContainText('Invalid email or password');
   });
 
   test('@login shows validation error on empty submit', async ({ page }) => {
