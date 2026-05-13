@@ -9,10 +9,12 @@ namespace Propel.Api.Gateway.Data;
 /// </summary>
 public static class SeedData
 {
+    // "General Practice" and "Cardiology" are omitted here — they are already owned
+    // by SpecialtyConfiguration.HasData with stable GUIDs (00000001, 00000002) and
+    // are inserted via EF Core migrations. Including them here would produce duplicates
+    // when both seeding paths run against the same database.
     private static readonly IReadOnlyList<string> SpecialtyNames =
     [
-        "General Practice",
-        "Cardiology",
         "Orthopaedics",
         "Neurology",
         "Paediatrics",

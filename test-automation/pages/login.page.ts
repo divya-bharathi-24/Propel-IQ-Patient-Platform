@@ -20,7 +20,8 @@ export class LoginPage {
   }
 
   get roleBadge(): Locator {
-    return this.page.getByTestId('user-role-badge');
+    // Sidebar renders the current role in .sidebar__user-role
+    return this.page.locator('.sidebar__user-role');
   }
 
   async login(email: string, password: string): Promise<void> {
