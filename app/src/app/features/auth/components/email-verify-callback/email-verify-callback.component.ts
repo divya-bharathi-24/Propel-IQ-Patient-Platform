@@ -31,7 +31,7 @@ export class EmailVerifyCallbackComponent implements OnInit {
     this.authService.verifyEmail(token).subscribe({
       next: () => {
         this.state.set('success');
-        setTimeout(() => this.router.navigate(['/booking']), 2000);
+        setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       },
       error: (err: { status: number }) => {
         if (err.status === 410) {

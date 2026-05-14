@@ -41,6 +41,12 @@ export interface PatientDashboardDto {
   upcomingAppointments: UpcomingAppointmentItem[];
   documents: DocumentHistoryItem[];
   viewVerified: boolean;
+  documentsUploaded?: number;
+  documentsAcrossVisits?: number;
+  intakeStatus?: string;       // e.g. 'Completed', 'Pending', 'Not Started'
+  intakeAllDone?: boolean;
+  waitlistedSlots?: number;
+  waitlistPosition?: number;
 }
 
 export type DashboardLoadState = 'idle' | 'loading' | 'success' | 'error';

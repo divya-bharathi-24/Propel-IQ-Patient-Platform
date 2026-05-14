@@ -66,19 +66,19 @@
     />
     <app-stat-card
       label="Documents uploaded"
-      value="7"
-      delta="Across 3 visits"
+      [value]="dashboard()?.documentsUploaded ?? dashboard()?.documents?.length ?? 0"
+      [delta]="dashboard()?.documentsAcrossVisits ? 'Across ' + dashboard()!.documentsAcrossVisits + ' visits' : ''"
     />
     <app-stat-card
       label="Intake status"
-      value="Completed"
-      badgeText="✓ All sections done"
-      badgeType="success"
+      [value]="dashboard()?.intakeStatus ?? 'Pending'"
+      [badgeText]="dashboard()?.intakeAllDone ? '✓ All sections done' : ''"
+      [badgeType]="dashboard()?.intakeAllDone ? 'success' : 'warning'"
     />
     <app-stat-card
       label="Waitlisted slots"
-      value="1"
-      delta="🕐 Position #3"
+      [value]="dashboard()?.waitlistedSlots ?? 0"
+      [delta]="dashboard()?.waitlistPosition ? '🕐 Position #' + dashboard()!.waitlistPosition : ''"
     />
   </div>
 
