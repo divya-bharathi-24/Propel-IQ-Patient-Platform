@@ -190,7 +190,10 @@ export class AiIntakeChatComponent implements OnInit {
             this.store.updateExtractedFields(response.extractedFields);
           }
 
-          if (response.isSessionComplete) {
+          const isComplete =
+            response.isSessionComplete ||
+            this.isCompletionMessage(response.aiResponse ?? '');
+          if (isComplete) {
             this.showConfirmation.set(true);
           }
 
@@ -234,9 +237,7 @@ export class AiIntakeChatComponent implements OnInit {
       .subscribe({
         next: () => {
           this.store.setIsSubmitting(false);
-          this.router.navigate(['/appointments'], {
-            queryParams: { appointmentId: this.appointmentId() },
-          });
+          this.router.navigate(['/appointments', this.appointmentId()]);
         },
         error: () => {
           this.store.setIsSubmitting(false);
@@ -250,6 +251,21 @@ export class AiIntakeChatComponent implements OnInit {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
+
+  /**
+   * Detects session completion from the AI's response text as a client-side
+   * fallback when the backend does not return isSessionComplete: true.
+   */
+  private isCompletionMessage(message: string): boolean {
+    const lower = message.toLowerCase();
+    return (
+      lower.includes('confirm & submit') ||
+      lower.includes('confirm and submit') ||
+      lower.includes('i have everything i need') ||
+      lower.includes('review the information') ||
+      lower.includes('ready to submit')
+    );
+  }
 
   private addAssistantMessage(content: string): void {
     const msg: ChatMessage = {
