@@ -24,8 +24,8 @@ app-root {
 }
 
 router-outlet + * {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  width: 100%;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;

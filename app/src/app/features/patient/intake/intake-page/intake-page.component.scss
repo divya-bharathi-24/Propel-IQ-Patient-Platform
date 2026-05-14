@@ -3,9 +3,14 @@
 .intake-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding: 1.5rem;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0;
   position: relative;
+
+  &.manual-mode {
+    overflow-y: auto;
+  }
 }
 
 // ── Autosave status indicator (AC-4) ──────────────────────────────────────────
@@ -42,8 +47,12 @@
 .mode-toolbar {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0;
   flex-wrap: wrap;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
 
   .mode-btn {
     display: flex;
@@ -62,6 +71,9 @@
 
 .intake-surface {
   flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 // ── Conflict modal ─────────────────────────────────────────────────────────────

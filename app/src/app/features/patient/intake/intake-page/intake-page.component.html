@@ -1,4 +1,4 @@
-<main class="intake-page" role="main" aria-label="Patient intake">
+<main class="intake-page" [class.manual-mode]="store.mode() === 'Manual'" role="main" aria-label="Patient intake">
 
   <!-- ── Autosave status live region (AC-4, accessibility) ─────────────── -->
   <span
