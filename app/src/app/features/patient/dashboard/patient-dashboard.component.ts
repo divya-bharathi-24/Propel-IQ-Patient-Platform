@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   OnInit,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -47,6 +49,8 @@ export class PatientDashboardComponent implements OnInit {
   }
   private readonly destroyRef = inject(DestroyRef);
 
+  @ViewChild('pendingIntakeSection') pendingIntakeSectionRef!: ElementRef<HTMLElement>;
+
   readonly loadState = signal<DashboardLoadState>('idle');
   readonly dashboard = signal<PatientDashboardDto | null>(null);
 
@@ -56,6 +60,13 @@ export class PatientDashboardComponent implements OnInit {
       (a) => a.hasPendingIntake,
     ),
   );
+
+  scrollToPendingIntakes(): void {
+    this.pendingIntakeSectionRef?.nativeElement?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
 
   ngOnInit(): void {
     this.loadDashboard();

@@ -1,9 +1,26 @@
-<a [routerLink]="route" class="quick-action" [attr.aria-label]="ariaLabel || null">
-  <div 
-    class="quick-action__icon" 
-    [style.background-color]="iconBg || 'var(--color-primary-100)'"
+@if (route) {
+  <a [routerLink]="route" class="quick-action" [attr.aria-label]="ariaLabel || label">
+    <div
+      class="quick-action__icon"
+      [style.background-color]="iconBg || 'var(--color-primary-100)'"
+    >
+      {{ icon }}
+    </div>
+    <div class="quick-action__label">{{ label }}</div>
+  </a>
+} @else {
+  <button
+    type="button"
+    class="quick-action quick-action--btn"
+    [attr.aria-label]="ariaLabel || label"
+    (click)="clicked.emit()"
   >
-    {{ icon }}
-  </div>
-  <div class="quick-action__label">{{ label }}</div>
-</a>
+    <div
+      class="quick-action__icon"
+      [style.background-color]="iconBg || 'var(--color-primary-100)'"
+    >
+      {{ icon }}
+    </div>
+    <div class="quick-action__label">{{ label }}</div>
+  </button>
+}

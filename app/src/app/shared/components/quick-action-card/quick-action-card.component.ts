@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -12,7 +12,10 @@ import { RouterLink } from '@angular/router';
 export class QuickActionCardComponent {
   @Input() label!: string;
   @Input() icon!: string;
-  @Input() route!: string;
+  /** When provided the card renders as a link. Omit to render as a button. */
+  @Input() route?: string;
   @Input() iconBg?: string;
   @Input() ariaLabel?: string;
+  /** Emitted when the card is used as a button (no route supplied). */
+  @Output() clicked = new EventEmitter<void>();
 }

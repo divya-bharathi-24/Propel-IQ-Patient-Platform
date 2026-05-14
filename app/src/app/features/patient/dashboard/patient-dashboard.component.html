@@ -91,7 +91,7 @@
           <h2 class="card__title">Upcoming Appointments</h2>
           <a routerLink="/appointments" class="btn btn--ghost btn--sm">View all</a>
         </div>
-        
+
         <div class="card__body">
           <!-- Skeleton loader -->
           @if (loadState() === "loading" || loadState() === "idle") {
@@ -156,7 +156,56 @@
           }
         </div>
       </section>
-      
+
+      <!-- Intake Needed Section -->
+      <section
+        #pendingIntakeSection
+        id="pending-intake"
+        class="card mb-6"
+        aria-label="Intake Needed"
+      >
+        <div class="card__header">
+          <h2 class="card__title">🤖 Intake Needed</h2>
+        </div>
+        <div class="card__body">
+          @if (loadState() === 'loading' || loadState() === 'idle') {
+            <div class="skeleton-list" aria-hidden="true">
+              <div class="skeleton-card"></div>
+            </div>
+          }
+          @if (loadState() === 'success' && pendingIntakeItems().length === 0) {
+            <p class="empty-message" role="status">
+              No pending intake forms — you're all caught up! ✓
+            </p>
+          }
+          @if (loadState() === 'success' && pendingIntakeItems().length > 0) {
+            <div class="appointments-list">
+              @for (appt of pendingIntakeItems(); track appt.id) {
+                <div class="appt-card">
+                  <div class="appt-card__date-box">
+                    <span class="appt-card__month">{{ appt.date | date: 'MMM' | uppercase }}</span>
+                    <span class="appt-card__day">{{ appt.date | date: 'd' }}</span>
+                  </div>
+                  <div class="appt-card__info">
+                    <h3 class="appt-card__title">{{ appt.specialty }}</h3>
+                    <div class="appt-card__meta">
+                      <span>🕐 {{ appt.timeSlotStart }}</span>
+                    </div>
+                  </div>
+                  <a
+                    [routerLink]="['/intake', appt.id]"
+                    class="btn btn--primary btn--sm"
+                    [attr.aria-label]="'Start AI intake for ' + appt.specialty + ' on ' + (appt.date | date: 'mediumDate')"
+                  >
+                    Start AI Intake
+                  </a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
     </div>
 
     <!-- Sidebar: Quick Actions -->
@@ -167,19 +216,20 @@
         </div>
         <div class="card__body">
           <div class="quick-actions-grid">
-            <app-quick-action-card 
-              label="Book Appointment" 
-              icon="📅" 
+            <app-quick-action-card
+              label="Book Appointment"
+              icon="📅"
               route="/appointments/book"
               iconBg="var(--color-primary-100)" />
-            <app-quick-action-card 
-              label="AI Intake" 
-              icon="🤖" 
-              route="/intake"
-              iconBg="var(--color-purple-100)" />
-            <app-quick-action-card 
-              label="Upload Documents" 
-              icon="📄" 
+            <app-quick-action-card
+              label="AI Intake"
+              icon="🤖"
+              iconBg="var(--color-purple-100)"
+              ariaLabel="View appointments needing AI intake"
+              (clicked)="scrollToPendingIntakes()" />
+            <app-quick-action-card
+              label="Upload Documents"
+              icon="📄"
               route="/documents"
               ariaLabel="Upload medical documents"
               iconBg="var(--color-info-100)" />
