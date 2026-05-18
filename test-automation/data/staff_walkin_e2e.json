@@ -10,7 +10,8 @@
     "searchName": "Walk-In Patient",
     "patientRef": "walkin-patient-e2e",
     "patientId": "walkin-patient-e2e-id",
-    "profileStatus": "Verified"
+    "profileStatus": "Verified",
+    "chiefComplaint": "Chest pain"
   },
   "slot": {
     "id": "walkin-e2e-001",

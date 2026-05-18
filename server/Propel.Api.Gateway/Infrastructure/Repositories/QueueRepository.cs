@@ -34,6 +34,7 @@ public sealed class QueueRepository : IQueueRepository
             .Where(a => a.Date == today)
             .Include(a => a.Patient)
             .Include(a => a.QueueEntry)
+            .Include(a => a.NoShowRisk)
             .OrderBy(a => a.TimeSlotStart)
             .ToListAsync(cancellationToken);
     }

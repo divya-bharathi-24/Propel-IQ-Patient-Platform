@@ -77,6 +77,11 @@ public sealed class AppointmentConfiguration : IEntityTypeConfiguration<Appointm
         builder.HasIndex(a => new { a.Date, a.TimeSlotStart, a.SpecialtyId })
                .HasDatabaseName("ix_appointments_slot_lookup");
 
+        // chief_complaint: optional free-text reason for visit (bug_queue_row_column_mismatch)
+        builder.Property(a => a.ChiefComplaint)
+               .HasMaxLength(500)
+               .IsRequired(false);
+
         // Global query filter — soft-delete: Cancelled appointments excluded from standard queries (DR-010)
         builder.HasQueryFilter(a => a.Status != AppointmentStatus.Cancelled);
     }

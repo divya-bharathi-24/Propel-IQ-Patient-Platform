@@ -35,6 +35,77 @@
 			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git add test-automation/tests/login.spec.ts .vscode/tasks.json ; git status",
 			"isBackground": false,
 			"group": "test"
+		},
+		{
+			"label": "Run Queue-Row Regression Tests",
+			"type": "shell",
+			"command": "cd app ; npx ng test --include=\"**/queue-row*\" --watch=false --browsers=ChromeHeadless",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Run Staff Walk-In E2E (headed)",
+			"type": "shell",
+			"command": "cd test-automation ; npx playwright test e2e/staff_walkin_clinical_workflow.spec.ts --project=e2e --headed",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Run Staff Walk-In E2E (debug)",
+			"type": "shell",
+			"command": "cd test-automation ; npx playwright test e2e/staff_walkin_clinical_workflow.spec.ts --project=e2e --debug",
+			"isBackground": true,
+			"group": "test"
+		},
+		{
+			"label": "Git status",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git status --short",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git current branch",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git branch --show-current",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git stage bug fix files",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git add app/src/app/features/staff/queue/queue-row/queue-row.component.ts app/src/app/features/staff/queue/queue.models.ts app/src/app/features/staff/queue/same-day-queue.component.html app/src/app/features/staff/queue/queue-row/queue-row.component.spec.ts server/Propel.Modules.Queue/Dtos/QueueItemDto.cs server/Propel.Modules.Queue/Handlers/GetTodayQueueQueryHandler.cs server/Propel.Api.Gateway/Data/Configurations/AppointmentConfiguration.cs server/Propel.Api.Gateway/Infrastructure/Repositories/QueueRepository.cs server/Propel.Domain/Entities/Appointment.cs 'server/Propel.Api.Gateway/Migrations/20260515000001_AddChiefComplaintToAppointments.cs' test-automation/data/staff_walkin_e2e.json test-automation/e2e/staff_walkin_clinical_workflow.spec.ts .propel/context/tasks/bug_queue_row_column_mismatch/ ; git status --short",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git commit and push bug fix",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git commit -m \"fix(queue): resolve row/column mismatch in same-day queue (bug_queue_row_column_mismatch)\n\n- Extend QueueItem model with chiefComplaint, waitTime, riskLevel, queuePosition\n- Rewrite QueueRowComponent template from 5 to 8 aligned columns (SCR-014)\n- Extend QueueItemDto with ChiefComplaint, WaitTime, RiskLevel, QueuePosition\n- Populate new DTO fields in GetTodayQueueQueryHandler (ComputeWaitTime, NoShowRisk)\n- Add ChiefComplaint to Appointment entity, EF Core config, and migration\n- Add 24-test QueueRowComponent regression suite (all pass, ChromeHeadless)\n- E2E staff_walkin_clinical_workflow: chief-complaint column assertion passes\" ; git push origin feature/figmaGeneration",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git commit and push",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git commit -m 'fix(queue): resolve 5-to-8 column mismatch in same-day queue (bug_queue_row_column_mismatch)' ; git push origin feature/figmaGeneration",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git rebase and push",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git pull --rebase origin feature/figmaGeneration ; git push origin feature/figmaGeneration",
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Git stash rebase push",
+			"type": "shell",
+			"command": "cd 'D:\\Propel_05_04\\Propel-IQ-Patient-Platform' ; git stash ; git pull --rebase origin feature/figmaGeneration ; git push origin feature/figmaGeneration ; git stash pop",
+			"isBackground": false,
+			"group": "test"
 		}
 	]
 }
