@@ -14,20 +14,26 @@
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     margin-bottom: var(--space-2);
+
+    &--loading {
+      color: var(--color-text-muted, #94a3b8);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
   }
-  
+
   &__delta {
     font-size: var(--font-size-body-sm);
     color: var(--color-text-secondary);
-    
-    &--up {
-      color: var(--color-success-700);
-    }
-    
-    &--down {
-      color: var(--color-error-700);
-    }
+
+    &--up      { color: var(--color-success-700); }
+    &--down    { color: var(--color-error-700); }
+    &--neutral { color: var(--color-text-muted, #94a3b8); }
   }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
 }
 
 .mt-2 {

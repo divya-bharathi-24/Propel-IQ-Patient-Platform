@@ -141,9 +141,6 @@
     </header>
 
     <div class="page-body">
-      <!-- Requires Attention Banner -->
-      <app-requires-attention-section />
-
       <!-- Stats Row -->
       <div class="grid grid--4 mb-6">
         <div class="card">
@@ -151,10 +148,18 @@
             <div class="stat-card__content">
               <div>
                 <div class="stat-card__label">Today's appointments</div>
-                <div class="stat-card__value">18</div>
-                <div class="stat-card__delta stat-card__delta--up">
-                  ↑ 3 vs yesterday
-                </div>
+                @if (appointmentsLoading()) {
+                  <div class="stat-card__value stat-card__value--loading">—</div>
+                } @else {
+                  <div class="stat-card__value">{{ totalAppointmentsCount() }}</div>
+                  @if (highRiskCount() > 0) {
+                    <div class="stat-card__delta" style="color: var(--color-warning-700)">
+                      {{ highRiskCount() }} high-risk
+                    </div>
+                  } @else {
+                    <div class="stat-card__delta stat-card__delta--neutral">&nbsp;</div>
+                  }
+                }
               </div>
               <div class="stat-card__icon stat-card__icon--primary">📅</div>
             </div>
@@ -165,13 +170,18 @@
             <div class="stat-card__content">
               <div>
                 <div class="stat-card__label">Queue size</div>
-                <div class="stat-card__value">5</div>
-                <div
-                  class="stat-card__delta"
-                  style="color: var(--color-warning-700)"
-                >
-                  2 high-risk patients
-                </div>
+                @if (queueLoading()) {
+                  <div class="stat-card__value stat-card__value--loading">—</div>
+                } @else {
+                  <div class="stat-card__value">{{ queueSize() }}</div>
+                  @if (queueSize() === 0) {
+                    <div class="stat-card__delta stat-card__delta--neutral">All clear</div>
+                  } @else {
+                    <div class="stat-card__delta" style="color: var(--color-warning-700)">
+                      {{ queueSize() }} waiting
+                    </div>
+                  }
+                }
               </div>
               <div class="stat-card__icon stat-card__icon--warning">⏳</div>
             </div>
@@ -182,13 +192,19 @@
             <div class="stat-card__content">
               <div>
                 <div class="stat-card__label">Pending intakes</div>
-                <div class="stat-card__value">4</div>
-                <div
-                  class="stat-card__delta"
-                  style="color: var(--color-text-secondary)"
-                >
-                  Need review
-                </div>
+                @if (pendingIntakesLoading()) {
+                  <div class="stat-card__value stat-card__value--loading">—</div>
+                } @else if (pendingIntakesCount() === null) {
+                  <div class="stat-card__value">—</div>
+                  <div class="stat-card__delta stat-card__delta--neutral">Unavailable</div>
+                } @else {
+                  <div class="stat-card__value">{{ pendingIntakesCount() }}</div>
+                  @if ((pendingIntakesCount() ?? 0) > 0) {
+                    <div class="stat-card__delta" style="color: var(--color-text-secondary)">Need review</div>
+                  } @else {
+                    <div class="stat-card__delta stat-card__delta--neutral">All reviewed</div>
+                  }
+                }
               </div>
               <div class="stat-card__icon stat-card__icon--info">📋</div>
             </div>

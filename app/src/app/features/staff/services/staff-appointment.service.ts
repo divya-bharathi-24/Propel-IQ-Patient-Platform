@@ -60,6 +60,20 @@ export class StaffAppointmentService {
       );
   }
 
+  /**
+   * Returns the count of patient intake forms that are pending staff review.
+   * GET /api/staff/pending-intakes/count
+   */
+  getPendingIntakesCount(): Observable<number> {
+    return this.http
+      .get<number>('/api/staff/pending-intakes/count')
+      .pipe(
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => this.mapError(err)),
+        ),
+      );
+  }
+
   private mapError(err: HttpErrorResponse): StaffAppointmentServiceError {
     return {
       status: err.status,

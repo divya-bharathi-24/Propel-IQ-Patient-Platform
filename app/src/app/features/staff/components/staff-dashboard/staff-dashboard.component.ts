@@ -8,10 +8,11 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { DatePipe, SlicePipe } from '@angular/common';
-import { RequiresAttentionSectionComponent } from '../requires-attention-section/requires-attention-section.component';
 import { QueueService } from '../../queue/queue.service';
 import { QueueItem } from '../../queue/queue.models';
 import { AuthService } from '../../../../features/auth/services/auth.service';
+import { StaffAppointmentService } from '../../services/staff-appointment.service';
+import { StaffAppointmentDto } from '../../models/staff-appointment.models';
 
 /**
  * Staff dashboard page — the primary landing view for Staff and Admin users
@@ -28,7 +29,6 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RequiresAttentionSectionComponent,
     RouterLink,
     RouterLinkActive,
     DatePipe,
@@ -40,12 +40,29 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
 export class StaffDashboardComponent implements OnInit {
   readonly today = new Date();
 
+  // Queue signals (loaded by QueueService)
   protected readonly queueItems = signal<QueueItem[]>([]);
   protected readonly queueLoading = signal(false);
   protected readonly queueError = signal<string | null>(null);
   protected readonly checkingInId = signal<string | null>(null);
 
+  // Appointment stats signals
+  protected readonly todayAppointments = signal<StaffAppointmentDto[]>([]);
+  protected readonly appointmentsLoading = signal(false);
+
+  // Pending intakes signal
+  protected readonly pendingIntakesCount = signal<number | null>(null);
+  protected readonly pendingIntakesLoading = signal(false);
+
+  // Derived stats
+  protected readonly totalAppointmentsCount = computed(() => this.todayAppointments().length);
+  protected readonly highRiskCount = computed(() =>
+    this.todayAppointments().filter(a => a.noShowRisk?.severity === 'High').length
+  );
+  protected readonly queueSize = computed(() => this.queueItems().length);
+
   private readonly queueService = inject(QueueService);
+  private readonly appointmentService = inject(StaffAppointmentService);
   readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -66,6 +83,34 @@ export class StaffDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadQueue();
+    this.loadTodayAppointments();
+    this.loadPendingIntakesCount();
+  }
+
+  loadTodayAppointments(): void {
+    this.appointmentsLoading.set(true);
+    const dateStr = this.today.toISOString().split('T')[0];
+    this.appointmentService.getAppointments(dateStr).subscribe({
+      next: (items) => {
+        this.todayAppointments.set(items);
+        this.appointmentsLoading.set(false);
+      },
+      error: () => this.appointmentsLoading.set(false),
+    });
+  }
+
+  loadPendingIntakesCount(): void {
+    this.pendingIntakesLoading.set(true);
+    this.appointmentService.getPendingIntakesCount().subscribe({
+      next: (count) => {
+        this.pendingIntakesCount.set(count);
+        this.pendingIntakesLoading.set(false);
+      },
+      error: () => {
+        this.pendingIntakesCount.set(null);
+        this.pendingIntakesLoading.set(false);
+      },
+    });
   }
 
   loadQueue(): void {
