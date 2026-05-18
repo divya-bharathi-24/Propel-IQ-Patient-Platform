@@ -210,6 +210,20 @@
             </div>
           </div>
         </div>
+        <div class="card">
+          <div class="card__body stat-card">
+            <div class="stat-card__content">
+              <div>
+                <div class="stat-card__label">Code reviews</div>
+                <div class="stat-card__value">3</div>
+                <div class="stat-card__delta" style="color: var(--color-error-600)">
+                  Awaiting approval
+                </div>
+              </div>
+              <div class="stat-card__icon stat-card__icon--error">⚕</div>
+            </div>
+          </div>
+        </div>
 
       </div>
 
@@ -238,6 +252,8 @@
                   <tr>
                     <th>Patient</th>
                     <th>Arrival</th>
+                    <th>Wait</th>
+                    <th>Risk</th>
                     <th>Status</th>
                     <th><span class="sr-only">Actions</span></th>
                   </tr>
@@ -246,37 +262,53 @@
                   @for (item of queueItems(); track item.appointmentId) {
                     <tr>
                       <td>
-                        <span class="patient-link">{{ item.patientName }}</span>
+                        <a
+                          class="patient-link"
+                          [routerLink]="['/staff/patients', item.patientId]"
+                          >{{ item.patientName }}</a
+                        >
                         <br /><span class="text-xs text-secondary">{{
-                          item.bookingType === "WalkIn"
-                            ? "Walk-in"
-                            : "Self-booked"
+                          item.chiefComplaint ?? (item.bookingType === 'WalkIn' ? 'Walk-in' : 'Self-booked')
                         }}</span>
                       </td>
                       <td>
                         {{
                           item.timeSlotStart
                             ? (item.timeSlotStart | slice: 0 : 5)
-                            : "—"
+                            : '—'
                         }}
+                      </td>
+                      <td
+                        [class.wait-time--urgent]="
+                          item.waitTime && +item.waitTime.replace(' min', '') >= 30
+                        "
+                      >
+                        {{ item.waitTime ?? '—' }}
+                      </td>
+                      <td>
+                        @if (item.riskLevel) {
+                          <span
+                            class="risk-badge"
+                            [class.risk-badge--high]="item.riskLevel === 'High'"
+                            [class.risk-badge--medium]="item.riskLevel === 'Medium'"
+                            [class.risk-badge--low]="item.riskLevel === 'Low'"
+                            >{{ item.riskLevel }}</span
+                          >
+                        } @else {
+                          <span class="text-secondary">—</span>
+                        }
                       </td>
                       <td>
                         <span
                           class="badge"
-                          [class.badge--warning]="
-                            item.arrivalStatus === 'Waiting'
-                          "
-                          [class.badge--success]="
-                            item.arrivalStatus === 'Arrived'
-                          "
-                          [class.badge--neutral]="
-                            item.arrivalStatus === 'Cancelled'
-                          "
+                          [class.badge--warning]="item.arrivalStatus === 'Waiting'"
+                          [class.badge--success]="item.arrivalStatus === 'Arrived'"
+                          [class.badge--neutral]="item.arrivalStatus === 'Cancelled' || item.arrivalStatus === 'Scheduled'"
                           >{{ item.arrivalStatus }}</span
                         >
                       </td>
                       <td class="table-actions">
-                        @if (item.arrivalStatus === "Waiting") {
+                        @if (item.arrivalStatus === 'Waiting') {
                           <button
                             class="btn btn--primary btn--sm"
                             [disabled]="checkingInId() === item.appointmentId"
@@ -285,17 +317,15 @@
                           >
                             {{
                               checkingInId() === item.appointmentId
-                                ? "…"
-                                : "Check in"
+                                ? '…'
+                                : 'Check in'
                             }}
                           </button>
                         } @else {
                           <button
                             class="btn btn--secondary btn--sm"
                             (click)="viewAppointment(item.appointmentId)"
-                            [attr.aria-label]="
-                              'View appointment for ' + item.patientName
-                            "
+                            [attr.aria-label]="'View appointment for ' + item.patientName"
                           >
                             View
                           </button>
@@ -312,6 +342,36 @@
         <!-- Right Column -->
         <div class="dashboard-sidebar-right">
 
+          <!-- Pending code reviews -->
+          <div class="card">
+            <div class="card__header">
+              <h2 class="card__title">Pending code reviews</h2>
+              <a routerLink="/staff/code-review" class="btn btn--ghost btn--sm">Review all →</a>
+            </div>
+            <div class="card__body code-reviews-list">
+              <div class="code-review-item">
+                <div>
+                  <div class="code-review-item__title">M. Johnson · J45.9</div>
+                  <div class="code-review-item__sub">AI confidence: 87%</div>
+                </div>
+                <span class="badge badge--warning">Pending</span>
+              </div>
+              <div class="code-review-item">
+                <div>
+                  <div class="code-review-item__title">R. Thompson · E11.9</div>
+                  <div class="code-review-item__sub">AI confidence: 92%</div>
+                </div>
+                <span class="badge badge--warning">Pending</span>
+              </div>
+              <div class="code-review-item">
+                <div>
+                  <div class="code-review-item__title">P. Williams · Z00.00</div>
+                  <div class="code-review-item__sub">AI confidence: 95%</div>
+                </div>
+                <span class="badge badge--warning">Pending</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Quick Links -->
           <div class="card">

@@ -35,6 +35,7 @@ import { RequiresAttentionItemDto } from '../../models/risk-flag.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
+    @if (store.requiresAttentionLoadingState() !== 'loaded' || store.requiresAttentionCount() > 0) {
     <section
       class="requires-attention"
       aria-labelledby="requires-attention-heading"
@@ -118,6 +119,7 @@ import { RequiresAttentionItemDto } from '../../models/risk-flag.models';
         </ul>
       }
     </section>
+    }
   `,
   styles: [
     `
