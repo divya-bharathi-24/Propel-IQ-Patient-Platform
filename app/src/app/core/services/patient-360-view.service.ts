@@ -69,6 +69,14 @@ export interface DocumentStatusDto {
 
 export interface Patient360ViewDto {
   patientId: string;
+  patientName?: string;
+  mrn?: string;
+  dateOfBirth?: string;
+  insurancePlan?: string;
+  provider?: string;
+  riskLevel?: 'High' | 'Medium' | 'Low';
+  visitType?: string;
+  lastUpdatedAt?: string;
   verificationStatus: VerificationStatus;
   verifiedAt?: string;
   verifiedByStaffName?: string;

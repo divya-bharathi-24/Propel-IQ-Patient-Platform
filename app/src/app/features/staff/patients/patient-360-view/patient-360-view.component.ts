@@ -1,17 +1,15 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { DatePipe } from '@angular/common';
 import { Patient360ViewStore } from './patient-360-view.store';
 import { ClinicalConflictStore } from './store/clinical-conflict.store';
@@ -22,7 +20,6 @@ import {
   SectionType,
 } from '../../../../core/services/patient-360-view.service';
 
-/** Ordered list of section types to render — matches AC-1. */
 const SECTION_ORDER: SectionType[] = [
   'Vitals',
   'Medications',
@@ -32,504 +29,32 @@ const SECTION_ORDER: SectionType[] = [
   'SurgicalHistory',
 ];
 
-/**
- * 360-degree patient view page (US_041, task_001).
- *
- * Renders aggregated clinical data sections, a "Verify Profile" action,
- * conflict warnings, and document failure badges.
- *
- * AC-1: Six expandable sections for Vitals, Medications, Diagnoses, Allergies,
- *       Immunizations, Surgical History.
- * AC-2: Confidence badges and low-confidence row flags on each data row.
- * AC-3: "Verify Profile" button shows success confirmation with timestamp + staff name.
- * AC-4: Button is blocked (aria-disabled) with an inline conflict list when
- *       unresolved Critical conflicts exist.
- *
- * WCAG 2.2 AA:
- *  - Conflict list announced via aria-live="assertive" (4.1.3 Status Messages).
- *  - Verify button uses aria-disabled + aria-describedby when blocked (4.1.2 Name/Role/Value).
- *  - Progress bar has aria-label.
- *  - All interactive elements have visible focus indicators.
- */
+type Tab = 'clinical' | 'appointments' | 'documents' | 'intake' | 'billing';
+
 @Component({
   selector: 'app-patient-360-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatePipe,
+    RouterLink,
     MatButtonModule,
-    MatCardModule,
-    MatDialogModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatChipsModule,
     ClinicalSectionComponent,
   ],
-  template: `
-    <main class="view-360-page" aria-label="360-degree patient view">
-      <!-- Page heading (required for navigation landmarks and E2E locators) -->
-      <h1 class="page-heading">360° Patient View</h1>
-
-      <!-- Loading bar -->
-      @if (store.loadingState() === 'loading') {
-        <mat-progress-bar
-          mode="indeterminate"
-          aria-label="Loading 360-degree patient view"
-        />
-      }
-
-      <!-- Load error -->
-      @if (store.loadingState() === 'error') {
-        <mat-card class="error-card" role="alert">
-          <mat-card-content>
-            <mat-icon aria-hidden="true">error_outline</mat-icon>
-            {{ store.loadError() ?? 'Failed to load patient data.' }}
-          </mat-card-content>
-        </mat-card>
-      }
-
-      <!-- Aggregating: AI extraction still in progress (HTTP 202) -->
-      @if (store.loadingState() === 'aggregating') {
-        <mat-card class="aggregating-card" role="status" aria-live="polite">
-          <mat-card-content>
-            <mat-icon aria-hidden="true">hourglass_top</mat-icon>
-            Clinical data is still being extracted from uploaded documents.
-            Please check back in a moment.
-          </mat-card-content>
-        </mat-card>
-      }
-
-      @if (store.loadingState() === 'loaded' && store.view360(); as view) {
-        <!-- Profile verification status badge -->
-        <span
-          data-testid="profile-status-badge"
-          class="status-badge"
-          [class.status-badge--verified]="
-            view.verificationStatus === 'Verified'
-          "
-          [attr.aria-label]="'Profile status: ' + view.verificationStatus"
-          >{{ view.verificationStatus }}</span
-        >
-
-        <!-- >10 documents banner (edge case) -->
-        @if (view.documents.length > 10) {
-          <div class="banner-info" role="status" aria-live="polite">
-            <mat-icon aria-hidden="true">info</mat-icon>
-            Showing data from all {{ view.documents.length }} documents —
-            2-minute SLA applies to ≤10 documents only.
-          </div>
-        }
-
-        <!-- Document failure badges -->
-        @if (failedDocuments(view.documents).length > 0) {
-          <mat-card class="doc-failures-card">
-            <mat-card-header>
-              <mat-card-title>
-                <mat-icon aria-hidden="true">report_problem</mat-icon>
-                Document Processing Issues
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              @for (
-                doc of failedDocuments(view.documents);
-                track doc.documentId
-              ) {
-                <div class="doc-failure-row">
-                  <mat-chip
-                    class="failed-chip"
-                    aria-label="{{ doc.documentName }}: Processing Failed"
-                  >
-                    Processing Failed
-                  </mat-chip>
-                  <span class="doc-name">{{ doc.documentName }}</span>
-                  <button
-                    mat-stroked-button
-                    type="button"
-                    (click)="onRetryDocument(doc.documentId)"
-                    [attr.aria-label]="
-                      'Retry extraction for ' + doc.documentName
-                    "
-                  >
-                    <mat-icon aria-hidden="true">refresh</mat-icon>
-                    Retry
-                  </button>
-                </div>
-              }
-            </mat-card-content>
-          </mat-card>
-        }
-
-        <!-- Verification success -->
-        @if (
-          store.verifyState() === 'success' && store.verifyResult();
-          as result
-        ) {
-          <mat-card
-            class="verify-success-card"
-            role="status"
-            aria-live="polite"
-          >
-            <mat-card-content>
-              <mat-icon aria-hidden="true" class="success-icon"
-                >verified</mat-icon
-              >
-              Profile verified on {{ result.verifiedAt | date: 'medium' }} by
-              {{ result.verifiedByStaffName }}.
-            </mat-card-content>
-          </mat-card>
-        }
-
-        <!-- Conflict warning block (AC-4) -->
-        @if (conflictStore.unresolvedCriticalCount() > 0) {
-          <mat-card
-            id="conflict-warning-block"
-            class="conflict-warning-card"
-            role="alert"
-            aria-live="assertive"
-          >
-            <mat-card-header>
-              <mat-card-title>
-                <mat-icon aria-hidden="true">block</mat-icon>
-                Verification Blocked —
-                {{ conflictStore.unresolvedCriticalCount() }} Unresolved
-                Critical
-                {{
-                  conflictStore.unresolvedCriticalCount() === 1
-                    ? 'Conflict'
-                    : 'Conflicts'
-                }}
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <p class="conflict-hint">
-                Resolve all Critical conflicts in the sections below before
-                verifying.
-              </p>
-              @for (
-                conflict of conflictStore.unresolvedConflicts();
-                track conflict.conflictId
-              ) {
-                <div
-                  class="conflict-inline-detail"
-                  [attr.data-testid]="
-                    'conflict-indicator-' + conflict.fieldName
-                  "
-                >
-                  <span class="conflict-field-label">{{
-                    conflict.fieldName
-                  }}</span>
-                  <div class="conflict-values-row">
-                    <span
-                      class="conflict-value-chip"
-                      [attr.data-testid]="'conflict-value-1'"
-                      >{{ conflict.value1 }}</span
-                    >
-                    <span class="vs-label" aria-hidden="true">vs</span>
-                    <span
-                      class="conflict-value-chip"
-                      [attr.data-testid]="'conflict-value-2'"
-                      >{{ conflict.value2 }}</span
-                    >
-                  </div>
-                  <div class="conflict-select-row">
-                    <button
-                      mat-stroked-button
-                      type="button"
-                      class="select-value-btn"
-                      [attr.aria-label]="'Select ' + conflict.value1"
-                      (click)="
-                        onSelectConflictValue(
-                          conflict.conflictId,
-                          conflict.value1
-                        )
-                      "
-                    >
-                      Select {{ conflict.value1 }}
-                    </button>
-                    <button
-                      mat-stroked-button
-                      type="button"
-                      class="select-value-btn"
-                      [attr.aria-label]="'Select ' + conflict.value2"
-                      (click)="
-                        onSelectConflictValue(
-                          conflict.conflictId,
-                          conflict.value2
-                        )
-                      "
-                    >
-                      Select {{ conflict.value2 }}
-                    </button>
-                  </div>
-                </div>
-              }
-            </mat-card-content>
-          </mat-card>
-        }
-
-        <!-- Clinical sections (AC-1) -->
-        <section class="sections-container" aria-label="Clinical data sections">
-          @for (
-            section of orderedSections(view.sections);
-            track section.sectionType
-          ) {
-            <app-clinical-section
-              [section]="section"
-              [conflicts]="conflictStore.conflicts()"
-              [attr.data-testid]="'intake-data-' + section.sectionType.toLowerCase()"
-            />
-          }
-        </section>
-
-        <!-- Verify Profile button (AC-3, AC-4) -->
-        @if (store.verifyState() !== 'success') {
-          <div class="verify-action-row">
-            <button
-              mat-raised-button
-              color="primary"
-              type="button"
-              [disabled]="store.verifyState() === 'loading'"
-              [attr.aria-describedby]="
-                conflictStore.unresolvedCriticalCount() > 0
-                  ? 'conflict-warning-block'
-                  : null
-              "
-              (click)="onVerifyProfile()"
-            >
-              @if (store.verifyState() === 'loading') {
-                <mat-spinner diameter="18" strokeWidth="2" />
-                Verifying…
-              } @else {
-                Verify Profile
-              }
-            </button>
-
-            @if (store.verifyState() === 'error') {
-              <span
-                class="verify-error"
-                role="alert"
-                aria-live="assertive"
-                data-testid="verify-error-alert"
-              >
-                <mat-icon aria-hidden="true">error</mat-icon>
-                {{ store.verifyError() }}
-              </span>
-            }
-          </div>
-        }
-      }
-    </main>
-  `,
-  styles: [
-    `
-      .view-360-page {
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-
-      .page-heading {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0 0 12px;
-        color: #212121;
-      }
-
-      .status-badge {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        background-color: #fff3e0;
-        color: #e65100;
-        border: 1px solid #ffcc80;
-        margin-bottom: 12px;
-      }
-
-      .status-badge--verified {
-        background-color: #e8f5e9;
-        color: #2e7d32;
-        border-color: #a5d6a7;
-      }
-
-      .view-360-page {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 24px 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .banner-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 16px;
-        background-color: #e3f2fd;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        color: #0d47a1;
-      }
-
-      .doc-failures-card mat-card-header {
-        color: #b71c1c;
-      }
-
-      .doc-failure-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-      }
-
-      .failed-chip {
-        background-color: #b71c1c !important;
-        color: #fff !important;
-        font-size: 0.72rem;
-        font-weight: 700;
-      }
-
-      .doc-name {
-        flex: 1;
-        font-size: 0.875rem;
-      }
-
-      .verify-success-card {
-        background-color: #e8f5e9;
-        border-left: 4px solid #2e7d32;
-      }
-
-      .success-icon {
-        color: #2e7d32;
-        vertical-align: middle;
-        margin-right: 6px;
-      }
-
-      .conflict-warning-card {
-        background-color: #fff3e0;
-        border-left: 4px solid #e65100;
-      }
-
-      .conflict-hint {
-        font-size: 0.875rem;
-        color: #6d4c41;
-        margin: 0 0 12px;
-      }
-
-      .conflict-inline-detail {
-        background: #fff;
-        border: 1px solid #ffcc80;
-        border-radius: 6px;
-        padding: 10px 14px;
-        margin-top: 8px;
-      }
-
-      .conflict-field-label {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #e65100;
-        display: block;
-        margin-bottom: 6px;
-      }
-
-      .conflict-values-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
-      }
-
-      .conflict-value-chip {
-        background: #fff3e0;
-        border: 1px solid #ffcc80;
-        border-radius: 4px;
-        padding: 3px 8px;
-        font-size: 0.825rem;
-        color: #212121;
-      }
-
-      .vs-label {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #aaa;
-        text-transform: uppercase;
-      }
-
-      .conflict-select-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .select-value-btn {
-        font-size: 0.8rem;
-      }
-
-      .conflict-list {
-        margin: 0;
-        padding-left: 20px;
-        font-size: 0.875rem;
-      }
-
-      .conflict-list li {
-        margin-bottom: 4px;
-      }
-
-      .sections-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-      }
-
-      .verify-action-row {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 8px 0;
-      }
-
-      .verify-error {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        color: #b71c1c;
-        font-size: 0.875rem;
-      }
-
-      .error-card {
-        border-left: 4px solid #b71c1c;
-        color: #b71c1c;
-      }
-
-      .error-card mat-card-content {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .aggregating-card {
-        border-left: 4px solid #1976d2;
-        background: #e3f2fd;
-      }
-
-      .aggregating-card mat-card-content {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #0d47a1;
-        font-size: 0.9rem;
-      }
-    `,
-  ],
+  templateUrl: './patient-360-view.component.html',
+  styleUrl: './patient-360-view.component.scss',
 })
 export class Patient360ViewComponent implements OnInit {
   protected readonly store = inject(Patient360ViewStore);
   protected readonly conflictStore = inject(ClinicalConflictStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   private patientId = '';
+  readonly activeTab = signal<Tab>('clinical');
 
   ngOnInit(): void {
     this.patientId = this.route.snapshot.paramMap.get('patientId') ?? '';
@@ -538,34 +63,50 @@ export class Patient360ViewComponent implements OnInit {
     }
   }
 
-  protected orderedSections(
-    sections: ClinicalSectionDto[] | undefined | null,
-  ): ClinicalSectionDto[] {
-    const sectionMap = new Map((sections ?? []).map((s) => [s.sectionType, s]));
-    return SECTION_ORDER.map((type) => sectionMap.get(type)).filter(
-      (s): s is ClinicalSectionDto => s !== undefined,
-    );
+  protected initials(name?: string): string {
+    if (!name) return '?';
+    return name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  protected failedDocuments(
-    docs: DocumentStatusDto[] | undefined | null,
-  ): DocumentStatusDto[] {
-    return (docs ?? []).filter((d) => d.status === 'Failed');
+  protected sectionLabel(type: SectionType): string {
+    const labels: Record<SectionType, string> = {
+      Vitals: 'Vitals',
+      Medications: 'Current Medications',
+      Diagnoses: 'Medical History',
+      Allergies: 'Allergies',
+      Immunizations: 'Immunizations',
+      SurgicalHistory: 'Surgical History',
+    };
+    return labels[type] ?? type;
   }
 
-  /** Uses the route-param patientId — never view.patientId, which can be undefined on 202. */
+  protected leftSections(sections: ClinicalSectionDto[] | undefined | null): ClinicalSectionDto[] {
+    return this.orderedSections(sections).filter((_, i) => i % 2 === 0);
+  }
+
+  protected rightSections(sections: ClinicalSectionDto[] | undefined | null): ClinicalSectionDto[] {
+    return this.orderedSections(sections).filter((_, i) => i % 2 !== 0);
+  }
+
+  protected orderedSections(sections: ClinicalSectionDto[] | undefined | null): ClinicalSectionDto[] {
+    const sectionMap = new Map((sections ?? []).map(s => [s.sectionType, s]));
+    return SECTION_ORDER.map(type => sectionMap.get(type)).filter((s): s is ClinicalSectionDto => s !== undefined);
+  }
+
+  protected failedDocuments(docs: DocumentStatusDto[] | undefined | null): DocumentStatusDto[] {
+    return (docs ?? []).filter(d => d.status === 'Failed');
+  }
+
   protected onVerifyProfile(): void {
     this.store.verifyProfile(this.patientId);
   }
 
-  protected onSelectConflictValue(
-    conflictId: string,
-    resolvedValue: string,
-  ): void {
-    this.conflictStore.resolveConflict({
-      conflictId,
-      payload: { resolvedValue },
-    });
+  protected onSelectConflictValue(conflictId: string, resolvedValue: string): void {
+    this.conflictStore.resolveConflict({ conflictId, payload: { resolvedValue } });
+  }
+
+  protected onResolveConflicts(): void {
+    this.router.navigate(['/staff/conflict-resolution', this.patientId]);
   }
 
   protected onRetryDocument(documentId: string): void {
