@@ -33,6 +33,12 @@ public sealed class Appointment
     public TimeOnly? TimeSlotEnd { get; set; }
     public AppointmentStatus Status { get; set; }
     public string? CancellationReason { get; set; }
+
+    /// <summary>
+    /// Reason for the visit captured at check-in or booking (e.g. "Chest pain, shortness of breath").
+    /// Null when not yet recorded.
+    /// </summary>
+    public string? ChiefComplaint { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
 

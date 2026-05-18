@@ -84,8 +84,13 @@ async function mockAllApis(page: import('@playwright/test').Page, patientName: s
       json: [
         {
           appointmentId: APPT_ID,
+          patientId: 'walkin-patient-e2e-id',
           patientName,
+          queuePosition: 1,
+          chiefComplaint: journeyData.patient.chiefComplaint,
           timeSlotStart: '09:00',
+          waitTime: null,
+          riskLevel: null,
           bookingType: 'WalkIn',
           arrivalStatus: 'Waiting',
           arrivalTimestamp: null,
@@ -187,6 +192,11 @@ test.describe('E2E Journey: Staff Walk-In and Clinical Workflow (UC-005 → UC-0
     await test.step('Phase 2: Queue entry shows walk-in badge', async () => {
       const queue = new QueuePage(page);
       await expect(queue.walkinBadge(patientName)).toBeVisible({ timeout: 5_000 });
+    });
+
+    await test.step('Phase 2: Chief complaint column shows correct value', async () => {
+      const row = page.locator('tr.queue-row').filter({ hasText: patientName });
+      await expect(row.locator('td.col-complaint')).toHaveText(d.patient.chiefComplaint, { timeout: 5_000 });
     });
 
     await test.step('Phase 2: Staff marks patient as Arrived', async () => {

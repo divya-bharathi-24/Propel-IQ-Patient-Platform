@@ -1,5 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Propel.Domain.Entities;
+using Propel.Domain.Enums;
 using Propel.Domain.Interfaces;
 using Propel.Modules.Queue.Queries;
 
@@ -42,19 +44,52 @@ public sealed class GetTodayQueueQueryHandler
             appointments.Count, DateOnly.FromDateTime(DateTime.UtcNow));
 
         // Step 2 — Project to QueueItemDto.
-        // BookingType: CreatedBy == Guid.Empty is used as proxy for anonymous walk-in;
-        // US_026 sets CreatedBy = staffId for walk-in appointments. PatientId null also
-        // indicates an anonymous walk-in (US_026, AC-3).
+        // BookingType: PatientId null = anonymous walk-in (US_026, AC-3).
+        // ArrivalStatus: Booked is normalised to "Waiting" so the frontend model
+        //   ('Waiting' | 'Arrived' | 'Cancelled') stays consistent with the wireframe (SCR-014).
+        // QueuePosition: use QueueEntry.Position when present; fall back to the row's
+        //   ascending order index so every row has a non-zero position.
+        // WaitTime: computed for Waiting (Booked) appointments whose slot has passed.
+        // RiskLevel: derived from NoShowRisk.Severity when a score record exists.
+        var now = DateTime.UtcNow;
         var items = appointments
-            .Select(a => new QueueItemDto(
-                AppointmentId: a.Id,
-                PatientName: a.Patient?.Name ?? "Walk-In Guest",
-                TimeSlotStart: a.TimeSlotStart,
-                BookingType: a.PatientId is null ? "WalkIn" : "SelfBooked",
-                ArrivalStatus: a.Status.ToString(),
-                ArrivalTimestamp: a.QueueEntry?.ArrivalTime))
+            .Select((a, index) =>
+            {
+                var waitTime = ComputeWaitTime(a, now);
+                var arrivalStatus = a.Status == AppointmentStatus.Booked
+                    ? "Waiting"
+                    : a.Status.ToString();
+                return new QueueItemDto(
+                    AppointmentId: a.Id,
+                    PatientId: a.PatientId,
+                    PatientName: a.Patient?.Name ?? "Walk-In Guest",
+                    QueuePosition: a.QueueEntry?.Position ?? (index + 1),
+                    ChiefComplaint: a.ChiefComplaint,
+                    TimeSlotStart: a.TimeSlotStart,
+                    WaitTime: waitTime,
+                    RiskLevel: a.NoShowRisk?.Severity,
+                    BookingType: a.PatientId is null ? "WalkIn" : "SelfBooked",
+                    ArrivalStatus: arrivalStatus,
+                    ArrivalTimestamp: a.QueueEntry?.ArrivalTime);
+            })
             .ToList();
 
         return items;
+    }
+
+    /// <summary>
+    /// Returns a human-readable wait string (e.g. "47 min") for Booked appointments
+    /// whose scheduled slot has already passed. Returns <c>null</c> in all other cases.
+    /// </summary>
+    private static string? ComputeWaitTime(Appointment appointment, DateTime now)
+    {
+        if (appointment.Status != AppointmentStatus.Booked)
+            return null;
+        if (appointment.TimeSlotStart is null)
+            return null;
+
+        var slotUtc = appointment.Date.ToDateTime(appointment.TimeSlotStart.Value, DateTimeKind.Utc);
+        var elapsed = (int)(now - slotUtc).TotalMinutes;
+        return elapsed > 0 ? $"{elapsed} min" : null;
     }
 }
