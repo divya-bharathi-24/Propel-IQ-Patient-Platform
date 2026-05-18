@@ -184,14 +184,65 @@ public sealed class GetPatient360ViewQueryHandler
                 })
             .FirstOrDefaultAsync(cancellationToken);
 
+        // ── 8. Load patient demographics (PHI auto-decrypted via EF value converters) ────
+        var patient = await _db.Patients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == request.PatientId, cancellationToken);
+
+        var dobString = patient != null && patient.DateOfBirth != default(DateOnly)
+            ? patient.DateOfBirth.ToString("yyyy-MM-dd")
+            : null;
+
+        // ── 9. Load latest appointment for risk level and visit type ─────────────
+        var latestAppt = await _db.Appointments
+            .AsNoTracking()
+            .Include(a => a.NoShowRisk)
+            .Include(a => a.QueueEntry)
+            .Include(a => a.Specialty)
+            .Where(a => a.PatientId == request.PatientId)
+            .OrderByDescending(a => a.Date)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var visitType = latestAppt?.QueueEntry != null ? "Walk-in" : "Scheduled";
+        var riskLevel = latestAppt?.NoShowRisk?.Severity;
+
+        // ── 10. Compute last-updated timestamp from most recent document upload ──
+        var lastUpdatedAt = documents.Any()
+            ? documents.Max(d => (DateTime?)d.UploadedAt)
+            : null;
+
+        // ── 11. Load latest completed intake record for this patient ─────────────
+        var latestIntake = await _db.IntakeRecords
+            .AsNoTracking()
+            .Where(r => r.PatientId == request.PatientId && r.CompletedAt != null)
+            .OrderByDescending(r => r.CompletedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var intakeSnapshot = latestIntake is not null
+            ? new IntakeSnapshotDto(
+                latestIntake.Demographics,
+                latestIntake.MedicalHistory,
+                latestIntake.Symptoms,
+                latestIntake.Medications,
+                "Submitted",
+                latestIntake.CompletedAt)
+            : null;
+
         return new Patient360ViewDto(
             request.PatientId,
+            patient?.Name,
+            dobString,
+            patient?.InsurerName,
+            visitType,
+            riskLevel,
+            lastUpdatedAt,
             verificationRow?.Status ?? "Unverified",
             verificationRow?.VerifiedAt,
             verificationRow?.VerifiedByName,
             unresolvedCritical,
             conflicts,
             documentStatuses,
-            sections);
+            sections,
+            intakeSnapshot);
     }
 }

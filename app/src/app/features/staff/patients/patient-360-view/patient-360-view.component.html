@@ -1,0 +1,424 @@
+<div class="view-360-page">
+
+  <!-- Loading bar -->
+  @if (store.loadingState() === 'loading') {
+    <mat-progress-bar mode="indeterminate" aria-label="Loading patient data" />
+  }
+
+  <!-- Breadcrumb header -->
+  <header class="page-header">
+    <div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/staff/queue" class="breadcrumb__link">Queue</a>
+        <span class="breadcrumb__sep" aria-hidden="true">&#8250;</span>
+        <span>{{ store.view360()?.patientName ?? 'Patient' }} &mdash; 360&deg; View</span>
+      </nav>
+    </div>
+    <div class="page-header__actions">
+      <a routerLink="/staff/code-review" mat-stroked-button class="btn-code-review">Code Review</a>
+      @if (store.loadingState() === 'loaded' && store.verifyState() !== 'success') {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          class="btn-verify"
+          [disabled]="store.verifyState() === 'loading' || conflictStore.unresolvedCriticalCount() > 0"
+          (click)="onVerifyProfile()"
+          aria-label="Verify and sign off patient profile"
+        >
+          @if (store.verifyState() === 'loading') {
+            <mat-spinner diameter="16" strokeWidth="2" />
+            Verifying&hellip;
+          } @else {
+            Verify &amp; Sign Off
+          }
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Load error -->
+  @if (store.loadingState() === 'error') {
+    <div class="alert alert--error" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      {{ store.loadError() ?? 'Failed to load patient data.' }}
+    </div>
+  }
+
+  <!-- Aggregating state -->
+  @if (store.loadingState() === 'aggregating') {
+    <div class="alert alert--info" role="status" aria-live="polite">
+      <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+      Clinical data is still being extracted. Please check back shortly.
+    </div>
+  }
+
+  @if (store.loadingState() === 'loaded' && store.view360(); as view) {
+
+    <!-- Patient header card -->
+    <div class="patient-header-card">
+      <div class="patient-header-card__body">
+        <div class="patient-avatar patient-avatar--teal" aria-hidden="true">{{ initials(view.patientName) }}</div>
+        <div class="patient-header-card__info">
+          <div class="patient-header-card__name-row">
+            <h1 class="patient-name">{{ view.patientName ?? 'Unknown Patient' }}</h1>
+            @if (view.riskLevel === 'High') {
+              <span class="risk-badge risk-badge--high">High Risk</span>
+            } @else if (view.riskLevel === 'Medium') {
+              <span class="risk-badge risk-badge--medium">Medium Risk</span>
+            }
+            @if (view.visitType) {
+              <span class="badge badge--neutral">{{ view.visitType }} &middot; Today</span>
+            }
+          </div>
+          <div class="patient-meta">
+            @if (view.mrn) {
+              <span>MRN: <strong>{{ view.mrn }}</strong></span>
+            }
+            @if (view.dateOfBirth) {
+              <span class="phi-field">DOB: <strong class="phi-masked">&#x2022;&#x2022;/&#x2022;&#x2022;/{{ view.dateOfBirth | date:'yyyy' }}</strong>
+                <button type="button" class="phi-reveal-btn" aria-label="Reveal date of birth">&#128065;</button>
+              </span>
+            }
+            @if (view.insurancePlan) {
+              <span>Insurance: <strong>{{ view.insurancePlan }}</strong></span>
+            }
+            @if (view.provider) {
+              <span>Provider: <strong>{{ view.provider }}</strong></span>
+            }
+          </div>
+        </div>
+        @if (view.lastUpdatedAt) {
+          <div class="patient-header-card__updated">
+            <div class="updated-label">Last updated</div>
+            <div class="updated-value">{{ view.lastUpdatedAt | date:'MMM d, y \u00B7 h:mm a' }}</div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Verify success banner -->
+    @if (store.verifyState() === 'success' && store.verifyResult(); as result) {
+      <div class="alert alert--success" role="status" aria-live="polite">
+        <mat-icon aria-hidden="true">verified</mat-icon>
+        Profile verified on {{ result.verifiedAt | date:'medium' }} by {{ result.verifiedByStaffName }}.
+      </div>
+    }
+
+    <!-- Conflict alert -->
+    @if (conflictStore.unresolvedCriticalCount() > 0) {
+      <div class="alert alert--warning" role="alert">
+        <span class="alert__warn-icon" aria-hidden="true">&#9888;</span>
+        <div class="alert__content">
+          <div class="alert__title">{{ conflictStore.unresolvedCriticalCount() }} data conflict(s) detected</div>
+          <div class="alert__body">
+            @for (c of conflictStore.unresolvedConflicts(); track c.conflictId) {
+              {{ c.fieldName }} &mdash; {{ c.value1 }} vs {{ c.value2 }}.
+            }
+          </div>
+          <button type="button" class="btn-resolve" (click)="onResolveConflicts()">Resolve conflicts &rarr;</button>
+        </div>
+      </div>
+    }
+
+    <!-- Document failures -->
+    @if (failedDocuments(view.documents).length > 0) {
+      <div class="alert alert--error" role="alert">
+        <mat-icon aria-hidden="true">report_problem</mat-icon>
+        <div>
+          <div class="alert__title">Document processing issues</div>
+          @for (doc of failedDocuments(view.documents); track doc.documentId) {
+            <div class="doc-failure-row">
+              <span>{{ doc.documentName }}</span>
+              <button mat-stroked-button type="button" (click)="onRetryDocument(doc.documentId)">
+                <mat-icon aria-hidden="true">refresh</mat-icon> Retry
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Patient record sections">
+      <button class="tab" [class.active]="activeTab() === 'clinical'" role="tab"
+        [attr.aria-selected]="activeTab() === 'clinical'" (click)="activeTab.set('clinical')">
+        Clinical Summary
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'appointments'" role="tab"
+        [attr.aria-selected]="activeTab() === 'appointments'" (click)="activeTab.set('appointments')">
+        Appointments
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'documents'" role="tab"
+        [attr.aria-selected]="activeTab() === 'documents'" (click)="activeTab.set('documents')">
+        Documents
+        @if (view.documents.length > 0) {
+          <span class="tab-count-badge">{{ view.documents.length }}</span>
+        }
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'intake'" role="tab"
+        [attr.aria-selected]="activeTab() === 'intake'" (click)="activeTab.set('intake')">
+        Intake Form
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'billing'" role="tab"
+        [attr.aria-selected]="activeTab() === 'billing'" (click)="activeTab.set('billing')">
+        Billing / Codes
+      </button>
+    </div>
+
+    <!-- Tab: Clinical Summary -->
+    @if (activeTab() === 'clinical') {
+      @if (orderedSections(view.sections).length === 0) {
+        <div class="tab-placeholder tab-placeholder--clinical">
+          <mat-icon aria-hidden="true">health_and_safety</mat-icon>
+          <p>Clinical summary is not available yet for this patient.</p>
+          <p class="tab-placeholder__hint">Upload source documents or complete intake to populate this section.</p>
+        </div>
+      } @else {
+        <div class="clinical-grid">
+          <div class="clinical-col">
+            @for (section of leftSections(view.sections); track section.sectionType) {
+              <div class="clinical-card">
+                <div class="clinical-card__header">
+                  <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
+                  <span class="source-badge source-badge--ehr">EHR</span>
+                </div>
+                <div class="clinical-card__body">
+                  <app-clinical-section
+                    [section]="section"
+                    [conflicts]="conflictStore.conflicts()"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+          <div class="clinical-col">
+            @for (section of rightSections(view.sections); track section.sectionType) {
+              <div class="clinical-card">
+                <div class="clinical-card__header">
+                  <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
+                  <span class="source-badge source-badge--ehr">EHR</span>
+                </div>
+                <div class="clinical-card__body">
+                  <app-clinical-section
+                    [section]="section"
+                    [conflicts]="conflictStore.conflicts()"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Tab: Appointments -->
+    @if (activeTab() === 'appointments') {
+      <div class="tab-placeholder">
+        <mat-icon aria-hidden="true">event</mat-icon>
+        <p>Appointment history will appear here.</p>
+      </div>
+    }
+
+    <!-- Tab: Documents -->
+    @if (activeTab() === 'documents') {
+      <div class="tab-content">
+        @if (view.documents.length === 0) {
+          <div class="tab-placeholder">
+            <mat-icon aria-hidden="true">folder_open</mat-icon>
+            <p>No documents uploaded.</p>
+          </div>
+        } @else {
+          <div class="doc-list">
+            @for (doc of view.documents; track doc.documentId) {
+              <div class="doc-row">
+                <mat-icon aria-hidden="true">description</mat-icon>
+                <span class="doc-name">{{ doc.documentName }}</span>
+                <span
+                  class="badge"
+                  [class.badge--success]="doc.status === 'Completed'"
+                  [class.badge--error]="doc.status === 'Failed'"
+                >{{ doc.status }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab: Intake Form -->
+    @if (activeTab() === 'intake') {
+      @if (!view.intakeSnapshot) {
+        <div class="tab-placeholder">
+          <mat-icon aria-hidden="true">assignment</mat-icon>
+          <p>No intake form has been submitted for this patient yet.</p>
+        </div>
+      } @else {
+        <div class="intake-grid">
+
+          <!-- Demographics -->
+          @if (view.intakeSnapshot.demographics) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Patient Demographics</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <dl class="intake-field-list">
+                  @if (view.intakeSnapshot.demographics.firstName || view.intakeSnapshot.demographics.lastName) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Full Name</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.firstName }} {{ view.intakeSnapshot.demographics.lastName }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.dateOfBirth) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Date of Birth</dt>
+                      <dd class="intake-field-value phi-masked">{{ view.intakeSnapshot.demographics.dateOfBirth }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.biologicalSex || view.intakeSnapshot.demographics.gender) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Sex / Gender</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.biologicalSex ?? view.intakeSnapshot.demographics.gender }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.phone) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Phone</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.phone }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.city || view.intakeSnapshot.demographics.state) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Location</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.city }}{{ view.intakeSnapshot.demographics.state ? ', ' + view.intakeSnapshot.demographics.state : '' }} {{ view.intakeSnapshot.demographics.postalCode }}</dd>
+                    </div>
+                  }
+                </dl>
+              </div>
+            </div>
+          }
+
+          <!-- Reported Symptoms -->
+          @if (view.intakeSnapshot.symptoms?.length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Reported Symptoms</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (symptom of view.intakeSnapshot.symptoms; track symptom.name) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ symptom.name }}</span>
+                      @if (symptom.severity) {
+                        <span class="badge badge--neutral">{{ symptom.severity }}</span>
+                      }
+                      @if (symptom.onsetDate) {
+                        <span class="intake-item-meta">since {{ symptom.onsetDate }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Self-Reported Medications -->
+          @if (view.intakeSnapshot.medications?.length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Self-Reported Medications</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (med of view.intakeSnapshot.medications; track med.name) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ med.name }}</span>
+                      @if (med.dosage) {
+                        <span class="intake-item-meta">{{ med.dosage }}</span>
+                      }
+                      @if (med.frequency) {
+                        <span class="intake-item-meta">· {{ med.frequency }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Medical History -->
+          @if (intakeConditions(view.intakeSnapshot.medicalHistory).length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Medical History</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (item of intakeConditions(view.intakeSnapshot.medicalHistory); track item.condition) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ item.condition }}</span>
+                      @if (item.diagnosedAt) {
+                        <span class="intake-item-meta">Dx {{ item.diagnosedAt }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Allergies (manual intake only) -->
+          @if (intakeAllergies(view.intakeSnapshot.medicalHistory).length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Allergies</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (allergy of intakeAllergies(view.intakeSnapshot.medicalHistory); track allergy.substance) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ allergy.substance }}</span>
+                      @if (allergy.reaction) {
+                        <span class="intake-item-meta">{{ allergy.reaction }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+
+        @if (view.intakeSnapshot.completedAt) {
+          <div class="intake-submitted-note">
+            Submitted {{ view.intakeSnapshot.completedAt | date:'mediumDate' }}
+          </div>
+        }
+      }
+    }
+
+    <!-- Tab: Billing / Codes -->
+    @if (activeTab() === 'billing') {
+      <div class="tab-placeholder">
+        <mat-icon aria-hidden="true">receipt_long</mat-icon>
+        <p>Billing and ICD codes will appear here.</p>
+      </div>
+    }
+
+    <!-- Verify error -->
+    @if (store.verifyState() === 'error') {
+      <div class="alert alert--error" role="alert" aria-live="assertive">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        {{ store.verifyError() }}
+      </div>
+    }
+
+  }
+</div>

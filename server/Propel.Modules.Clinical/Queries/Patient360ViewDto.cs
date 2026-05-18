@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Propel.Modules.Clinical.Queries;
 
 /// <summary>
@@ -59,11 +61,41 @@ public sealed record DataConflictItemDto(
     string? ResolvedValue);
 
 /// <summary>
+/// Intake form snapshot embedded in the 360-view response (SCR-016).
+/// Carries the raw JSONB payloads of the latest completed <c>IntakeRecord</c> for read-only display.
+/// </summary>
+public sealed record IntakeSnapshotDto(
+    JsonDocument? Demographics,
+    JsonDocument? MedicalHistory,
+    JsonDocument? Symptoms,
+    JsonDocument? Medications,
+    string Status,
+    DateTime? CompletedAt);
+
+/// <summary>
 /// Top-level response DTO for <c>GET /api/staff/patients/{patientId}/360-view</c> (AC-1, AC-2).
 /// Shape matches the Angular <c>Patient360ViewDto</c> interface (task_001, US_041).
 /// </summary>
 public sealed record Patient360ViewDto(
     Guid PatientId,
+
+    /// <summary>Decrypted patient display name from the <c>patients</c> table.</summary>
+    string? PatientName,
+
+    /// <summary>Patient date of birth formatted as "yyyy-MM-dd"; null for anonymous visits.</summary>
+    string? DateOfBirth,
+
+    /// <summary>Insurance carrier name from <c>patients.insurer_name</c>.</summary>
+    string? InsurancePlan,
+
+    /// <summary>Visit type derived from queue entry ("Walk-in") or appointment ("Scheduled").</summary>
+    string? VisitType,
+
+    /// <summary>Risk severity from the latest appointment's NoShowRisk ("Low"|"Medium"|"High").</summary>
+    string? RiskLevel,
+
+    /// <summary>UTC timestamp of the most recently uploaded clinical document.</summary>
+    DateTime? LastUpdatedAt,
 
     /// <summary>'Unverified' or 'Verified' — flattened from PatientProfileVerification.</summary>
     string VerificationStatus,
@@ -82,7 +114,10 @@ public sealed record Patient360ViewDto(
 
     IReadOnlyList<DocumentStatusDto> Documents,
 
-    IReadOnlyList<ClinicalSectionDto> Sections);
+    IReadOnlyList<ClinicalSectionDto> Sections,
+
+    /// <summary>Latest completed intake record payload; null when patient has not submitted intake.</summary>
+    IntakeSnapshotDto? IntakeSnapshot);
 
 /// <summary>
 /// Response DTO for <c>POST /api/staff/patients/{patientId}/360-view/verify</c> (AC-3).
