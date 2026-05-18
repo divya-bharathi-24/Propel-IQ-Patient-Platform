@@ -365,6 +365,16 @@
 
   mat-icon { font-size: 2rem; width: 2rem; height: 2rem; }
   p { margin: 0; font-size: 0.875rem; }
+
+  &__hint {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted, #94a3b8);
+  }
+}
+
+.tab-placeholder--clinical {
+  border-radius: 0 0 0.5rem 0.5rem;
+  border-top: none;
 }
 
 .tab-content {
@@ -477,4 +487,81 @@
     color: #15803d;
     border: 1px solid #bbf7d0;
   }
+}
+
+/* ── Intake form grid & fields ────────────────────── */
+.intake-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.intake-field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+}
+
+.intake-field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--color-border, #f1f5f9);
+  padding-bottom: 0.5rem;
+
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+}
+
+.intake-field-label {
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  min-width: 7rem;
+  flex-shrink: 0;
+}
+
+.intake-field-value {
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.intake-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.intake-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--color-border, #f1f5f9);
+
+  &:last-child { border-bottom: none; }
+}
+
+.intake-item-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.intake-item-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.intake-submitted-note {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #94a3b8);
+  text-align: right;
 }

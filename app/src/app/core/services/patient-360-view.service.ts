@@ -67,6 +67,66 @@ export interface DocumentStatusDto {
   status: DocumentProcessingStatus;
 }
 
+/** Demographics section from a patient's submitted intake record. */
+export interface IntakeDemographicsSnapshot {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  biologicalSex?: string;
+  /** Manual intake form uses 'gender' instead of 'biologicalSex'. */
+  gender?: string;
+  phone?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+}
+
+/** A single medical condition entry (AI intake format). */
+export interface IntakeConditionItem {
+  condition: string;
+  diagnosedAt?: string;
+  notes?: string;
+}
+
+/** Medical history from manual intake form (object shape). */
+export interface ManualMedicalHistorySnapshot {
+  conditions?: IntakeConditionItem[];
+  allergies?: { substance: string; reaction?: string }[];
+  surgeries?: { procedure: string; year?: string; notes?: string }[];
+  familyHistory?: string;
+}
+
+/** Symptom entry from intake form. */
+export interface IntakeSymptomSnapshot {
+  name: string;
+  severity?: string;
+  onsetDate?: string;
+  duration?: string;
+}
+
+/** Medication entry from intake form. */
+export interface IntakeMedicationSnapshot {
+  name: string;
+  dosage?: string;
+  frequency?: string;
+  isOtcSupplement?: boolean;
+}
+
+/**
+ * Snapshot of the patient's most recent completed intake record,
+ * embedded in the 360-view response for the Intake Form tab (SCR-016).
+ */
+export interface IntakeSnapshotDto {
+  demographics: IntakeDemographicsSnapshot | null;
+  /** Can be an array (AI intake) or an object (manual intake). */
+  medicalHistory: IntakeConditionItem[] | ManualMedicalHistorySnapshot | null;
+  symptoms: IntakeSymptomSnapshot[] | null;
+  medications: IntakeMedicationSnapshot[] | null;
+  status: string;
+  completedAt: string | null;
+}
+
 export interface Patient360ViewDto {
   patientId: string;
   patientName?: string;
@@ -85,6 +145,8 @@ export interface Patient360ViewDto {
   conflicts: DataConflictDto[];
   documents: DocumentStatusDto[];
   sections: ClinicalSectionDto[];
+  /** Latest completed intake form snapshot; null when patient has not submitted intake. */
+  intakeSnapshot?: IntakeSnapshotDto | null;
 }
 
 export interface VerifyProfileResponseDto {

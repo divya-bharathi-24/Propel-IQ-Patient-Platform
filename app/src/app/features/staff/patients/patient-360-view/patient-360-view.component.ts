@@ -17,6 +17,8 @@ import { ClinicalSectionComponent } from './clinical-section/clinical-section.co
 import {
   ClinicalSectionDto,
   DocumentStatusDto,
+  IntakeConditionItem,
+  ManualMedicalHistorySnapshot,
   SectionType,
 } from '../../../../core/services/patient-360-view.service';
 
@@ -111,5 +113,28 @@ export class Patient360ViewComponent implements OnInit {
 
   protected onRetryDocument(documentId: string): void {
     this.store.retryDocument({ patientId: this.patientId, documentId });
+  }
+
+  /**
+   * Normalises the medicalHistory field from either AI intake (array) or
+   * manual intake (object with .conditions array) into a flat list of conditions.
+   */
+  protected intakeConditions(
+    medHistory: IntakeConditionItem[] | ManualMedicalHistorySnapshot | null | undefined,
+  ): IntakeConditionItem[] {
+    if (!medHistory) return [];
+    if (Array.isArray(medHistory)) return medHistory;
+    return (medHistory as ManualMedicalHistorySnapshot).conditions ?? [];
+  }
+
+  /**
+   * Extracts allergies from a manual-intake medical history object.
+   * Returns an empty array for AI-intake (array) format.
+   */
+  protected intakeAllergies(
+    medHistory: IntakeConditionItem[] | ManualMedicalHistorySnapshot | null | undefined,
+  ): { substance: string; reaction?: string }[] {
+    if (!medHistory || Array.isArray(medHistory)) return [];
+    return (medHistory as ManualMedicalHistorySnapshot).allergies ?? [];
   }
 }

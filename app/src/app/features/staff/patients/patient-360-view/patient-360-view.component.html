@@ -168,40 +168,48 @@
 
     <!-- Tab: Clinical Summary -->
     @if (activeTab() === 'clinical') {
-      <div class="clinical-grid">
-        <div class="clinical-col">
-          @for (section of leftSections(view.sections); track section.sectionType) {
-            <div class="clinical-card">
-              <div class="clinical-card__header">
-                <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
-                <span class="source-badge source-badge--ehr">EHR</span>
-              </div>
-              <div class="clinical-card__body">
-                <app-clinical-section
-                  [section]="section"
-                  [conflicts]="conflictStore.conflicts()"
-                />
-              </div>
-            </div>
-          }
+      @if (orderedSections(view.sections).length === 0) {
+        <div class="tab-placeholder tab-placeholder--clinical">
+          <mat-icon aria-hidden="true">health_and_safety</mat-icon>
+          <p>Clinical summary is not available yet for this patient.</p>
+          <p class="tab-placeholder__hint">Upload source documents or complete intake to populate this section.</p>
         </div>
-        <div class="clinical-col">
-          @for (section of rightSections(view.sections); track section.sectionType) {
-            <div class="clinical-card">
-              <div class="clinical-card__header">
-                <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
-                <span class="source-badge source-badge--ehr">EHR</span>
+      } @else {
+        <div class="clinical-grid">
+          <div class="clinical-col">
+            @for (section of leftSections(view.sections); track section.sectionType) {
+              <div class="clinical-card">
+                <div class="clinical-card__header">
+                  <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
+                  <span class="source-badge source-badge--ehr">EHR</span>
+                </div>
+                <div class="clinical-card__body">
+                  <app-clinical-section
+                    [section]="section"
+                    [conflicts]="conflictStore.conflicts()"
+                  />
+                </div>
               </div>
-              <div class="clinical-card__body">
-                <app-clinical-section
-                  [section]="section"
-                  [conflicts]="conflictStore.conflicts()"
-                />
+            }
+          </div>
+          <div class="clinical-col">
+            @for (section of rightSections(view.sections); track section.sectionType) {
+              <div class="clinical-card">
+                <div class="clinical-card__header">
+                  <span class="clinical-card__title">{{ sectionLabel(section.sectionType) }}</span>
+                  <span class="source-badge source-badge--ehr">EHR</span>
+                </div>
+                <div class="clinical-card__body">
+                  <app-clinical-section
+                    [section]="section"
+                    [conflicts]="conflictStore.conflicts()"
+                  />
+                </div>
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
-      </div>
+      }
     }
 
     <!-- Tab: Appointments -->
@@ -240,10 +248,160 @@
 
     <!-- Tab: Intake Form -->
     @if (activeTab() === 'intake') {
-      <div class="tab-placeholder">
-        <mat-icon aria-hidden="true">assignment</mat-icon>
-        <p>Intake form data will appear here.</p>
-      </div>
+      @if (!view.intakeSnapshot) {
+        <div class="tab-placeholder">
+          <mat-icon aria-hidden="true">assignment</mat-icon>
+          <p>No intake form has been submitted for this patient yet.</p>
+        </div>
+      } @else {
+        <div class="intake-grid">
+
+          <!-- Demographics -->
+          @if (view.intakeSnapshot.demographics) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Patient Demographics</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <dl class="intake-field-list">
+                  @if (view.intakeSnapshot.demographics.firstName || view.intakeSnapshot.demographics.lastName) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Full Name</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.firstName }} {{ view.intakeSnapshot.demographics.lastName }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.dateOfBirth) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Date of Birth</dt>
+                      <dd class="intake-field-value phi-masked">{{ view.intakeSnapshot.demographics.dateOfBirth }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.biologicalSex || view.intakeSnapshot.demographics.gender) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Sex / Gender</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.biologicalSex ?? view.intakeSnapshot.demographics.gender }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.phone) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Phone</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.phone }}</dd>
+                    </div>
+                  }
+                  @if (view.intakeSnapshot.demographics.city || view.intakeSnapshot.demographics.state) {
+                    <div class="intake-field-row">
+                      <dt class="intake-field-label">Location</dt>
+                      <dd class="intake-field-value">{{ view.intakeSnapshot.demographics.city }}{{ view.intakeSnapshot.demographics.state ? ', ' + view.intakeSnapshot.demographics.state : '' }} {{ view.intakeSnapshot.demographics.postalCode }}</dd>
+                    </div>
+                  }
+                </dl>
+              </div>
+            </div>
+          }
+
+          <!-- Reported Symptoms -->
+          @if (view.intakeSnapshot.symptoms?.length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Reported Symptoms</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (symptom of view.intakeSnapshot.symptoms; track symptom.name) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ symptom.name }}</span>
+                      @if (symptom.severity) {
+                        <span class="badge badge--neutral">{{ symptom.severity }}</span>
+                      }
+                      @if (symptom.onsetDate) {
+                        <span class="intake-item-meta">since {{ symptom.onsetDate }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Self-Reported Medications -->
+          @if (view.intakeSnapshot.medications?.length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Self-Reported Medications</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (med of view.intakeSnapshot.medications; track med.name) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ med.name }}</span>
+                      @if (med.dosage) {
+                        <span class="intake-item-meta">{{ med.dosage }}</span>
+                      }
+                      @if (med.frequency) {
+                        <span class="intake-item-meta">· {{ med.frequency }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Medical History -->
+          @if (intakeConditions(view.intakeSnapshot.medicalHistory).length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Medical History</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (item of intakeConditions(view.intakeSnapshot.medicalHistory); track item.condition) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ item.condition }}</span>
+                      @if (item.diagnosedAt) {
+                        <span class="intake-item-meta">Dx {{ item.diagnosedAt }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Allergies (manual intake only) -->
+          @if (intakeAllergies(view.intakeSnapshot.medicalHistory).length) {
+            <div class="clinical-card">
+              <div class="clinical-card__header">
+                <span class="clinical-card__title">Allergies</span>
+                <span class="source-badge source-badge--manual">Patient</span>
+              </div>
+              <div class="clinical-card__body">
+                <div class="intake-item-list">
+                  @for (allergy of intakeAllergies(view.intakeSnapshot.medicalHistory); track allergy.substance) {
+                    <div class="intake-item-row">
+                      <span class="intake-item-name">{{ allergy.substance }}</span>
+                      @if (allergy.reaction) {
+                        <span class="intake-item-meta">{{ allergy.reaction }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+
+        @if (view.intakeSnapshot.completedAt) {
+          <div class="intake-submitted-note">
+            Submitted {{ view.intakeSnapshot.completedAt | date:'mediumDate' }}
+          </div>
+        }
+      }
     }
 
     <!-- Tab: Billing / Codes -->
