@@ -1,5 +1,5 @@
 /** Arrival status of a queue entry */
-export type ArrivalStatus = 'Waiting' | 'Arrived' | 'Cancelled';
+export type ArrivalStatus = 'Scheduled' | 'Waiting' | 'Arrived' | 'Cancelled';
 
 /** How the appointment was booked */
 export type BookingType = 'SelfBooked' | 'WalkIn';

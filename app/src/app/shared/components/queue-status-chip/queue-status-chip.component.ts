@@ -3,12 +3,14 @@ import { NgClass } from '@angular/common';
 import { ArrivalStatus } from '../../../features/staff/queue/queue.models';
 
 const STATUS_CLASS_MAP: Record<ArrivalStatus, string> = {
+  Scheduled: 'chip-scheduled',
   Waiting: 'chip-waiting',
   Arrived: 'chip-arrived',
   Cancelled: 'chip-cancelled',
 };
 
 const STATUS_LABEL_MAP: Record<ArrivalStatus, string> = {
+  Scheduled: 'Scheduled',
   Waiting: 'Waiting',
   Arrived: 'Arrived',
   Cancelled: 'Cancelled',
